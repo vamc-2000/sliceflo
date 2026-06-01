@@ -1,0 +1,67 @@
+import * as React from "react"
+const SvgComponent = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={60}
+    height={60}
+    fill="none"
+    {...props}
+  >
+    <path fill="#fff" d="M0 0h60v60H0z" />
+    <rect
+      width={11.404}
+      height={8.723}
+      x={6}
+      y={10}
+      stroke="#FC0"
+      strokeWidth={2}
+      rx={1}
+    />
+    <rect
+      width={11.404}
+      height={24.808}
+      x={6}
+      y={25.191}
+      stroke="#F68C1F"
+      strokeWidth={2}
+      rx={1}
+    />
+    <rect
+      width={11.404}
+      height={13.191}
+      x={23.873}
+      y={36.809}
+      stroke="#F68C1F"
+      strokeWidth={2}
+      rx={1}
+    />
+    <rect
+      width={11.404}
+      height={17.66}
+      x={41.744}
+      y={32.34}
+      stroke="#F68C1F"
+      strokeWidth={2}
+      rx={1}
+    />
+    <rect
+      width={11.404}
+      height={20.34}
+      x={23.873}
+      y={10}
+      stroke="#FC0"
+      strokeWidth={2}
+      rx={1}
+    />
+    <rect
+      width={11.404}
+      height={15.872}
+      x={41.744}
+      y={10}
+      stroke="#FC0"
+      strokeWidth={2}
+      rx={1}
+    />
+  </svg>
+)
+export default SvgComponent

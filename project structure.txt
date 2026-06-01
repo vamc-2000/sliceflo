@@ -1,0 +1,350 @@
+project-management-app/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   ├── register/
+│   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (pages)/
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx
+│   │   │   ├── smartlens/
+│   │   │   │   └── page.tsx
+│   │   │   ├── mailbox/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [messageId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── workspace/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [workspaceId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── goals/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [goalId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── docs/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [docId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── whiteboards/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [whiteboardId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── timesheets/
+│   │   │   │   └── page.tsx
+│   │   │   ├── reports/
+│   │   │   │   └── page.tsx
+│   │   │   ├── favorites/
+│   │   │   │   └── page.tsx
+│   │   │   ├── portfolios/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [portfolioId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── projects/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [projectId]/
+│   │   │   │       ├── page.tsx
+│   │   │   │       ├── tasks/
+│   │   │   │       │   └── page.tsx
+│   │   │   │       └── overview/
+│   │   │   │           └── page.tsx
+│   │   │   ├── teams/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [teamId]/
+│   │   │   │       └── page.tsx
+│   │   │   ├── profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── activity/
+│   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── layout.tsx
+│   │   ├── globals.css
+│   │   └── not-found.tsx
+│   │
+│   ├── components/
+│   │   ├── ui/                           # shadcn/ui components
+│   │   │   ├── accordion.tsx
+│   │   │   ├── alert.tsx
+│   │   │   ├── avatar.tsx
+│   │   │   ├── badge.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── calendar.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── checkbox.tsx
+│   │   │   ├── command.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── form.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── popover.tsx
+│   │   │   ├── progress.tsx
+│   │   │   ├── radio-group.tsx
+│   │   │   ├── scroll-area.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── sheet.tsx
+│   │   │   ├── skeleton.tsx
+│   │   │   ├── slider.tsx
+│   │   │   ├── switch.tsx
+│   │   │   ├── table.tsx
+│   │   │   ├── tabs.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   ├── toast.tsx
+│   │   │   ├── toaster.tsx
+│   │   │   ├── tooltip.tsx
+│   │   │   └── universalLoader.ts
+│   │   │   └── use-toast.ts
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── header.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   ├── mobile-nav.tsx
+│   │   │   └── breadcrumb.tsx
+│   │   │
+│   │   ├── auth/
+│   │   │   ├── login-form.tsx
+│   │   │   └── register-form.tsx
+│   │   │ 
+│   │   ├── onBoarding/
+│   │   │   └── questionnaire.tsx
+│   │   │
+│   │   ├── smart-lens/
+│   │   │   ├── smart-lens-search.tsx
+│   │   │   ├── smart-lens-results.tsx
+│   │   │   ├── smart-lens-filters.tsx
+│   │   │   └── smart-lens-card.tsx
+│   │   │
+│   │   ├── mailbox/
+│   │   │   ├── mail-list.tsx
+│   │   │   ├── mail-item.tsx
+│   │   │   ├── mail-viewer.tsx
+│   │   │   └── mail-filters.tsx
+│   │   │
+│   │   ├── workspace/
+│   │   │   ├── workspace-card.tsx
+│   │   │   ├── workspace-list.tsx
+│   │   │   ├── workspace-settings.tsx
+│   │   │   ├── workspace-members.tsx
+│   │   │   └── create-workspace-dialog.tsx
+│   │   │
+│   │   ├── goals/
+│   │   │   ├── goal-card.tsx
+│   │   │   ├── goal-list.tsx
+│   │   │   ├── goal-progress.tsx
+│   │   │   ├── create-goal-dialog.tsx
+│   │   │   └── goal-timeline.tsx
+│   │   │
+│   │   ├── docs/
+│   │   │   ├── doc-editor.tsx
+│   │   │   ├── doc-viewer.tsx
+│   │   │   ├── doc-list.tsx
+│   │   │   ├── doc-sidebar.tsx
+│   │   │   └── create-doc-dialog.tsx
+│   │   │
+│   │   ├── whiteboards/
+│   │   │   ├── whiteboard-canvas.tsx
+│   │   │   ├── whiteboard-toolbar.tsx
+│   │   │   ├── whiteboard-list.tsx
+│   │   │   └── create-whiteboard-dialog.tsx
+│   │   │
+│   │   ├── timesheets/
+│   │   │   ├── timesheet-table.tsx
+│   │   │   ├── timesheet-entry.tsx
+│   │   │   ├── timesheet-calendar.tsx
+│   │   │   ├── time-tracker.tsx
+│   │   │   └── timesheet-summary.tsx
+│   │   │
+│   │   ├── reports/
+│   │   │   ├── report-dashboard.tsx
+│   │   │   ├── report-chart.tsx
+│   │   │   ├── report-table.tsx
+│   │   │   ├── report-filters.tsx
+│   │   │   └── export-report-button.tsx
+│   │   │
+│   │   ├── favorites/
+│   │   │   ├── favorites-list.tsx
+│   │   │   ├── favorite-item.tsx
+│   │   │   └── add-to-favorites-button.tsx
+│   │   │
+│   │   ├── portfolios/
+│   │   │   ├── portfolio-card.tsx
+│   │   │   ├── portfolio-list.tsx
+│   │   │   ├── portfolio-overview.tsx
+│   │   │   └── create-portfolio-dialog.tsx
+│   │   │
+│   │   ├── projects/
+│   │   │   ├── project-card.tsx
+│   │   │   ├── project-list.tsx
+│   │   │   ├── project-overview.tsx
+│   │   │   ├── project-settings.tsx
+│   │   │   ├── project-members.tsx
+│   │   │   ├── create-project-dialog.tsx
+│   │   │   └── project-status-badge.tsx
+│   │   │
+│   │   ├── teams/
+│   │   │   ├── team-card.tsx
+│   │   │   ├── team-list.tsx
+│   │   │   ├── team-members.tsx
+│   │   │   ├── team-settings.tsx
+│   │   │   └── create-team-dialog.tsx
+│   │   │
+│   │   ├── tasks/
+│   │   │   ├── task-card.tsx
+│   │   │   ├── task-list.tsx
+│   │   │   ├── task-board.tsx
+│   │   │   ├── task-details.tsx
+│   │   │   ├── create-task-dialog.tsx
+│   │   │   ├── task-priority-badge.tsx
+│   │   │   └── task-status-badge.tsx
+│   │   │
+│   │   ├── users/
+│   │   │   ├── user-card.tsx
+│   │   │   ├── user-list.tsx
+│   │   │   ├── user-avatar.tsx
+│   │   │   ├── user-profile.tsx
+│   │   │   └── invite-user-dialog.tsx
+│   │   │
+│   │   ├── profile/
+│   │   │   ├── profile-header.tsx
+│   │   │   ├── profile-edit-form.tsx
+│   │   │   ├── profile-settings.tsx
+│   │   │   ├── profile-avatar-upload.tsx
+│   │   │   └── profile-stats.tsx
+│   │   │
+│   │   ├── activity/
+│   │   │   ├── activity-feed.tsx
+│   │   │   ├── activity-item.tsx
+│   │   │   ├── activity-filters.tsx
+│   │   │   └── activity-timeline.tsx
+│   │   │
+│   │   ├── theme/
+│   │   │   ├── theme-provider.tsx
+│   │   │   ├── theme-toggle.tsx
+│   │   │   └── theme-customizer.tsx
+│   │   │
+│   │   └── common/
+│   │       ├── data-table.tsx
+│   │       ├── empty-state.tsx
+│   │       ├── error-boundary.tsx
+│   │       ├── loading-spinner.tsx
+│   │       ├── pagination.tsx
+│   │       ├── search-bar.tsx
+│   │       ├── sort-dropdown.tsx
+│   │       ├── filter-panel.tsx
+│   │       ├── date-range-picker.tsx
+│   │       ├── file-upload.tsx
+│   │       ├── confirm-dialog.tsx
+│   │       └── page-header.tsx
+│   │
+│   ├── stores/
+│   │   ├── auth-store.ts
+│   │   ├── user-store.ts
+│   │   ├── workspace-store.ts
+│   │   ├── project-store.ts
+│   │   ├── task-store.ts
+│   │   ├── team-store.ts
+│   │   ├── goal-store.ts
+│   │   ├── doc-store.ts
+│   │   ├── whiteboard-store.ts
+│   │   ├── timesheet-store.ts
+│   │   ├── report-store.ts
+│   │   ├── note-store.ts
+│   │   ├── mailbox-store.ts
+│   │   ├── portfolio-store.ts
+│   │   ├── favorite-store.ts
+│   │   ├── activity-store.ts
+│   │   ├── theme-store.ts
+│   │   └── index.ts
+│   │
+│   ├── lib/
+│   │   ├── api/
+│   │   │   ├── axios-instance.ts
+│   │   │   ├── auth-api.ts
+│   │   │   ├── user-api.ts
+│   │   │   ├── workspace-api.ts
+│   │   │   ├── project-api.ts
+│   │   │   ├── task-api.ts
+│   │   │   ├── team-api.ts
+│   │   │   ├── goal-api.ts
+│   │   │   ├── doc-api.ts
+│   │   │   ├── whiteboard-api.ts
+│   │   │   ├── timesheet-api.ts
+│   │   │   ├── report-api.ts
+│   │   │   ├── note-api.ts
+│   │   │   ├── mailbox-api.ts
+│   │   │   ├── portfolio-api.ts
+│   │   │   └── activity-api.ts
+│   │   ├── utils.ts
+│   │   └── cn.ts
+│   │
+│   ├── hooks/
+│   │   ├── use-auth.ts
+│   │   ├── use-debounce.ts
+│   │   ├── use-local-storage.ts
+│   │   ├── use-media-query.ts
+│   │   ├── use-click-outside.ts
+│   │   └── use-pagination.ts
+│   │
+│   ├── types/
+│   │   ├── auth.types.ts
+│   │   ├── user.types.ts
+│   │   ├── workspace.types.ts
+│   │   ├── project.types.ts
+│   │   ├── task.types.ts
+│   │   ├── team.types.ts
+│   │   ├── goal.types.ts
+│   │   ├── doc.types.ts
+│   │   ├── whiteboard.types.ts
+│   │   ├── timesheet.types.ts
+│   │   ├── report.types.ts
+│   │   ├── note.types.ts
+│   │   ├── mailbox.types.ts
+│   │   ├── portfolio.types.ts
+│   │   ├── activity.types.ts
+│   │   └── common.types.ts
+│   │
+│   ├── schemas/
+│   │   ├── auth-schema.ts
+│   │   ├── user-schema.ts
+│   │   ├── workspace-schema.ts
+│   │   ├── project-schema.ts
+│   │   ├── task-schema.ts
+│   │   ├── team-schema.ts
+│   │   ├── goal-schema.ts
+│   │   ├── doc-schema.ts
+│   │   ├── whiteboard-schema.ts
+│   │   ├── timesheet-schema.ts
+│   │   ├── report-schema.ts
+│   │   ├── note-schema.ts
+│   │   └── mailbox-schema.ts
+│   │
+│   ├── constants/
+│   │   ├── routes.ts
+│   │   ├── api-endpoints.ts
+│   │   ├── status.ts
+│   │   ├── priorities.ts
+│   │   └── permissions.ts
+│   │
+│   └── config/
+│       ├── site.ts
+│       └── navigation.ts
+│
+├── public/
+│   ├── images/
+│   ├── icons/
+│   └── fonts/
+│
+├── .env.local
+├── .env.example
+├── .eslintrc.json
+├── .gitignore
+├── components.json
+├── next.config.js
+├── package.json
+├── postcss.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+└── README.md
