@@ -33,13 +33,13 @@ export function ProjectGroup({
     <div className="flex flex-col gap-2 overflow-hidden">
       {/* ── Group Header ─────────────────────────────────────────── */}
       <div
-        className="flex items-center justify-between px-4 py-3 bg-gray-200 rounded-l-md"
+        className="flex items-center justify-between px-4 py-3 bg-muted rounded-l-md"
       >
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
           <button
             onClick={() => onToggle(id)}
-            className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 transition-colors text-gray-500"
+            className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted/50 transition-colors text-muted-foreground"
           >
             <ChevronDown
               className="h-4 w-4 transition-transform duration-200"
@@ -53,12 +53,12 @@ export function ProjectGroup({
             style={{ backgroundColor: color }}
           />
 
-          <h3 className="text-sm font-semibold text-gray-800 leading-none">
+          <h3 className="text-sm font-semibold text-foreground leading-none">
             {name}
           </h3>
 
           {/* Task count badge */}
-          <span className="text-xs text-gray-400 ml-1">
+          <span className="text-xs text-muted-foreground ml-1">
             {projects.length} {projects.length === 1 ? 'Project' : 'Projects'}
           </span>
         </div>

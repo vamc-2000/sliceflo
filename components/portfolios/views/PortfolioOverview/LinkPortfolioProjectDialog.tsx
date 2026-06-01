@@ -58,9 +58,9 @@ export default function LinkPortfolioProjectDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full">
+      <DialogContent className="max-w-lg w-full bg-card">
         <DialogHeader>
-          <DialogTitle>Link Projects to Portfolio</DialogTitle>
+          <DialogTitle className="text-sm font-bold">Link Projects to Portfolio</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-2 w-full">
@@ -70,33 +70,33 @@ export default function LinkPortfolioProjectDialog({
               placeholder="Search for project name"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pr-10 placeholder-[#8E8E93] text-black w-full border-6 border-[#E5E5EA] rounded-md h-10 bg-white"
+              className="pr-10 placeholder:text-muted-foreground text-foreground w-full border border-border rounded-md h-9 text-xs bg-card"
             />
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-[#8E8E93]" />
+              <Search className="w-4 h-4 text-muted-foreground" />
             </span>
           </div>
 
           {/* Table */}
-          <div className="w-full border-6 border-[#E5E5EA] rounded-md relative">
+          <div className="w-full border border-border rounded-md relative">
             {/* Table Header */}
-            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-sm font-medium items-center text-[#001F3F]">
+            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary">
               <div />
               <div className="pr-2">Projects</div>
               <div className="grid place-items-center pl-0 pr-4">Leader</div>
             </div>
 
             {/* Table Rows */}
-            <div className="max-h-65 overflow-y-auto text-sm text-[#8E8E93]">
+            <div className="max-h-65 overflow-y-auto text-xs text-muted-foreground">
               {availableProjects.length === 0 ? (
-                <div className="px-3 py-4 text-center text-sm text-gray-400">
+                <div className="px-3 py-4 text-center text-xs text-muted-foreground">
                   No projects available to link
                 </div>
               ) : (
                 availableProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="grid grid-cols-[40px_1fr_60px] h-11 items-center px-3 border-t"
+                    className="grid grid-cols-[40px_1fr_60px] h-9 items-center px-3 border-t text-xs"
                   >
                     <div className="flex items-center">
                       <Checkbox
@@ -104,7 +104,7 @@ export default function LinkPortfolioProjectDialog({
                         onCheckedChange={() => toggleSelect(project.id!)}
                       />
                     </div>
-                    <div className="pr-2 h-full flex items-center text-sm">
+                    <div className="pr-2 h-full flex items-center text-xs">
                       <span className="truncate">{project.name}</span>
                     </div>
                     <div className="grid place-items-center pl-2">
@@ -133,7 +133,7 @@ export default function LinkPortfolioProjectDialog({
         <div className="flex justify-between pt-4">
           <Button
             variant="outline"
-            className='border-[#8E8E93] text-[#8E8E93] w-40 hover:bg-[#001F3F] hover:text-white'
+            className='border-input text-muted-foreground w-40 h-9 text-xs hover:bg-primary hover:text-primary-foreground'
             onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
           >
             Create new project
@@ -145,7 +145,7 @@ export default function LinkPortfolioProjectDialog({
               addProjectsToPortfolio(portfolioId, Array.from(selectedIds))
               onClose()
             }}
-            className="bg-[#001F3F] text-white w-40"
+            className="bg-primary text-primary-foreground w-40 h-9 text-xs"
           >
             Assign project
           </Button>

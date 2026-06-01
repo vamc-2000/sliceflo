@@ -59,8 +59,8 @@ const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, la
             </Avatar>
           ))}
           {overflowCount > 0 && (
-            <div className="h-6 min-w-[24px] rounded-full border-2 border-white bg-gray-50 flex items-center justify-center relative z-0 px-1">
-              <span className="text-[10px] text-gray-600 font-medium whitespace-nowrap">+{overflowCount}</span>
+            <div className="h-6 min-w-[24px] rounded-full border-2 border-card bg-muted flex items-center justify-center relative z-0 px-1">
+              <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">+{overflowCount}</span>
             </div>
           )}
         </div>
@@ -68,7 +68,7 @@ const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, la
       <DropdownMenuContent align="start" onClick={(e) => e.stopPropagation()}>
         {label && (
           <>
-            <DropdownMenuLabel className="px-2 py-1.5 text-xs text-gray-500 font-normal outline-none">{label}</DropdownMenuLabel>
+            <DropdownMenuLabel className="px-2 py-1.5 text-xs text-muted-foreground font-normal outline-none">{label}</DropdownMenuLabel>
             <DropdownMenuSeparator />
           </>
         )}
@@ -135,7 +135,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
   return (
     <div
       className={cn(
-        "group relative rounded-lg bg-white p-2 shadow-sm border border-gray-200 border-l-4 hover:shadow-md transition-shadow cursor-pointer"
+        "group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow cursor-pointer"
       )}
       style={{ borderLeftColor: groupColor }}
     >
@@ -179,16 +179,16 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
                         <Flag className="h-4 w-4" />
                       </Badge>
                     ) : (
-                      <div className="h-6 w-6 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors">
-                        <Flag className="h-4 w-4 text-gray-400" />
-                      </div>
-                    );
-                  })()
-                ) : (
-                  <div className="h-6 w-6 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors">
-                    <Flag className="h-4 w-4 text-gray-400" />
-                  </div>
-                )}
+                    <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
+                      <Flag className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  );
+                })()
+              ) : (
+                <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
+                  <Flag className="h-4 w-4 text-muted-foreground" />
+                </div>
+              )}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-36 p-2" align="start" onClick={(e) => e.stopPropagation()}>
@@ -200,7 +200,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
                       updateProject(project.id!, { priority: priority.value });
                       setIsPriorityOpen(false);
                     }}
-                    className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-gray-100 text-sm"
+                    className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-muted text-sm"
                     style={{ color: priority.color }}
                   >
                     <span>{priority.label}</span>
@@ -221,7 +221,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
                     updateProject(project.id!, { priority: undefined });
                     setIsPriorityOpen(false);
                   }}
-                  className="w-full flex items-center px-2 py-1 rounded hover:bg-gray-100 text-sm text-gray-500"
+                  className="w-full flex items-center px-2 py-1 rounded hover:bg-muted text-sm text-muted-foreground"
                 >
                   Clear priority
                 </button>
@@ -250,7 +250,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       {/* Project Name */}
       <Link
         href={`/project/${project.id}`}
-        className="text-base font-bold text-gray-900 hover:underline mb-2 line-clamp-2 transition-colors block"
+        className="text-base font-bold text-foreground hover:underline mb-2 line-clamp-2 transition-colors block"
         onClick={(e) => e.stopPropagation()}
       >
         {project.name}

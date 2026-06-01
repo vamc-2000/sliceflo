@@ -185,8 +185,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
     return fallbacks[project.priority.toLowerCase()] || fallbacks.low;
   };
 
-  const headerCellCls = "h-9 font-semibold text-gray-500 uppercase tracking-wide px-3 select-none border-r border-gray-200";
-  const bodyCellCls = "px-3 py-2.5 border-r border-gray-200";
+  const headerCellCls = "h-9 font-semibold text-muted-foreground uppercase tracking-wide px-3 select-none border-r border-border bg-card";
+  const bodyCellCls = "px-3 py-2.5 border-r border-border";
 
   const getDragColumnStyle = (isHeader: boolean, customColor?: string): React.CSSProperties => {
     return {
@@ -196,8 +196,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
       minWidth: '40px',
       width: '40px',
       boxShadow: `inset 4px 0 0 0 ${customColor || groupColor}`,
-      backgroundColor: isHeader ? '#F9FAFB' : 'white',
-      borderRight: '1px solid #E5E7EB',
+      backgroundColor: isHeader ? 'var(--muted)' : 'var(--card)',
+      borderRight: '1px solid var(--border)',
       padding: 0,
     };
   };
@@ -206,9 +206,9 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
     <>
       <div className="relative">
         <div className="overflow-x-auto rounded-tl-sm">
-          <Table className="relative border-y border-gray-200 text-sm">
+          <Table className="relative border-y border-border text-sm">
             <TableHeader>
-              <TableRow className="hover:bg-transparent border-b border-gray-200">
+              <TableRow className="hover:bg-transparent border-b border-border">
                 <TableHead className={headerCellCls} style={getDragColumnStyle(true)} />
                 {isVisible("id") && <TableHead className={`${headerCellCls} text-center`}>ID</TableHead>}
                 {isVisible("name") && (
@@ -282,8 +282,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     position: 'sticky',
                     right: 0,
                     zIndex: 20,
-                    backgroundColor: 'white',
-                    borderLeft: '1px solid #E5E7EB',
+                    backgroundColor: 'var(--card)',
+                    borderLeft: '1px solid var(--border)',
                     boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                     padding: 4,
                     margin: 0,
@@ -309,10 +309,10 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                 return (
                   <TableRow
                     key={project.id || index}
-                    className="group hover:bg-gray-50 transition-colors h-11 border-b border-gray-100 last:border-0"
+                    className="group hover:bg-muted/50 transition-colors h-11 border-b border-border last:border-0"
                   >
                     <TableCell className="p-0" style={getDragColumnStyle(false)}>
-                      <GripVertical className="h-4 w-4 text-gray-300 opacity-0 group-hover:opacity-100 cursor-grab mx-auto" />
+                      <GripVertical className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 cursor-grab mx-auto" />
                     </TableCell>
 
                     {isVisible("id") && (
@@ -321,7 +321,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                       >
                         <Link
                           href={`/project/${project.id}`}
-                          className="hover:underline font-medium text-gray-600"
+                          className="hover:underline font-medium text-muted-foreground"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {project.slug || (index + 1)}
@@ -335,7 +335,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                       >
                         <Link
                           href={`/project/${project.id}`}
-                          className="hover:underline font-medium truncate max-w-[200px] block text-[#001F3F]"
+                          className="hover:underline font-medium truncate max-w-[200px] block text-foreground"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {project.name || "Untitled Project"}
@@ -348,10 +348,10 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         {assignedPhase ? (
                           <div className="flex items-center justify-center gap-2">
                             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: assignedPhase.color || '#3B82F6' }} />
-                            <span className="text-gray-700 font-medium truncate">{assignedPhase.label}</span>
+                            <span className="text-foreground font-medium truncate">{assignedPhase.label}</span>
                           </div>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                     )}
@@ -397,9 +397,9 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     {isVisible("startDate") && (
                       <TableCell className={`${bodyCellCls} text-center`}>
                         {project.startDate ? (
-                          <span className="text-gray-700">{format(new Date(project.startDate), 'd MMM')}</span>
+                          <span className="text-foreground">{format(new Date(project.startDate), 'd MMM')}</span>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                     )}
@@ -407,9 +407,9 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     {isVisible("endDate") && (
                       <TableCell className={`${bodyCellCls} text-center`}>
                         {project.endDate ? (
-                          <span className="text-gray-700">{format(new Date(project.endDate), 'd MMM')}</span>
+                          <span className="text-foreground">{format(new Date(project.endDate), 'd MMM')}</span>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                     )}
@@ -420,8 +420,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         position: 'sticky',
                         right: 0,
                         zIndex: 10,
-                        backgroundColor: 'white',
-                        borderLeft: '1px solid #E5E7EB',
+                        backgroundColor: 'var(--card)',
+                        borderLeft: '1px solid var(--border)',
                         boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                         padding: 0,
                         margin: 0,
@@ -430,13 +430,13 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button
-                            className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all transition-colors"
+                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-all transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[180px] p-1 border-b-5 border-b-[#001F3F]">
+                        <DropdownMenuContent align="end" className="w-[180px] p-1 border-b-5 border-b-primary">
                           <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); project.id && router.push(`/project/${project.id}`); }}
                             className="py-2"
@@ -477,7 +477,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
               {/* Add Project row */}
               <TableRow
-                className="group border-b border-gray-100"
+                className="group border-b border-border"
                 onMouseEnter={() => setIsAddProjectRowHovered(true)}
                 onMouseLeave={() => {
                   setIsAddProjectRowHovered(false);
@@ -491,17 +491,17 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     <div
                       className={cn(
                         "flex items-center rounded-sm transition-all group",
-                        (isAddProjectRowHovered || showAddProjectMenu) ? "border border-[#001F3F]/30" : "border border-transparent"
+                        (isAddProjectRowHovered || showAddProjectMenu) ? "border border-primary/30" : "border border-transparent"
                       )}
                     >
                       <button
                         className={cn(
                           "flex items-center gap-1 px-2 py-0.5 transition-colors text-sm focus:outline-none",
-                          (isAddProjectRowHovered || showAddProjectMenu) ? "text-[#001F3F]/60" : "text-gray-400"
+                          (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground"
                         )}
                         onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
                       >
-                        <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-[#001F3F]/60" : "text-gray-400")} />
+                        <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground")} />
                         Add New Project
                       </button>
 
@@ -509,7 +509,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         <div className="relative">
                           <button
                             ref={chevronButtonRef}
-                            className="px-1 py-0.5 border-l border-[#001F3F]/30 text-gray-400 hover:text-[#001F3F]/60 transition-colors"
+                            className="px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!showAddProjectMenu && chevronButtonRef.current) {
@@ -523,7 +523,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                               setShowAddProjectMenu(prev => !prev);
                             }}
                           >
-                            <ChevronUp className="h-3 w-3 text-[#001F3F]/60" />
+                            <ChevronUp className="h-3 w-3 text-primary/60" />
                           </button>
 
                           {showAddProjectMenu && addProjectMenuCoords && (
@@ -534,14 +534,14 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                 left: addProjectMenuCoords.left,
                                 zIndex: 9999,
                               }}
-                              className="bg-white border border-gray-200 border-b-[5px] border-b-[#001F3F] rounded-md shadow-lg min-w-[170px] overflow-hidden"
+                              className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] overflow-hidden"
                             >
                               <button
                                 onClick={() => {
                                   setShowAddProjectMenu(false);
                                   router.push(`/portfolio/${portfolioId}/create-project`);
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
                               >
                                 <Plus className="h-3.5 w-3.5" />
                                 <span>Add new project</span>
@@ -551,7 +551,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                   setShowAddProjectMenu(false);
                                   onAddProject?.();
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left border-t border-gray-50"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left border-t border-border"
                               >
                                 <LinkIcon className="h-3.5 w-3.5" />
                                 <span>Add existing project</span>

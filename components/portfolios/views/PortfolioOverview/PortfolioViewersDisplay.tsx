@@ -101,7 +101,7 @@ export function PortfolioViewersDisplay({
             <button
               data-testid="portfoliooverview-add-viewer-btn"
               onClick={onAddViewer}
-              className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted hover:bg-muted/80 transition-colors"
             >
               <UserPlus size={18} className="text-muted-foreground" />
             </button>
@@ -129,7 +129,7 @@ export function PortfolioViewersDisplay({
             onClick={onAddViewer}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-gray-100">
+            <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
               <Eye size={18} />
             </span>
             <span>Viewers</span>

@@ -67,9 +67,9 @@ const ViewAllPortfolioMembersModal: React.FC<ViewAllPortfolioMembersModalProps> 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="!max-w-2xl !w-full border-0 border-b-[5px] border-b-[#001F3F] rounded-lg">
+        <DialogContent className="!max-w-2xl !w-full border-0 border-b-[5px] border-b-primary rounded-lg bg-card">
           <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle className="text-[#001F3F]">
+            <DialogTitle className="text-primary text-sm font-bold">
               {type === 'members'
                 ? 'People associated with the Portfolio'
                 : 'Viewers associated with the Portfolio'}
@@ -79,18 +79,18 @@ const ViewAllPortfolioMembersModal: React.FC<ViewAllPortfolioMembersModalProps> 
             </DialogClose> */}
           </DialogHeader>
 
-          <div className="overflow-y-auto border border-[#D1D1D6] rounded-md">
+          <div className="overflow-y-auto border border-border rounded-md">
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-[#D1D1D6] bg-[#E3EFFF]">
-                  <TableHead className="border-r border-[#D1D1D6] text-center text-[#001F3F]">{type === 'members' ? 'Members' : 'Viewers'}</TableHead>
-                  <TableHead className="text-center text-[#001F3F]">Action</TableHead>
+                <TableRow className="border-b border-border bg-muted">
+                  <TableHead className="border-r border-border text-center text-primary text-xs">{type === 'members' ? 'Members' : 'Viewers'}</TableHead>
+                  <TableHead className="text-center text-primary text-xs">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {members.map((member) => (
-                  <TableRow key={member.id} className="border-b border-b-[#D1D1D6] last:border-b-0">
-                    <TableCell className="border-r border-r-[#D1D1D6]">
+                  <TableRow key={member.id} className="border-b border-b-border last:border-b-0">
+                    <TableCell className="border-r border-r-border">
                       <div className="flex items-center gap-3">
                         {/* Avatar Cell */}
                         <Avatar className="h-9 w-9 flex-shrink-0">
@@ -120,7 +120,7 @@ const ViewAllPortfolioMembersModal: React.FC<ViewAllPortfolioMembersModalProps> 
                           setConfirmOpen(true);
                         }}
                         disabled={type === 'members' && member.role === 'owner'}
-                        className={`bg-[#F2F2F7] text-sm hover:cursor-pointer hover:underline px-3 py-1 rounded-md ${type === 'members' && member.role === 'owner'
+                        className={`bg-muted text-xs hover:cursor-pointer hover:underline px-3 py-1 rounded-md ${type === 'members' && member.role === 'owner'
                           ? 'text-muted-foreground cursor-not-allowed opacity-50'
                           : 'text-destructive'
                           }`}

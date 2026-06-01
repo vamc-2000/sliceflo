@@ -57,17 +57,17 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 h-9 rounded text-gray-600 bg-background hover:bg-gray-100">
+                <Button variant="ghost" size="sm" className="gap-1 h-9 rounded text-muted-foreground bg-background hover:bg-muted hover:text-foreground">
                     More
                     <ChevronDown className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[400px] p-2">
+            <DropdownMenuContent align="end" className="w-[400px] p-2 border-b-[5px] border-b-primary bg-popover">
                 <Tabs defaultValue="popular" className="w-full">
                     <TabsList className="w-full rounded p-0">
                         <TabsTrigger
                             value="popular"
-                            className="rounded data-[state=active]:bg-[#001F3F] data-[state=active]:text-background"
+                            className="rounded data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                         >
                             Popular
                         </TabsTrigger>
@@ -87,10 +87,10 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
                                         disabled={isSelected}
                                         className="flex justify-start items-center gap-3 p-3 transition-colors text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-full bg-muted-foreground/30 flex items-center justify-center flex-shrink-0">
-                                            <Icon className="h-4 w-4 text-gray-600" />
+                                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                                            <Icon className="h-4 w-4 text-muted-foreground" />
                                         </div>
-                                        <span className="text-sm font-medium text-gray-700">
+                                        <span className="text-sm font-medium text-foreground">
                                             {view.name}
                                         </span>
                                     </Button>

@@ -30,7 +30,7 @@ const PortfolioProjectsList: React.FC<PortfolioProjectsListProps> = ({
         return (
           <div
             key={project.id}
-            className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary bg-white px-5 py-3 hover:bg-muted/30 transition group/item"
+            className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary bg-card px-5 py-3 hover:bg-muted/30 transition group/item"
           >
             <div className="flex items-center gap-3">
               <div
@@ -53,7 +53,7 @@ const PortfolioProjectsList: React.FC<PortfolioProjectsListProps> = ({
               <div className="flex flex-col min-w-0">
               <Link
                 href={`/project/${project.id}`}
-                className="text-sm font-medium hover:underline truncate block"
+                className="text-sm font-medium hover:underline truncate block text-foreground"
               >
                 {project.name}
               </Link>

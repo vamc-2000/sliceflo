@@ -326,12 +326,12 @@ export function PortfolioHeader({
                   </Button>
                 </div>
               ) : (
-                <h1 className="text-lg font-semibold text-gray-900">{portfolio.name}</h1>
+                <h1 className="text-lg font-semibold text-foreground">{portfolio.name}</h1>
               )}
             </div>
 
             {/* Separator */}
-            <div className="h-6 border-gray-200" />
+            <div className="h-6 w-px bg-border" />
 
             {/* Status + Viewers row — same structure as project-header */}
             <div className="flex items-center gap-2">

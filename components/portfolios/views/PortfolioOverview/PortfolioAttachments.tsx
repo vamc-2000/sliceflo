@@ -56,7 +56,7 @@ export function PortfolioAttachments({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 p-3 border border-[#8E8E93] rounded-md bg-white hover:shadow-sm transition">
+      <div className="flex items-center justify-between gap-3 p-3 border border-input rounded-md bg-card hover:shadow-sm transition">
         {/* LEFT SECTION */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Image
@@ -90,7 +90,7 @@ export function PortfolioAttachments({
               </Tooltip>
             </TooltipProvider>
 
-            <p className="text-[10px] text-[#8E8E93]">{file.size}</p>
+            <p className="text-[10px] text-muted-foreground">{file.size}</p>
           </div>
         </div>
 
@@ -103,9 +103,9 @@ export function PortfolioAttachments({
                   variant="ghost"
                   size="icon"
                   onClick={() => onDownload?.(file.id)}
-                  className="bg-[#F2F2F7] rounded-full cursor-pointer"
+                  className="bg-muted rounded-full cursor-pointer"
                 >
-                  <Download className="h-3 w-3 text-[#8E8E93]" />
+                  <Download className="h-3 w-3 text-muted-foreground" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -119,9 +119,9 @@ export function PortfolioAttachments({
                   variant="ghost"
                   size="icon"
                   onClick={() => onView ? onView(file.id) : setExpanded(!expanded)}
-                  className="bg-[#F2F2F7] rounded-full cursor-pointer"
+                  className="bg-muted rounded-full cursor-pointer"
                 >
-                  <Maximize2 className="h-3 w-3 text-[#8E8E93]" />
+                  <Maximize2 className="h-3 w-3 text-muted-foreground" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -135,9 +135,9 @@ export function PortfolioAttachments({
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsDeleteModalOpen(true)}
-                  className="bg-[#F2F2F7] rounded-full cursor-pointer"
+                  className="bg-muted rounded-full cursor-pointer"
                 >
-                  <Trash2 className="h-3 w-3 text-[#EC221F]" />
+                  <Trash2 className="h-3 w-3 text-destructive" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">

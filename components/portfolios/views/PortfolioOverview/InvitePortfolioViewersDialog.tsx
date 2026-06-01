@@ -113,43 +113,43 @@ export default function InvitePortfolioViewersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="!max-w-[60vw] w-full p-0 gap-0 bg-white overflow-hidden border-0 border-b-[5px] border-[#001F3F] rounded-lg">
+      <DialogContent className="!max-w-[60vw] w-full p-0 gap-0 bg-card overflow-hidden border-0 border-b-[5px] border-primary rounded-lg">
         <div className="flex h-[450px]">
           {/* Left Panel */}
           <div className="w-1/2 p-6 flex flex-col overflow-y-auto">
-            <DialogTitle className="text-sm font-bold mb-6">
+            <DialogTitle className="text-sm font-bold text-foreground mb-6">
               Invite viewers to your Portfolio :
             </DialogTitle>
 
             <div className="mb-6">
               <label className="text-xs mb-2 block">Invite with Shareable link</label>
-              <div className="flex items-center border border-gray-300 rounded-lg px-3 h-9 bg-gray-50">
-                <span className="text-xs text-gray-500 truncate flex-1">{inviteLink}</span>
-                <Button variant="ghost" size="icon" onClick={copyInviteLink} className="h-7 w-7 hover:bg-gray-200 rounded">
+              <div className="flex items-center border border-input rounded-lg px-3 h-9 bg-muted">
+                <span className="text-xs text-muted-foreground truncate flex-1">{inviteLink}</span>
+                <Button variant="ghost" size="icon" onClick={copyInviteLink} className="h-7 w-7 hover:bg-muted/80 rounded">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
             <div className="space-y-3 mt-2">
-              <span className="text-[#8E8E93] font-medium text-xs">Invite with email</span>
+              <span className="text-muted-foreground font-medium text-xs">Invite with email</span>
               {rows.map((row, index) => (
                 <div key={index} className="w-full space-y-1">
                   <div className="flex items-center gap-2 w-full">
-                    <div className={`flex items-center flex-1 p-1 rounded-md bg-white border ${row.email && !isValidEmail(row.email) ? 'border-red-500' : 'border-[#8E8E93]'}`}>
+                    <div className={`flex items-center flex-1 p-1 rounded-md bg-background border ${row.email && !isValidEmail(row.email) ? 'border-red-500' : 'border-input'}`}>
                       <Input
                         placeholder="Enter email address"
                         value={row.email}
                         onChange={(e) => { const u = [...rows]; u[index].email = e.target.value; setRows(u); }}
                         className={`border-0 shadow-none focus-visible:ring-0 flex-1 text-xs ${row.email && !isValidEmail(row.email) ? 'text-red-600' : ''}`}
                       />
-                      <div className="w-[120px] flex items-center justify-center rounded-md bg-[#E5E5EA] h-8 px-3 flex-shrink-0">
-                        <span className="text-xs text-gray-600">Viewer</span>
+                      <div className="w-[120px] flex items-center justify-center rounded-md bg-muted h-8 px-3 flex-shrink-0">
+                        <span className="text-xs text-muted-foreground">Viewer</span>
                       </div>
                     </div>
                     {rows.length > 1 && (
-                      <button onClick={() => setRows(rows.filter((_, i) => i !== index))} className="p-1 hover:bg-gray-200 rounded">
-                        <X size={18} className="text-xs text-gray-600" />
+                      <button onClick={() => setRows(rows.filter((_, i) => i !== index))} className="p-1 hover:bg-muted rounded">
+                        <X size={18} className="text-muted-foreground" />
                       </button>
                     )}
                   </div>
@@ -157,25 +157,25 @@ export default function InvitePortfolioViewersDialog({
                 </div>
               ))}
               <div className="flex justify-end">
-                <span className="text-xs text-[#001F3F] cursor-pointer hover:underline" onClick={() => setRows([...rows, { email: '' }])}>
+                <span className="text-xs text-primary cursor-pointer hover:underline" onClick={() => setRows([...rows, { email: '' }])}>
                   + Add more
                 </span>
               </div>
             </div>
 
             <div className="flex justify-center mt-6">
-              <Button onClick={handleAdd} disabled={!canAdd || isLoading} className="bg-[#001F3F] hover:bg-[#001730] text-white rounded-md px-8 py-2">
+              <Button onClick={handleAdd} disabled={!canAdd || isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-8 py-1.5">
                 {isLoading ? 'Adding...' : '+ Add to portfolio'}
               </Button>
             </div>
           </div>
 
           {/* Right Panel */}
-          <div className="w-1/2 flex flex-col border-l border-gray-200 overflow-hidden bg-background">
-            <div className="px-3 py-4 border-b border-gray-200 flex items-center gap-4">
-              <h3 className="text-xs font-semibold">Workspace Members</h3>
+          <div className="w-1/2 flex flex-col border-l border-border overflow-hidden bg-background">
+            <div className="px-3 py-4 border-b border-border flex items-center gap-4">
+              <h3 className="text-xs font-semibold text-foreground">Workspace Members</h3>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9 text-xs w-32" />
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function InvitePortfolioViewersDialog({
                 {filtered.map((u) => (
                   <div
                     key={u.id}
-                    className={`flex items-center gap-3 py-3 px-2 border-b last:border-0 ${u.alreadyAdded ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'}`}
+                    className={`flex items-center gap-3 py-3 px-2 border-b border-border last:border-0 ${u.alreadyAdded ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted cursor-pointer'}`}
                     onClick={() => !u.alreadyAdded && toggle(u.id)}
                   >
                     <div onClick={(e) => e.stopPropagation()}>
@@ -196,7 +196,7 @@ export default function InvitePortfolioViewersDialog({
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium">{u.name}</p>
-                      <p className="text-xs text-gray-500">{u.username}</p>
+                      <p className="text-xs text-muted-foreground">{u.username}</p>
                     </div>
                     {u.alreadyAdded && <span className="text-xs text-muted-foreground">Already viewer</span>}
                   </div>

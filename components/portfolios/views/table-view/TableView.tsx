@@ -39,9 +39,9 @@ export function TableView({ portfolioId }: TableViewProps) {
   }, [projects, portfolioProjectIds, searchQuery]);
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-background">
       {/* Action Bar */}
-      <div className="bg-white border-b p-4 flex items-center justify-between">
+      <div className="bg-card border-b border-border p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Search bar */}
           <div className="relative flex">
@@ -52,7 +52,7 @@ export function TableView({ portfolioId }: TableViewProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-2 pr-8 rounded w-[240px]"
             />
-            <Search className="absolute top-2.5 right-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
           </div>
 
           <div className="flex items-center gap-1">
@@ -60,7 +60,7 @@ export function TableView({ portfolioId }: TableViewProps) {
               variant="secondary"
               size="sm"
               onClick={() => setShowSortOptions(!showSortOptions)}
-              className={`rounded cursor-pointer ${showSortOptions ? "bg-[#001F3F] text-white hover:bg-[#001F3F]" : ""}`}
+              className={`rounded cursor-pointer ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
             >
               <SlidersVertical className="h-4 w-4" />
             </Button>
@@ -74,8 +74,8 @@ export function TableView({ portfolioId }: TableViewProps) {
                       Sort
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -86,8 +86,8 @@ export function TableView({ portfolioId }: TableViewProps) {
                       Filter
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -117,8 +117,8 @@ export function TableView({ portfolioId }: TableViewProps) {
                       Display
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
@@ -130,16 +130,16 @@ export function TableView({ portfolioId }: TableViewProps) {
       {/* Main content - Direct Table */}
       <div className="flex-1 overflow-y-auto p-4">
         {filteredProjects.length === 0 ? (
-          <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
+          <div className="h-64 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">No projects found</p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">No projects found</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
                 Try adjusting your search, or link new projects.
               </p>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
             <ProjectTable 
               portfolioId={portfolioId} 
               projects={filteredProjects} 

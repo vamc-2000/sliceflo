@@ -188,7 +188,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
     return fallbacks[project.priority.toLowerCase()] || fallbacks.low;
   };
 
-  const headerCellCls = "h-[60px] px-4 text-center align-middle font-medium text-muted-foreground uppercase text-sm border-r bg-white last:border-r-0";
+  const headerCellCls = "h-[60px] px-4 text-center align-middle font-medium text-muted-foreground uppercase text-sm border-r bg-card last:border-r-0";
   const bodyCellCls = "px-4 h-[48px] align-middle border-r last:border-r-0";
 
   return (
@@ -198,7 +198,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
       className="w-full h-full overflow-auto rounded-tl-lg bg-background border-r scrollbar-thin"
     >
       <table className="w-full border-collapse table-auto min-w-max text-sm">
-        <thead className="sticky top-0 z-20 bg-white shadow-sm">
+        <thead className="sticky top-0 z-20 bg-card shadow-sm">
           <tr className="h-[60px] border-b">
             {isVisible("id") && <th className={cn(headerCellCls, "min-w-[70px]")}>ID</th>}
             {isVisible("name") && (
@@ -216,14 +216,14 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
             {isVisible("endDate") && <th className={cn(headerCellCls, "min-w-[110px]")}>Due Date</th>}
 
             <th
-              className="w-10 px-2 text-center align-middle bg-white sticky right-0 z-30 border-l"
+              className="w-10 px-2 text-center align-middle bg-card sticky right-0 z-30 border-l"
               style={{ boxShadow: '-2px 0 4px rgba(0,0,0,0.02)' }}
             >
               <PortfolioFieldVisibilityPopup portfolioId={portfolioId} viewType="gantt" />
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white">
+        <tbody className="bg-card">
           {projects.map((project, index) => {
             const leaderIds = project.leaders?.length
               ? project.leaders
@@ -345,7 +345,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                 )}
 
                 <td
-                  className="w-10 px-2 text-center sticky right-0 z-10 bg-white group-hover:bg-[#f8f9fa] border-l"
+                  className="w-10 px-2 text-center sticky right-0 z-10 bg-card group-hover:bg-[#f8f9fa] border-l"
                   style={{ boxShadow: '-2px 0 4px rgba(0,0,0,0.02)' }}
                 >
                   <DropdownMenu>
@@ -357,7 +357,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuPortal>
-                      <DropdownMenuContent align="end" className="w-[180px] border-b-4 border-b-[#001F3F] z-[50]">
+                      <DropdownMenuContent align="end" className="w-[180px] border-b-4 border-b-primary z-[50]">
                         <DropdownMenuItem onClick={() => router.push(`/project/${project.id}`)}>
                           <ExternalLink className="h-3.5 w-3.5 mr-2" />
                           Open project
@@ -396,17 +396,17 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                   <div
                     className={cn(
                       "flex items-center rounded-sm transition-all group",
-                      (isAddProjectRowHovered || showAddProjectMenu) ? "border border-[#001F3F]/30" : "border border-transparent"
+                      (isAddProjectRowHovered || showAddProjectMenu) ? "border border-primary/30" : "border border-transparent"
                     )}
                   >
                     <button
                       className={cn(
                         "flex items-center gap-1 px-2 py-0.5 transition-colors text-sm focus:outline-none",
-                        (isAddProjectRowHovered || showAddProjectMenu) ? "text-[#001F3F]/60" : "text-gray-400"
+                        (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground"
                       )}
                       onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
                     >
-                      <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-[#001F3F]/60" : "text-gray-400")} />
+                      <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground")} />
                       Add New Project
                     </button>
 
@@ -414,7 +414,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                       <div className="relative">
                         <button
                           ref={chevronButtonRef}
-                          className="px-1 py-0.5 border-l border-[#001F3F]/30 text-gray-400 hover:text-[#001F3F]/60 transition-colors"
+                          className="px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!showAddProjectMenu && chevronButtonRef.current) {
@@ -428,7 +428,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                             setShowAddProjectMenu(prev => !prev);
                           }}
                         >
-                          <ChevronUp className="h-3 w-3 text-[#001F3F]/60" />
+                          <ChevronUp className="h-3 w-3 text-primary/60" />
                         </button>
 
                         {showAddProjectMenu && addProjectMenuCoords && (
@@ -439,16 +439,16 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                               left: addProjectMenuCoords.left,
                               zIndex: 9999,
                             }}
-                            className="bg-white border border-gray-200 border-b-[5px] border-b-[#001F3F] rounded-md shadow-lg min-w-[170px] overflow-hidden"
+                            className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] overflow-hidden"
                           >
                             <button
                               onClick={() => {
                                 setShowAddProjectMenu(false);
                                 router.push(`/portfolio/${portfolioId}/create-project`);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
                             >
-                              <Plus className="h-3.5 w-3.5 text-gray-400" />
+                              <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                               <span>Add new project</span>
                             </button>
                             <button
@@ -456,9 +456,9 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                                 setShowAddProjectMenu(false);
                                 onAddProject?.();
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left border-t border-gray-50"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left border-t border-border"
                             >
-                              <LinkIcon className="h-3.5 w-3.5 text-gray-400" />
+                              <LinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
                               <span>Add existing project</span>
                             </button>
                           </div>

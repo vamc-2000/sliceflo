@@ -339,7 +339,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
           </div>
         </ResizablePanel>
 
-        <ResizableHandle className="w-[2px] bg-muted hover:muted-foreground/50 transition-all" />
+        <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
 
         {/* ── Right Panel - Fixed ── */}
         <ResizablePanel defaultSize={30} minSize={20} className="border-l">

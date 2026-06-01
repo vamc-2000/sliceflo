@@ -200,9 +200,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => { inputRef.current?.focus(); }, []);
     return (
-      <div className="w-80 bg-white rounded-lg border-2 border-dashed border-gray-300 p-4">
+      <div className="w-80 bg-card rounded-lg border-2 border-dashed border-border p-4">
         <div className="mb-3">
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Group Name</label>
+          <label className="text-sm font-medium text-foreground mb-2 block">Group Name</label>
           <Input
             ref={inputRef}
             type="text"
@@ -227,7 +227,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   return (
     <div className="h-full flex flex-col">
       {/* Toolbar */}
-      <div className="bg-white border-b p-4 flex items-center justify-between sticky top-0 z-10">
+      <div className="bg-card border-b border-border p-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <div className="relative flex">
             <Input
@@ -237,7 +237,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-2 pr-8 rounded w-[240px] h-9"
             />
-            <Search className="absolute top-2.5 right-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -246,7 +246,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                 Group by: <span className="capitalize">{groupBy}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-[#001F3F] p-1">
+            <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-primary p-1">
               <DropdownMenuItem onClick={() => setGroupBy("phase")} className="cursor-pointer text-sm">Phase</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setGroupBy("status")} className="cursor-pointer text-sm">Status</DropdownMenuItem>
             </DropdownMenuContent>
@@ -268,7 +268,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64 p-3 border-b-5 border-b-[#001F3F]">
+            <DropdownMenuContent align="start" className="w-64 p-3 border-b-5 border-b-primary">
               <h3 className="text-sm font-semibold mb-3">Unhide Group</h3>
               {settings.hiddenColumns.length === 0 ? (
                 <p className="text-xs text-gray-500 py-2">No hidden groups</p>
@@ -278,7 +278,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                     <button
                       key={colId}
                       onClick={() => showColumn(portfolioId, colId)}
-                      className="w-full flex items-center justify-between p-2 rounded hover:bg-gray-100 text-sm transition-colors capitalize"
+                      className="w-full flex items-center justify-between p-2 rounded hover:bg-muted text-sm transition-colors capitalize"
                     >
                       <span>{colId.replace(/-/g, ' ')}</span>
                       <Check className="h-4 w-4 text-blue-600" />
@@ -300,7 +300,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             onDragEnd={handleDragEnd}
           >
             {(column) => (
-              <KanbanBoard key={column.id} id={column.id} className="w-80 h-full flex flex-col shrink-0 bg-gray-100 border-none shadow-none ring-0 divide-y-0 overflow-visible rounded-t-lg" style={{ borderTop: `4px solid ${column.color}` }}>
+              <KanbanBoard key={column.id} id={column.id} className="w-80 h-full flex flex-col shrink-0 bg-muted border-none shadow-none ring-0 divide-y-0 overflow-visible rounded-t-lg" style={{ borderTop: `4px solid ${column.color}` }}>
                 <KanbanHeader className="border-none py-2 px-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -314,16 +314,16 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                           autoFocus
                         />
                       ) : (
-                        <>
-                          <h3 className="font-semibold text-sm text-gray-700 uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
-                          <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-gray-200 text-gray-500 border-none font-bold">
-                            {kanbanData.filter(item => item.column === column.id).length}
-                          </Badge>
-                        </>
+                         <>
+                           <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
+                           <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold">
+                             {kanbanData.filter(item => item.column === column.id).length}
+                           </Badge>
+                         </>
                       )}
                     </div>
                     <div className="flex items-center gap-0.5">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400" onClick={() => hideColumn(portfolioId, column.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => hideColumn(portfolioId, column.id)}><Eye className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
                 </KanbanHeader>
@@ -347,7 +347,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="flex justify-start items-center gap-2 border-l-4 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors py-2 px-3 rounded-md w-full h-10"
+                    className="flex justify-start items-center gap-2 border-l-4 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors py-2 px-3 rounded-md w-full h-10"
                     style={{ borderLeftColor: `${column.color}80` }}
                     onClick={() => handleAddProject(column.id)}
                   >
@@ -362,7 +362,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             {isCreatingNewGroup ? (
               <AddGroupCard onSave={handleSaveNewGroup} onCancel={handleCancelCreateGroup} />
             ) : (
-              <button onClick={handleStartCreateGroup} className="w-80 bg-white rounded-lg hover:bg-gray-50 p-4 transition-colors flex items-center justify-start gap-2 text-gray-600 hover:text-gray-800 font-medium">
+              <button onClick={handleStartCreateGroup} className="w-80 bg-card border border-border rounded-lg hover:bg-muted/50 p-4 transition-colors flex items-center justify-start gap-2 text-muted-foreground hover:text-foreground font-medium">
                 <Plus className="w-5 h-5" />Add Group
               </button>
             )}

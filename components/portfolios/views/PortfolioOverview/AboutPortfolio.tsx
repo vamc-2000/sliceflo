@@ -331,7 +331,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
         <div className="flex items-center justify-between">
           <Label className="text-muted-foreground flex items-center gap-2 text-xs">
             <Hexagon
-              className="h-4 w-4 text-[#001F3F]"
+              className="h-4 w-4"
             />
             Status
           </Label>
@@ -428,7 +428,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                 size="sm"
                 className={cn(
                   "h-8 px-3 font-normal hover:bg-muted text-xs",
-                  !portfolio.startDate && "text-gray-400"
+                  !portfolio.startDate && "text-muted-foreground"
                 )}
               >
                 {portfolio.startDate ? format(new Date(portfolio.startDate), "PP") : "—"}
@@ -602,7 +602,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
             <DropdownMenuContent align="end" className="w-56 max-h-72 overflow-y-auto p-2">
               {linkedDocs.length > 0 && (
                 <>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-white z-10">
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-popover z-10">
                     Linked Documents
                   </div>
                   {linkedDocs.map((doc) => (
@@ -748,13 +748,13 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
           >
             <div className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Upload className="h-6 w-6 text-[#FF8D28]" />
+                <Upload className="h-6 w-6 text-brand-orange" />
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium">Upload sources</p>
                 <p className="text-xs text-muted-foreground">
                   Drag & drop or{" "}
-                  <span className="text-[#FF8D28] cursor-pointer">
+                  <span className="text-brand-orange cursor-pointer">
                     choose file
                   </span>{" "}
                   to upload

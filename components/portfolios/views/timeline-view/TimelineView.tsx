@@ -115,7 +115,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
     return (
         <div className="w-full h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="bg-white border-b p-4 flex items-center justify-between">
+            <div className="bg-card border-b border-border p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="relative flex">
                         <Input
@@ -124,7 +124,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-2 pr-8 rounded"
                         />
-                        <Search className="absolute top-2.5 right-3 h-4 w-4 text-gray-400" />
+                        <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
                         </Button>
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" className="h-8 px-3 text-sm font-semibold hover:bg-gray-100 flex items-center gap-1">
+                                <Button variant="ghost" className="h-8 px-3 text-sm font-semibold hover:bg-muted flex items-center gap-1">
                                     {getDateLabel()}
                                 </Button>
                             </PopoverTrigger>
@@ -156,7 +156,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
                         </Button>
                     </div>
 
-                    <div className="h-8 flex items-center gap-1 bg-gray-100 rounded p-1 ml-4">
+                    <div className="h-8 flex items-center gap-1 bg-muted rounded p-1 ml-4">
                         {(['monthly', 'quarterly', 'half-yearly', 'yearly'] as Range[]).map((r) => {
                             const labels: Record<string, string> = {
                                 monthly: 'Month',
@@ -172,7 +172,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
                                     onClick={() => setRange(r)}
                                     className={cn(
                                         "h-7 px-2 rounded text-xs",
-                                        range === r ? "bg-[#001F3F] text-white shadow-sm" : "text-gray-600 hover:text-gray-900"
+                                        range === r ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
                                     {labels[r]}
@@ -184,7 +184,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
             </div>
 
             {/* Timeline Area */}
-            <div className="flex-1 h-full flex border rounded-lg mx-4 my-2 overflow-hidden shadow-sm">
+            <div className="flex-1 h-full flex border border-border bg-card rounded-lg mx-4 my-2 overflow-hidden shadow-sm">
                 {/* Timeline Only - No Sidebar */}
                 <div className="flex-1 min-h-0 relative">
                     <GanttProvider
@@ -225,7 +225,7 @@ export function TimelineView({ portfolioId }: TimelineViewProps) {
                     </GanttProvider>
 
                     {/* Zoom Controls */}
-                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border bg-white shadow-md">
+                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border border-border bg-card shadow-md">
                         <Button
                             variant="ghost"
                             size="sm"

@@ -24,9 +24,9 @@ export function PortfolioRightPanel({
   ];
 
   return (
-    <div className="h-full flex flex-col bg-white overflow-hidden">
+    <div className="h-full flex flex-col bg-card overflow-hidden">
       {/* Full-width pill tab switcher */}
-      <div className="bg-[#F2F2F7] p-2 flex items-center gap-1">
+      <div className="bg-muted p-2 flex items-center gap-1">
         {tabs.map((tab) => (
           <button
             key={tab.value}
@@ -35,8 +35,8 @@ export function PortfolioRightPanel({
               flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200
               ${
                 activeTab === tab.value
-                  ? "bg-[#001F3F] text-white shadow-sm"
-                  : "text-[#8E8E93] hover:text-[#3C3C43]"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }
             `}
           >

@@ -141,7 +141,7 @@ export function ListView({ portfolioId }: ListViewProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Action Bar */}
-      <div className="bg-white border-b p-4 flex items-center justify-between">
+      <div className="bg-card border-b border-border p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Search bar */}
           <div className="relative flex">
@@ -152,7 +152,7 @@ export function ListView({ portfolioId }: ListViewProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-2 pr-8 rounded w-[240px]"
             />
-            <Search className="absolute top-2.5 right-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
           </div>
 
           {/* Group By Dropdown */}
@@ -163,7 +163,7 @@ export function ListView({ portfolioId }: ListViewProps) {
                 Group by: <span className="capitalize">{groupBy}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-[#001F3F] p-1">
+            <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-primary p-1">
               <DropdownMenuItem
                 onClick={() => setGroupBy("phase")}
                 className="cursor-pointer text-sm"
@@ -190,7 +190,7 @@ export function ListView({ portfolioId }: ListViewProps) {
               variant="secondary"
               size="sm"
               onClick={() => setShowSortOptions(!showSortOptions)}
-              className={`rounded cursor-pointer ${showSortOptions ? "bg-[#001F3F] text-white hover:bg-[#001F3F]" : ""}`}
+              className={`rounded cursor-pointer ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
             >
               <SlidersVertical className="h-4 w-4" />
             </Button>
@@ -204,8 +204,8 @@ export function ListView({ portfolioId }: ListViewProps) {
                       Sort
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -216,8 +216,8 @@ export function ListView({ portfolioId }: ListViewProps) {
                       Filter
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -247,8 +247,8 @@ export function ListView({ portfolioId }: ListViewProps) {
                       Display
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
+                    <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
@@ -260,10 +260,10 @@ export function ListView({ portfolioId }: ListViewProps) {
       {/* Main content - Groups */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {Object.values(groupedProjects).length === 0 ? (
-          <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
+          <div className="h-64 flex items-center justify-center border-2 border-dashed border-border rounded-lg">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">No projects found</p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">No projects found</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
                 Try adjusting your search or grouping options, or link new projects.
               </p>
             </div>
