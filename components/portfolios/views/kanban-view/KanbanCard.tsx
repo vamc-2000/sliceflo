@@ -179,7 +179,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
                         <Flag className="h-4 w-4" />
                       </Badge>
                     ) : (
-                    <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
+                      <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
                       <Flag className="h-4 w-4 text-muted-foreground" />
                     </div>
                   );

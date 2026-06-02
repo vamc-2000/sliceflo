@@ -42,6 +42,7 @@ export default function SettingsMenu() {
                     <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                             <Button
+                                data-testid="settings-menu-trigger-btn"
                                 variant="ghost"
                                 size="icon"
                                 className="text-foreground hover:text-foreground hover:bg-transparent"
@@ -52,10 +53,12 @@ export default function SettingsMenu() {
                     </TooltipTrigger>
 
                     <DropdownMenuContent
+                        data-testid="settings-menu-content"
                         align="end"
                         className="w-52 border-0 border-b-4 border-primary"
                     >
                         <DropdownMenuItem
+                            data-testid="settings-menu-manage-notifications"
                             className="text-foreground"
                             onClick={() =>
                                 router.push(
@@ -69,6 +72,7 @@ export default function SettingsMenu() {
                         <DropdownMenuSeparator className="h-[1px] bg-border" />
 
                         <DropdownMenuItem
+                            data-testid="settings-menu-delete-read"
                             onClick={() =>
                                 openModal(
                                     "Are you sure you want to delete all read notifications?",
@@ -86,6 +90,7 @@ export default function SettingsMenu() {
             </Tooltip>
 
             <ConfirmationModal
+                data-testid="settings-menu-confirm-modal"
                 open={modalState.open}
                 onClose={() => setModalState({ ...modalState, open: false })}
                 title={modalState.title}

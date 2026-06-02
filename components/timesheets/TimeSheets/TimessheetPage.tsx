@@ -56,7 +56,7 @@ export default function TimessheetPage({
 
   if (isTimesheetsLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-12">
+      <div data-testid="timesheet-loading" className="flex flex-col items-center justify-center h-full text-center p-12">
         <Loader
           message="Loading timesheets..."
           size="md"
@@ -66,11 +66,11 @@ export default function TimessheetPage({
   }
 
   return (
-    <div className="h-full min-h-0 flex flex-col overflow-hidden">
+    <div data-testid="timesheet-page-container" className="h-full min-h-0 flex flex-col overflow-hidden">
       {!hasEntries ? (
         <EmptyTimesheetEntries onAddEntry={() => setOpen(true)} />
       ) : (
-        <div className="flex-1 min-h-0 overflow-y-auto p-2">
+        <div data-testid="timesheet-entries-container" className="flex-1 min-h-0 overflow-y-auto p-2">
           <TimesheetBody
             entries={filteredTimesheets}
             onAddEntry={(date) => {

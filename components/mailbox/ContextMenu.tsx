@@ -33,30 +33,36 @@ export default function ShadContextMenu({ children, emailId }: ShadContextMenuPr
     <>
       <ContextMenu>
         {/* Trigger — wrap whatever you want to right-click */}
-        <ContextMenuTrigger className="w-full">
+        <ContextMenuTrigger data-testid="context-menu-trigger" className="w-full">
           {children}
         </ContextMenuTrigger>
 
-        <ContextMenuContent className="w-48">
+        <ContextMenuContent data-testid="context-menu-content" className="w-48">
           <ContextMenuItem
+            data-testid="context-menu-mark-unread"
             onClick={() => markAsUnread(emailId)}
           >
             <Mail className="mr-2 h-4 w-4" /> Mark as Unread
           </ContextMenuItem>
 
           <ContextMenuItem
+            data-testid="context-menu-open-new-tab"
             onClick={() => window.open(`/mailbox/mail/${emailId}`, "_blank")}
           >
             <ExternalLink className="mr-2 h-4 w-4" /> Open in New Tab
           </ContextMenuItem>
 
-          <ContextMenuItem onClick={() => console.log("Snooze coming soon")}>
+          <ContextMenuItem
+            data-testid="context-menu-snooze"
+            onClick={() => console.log("Snooze coming soon")}
+          >
             <Clock className="mr-2 h-4 w-4" /> Snooze
           </ContextMenuItem>
 
           <ContextMenuSeparator />
 
           <ContextMenuItem
+            data-testid="context-menu-delete"
             onClick={() => setDeleteModalOpen(true)}
             className="text-red-600 focus:text-red-600 focus:bg-red-50"
           >
@@ -67,6 +73,7 @@ export default function ShadContextMenu({ children, emailId }: ShadContextMenuPr
 
       {/* Delete confirmation modal */}
       <ConfirmationModal
+        data-testid="context-menu-delete-modal"
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         title="Are you sure you want to delete this notification?"

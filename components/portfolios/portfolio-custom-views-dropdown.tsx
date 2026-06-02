@@ -87,7 +87,7 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
                                         disabled={isSelected}
                                         className="flex justify-start items-center gap-3 p-3 transition-colors text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                                        <div className="w-8 h-8 rounded-full bg-muted-foreground/30 flex items-center justify-center flex-shrink-0">
                                             <Icon className="h-4 w-4 text-muted-foreground" />
                                         </div>
                                         <span className="text-sm font-medium text-foreground">

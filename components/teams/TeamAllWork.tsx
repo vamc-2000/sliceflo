@@ -324,27 +324,33 @@ export default function TeamAllWork() {
   if (!activeTeam) {
     if (isLoading) {
       return (
-        <div className="flex h-full items-center justify-center text-muted-foreground">
+        <div 
+          data-testid="team-all-work-loading"
+          className="flex h-full items-center justify-center text-muted-foreground"
+        >
           Loading team work...
         </div>
       );
     }
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground">
+      <div 
+        data-testid="team-all-work-no-team"
+        className="flex h-full items-center justify-center text-muted-foreground"
+      >
         No active team found.
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col p-3 bg-background">
+    <div data-testid="team-all-work-container" className="w-full h-full flex flex-col p-3 bg-background">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {/* Create Button */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-0 py-2 rounded-md flex items-center text-sm">
+              <Button data-testid="btn-create-trigger" className="bg-primary hover:bg-primary/90 text-primary-foreground px-0 py-2 rounded-md flex items-center text-sm">
                 <Plus />
                 Create
                 <span className="h-4 w-px bg-white/30 ml-1" />
@@ -352,12 +358,12 @@ export default function TeamAllWork() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-35 p-2 border-b-5 border-b-primary rounded-b-lg bg-popover text-popover-foreground border-border" align="start">
-              <button className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors">
+              <button data-testid="btn-create-portfolio" className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors">
                 <LayoutDashboard className="h-4 w-4" />
                 Portfolio
               </button>
 
-              <button
+              <button data-testid="btn-create-project"
                 className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors"
                 onClick={() => router.push(`/teams/${teamId}/create-project`)}
               >
@@ -365,7 +371,7 @@ export default function TeamAllWork() {
                 Project
               </button>
 
-              <button
+              <button data-testid="btn-create-goal"
                 className="flex items-center gap-2 w-full text-left px-1 py-2 text-foreground text-sm hover:bg-muted rounded transition-colors"
                 onClick={() => router.push(`/teams/${teamId}/create-goal`)}
               >
@@ -379,6 +385,7 @@ export default function TeamAllWork() {
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              data-testid="input-allwork-search"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -389,7 +396,11 @@ export default function TeamAllWork() {
           {/* Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2 bg-muted text-muted-foreground hover:bg-muted/85 hover:text-foreground">
+              <Button 
+                data-testid="btn-allwork-filter-trigger"
+                variant="outline" 
+                className="flex items-center gap-2 bg-muted text-muted-foreground hover:bg-muted/85 hover:text-foreground"
+              >
                 <Filter className="h-4 w-4" />
                 <span className="text-sm">Filter</span>
                 {/* <Badge variant="secondary" className="rounded-full px-2 py-0 h-5 text-xs">
@@ -405,6 +416,7 @@ export default function TeamAllWork() {
               {/* User Submenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
+                  data-testid="filter-allwork-submenu-user"
                   className={`
                     relative flex items-center gap-2 pl-3 text-foreground
                     ${selectedUserId !== null ? 'bg-muted' : ''}
@@ -419,6 +431,7 @@ export default function TeamAllWork() {
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                     <DropdownMenuItem
+                      data-testid="filter-allwork-user-all"
                       onClick={() => setSelectedUserId(null)}
                       className={`
                         relative flex items-center gap-2 pl-3
@@ -435,6 +448,7 @@ export default function TeamAllWork() {
                     {filterOptions.users.map(user => (
                       <DropdownMenuItem
                         key={user.id}
+                        data-testid={`filter-allwork-user-${user.id}`}
                         onClick={() => setSelectedUserId(user.id)}
                         className={`
                           relative flex items-center gap-2 pl-3
@@ -459,6 +473,7 @@ export default function TeamAllWork() {
               {/* Projects Submenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
+                  data-testid="filter-allwork-submenu-project"
                   className={`
                     relative flex items-center gap-2 pl-3 text-foreground
                     ${selectedProjectId !== null ? 'bg-muted' : ''}
@@ -473,6 +488,7 @@ export default function TeamAllWork() {
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                     <DropdownMenuItem
+                      data-testid="filter-allwork-project-all"
                       onClick={() => setSelectedProjectId(null)}
                       className={`
                         relative flex items-center gap-2 pl-3
@@ -489,6 +505,7 @@ export default function TeamAllWork() {
                     {filterOptions.projects.map(project => (
                       <DropdownMenuItem
                         key={project.id}
+                        data-testid={`filter-allwork-project-${project.id}`}
                         onClick={() => setSelectedProjectId(project.id ?? null)}
                         className={`
                           relative flex items-center gap-2 pl-3
@@ -511,6 +528,7 @@ export default function TeamAllWork() {
               {/* Status Submenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
+                  data-testid="filter-allwork-submenu-status"
                   className={`
                     relative flex items-center gap-2 pl-3 text-foreground
                     ${selectedStatus !== null ? 'bg-muted' : ''}
@@ -525,6 +543,7 @@ export default function TeamAllWork() {
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                     <DropdownMenuItem
+                      data-testid="filter-allwork-status-all"
                       onClick={() => setSelectedStatus(null)}
                       className={`
                         relative flex items-center gap-2 pl-3
@@ -541,6 +560,7 @@ export default function TeamAllWork() {
                     {filterOptions.statuses.map(status => (
                       <DropdownMenuItem
                         key={status}
+                        data-testid={`filter-allwork-status-${status.toLowerCase().replace(/\s+/g, '-')}`}
                         onClick={() => setSelectedStatus(status)}
                         className={`
                           relative flex items-center gap-2 pl-3
@@ -561,6 +581,7 @@ export default function TeamAllWork() {
               {/* Priority Submenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
+                  data-testid="filter-allwork-submenu-priority"
                   className={`
                     relative flex items-center gap-2 pl-3 text-foreground
                     ${selectedPriority !== null ? 'bg-muted' : ''}
@@ -575,6 +596,7 @@ export default function TeamAllWork() {
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                     <DropdownMenuItem
+                      data-testid="filter-allwork-priority-all"
                       onClick={() => setSelectedPriority(null)}
                       className={`
                         relative flex items-center gap-2 pl-3
@@ -591,6 +613,7 @@ export default function TeamAllWork() {
                     {filterOptions.priorities.map(priority => (
                       <DropdownMenuItem
                         key={priority}
+                        data-testid={`filter-allwork-priority-${priority.toLowerCase().replace(/\s+/g, '-')}`}
                         onClick={() => setSelectedPriority(priority)}
                         className={`
                           relative flex items-center gap-2 pl-3 capitalize
@@ -611,6 +634,7 @@ export default function TeamAllWork() {
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    data-testid="filter-allwork-clear-filters"
                     className="w-full flex items-center justify-center rounded-md text-primary-foreground bg-primary hover:bg-primary/90 cursor-pointer font-medium px-3 py-2 mt-1"
                     onClick={() => {
                       setSelectedProjectId(null);
@@ -634,9 +658,14 @@ export default function TeamAllWork() {
           const memberStatusStats = getMemberStatusStats(member.tasks);
 
           return (
-            <Card key={member.id} className="border-l-4 border-l-primary overflow-hidden py-3!">
+            <Card 
+              key={member.id} 
+              data-testid={`member-card-${member.id}`}
+              className="border-l-4 border-l-primary overflow-hidden py-3!"
+            >
               {/* Member Header */}
               <div
+                data-testid={`btn-member-expand-${member.id}`}
                 onClick={() => toggleMember(member.id)}
                 className="px-2 py-0 flex items-center cursor-pointer"
               >
@@ -684,6 +713,7 @@ export default function TeamAllWork() {
 
                   <button
                     // onClick={(e) => e.stopPropagation()}
+                    data-testid={`btn-member-chevron-${member.id}`}
                     onClick={() => toggleMember(member.id)}
                     className="hover:bg-muted rounded px-2 py-2 transition-colors"
                   >
@@ -700,6 +730,7 @@ export default function TeamAllWork() {
               {expandedMembers.has(member.id) && (
                 <div className="max-h-[420px] overflow-auto rounded-md border border-border relative">
                   <TeamWorkTaskTable
+                    data-testid={`tasks-table-${member.id}`}
                     isTeamView
                     groupId={member.id}
                     filteredTasks={member.tasks}

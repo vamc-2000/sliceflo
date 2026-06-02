@@ -18,9 +18,10 @@ export default function TeamFilterTabs({
   onChange: (v: TeamFilter) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 bg-gray-200 rounded-lg p-1">
+    <div data-testid="team-filter-tabs" className="flex items-center gap-1 bg-gray-200 rounded-lg p-1">
       {FILTER_OPTIONS.map((opt) => (
         <button
+          data-testid={`btn-team-filter-${opt.value}`}
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={`
@@ -35,6 +36,7 @@ export default function TeamFilterTabs({
           {opt.label}
           {opt.count !== undefined && (
             <span
+              data-testid={`badge-team-filter-${opt.value}`}
               className={`text-xs rounded-full px-1.5 py-0.5 leading-none
                 ${value === opt.value
                   ? "bg-background/20 text-primary-foreground"

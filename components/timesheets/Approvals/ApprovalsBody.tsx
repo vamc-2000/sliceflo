@@ -9,8 +9,8 @@ interface ApprovalsBodyProps {
 
 export default function ApprovalsBody({ onNavigateToTimesheet }: ApprovalsBodyProps) {
     return (
-        <>
+        <div data-testid="approvals-body-container">
             <ApprovalsPage onNavigateToTimesheet={onNavigateToTimesheet} />
-        </>
+        </div>
     )
 }

@@ -10,7 +10,7 @@ interface EmptyTimesheetEntriesProps {
 
 export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps) {
     return (
-        <div className="rounded-lg border border-border bg-background">
+        <div data-testid="empty-timesheet-container" className="rounded-lg border border-border bg-background">
             {/* Header (NO padding gap) */}
             <div className="
                 sticky top-0 z-10
@@ -60,6 +60,7 @@ export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps
 
                 <div className="mt-4 flex gap-3">
                     <Button
+                        data-testid="btn-add-task-empty"
                         className="flex-1 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg"
                         onClick={onAddEntry}
                     >
@@ -67,6 +68,7 @@ export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps
                     </Button>
 
                     <Button
+                        data-testid="btn-add-freetext-empty"
                         className="flex-1 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg"
                         onClick={onAddEntry}
                     >

@@ -35,22 +35,23 @@ const ProfileModal: React.FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
-      <DialogContent className="w-95 rounded-2xl border-0 border-b-4 border-primary p-4">
-        <DialogHeader className="flex flex-col items-center text-center gap-2">
+      <DialogContent data-testid="profile-modal-content" className="w-95 rounded-2xl border-0 border-b-4 border-primary p-4">
+        <DialogHeader data-testid="profile-modal-header" className="flex flex-col items-center text-center gap-2">
           {/* Avatar */}
           <img
+            data-testid="profile-modal-avatar"
             src={profilePictureUrl || profilePicture || "/avatar-placeholder.png"}
             alt={name}
             className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-primary"
           />
 
-          <DialogTitle className="text-lg font-semibold text-foreground">
+          <DialogTitle data-testid="profile-modal-name" className="text-lg font-semibold text-foreground">
             {/* {name?.length > 10 ? `${name.slice(0, 10)}...` : name} */}
             {name}
           </DialogTitle>
 
           {position && (
-            <p className="text-muted-foreground text-sm font-semibold">
+            <p data-testid="profile-modal-position" className="text-muted-foreground text-sm font-semibold">
               {position}
             </p>
           )}
@@ -60,6 +61,7 @@ const ProfileModal: React.FC = () => {
 
         {/* Phone */}
         <InfoRow
+          data-testid="profile-modal-phone-row"
           icon={<Phone className="text-primary" />}
           label="Phone"
           value={phone || "+91 98765 43210"}
@@ -68,13 +70,16 @@ const ProfileModal: React.FC = () => {
         <Separator />
 
         {/* Email */}
-        <div className="px-0 flex items-center justify-between">
+        <div data-testid="profile-modal-email-row" className="px-0 flex items-center justify-between">
           <InfoRow
             icon={<Mail className="text-primary" />}
             label="Email"
             value={email}
           />
-          <SendHorizontal className="p-2 rounded-full bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 w-9 h-9" />
+          <SendHorizontal
+            data-testid="profile-modal-send-email-btn"
+            className="p-2 rounded-full bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80 w-9 h-9"
+          />
         </div>
 
         <Separator />
@@ -90,6 +95,7 @@ const ProfileModal: React.FC = () => {
 
         {/* Local Time */}
         <InfoRow
+          data-testid="profile-modal-localtime-row"
           icon={<Clock className="text-primary" />}
           label="Local Time"
           // value={localTime}
@@ -107,12 +113,14 @@ const InfoRow = ({
   icon,
   label,
   value,
+  "data-testid": dataTestId,
 }: {
   icon: React.ReactNode;
   label: string;
   value?: string;
+  "data-testid"?: string;
 }) => (
-  <div className="px-2 flex items-center gap-3">
+  <div data-testid={dataTestId} className="px-2 flex items-center gap-3">
     {icon}
     <div className="flex flex-col leading-tight">
       <span className="font-medium text-foreground text-sm">{label}</span>

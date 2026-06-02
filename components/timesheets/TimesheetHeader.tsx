@@ -43,6 +43,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
             {/* Left: Tabs */}
             <div className="relative flex gap-6">
                 <Button
+                    data-testid="tab-teams"
                     ref={(el) => { tabRefs.current[0] = el }}
                     variant="ghost"
                     onClick={() => onTabChange("teams")}
@@ -53,6 +54,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                 </Button>
 
                 <Button
+                    data-testid="tab-my"
                     ref={(el) => { tabRefs.current[1] = el }}
                     variant="ghost"
                     onClick={() => onTabChange("my")}
@@ -63,6 +65,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                 </Button>
 
                 <Button
+                    data-testid="tab-approvals"
                     ref={(el) => { tabRefs.current[2] = el }}
                     variant="ghost"
                     onClick={() => onTabChange("approvals")}
@@ -87,6 +90,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                 {activeTab === "my" && (
                     <div className="flex items-center gap-1 rounded-sm bg-muted px-1 py-1">
                         <Button
+                            data-testid="view-day"
                             variant="ghost"
                             className={`h-7.5 w-10 rounded-sm cursor-pointer ${myView === "timesheet"
                                 ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
@@ -98,6 +102,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                         </Button>
 
                         <Button
+                            data-testid="view-week"
                             variant="ghost"
                             className={`h-7.5 w-12 rounded-sm cursor-pointer ${myView === "clipboard"
                                 ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
@@ -109,6 +114,7 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                         </Button>
 
                         <Button
+                            data-testid="view-month"
                             variant="ghost"
                             className={`h-7.5 w-14 rounded-sm cursor-pointer ${myView === "month"
                                 ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"

@@ -185,8 +185,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
     return fallbacks[project.priority.toLowerCase()] || fallbacks.low;
   };
 
-  const headerCellCls = "h-9 font-semibold text-muted-foreground uppercase tracking-wide px-3 select-none border-r border-border bg-card";
-  const bodyCellCls = "px-3 py-2.5 border-r border-border";
+  const headerCellCls = "!h-9 font-semibold text-muted-foreground uppercase tracking-wide px-3 py-0 select-none border-r border-border bg-card";
+  const bodyCellCls = "!h-9 px-3 py-0 border-r border-border";
 
   const getDragColumnStyle = (isHeader: boolean, customColor?: string): React.CSSProperties => {
     return {
@@ -206,7 +206,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
     <>
       <div className="relative">
         <div className="overflow-x-auto rounded-tl-sm">
-          <Table className="relative border-y border-border text-sm">
+          <Table className="relative border-y border-border text-xs">
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
                 <TableHead className={headerCellCls} style={getDragColumnStyle(true)} />
@@ -277,7 +277,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
                 {/* ✅ Actions Column Header (sticky) */}
                 <TableHead
-                  className={cn("w-12 text-center")}
+                  className={cn("w-12 text-center !h-9")}
                   style={{
                     position: 'sticky',
                     right: 0,
@@ -309,7 +309,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                 return (
                   <TableRow
                     key={project.id || index}
-                    className="group hover:bg-muted/50 transition-colors h-11 border-b border-border last:border-0"
+                    className="group hover:bg-muted/50 transition-colors !h-11 border-b border-border last:border-0"
                   >
                     <TableCell className="p-0" style={getDragColumnStyle(false)}>
                       <GripVertical className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 cursor-grab mx-auto" />
@@ -496,7 +496,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     >
                       <button
                         className={cn(
-                          "flex items-center gap-1 px-2 py-0.5 transition-colors text-sm focus:outline-none",
+                          "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs focus:outline-none",
                           (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground"
                         )}
                         onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
@@ -541,7 +541,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                   setShowAddProjectMenu(false);
                                   router.push(`/portfolio/${portfolioId}/create-project`);
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left"
                               >
                                 <Plus className="h-3.5 w-3.5" />
                                 <span>Add new project</span>
@@ -551,7 +551,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                   setShowAddProjectMenu(false);
                                   onAddProject?.();
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left border-t border-border"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left border-t border-border"
                               >
                                 <LinkIcon className="h-3.5 w-3.5" />
                                 <span>Add existing project</span>

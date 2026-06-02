@@ -85,7 +85,7 @@ const ViewAllMembersModal: React.FC<ViewAllMembersModalProps> = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl! w-full! border-0 border-b-[5px] border-primary rounded-lg bg-card text-card-foreground">
+        <DialogContent data-testid="modal-view-all-members" className="max-w-2xl! w-full! border-0 border-b-[5px] border-primary rounded-lg bg-card text-card-foreground">
           <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle className="text-foreground">
               People associated with the Team
@@ -100,7 +100,10 @@ const ViewAllMembersModal: React.FC<ViewAllMembersModalProps> = ({
             </DialogClose>
           </DialogHeader>
 
-          <div className="overflow-y-auto border border-border rounded-md">
+          <div 
+            data-testid="members-table-container"
+            className="overflow-y-auto border border-border rounded-md"
+          >
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border ">
@@ -111,7 +114,7 @@ const ViewAllMembersModal: React.FC<ViewAllMembersModalProps> = ({
 
               <TableBody>
                 {members.map((member) => (
-                  <TableRow key={member.id} className="border-b border-b-border last:border-b-0">
+                  <TableRow key={member.id} data-testid={`member-row-${member.id}`} className="border-b border-b-border last:border-b-0">
                     <TableCell >
                       <div className="flex items-center gap-3">
                         {/* Avatar */}
@@ -138,6 +141,7 @@ const ViewAllMembersModal: React.FC<ViewAllMembersModalProps> = ({
 
                     <TableCell className="text-center">
                       <button
+                        data-testid={`btn-remove-member-${member.id}`}
                         className="text-xs text-red-600 hover:text-red-500 bg-muted hover:bg-muted/80 px-3 py-1 rounded-md cursor-pointer transition-colors"
                         onClick={() => {
                           setMemberToRemove(member);
@@ -156,6 +160,7 @@ const ViewAllMembersModal: React.FC<ViewAllMembersModalProps> = ({
       </Dialog>
 
       <ConfirmationModal
+        data-testid="modal-confirm-remove-member"
         open={confirmOpen}
         onClose={() => {
           if (isRemoving) return;

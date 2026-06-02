@@ -33,7 +33,7 @@ const MailList: React.FC<MailListProps> = ({
 
   if (!emails || emails.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-muted-foreground">
+      <div data-testid="mail-list-empty" className="p-4 text-center text-sm text-muted-foreground">
         No emails found.
       </div>
     );
@@ -87,15 +87,16 @@ const MailList: React.FC<MailListProps> = ({
   // console.log("Current userId:", currentUserId);
 
   return (
-    <div className="divide-y divide-border">
+    <div data-testid="mail-list-container" className="divide-y divide-border">
       {filteredEmails.length === 0 ? (
-        <div className="p-4 text-center text-sm text-muted-foreground">
+        <div data-testid="mail-list-no-results" className="p-4 text-center text-sm text-muted-foreground">
           No emails found for this date range.
         </div>
       ) : (
         filteredEmails.map((email) => (
           <div
             key={email._id}
+            data-testid={`mail-list-item-${email._id}`}
             onClick={() => onEmailSelect(email)}
             className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors ${email.read
               ? "bg-background text-muted-foreground font-normal hover:bg-muted"     // read → muted
@@ -103,10 +104,10 @@ const MailList: React.FC<MailListProps> = ({
               }`}
           >
             {/* Email content */}
-            <div className="flex-1 min-w-0">
+            <div data-testid={`mail-list-item-content-${email._id}`} className="flex-1 min-w-0">
               <div className="flex justify-between items-center">
                 {/* LEFT SIDE */}
-                <div className="flex items-center gap-2 min-w-0">
+                <div data-testid={`mail-list-item-sender-${email._id}`} className="flex items-center gap-2 min-w-0">
                   {/* <Avatar
                     className="h-7 w-7 shrink-0"
                     onClick={(e) => {
@@ -127,6 +128,7 @@ const MailList: React.FC<MailListProps> = ({
                     </AvatarFallback>
                   </Avatar> */}
                   <Avatar
+                    data-testid={`mail-list-item-avatar-${email._id}`}
                     className="h-7 w-7 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -148,11 +150,11 @@ const MailList: React.FC<MailListProps> = ({
                     </AvatarFallback>
                   </Avatar>
 
-                  <p className="truncate font-semibold text-sm">{email.eventData?.updatedBy?.name ?? "Unknown"}</p>
+                  <p data-testid={`mail-list-item-sender-name-${email._id}`} className="truncate font-semibold text-sm">{email.eventData?.updatedBy?.name ?? "Unknown"}</p>
                 </div>
 
                 {/* RIGHT SIDE */}
-                <div className="flex items-center gap-0 shrink-0">
+                <div data-testid={`mail-list-item-date-${email._id}`} className="flex items-center gap-0 shrink-0">
                   {email.createdAt && (
                     <span className="text-xs text-muted-foreground">
                       {dayjs(email.createdAt).format("DD MMM, hh:mm A")}
@@ -162,7 +164,7 @@ const MailList: React.FC<MailListProps> = ({
               </div>
 
               {/* Subject */}
-              <p className="text-xs truncate font-medium">
+              <p data-testid={`mail-list-item-subject-${email._id}`} className="text-xs truncate font-medium">
                 {email.subject ?? "(No Subject)"}
               </p>
             </div>
@@ -172,8 +174,9 @@ const MailList: React.FC<MailListProps> = ({
 
       {/* ✅ Load More Button */}
       {hasMore && (
-        <div className="flex justify-end px-4 pb-2 pt-1">
+        <div data-testid="mail-list-load-more-wrapper" className="flex justify-end px-4 pb-2 pt-1">
           <button
+            data-testid="mail-list-load-more-btn"
             onClick={() => loadMore()}
             disabled={loading}
             className="text-xs text-primary font-semibold px-4 py-2 hover:text-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:underline"
@@ -182,7 +185,7 @@ const MailList: React.FC<MailListProps> = ({
           </button>
         </div>
       )}
-      <ProfileModal />
+      <ProfileModal data-testid="mail-list-profile-modal" />
     </div>
   );
 };

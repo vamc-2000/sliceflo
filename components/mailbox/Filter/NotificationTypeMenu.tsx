@@ -9,19 +9,21 @@ interface Props {
 
 export default function NotificationTypeMenu({ selected, onToggle }: Props) {
   return (
-    <div className="relative w-68">
+    <div data-testid="notification-type-menu-container" className="relative w-68">
       {/* Menu container with border radius */}
       <div className="bg-background rounded-lg overflow-hidden ">
-        <div className="flex flex-col gap-0 p-2">
+        <div data-testid="notification-type-menu-list" className="flex flex-col gap-0 p-2">
           {Object.entries(selected).map(([key, value]) => (
             <button
               key={key}
+              data-testid={`notification-type-menu-item-${key}`}
               onClick={() => onToggle(key, !value)}
               className="flex items-center justify-between px-3 py-2 hover:bg-muted text-sm text-foreground rounded-md"
             >
               {/* Checkbox + Label */}
               <div className="flex items-center gap-3">
                 <Checkbox
+                  data-testid={`notification-type-checkbox-${key}`}
                   checked={value}
                   onCheckedChange={() => onToggle(key, !value)}
                   className="border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary border-primary"

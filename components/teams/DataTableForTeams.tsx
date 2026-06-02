@@ -211,6 +211,7 @@ export function DataTableForTeams<
             // <div className="relative w-full max-w-xs">    
             <div className="relative w-64">
               <Input
+                data-testid="input-global-search"
                 placeholder={searchPlaceholder}
                 value={globalFilter ?? ""}
                 onChange={(e) => setGlobalFilter(e.target.value)}
@@ -224,7 +225,7 @@ export function DataTableForTeams<
           {enableColumnFilter && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 bg-muted text-muted-foreground relative cursor-pointer hover:bg-muted/80">
+                <Button data-testid="btn-filter-trigger" variant="outline" className="flex items-center gap-2 bg-muted text-muted-foreground relative cursor-pointer hover:bg-muted/80">
                   <Filter className="h-4 w-4" />
                   Filter
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
@@ -236,7 +237,10 @@ export function DataTableForTeams<
 
                 {/* User Submenu */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center relative text-foreground">
+                  <DropdownMenuSubTrigger 
+                    data-testid="btn-filter-user"
+                    className="flex items-center relative text-foreground"
+                  >
                     {isNameFiltered && (
                       <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
@@ -245,6 +249,7 @@ export function DataTableForTeams<
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                       <DropdownMenuItem
+                        data-testid="filter-user-all"
                         onClick={() => table.getColumn("name")?.setFilterValue(undefined)}
                       >
                         All Users
@@ -255,6 +260,7 @@ export function DataTableForTeams<
                       {uniqueUsers.map((user) => (
                         <DropdownMenuItem
                           key={user.name}
+                          data-testid={`filter-user-${user.name.toLowerCase().replace(/\s+/g, '-')}`}
                           onClick={() =>
                             table.getColumn("name")?.setFilterValue(user.name)
                           }
@@ -281,7 +287,10 @@ export function DataTableForTeams<
 
                 {/* Project Submenu */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center relative text-foreground">
+                  <DropdownMenuSubTrigger 
+                    data-testid="filter-submenu-project"
+                    className="flex items-center relative text-foreground"
+                  >
                     {isProjectFiltered && (
                       <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
@@ -290,6 +299,7 @@ export function DataTableForTeams<
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                       <DropdownMenuItem
+                        data-testid="filter-project-all"
                         onClick={() => table.getColumn("project")?.setFilterValue(undefined)}
                       >
                         All Projects
@@ -298,6 +308,7 @@ export function DataTableForTeams<
 
                       {uniqueProjectsFromTeams.map((project) => (
                         <DropdownMenuItem
+                          data-testid={`filter-project-${project.id}`}
                           key={project.id}
                           onClick={() =>
                             table.getColumn("project")?.setFilterValue(project.name)
@@ -320,7 +331,10 @@ export function DataTableForTeams<
 
                 {/* Status Submenu (existing filter logic) */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center relative text-foreground">
+                  <DropdownMenuSubTrigger 
+                    data-testid="filter-submenu-status"
+                    className="flex items-center relative text-foreground"
+                  >
                     {isStatusFiltered && (
                       <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
@@ -329,6 +343,7 @@ export function DataTableForTeams<
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                       <DropdownMenuItem
+                        data-testid="filter-status-all"
                         onClick={() => filterColumn && table.getColumn(filterColumn)?.setFilterValue(undefined)}
                       >
                         All Statuses
@@ -338,6 +353,7 @@ export function DataTableForTeams<
                       {filterOptions.map((option) => (
                         <DropdownMenuItem
                           key={option.value}
+                          data-testid={`filter-status-${option.value.toLowerCase().replace(/\s+/g, '-')}`}
                           onClick={() => filterColumn && table.getColumn(filterColumn)?.setFilterValue(option.value)}
                           className="relative"
                         >
@@ -355,6 +371,7 @@ export function DataTableForTeams<
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
+                      data-testid="btn-clear-all-filters"
                       className="text-center justify-center font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => table.resetColumnFilters()}
                     >
@@ -372,7 +389,7 @@ export function DataTableForTeams<
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div data-testid="data-table-teams" className="rounded-md border">
         <Table >
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -391,7 +408,7 @@ export function DataTableForTeams<
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id} data-testid={`table-row-${row.id}`} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell, index) => (
                     <TableCell key={cell.id} className={`border-r border-border ${index === row.getVisibleCells().length - 1 ? "border-r-0" : ""
                       }`}>
@@ -401,7 +418,7 @@ export function DataTableForTeams<
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow data-testid="table-empty-state">
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   {emptyMessage}
                 </TableCell>
@@ -427,12 +444,12 @@ export function DataTableForTeams<
                   table.setPageSize(Number(value));
                 }}
               >
-                <SelectTrigger className="h-8 w-17.5">
+                <SelectTrigger data-testid="select-rows-per-page" className="h-8 w-17.5">
                   <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                    <SelectItem key={pageSize} value={`${pageSize}`} data-testid={`select-page-size-${pageSize}`}>
                       {pageSize}
                     </SelectItem>
                   ))}
@@ -445,6 +462,7 @@ export function DataTableForTeams<
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
+                data-testid="btn-go-to-first-page"
                 className="h-8 w-8 p-0"
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
@@ -454,6 +472,7 @@ export function DataTableForTeams<
               </Button>
               <Button
                 variant="outline"
+                data-testid="btn-go-to-previous-page"
                 className="h-8 w-8 p-0"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
@@ -463,6 +482,7 @@ export function DataTableForTeams<
               </Button>
               <Button
                 variant="outline"
+                data-testid="btn-go-to-next-page"
                 className="h-8 w-8 p-0"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
@@ -472,6 +492,7 @@ export function DataTableForTeams<
               </Button>
               <Button
                 variant="outline"
+                data-testid="btn-go-to-last-page"
                 className="h-8 w-8 p-0"
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}

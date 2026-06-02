@@ -51,10 +51,11 @@ export default function CustomCalendarHeader({
     };
 
     return (
-        <div className="flex items-center justify-between px-3 pt-2 pb-0">
+        <div data-testid="calendar-header" className="flex items-center justify-between px-3 pt-2 pb-0">
 
             {/* LEFT ARROW */}
             <button
+                data-testid="btn-calendar-prev"
                 onClick={() => {
                     setDirection("left");
 
@@ -72,6 +73,7 @@ export default function CustomCalendarHeader({
 
             {/* HEADER LABEL */}
             <button
+                data-testid="btn-calendar-header-label"
                 className="font-medium"
                 onClick={() => {
                     if (view === "days") setView("months");
@@ -84,6 +86,7 @@ export default function CustomCalendarHeader({
 
             {/* RIGHT ARROW */}
             <button
+                data-testid="btn-calendar-next"
                 onClick={() => {
                     setDirection("right");
 

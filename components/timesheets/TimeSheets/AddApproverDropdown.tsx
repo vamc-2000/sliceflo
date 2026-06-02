@@ -157,7 +157,7 @@ export function AddApproverDropdown({
       }}>
       <PopoverTrigger asChild>
         {trigger || (
-          <Button className="bg-muted text-muted-foreground hover:bg-primary py-5 px-5!">
+          <Button data-testid="btn-add-approver-trigger" className="bg-muted text-muted-foreground hover:bg-primary py-5 px-5!">
             <UserPlus className="mr-1 h-4 w-4" />
             Add approver
           </Button>
@@ -165,6 +165,7 @@ export function AddApproverDropdown({
       </PopoverTrigger>
 
       <PopoverContent
+        data-testid="add-approver-popover"
         align="end"
         className="z-60 w-95 px-4 py-3 border-0 border-b-[5px] border-primary bg-background"
         onWheel={(e) => e.stopPropagation()}
@@ -209,6 +210,7 @@ export function AddApproverDropdown({
               <div className="space-y-4 mb-4 max-h-[300px] overflow-y-auto pr-2">
                 {filteredSelectedUsers.map((member) => (
                   <div
+                    data-testid={`selected-approver-${member.userId}`}
                     key={member.userId}
                     className="flex items-center justify-between"
                   >
@@ -234,6 +236,7 @@ export function AddApproverDropdown({
                       {/* <div className="h-8 w-[2px] bg-gradient-to-b from-gray-200 via-[#001F3F] to-gray-200 rounded-full opacity-70" /> */}
                       <div className="h-6 w-0.5 bg-linear-to-b from-[#D1D1D6] via-[#000000] to-[#D1D1D6] rounded-md" />
                       <button
+                        data-testid={`btn-remove-approver-${member.userId}`}
                         onClick={() => setApproverToRemove(member.userId)}
                         disabled={isAdding}
                         className="text-gray-400 hover:text-red-500 disabled:opacity-50 transition-colors p-1"
@@ -248,6 +251,7 @@ export function AddApproverDropdown({
             {/* Footer */}
             <div className="border-t pt-3">
               <Button
+                data-testid="btn-change-approver"
                 className="w-full bg-primary hover:bg-primary cursor-pointer"
                 onClick={() => setView("select")}
               >
@@ -263,6 +267,7 @@ export function AddApproverDropdown({
             {/* Header */}
             <div className="flex items-center gap-2 mb-1">
               <Button
+                data-testid="btn-back-to-list"
                 size="icon"
                 variant="ghost"
                 onClick={() => setView("list")}
@@ -284,6 +289,7 @@ export function AddApproverDropdown({
                 <div className="relative mb-2">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
+                    data-testid="input-search-approvers"
                     placeholder="Search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -303,6 +309,7 @@ export function AddApproverDropdown({
                   ) : (
                     filteredMembers.map((member) => (
                       <div
+                        data-testid={`available-approver-${member.userId}`}
                         key={member.userId}
                         className={`flex items-center justify-between p-2 hover:bg-primary/10/30 rounded-md transition-colors group ${isAdding ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                         onClick={() => {

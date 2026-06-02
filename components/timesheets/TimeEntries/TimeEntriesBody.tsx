@@ -43,7 +43,7 @@ export default function TimeEntriesBody({ selectedWeek }: Props) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-12">
+      <div data-testid="time-entries-body-loading" className="flex flex-col items-center justify-center h-full text-center p-12">
         <Loader
           message="Loading timesheets..."
           size="md"
@@ -54,10 +54,18 @@ export default function TimeEntriesBody({ selectedWeek }: Props) {
 
   // 2️⃣ Empty state for selected week
   if (weekEntries.length === 0) {
-    return <EmptyTimeEntries selectedWeek={selectedWeek} />;
+    return (
+      <div data-testid="time-entries-body-empty">
+        <EmptyTimeEntries selectedWeek={selectedWeek} />
+      </div>
+    );
   }
 
   // 3️⃣ Filled entries
-  return <FilledTimeEntries selectedWeek={selectedWeek} />;
+  return (
+    <div data-testid="time-entries-body-filled">
+      <FilledTimeEntries selectedWeek={selectedWeek} />
+    </div>
+  );
 }
 

@@ -15,10 +15,11 @@ const GoalsList: React.FC<GoalsListProps> = ({ projects }) => {
   const router = useRouter()
 
   return (
-    <div className="-mx-4 space-y-2">
+    <div data-testid="projects-list-container" className="-mx-4 space-y-2">
       {projects.map(project => (
         <div
           key={project.id}
+          data-testid={`project-row-${project.id}`}
           className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary bg-white px-5 py-3 hover:bg-muted/50 transition"
           onClick={() => router.push(`/project/${project.id}`)}
         >
@@ -37,6 +38,7 @@ const GoalsList: React.FC<GoalsListProps> = ({ projects }) => {
             </div>
           </div>
           <ProjectActionsMenu
+            data-testid={`project-actions-menu-${project.id}`}
             onEdit={() => console.log('Edit project', project.id)}
             onDetach={() => console.log('Detach project', project.id)}
           />

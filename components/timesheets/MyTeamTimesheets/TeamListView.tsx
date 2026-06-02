@@ -160,7 +160,13 @@ const fadeSlideItem = {
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
-function StatusBadge({ status }: { status: UITimesheetStatus }) {
+function StatusBadge({
+  status,
+  userId,
+}: {
+  status: UITimesheetStatus;
+  userId: string;
+}) {
   const config: Record<
     UITimesheetStatus,
     { label: string; className: string }
@@ -175,12 +181,13 @@ function StatusBadge({ status }: { status: UITimesheetStatus }) {
 
   return (
     <span
+      data-testid={`timesheet-status-${userId}`}
       className={`
-      inline-flex items-center justify-center
-      w-full sm:w-[180px] md:w-[200px]
-      rounded-full px-3 py-1 text-xs font-medium
-      ${className}
-    `}
+        inline-flex items-center justify-center
+        w-full sm:w-[180px] md:w-[200px]
+        rounded-full px-3 py-1 text-xs font-medium
+        ${className}
+      `}
     >
       {label}
     </span>
@@ -272,9 +279,13 @@ function TimesheetRow({ sheet, expanded, onToggle, onApprove, onReject }: Timesh
     sheet.status === "Rejected" || sheet.status === "Pending" || sheet.status === "Approved";
 
   return (
-    <div className="border border-border border-l-4 border-l-[#001F3F] rounded-xl overflow-hidden bg-card shadow-sm mb-3">
+    <div
+      data-testid={`timesheet-row-${sheet.userId}`}
+      className="border border-border border-l-4 border-l-[#001F3F] rounded-xl overflow-hidden bg-card shadow-sm mb-3"
+    >
       {/* ── Header row ── */}
       <div
+        data-testid={`timesheet-row-header-${sheet.userId}`}
         className="flex items-center gap-4 px-5 py-4 cursor-pointer select-none"
         onClick={onToggle}
       >
@@ -308,7 +319,7 @@ function TimesheetRow({ sheet, expanded, onToggle, onApprove, onReject }: Timesh
         )}
 
         {/* Status badge */}
-        <StatusBadge status={sheet.status} />
+        <StatusBadge status={sheet.status} userId={sheet.userId} />
 
         {/* Toggle icon */}
         <button
@@ -379,6 +390,7 @@ function TimesheetRow({ sheet, expanded, onToggle, onApprove, onReject }: Timesh
 
                 <div className="ml-auto flex gap-2">
                   <Button
+                    data-testid={`btn-approve-timesheet-${sheet.userId}`}
                     size="sm"
                     variant="default"
                     className="w-24 bg-primary hover:bg-primary text-primary-foreground gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -388,6 +400,7 @@ function TimesheetRow({ sheet, expanded, onToggle, onApprove, onReject }: Timesh
                     <Check className="h-3.5 w-3.5" /> Approve
                   </Button>
                   <Button
+                    data-testid={`btn-reject-timesheet-${sheet.userId}`}
                     size="sm"
                     variant="destructive"
                     className="w-24 gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -521,7 +534,7 @@ export default function TeamListView({ selectedWeek, teamFilter }: TeamListViewP
 
   if (isApprovalLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+      <div data-testid="team-timesheet-loading-container" className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <Loader
           message="Loading timesheets..."
           size="md"
@@ -538,7 +551,7 @@ export default function TeamListView({ selectedWeek, teamFilter }: TeamListViewP
 
   if (!filtered.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+      <div data-testid="team-timesheet-no-filter-results" className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <p className="text-sm">No timesheets match this filter.</p>
       </div>
     );
@@ -546,7 +559,7 @@ export default function TeamListView({ selectedWeek, teamFilter }: TeamListViewP
 
   return (
     <>
-      <div className="space-y-2 p-4">
+      <div data-testid="team-timesheet-list" className="space-y-2 p-4">
         {filtered.map((sheet) => (
           <TimesheetRow
             key={sheet.userId}

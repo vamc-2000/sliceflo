@@ -29,7 +29,7 @@ const TeamMembersDisplay: React.FC<TeamMembersDisplayProps> = ({
   const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
   return (
-    <div className="flex items-center w-full">
+    <div data-testid="team-members-display" className="flex items-center w-full">
       {teamMembers.length > 1 ? (
         <>
           {/* Left: Avatars */}
@@ -55,6 +55,7 @@ const TeamMembersDisplay: React.FC<TeamMembersDisplayProps> = ({
 
           {/* Right: View all */}
           <button
+            data-testid="btn-view-all-members"
             onClick={() => setIsViewAllOpen(true)}
             className="ml-auto text-xs font-medium text-muted-foreground underline underline-offset-4 hover:opacity-80 cursor-pointer"
           >
@@ -84,6 +85,7 @@ const TeamMembersDisplay: React.FC<TeamMembersDisplayProps> = ({
       )}
 
       <ViewAllMembersModal
+        data-testid="modal-view-all-members"
         open={isViewAllOpen}
         onClose={() => setIsViewAllOpen(false)}
         members={teamMembers}

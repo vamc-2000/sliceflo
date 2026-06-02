@@ -141,8 +141,8 @@ export function ListView({ portfolioId }: ListViewProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Action Bar */}
-      <div className="bg-card border-b border-border p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-1">
           {/* Search bar */}
           <div className="relative flex">
             <Input
@@ -150,7 +150,7 @@ export function ListView({ portfolioId }: ListViewProps) {
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-2 pr-8 rounded w-[240px]"
+              className="pl-2 pr-8 rounded text-xs"
             />
             <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
           </div>
@@ -158,7 +158,7 @@ export function ListView({ portfolioId }: ListViewProps) {
           {/* Group By Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer">
+              <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs">
                 <Layers className="h-4 w-4" />
                 Group by: <span className="capitalize">{groupBy}</span>
               </Button>
@@ -166,19 +166,19 @@ export function ListView({ portfolioId }: ListViewProps) {
             <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-primary p-1">
               <DropdownMenuItem
                 onClick={() => setGroupBy("phase")}
-                className="cursor-pointer text-sm"
+                className="cursor-pointer text-xs"
               >
                 Phase
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setGroupBy("status")}
-                className="cursor-pointer text-sm"
+                className="cursor-pointer text-xs"
               >
                 Status
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setGroupBy("none")}
-                className="cursor-pointer text-sm"
+                className="cursor-pointer text-xs"
               >
                 None
               </DropdownMenuItem>
@@ -190,7 +190,7 @@ export function ListView({ portfolioId }: ListViewProps) {
               variant="secondary"
               size="sm"
               onClick={() => setShowSortOptions(!showSortOptions)}
-              className={`rounded cursor-pointer ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
+              className={`rounded cursor-pointer text-xs ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
             >
               <SlidersVertical className="h-4 w-4" />
             </Button>
@@ -199,7 +199,7 @@ export function ListView({ portfolioId }: ListViewProps) {
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <ArrowUpDown className="h-4 w-4" />
                       Sort
                     </Button>
@@ -211,7 +211,7 @@ export function ListView({ portfolioId }: ListViewProps) {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <Funnel className="h-4 w-4" />
                       Filter
                     </Button>
@@ -242,7 +242,7 @@ export function ListView({ portfolioId }: ListViewProps) {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <Monitor className="h-4 w-4" />
                       Display
                     </Button>

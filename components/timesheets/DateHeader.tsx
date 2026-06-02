@@ -166,7 +166,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
     const today = new Date();
 
     return (
-        <div className="flex items-center justify-between bg-background px-6 py-1">
+        <div data-testid="date-header-container" className="flex items-center justify-between bg-background px-6 py-1">
             {/* Left */}
             <div className="flex items-center gap-1.5 text-foreground">
                 {/* <span className="text-[15px] font-medium mr-1">
@@ -174,6 +174,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 </span> */}
                 {/* Left chevron */}
                 <button
+                    data-testid="btn-prev-week"
                     onClick={() => shiftWeek("prev")}
                     disabled={!selectedWeek}
                     className="p-0.5 disabled:opacity-40 cursor-pointer "
@@ -186,7 +187,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 {/* Date text → opens calendar */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <button className="font-medium px-1 cursor-pointer ">
+                        <button data-testid="btn-select-week" className="font-medium px-1 cursor-pointer ">
                             {selectedWeek
                                 ? `${formatShortDate(selectedWeek.start)} - ${formatShortDate(selectedWeek.end)}`
                                 : "Select week"}
@@ -208,6 +209,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
 
                 {/* Right chevron */}
                 <button
+                    data-testid="btn-next-week"
                     onClick={() => shiftWeek("next")}
                     disabled={!selectedWeek}
                     className="p-0.5 disabled:opacity-40 cursor-pointer "
@@ -231,6 +233,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                     userId={userId}
                     trigger={
                         <Button
+                            data-testid="btn-approvers"
                             variant="ghost"
                             // disabled={isFrozen}
                             className="bg-muted text-foreground hover:bg-muted/80 h-10 px-4 flex items-center gap-3 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
@@ -245,6 +248,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 {/* Conditional action button */}
                 {myView === "timesheet" && (
                     <Button
+                        data-testid="btn-add-entry"
                         className="bg-primary text-primary-foreground hover:bg-primary/90 py-5 px-5! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={onAddEntry}
                         disabled={isFrozen}
@@ -256,6 +260,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
 
                 {myView === "clipboard" && (
                     <Button
+                        data-testid="btn-send-approval"
                         className="bg-primary text-primary-foreground hover:bg-primary/90 py-5 px-5! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => setOpenApproval(true)}
                         disabled={isFrozen}

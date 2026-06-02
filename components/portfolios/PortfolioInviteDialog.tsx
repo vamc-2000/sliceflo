@@ -80,17 +80,17 @@ const PortfolioInviteDialog: React.FC<PortfolioInviteDialogProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Invite to {portfolioName}</DialogTitle>
+          <DialogTitle className="text-sm font-bold text-foreground">Invite to {portfolioName}</DialogTitle>
         </DialogHeader>
 
         {/* Shareable Link Section */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Invite with Shareable link</Label>
-          <div className="flex items-center gap-2 p-3 border rounded-md bg-gray-50">
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold text-foreground">Invite with Shareable link</Label>
+          <div className="flex items-center gap-2 p-2 border border-border rounded-md bg-muted h-9">
             <Input
               value={sharableLink}
               readOnly
-              className="border-0 bg-transparent focus-visible:ring-0 p-0"
+              className="border-0 bg-transparent focus-visible:ring-0 p-0 text-xs"
             />
             <Button
               variant="ghost"
@@ -104,14 +104,14 @@ const PortfolioInviteDialog: React.FC<PortfolioInviteDialogProps> = ({
         </div>
 
         {/* Email Section */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Invite with email</Label>
-          <div className="border rounded-md p-3 space-y-2">
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold text-foreground">Invite with email</Label>
+          <div className="border border-border rounded-md p-2 space-y-2">
             {/* Email Chips */}
             {emailList.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {emailList.map((email) => (
-                  <Badge key={email} variant="secondary" className="gap-1">
+                  <Badge key={email} variant="secondary" className="gap-1 text-xs">
                     {email}
                     <X
                       className="h-3 w-3 cursor-pointer hover:text-destructive"
@@ -128,7 +128,7 @@ const PortfolioInviteDialog: React.FC<PortfolioInviteDialogProps> = ({
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-[#8E8E93]"
+              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-muted-foreground placeholder:text-muted-foreground text-xs h-7"
             />
           </div>
 
@@ -142,7 +142,7 @@ const PortfolioInviteDialog: React.FC<PortfolioInviteDialogProps> = ({
           <Button
             onClick={handleSendInvite}
             disabled={emailList.length === 0 || inviteLoading}
-            className="w-full bg-[#001F3F] hover:bg-[#001F3F]/90"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs h-9"
           >
             {inviteLoading ? (
               <>

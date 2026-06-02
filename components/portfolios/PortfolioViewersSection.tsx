@@ -262,13 +262,13 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
             <TabsList className="w-full flex gap-1 bg-transparent border-b rounded-none p-0 justify-end">
               <TabsTrigger
                 value="teams"
-                className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
                 Teams
               </TabsTrigger>
               <TabsTrigger
                 value="members"
-                className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
               >
                 Members
               </TabsTrigger>
@@ -292,7 +292,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
                     {searchQuery ? "No teams found" : "No teams available"}
                   </p>
                   {!searchQuery && (
-                    <Button size="sm" onClick={onInviteClick} className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white">
+                    <Button size="sm" onClick={onInviteClick} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                       <Plus className="h-4 w-4 mr-1" /> Invite
                     </Button>
                   )}
@@ -345,7 +345,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
                           disabled={addedTeams.has(team.id)}
                           onCheckedChange={(checked) => toggleTeamSelect(team.id, Boolean(checked))}
                           onClick={(e) => e.stopPropagation()}
-                          className="border-[#8E8E93]"
+                          className="border-border"
                         />
                       </div>
 
@@ -368,7 +368,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
                                     checked={selectedTeamMembers[team.id]?.has(member.id)}
                                     disabled={isLoading || addedTeams.has(team.id)}
                                     onCheckedChange={(checked) => toggleTeamMemberSelect(team.id, member.id, Boolean(checked))}
-                                    className="border-[#8E8E93]"
+                                    className="border-border"
                                   />
                                 </div>
                               ))}
@@ -376,7 +376,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
                               {/* Add Selected button */}
                               <Button
                                 size="sm"
-                                className="mt-0 w-full bg-[#001F3F] text-white disabled:opacity-50"
+                                className="mt-0 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                                 disabled={(selectedTeamMembers[team.id]?.size ?? 0) === 0 || isLoading || addedTeams.has(team.id)}
                                 onClick={async () => {
                                   const selectedIds = Array.from(selectedTeamMembersRef.current[team.id] ?? []);
@@ -435,7 +435,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
                     {searchQuery ? "No members found" : "No available members"}
                   </p>
                   {!searchQuery && (
-                    <Button size="sm" onClick={onInviteClick} className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white">
+                    <Button size="sm" onClick={onInviteClick} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                       <Plus className="h-4 w-4 mr-1" /> Invite
                     </Button>
                   )}
@@ -488,7 +488,7 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
             {displayedViewers.map((viewer, index) => (
               <Avatar
                 key={viewer?.userId}
-                className="h-8 w-8 border-2 border-white ring-1 ring-gray-200"
+                className="h-8 w-8 border-2 border-background ring-1 ring-border"
                 style={{ zIndex: displayedViewers.length - index }}
               >
                 <AvatarImage src={viewer?.fullProfilePictureUrl} alt={viewer?.name} />
@@ -498,8 +498,8 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
               </Avatar>
             ))}
             {remainingCount > 0 && (
-              <div className="h-8 w-8 rounded-full bg-gray-100 border-2 border-white ring-1 ring-gray-200 flex items-center justify-center">
-                <span className="text-xs font-medium text-gray-600">+{remainingCount}</span>
+              <div className="h-8 w-8 rounded-full bg-muted border-2 border-background ring-1 ring-border flex items-center justify-center">
+                <span className="text-xs font-medium text-muted-foreground">+{remainingCount}</span>
               </div>
             )}
           </div>
@@ -555,14 +555,14 @@ const PortfolioViewersSection: React.FC<PortfolioViewersSectionProps> = ({
         )}
       </div>
 
-      <Separator className="text-[#D1D1D6]" />
+      <Separator className="bg-border" />
 
       {/* Action Buttons Row */}
       <div className="grid grid-cols-2 gap-2">
-        <Button size="sm" onClick={onInviteClick} className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white">
+        <Button size="sm" onClick={onInviteClick} className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <Plus className="h-4 w-4 mr-1" /> Invite
         </Button>
-        <Button size="sm" onClick={() => setShowAddInterface(true)} className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white">
+        <Button size="sm" onClick={() => setShowAddInterface(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <Plus className="h-4 w-4 mr-1" /> Add
         </Button>
       </div>

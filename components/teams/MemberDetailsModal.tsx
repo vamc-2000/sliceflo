@@ -63,7 +63,7 @@ const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-95 rounded-xl p-6 border-0 border-b-[5px] border-[#001F3F]">
+      <DialogContent data-testid="modal-member-details" className="w-95 rounded-xl p-6 border-0 border-b-[5px] border-[#001F3F]">
         {/* Close Button */}
         {/* <Button
           variant="ghost"
@@ -127,6 +127,7 @@ const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
               </p>
             </div>
             <Button
+              data-testid={`btn-send-email-${member.id}`}
               variant="ghost"
               size="icon"
               onClick={handleSendEmail}

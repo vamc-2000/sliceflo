@@ -36,9 +36,11 @@ export default function SortMenu({
 
   const renderMenuItem = (label: string, value: SortOption) => {
     const isSelected = sortOption === value;
+    const testId = `sort-menu-option-${value}`;
 
     return (
       <div
+        data-testid={testId}
         className={cn(
           "flex items-center justify-between rounded-none cursor-pointer px-3 py-2 text-xs transition-colors",
           isSelected
@@ -54,6 +56,7 @@ export default function SortMenu({
 
         {isSelected && (
           <Button
+            data-testid={`sort-menu-clear-${value}`}
             size="icon"
             variant="ghost"
             className="w-5 h-5 ml-2 rounded-full bg-muted hover:bg-red-100 hover:text-red-600"
@@ -77,6 +80,7 @@ export default function SortMenu({
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
               <Button
+                data-testid="sort-menu-trigger-btn"
                 variant="ghost"
                 size="icon"
                 className={cn(
@@ -98,6 +102,7 @@ export default function SortMenu({
       </TooltipProvider>
 
       <DropdownMenuContent
+        data-testid="sort-menu-content"
         side="bottom"
         align="start"
         className="w-45 text-xs border-0 border-b-[5px] border-primary rounded shadow-xl shadow-primary/20 mt-1"

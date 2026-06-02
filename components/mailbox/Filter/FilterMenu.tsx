@@ -21,11 +21,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 import NotificationTypeMenu from "./NotificationTypeMenu";
-import Milestone from "./Milestone";
 import User from "./User";
 import { useProjectsStore, TaskTypeConfig, DEFAULT_BACKEND_TYPE_IMAGES } from "@/stores/projects-store";
 import { iconComponentMap } from "@/components/ColorIconPicker";
@@ -316,6 +313,7 @@ export default function FilterMenu({
                     <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                             <Button
+                                data-testid="filter-menu-trigger-btn"
                                 variant="ghost"
                                 size="icon"
                                 className={`relative h-8 w-8 rounded-md transition-all duration-200
@@ -337,6 +335,7 @@ export default function FilterMenu({
             </TooltipProvider>
 
             <DropdownMenuContent
+                data-testid="filter-menu-content"
                 className="w-56 border-0 border-b-[5px] border-primary rounded-lg shadow-xl shadow-primary/20 mt-0"
                 side="bottom"
                 align="start"
@@ -345,7 +344,7 @@ export default function FilterMenu({
                 <div className="flex flex-col">
                     <Popover open={openNotification} onOpenChange={setOpenNotification}>
                         <PopoverTrigger asChild>
-                            <button className="flex items-center justify-between px-3 py-2 hover:bg-muted rounded-md">
+                            <button data-testid="filter-menu-notification-type-trigger" className="flex items-center justify-between px-3 py-2 hover:bg-muted rounded-md">
                                 <span className="text-xs font-medium text-foreground ml-0.5">Notification type</span>
                                 <ChevronRight className="h-4 w-4 text-foreground" />
                             </button>
@@ -396,6 +395,7 @@ export default function FilterMenu({
                         <PopoverTrigger asChild>
                             {/* <button className="w-full flex items-center justify-between px-3 py-2 text-xs rounded hover:bg-muted text-[#001F3F] font-medium"> */}
                             <button
+                                data-testid="filter-menu-project-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("project:"))
                                     ? "border-l-primary text-primary bg-background"  // ✅ active: primary left border
                                     : "border-l-transparent text-foreground"           // ✅ inactive: no border
@@ -417,6 +417,7 @@ export default function FilterMenu({
                                 projects.map((project) => (
                                     <button
                                         key={project.id}
+                                        data-testid={`filter-menu-project-item-${project.id}`}
                                         onClick={() => {
                                             // toggleFilter(`project:${project.id}`); //More than one project we can select
                                             selectProject(project.id!);
@@ -454,9 +455,10 @@ export default function FilterMenu({
                     <Popover open={openMilestone} onOpenChange={setOpenMilestone}>
                         <PopoverTrigger asChild>
                             <button
+                                data-testid="filter-menu-task-type-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("taskType:"))
-                                        ? "border-l-primary text-primary bg-background"
-                                        : "border-l-transparent text-foreground"
+                                    ? "border-l-primary text-primary bg-background"
+                                    : "border-l-transparent text-foreground"
                                     }`}
                             >
                                 Task type
@@ -477,14 +479,15 @@ export default function FilterMenu({
                                 allTaskTypes.map((taskType) => (
                                     <button
                                         key={taskType._id || taskType.value}
+                                        data-testid={`filter-menu-task-type-item-${taskType.value}`}
                                         onClick={() => {
                                             selectTaskType(taskType.value);
                                             setOpenMilestone(false);
                                             setOpen(false);
                                         }}
                                         className={`w-full flex items-center px-2 py-2 gap-2 text-xs rounded-none hover:bg-muted border-l-2 transition-colors ${isChecked(`taskType:${taskType.value}`)
-                                                ? "border-l-primary bg-background"
-                                                : "border-l-transparent"
+                                            ? "border-l-primary bg-background"
+                                            : "border-l-transparent"
                                             }`}
                                     >
                                         {renderTaskTypeVisual(taskType, "w-3.5 h-3.5")}
@@ -514,6 +517,7 @@ export default function FilterMenu({
                     <Popover open={openPriority} onOpenChange={setOpenPriority}>
                         <PopoverTrigger asChild>
                             <button
+                                data-testid="filter-menu-priority-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("priority:"))
                                     ? "border-l-primary text-primary bg-background"
                                     : "border-l-transparent text-foreground"
@@ -534,6 +538,7 @@ export default function FilterMenu({
                                 allTaskPriorities.map((priority) => (
                                     <button
                                         key={priority.value}
+                                        data-testid={`filter-menu-priority-item-${priority.value}`}
                                         onClick={() => {
                                             // toggleFilter(`priority:${priority.value}`);
                                             selectPriority(priority.value); // ✅ replaces toggleFilter
@@ -575,6 +580,7 @@ export default function FilterMenu({
                     <Popover open={openStatus} onOpenChange={setOpenStatus}>
                         <PopoverTrigger asChild>
                             <button
+                                data-testid="filter-menu-status-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("status:"))
                                     ? "border-l-primary text-primary bg-background"
                                     : "border-l-transparent text-foreground"
@@ -595,6 +601,7 @@ export default function FilterMenu({
                                 allTaskStatuses.map((status) => (
                                     <button
                                         key={status.value}
+                                        data-testid={`filter-menu-status-item-${status.value}`}
                                         onClick={() => {
                                             selectStatus(status.value);
                                             setOpenStatus(false);
@@ -637,6 +644,7 @@ export default function FilterMenu({
                     <Popover open={openUser} onOpenChange={setOpenUser}>
                         <PopoverTrigger asChild>
                             <button
+                                data-testid="filter-menu-user-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("user:"))
                                     ? "border-l-primary text-primary bg-background"  // ✅ active
                                     : "border-l-transparent text-foreground"          // ✅ inactive
@@ -663,6 +671,7 @@ export default function FilterMenu({
                     <Popover open={openFrom} onOpenChange={setOpenFrom}>
                         <PopoverTrigger asChild>
                             <button
+                                data-testid="filter-menu-from-trigger"
                                 className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-none hover:bg-muted font-medium border-l-2 transition-colors ${selectedFilters.some((f) => f.startsWith("from:"))
                                     ? "border-l-primary text-primary bg-background"  // ✅ active
                                     : "border-l-transparent text-foreground"         // ✅ inactive
@@ -685,6 +694,7 @@ export default function FilterMenu({
                                     return (
                                         <button
                                             key={user.id}
+                                            data-testid={`filter-menu-from-item-${user.id}`}
                                             onClick={() => {
                                                 selectFrom(user.id);
                                                 setOpenFrom(false);
@@ -742,6 +752,7 @@ export default function FilterMenu({
                     {/* Clear All Filters */}
                     {selectedFilters.length > 0 && (
                         <button
+                            data-testid="filter-menu-clear-all-btn"
                             onClick={() => {
                                 onChange([]);
                                 setSelected(Object.fromEntries(Object.keys(selected).map((k) => [k, false])));

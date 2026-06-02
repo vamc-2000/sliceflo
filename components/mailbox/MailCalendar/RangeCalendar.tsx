@@ -64,12 +64,13 @@ export default function RangeCalendar({
     const isActive = !!value?.from || !!value?.to;
 
     return (
-        <div className="flex flex-col gap-3 p-2 border-0 border-b-5 border-primary rounded-xl">   
+        <div data-testid="range-calendar-container" className="flex flex-col gap-3 p-2 border-0 border-b-5 border-primary rounded-xl">
             {/* Start + End Date Fields */}
-            <div className="grid grid-cols-2 gap-2">
+            <div data-testid="range-calendar-inputs" className="grid grid-cols-2 gap-2">
                 <div className="relative">
                     <Calendar1 className={`absolute left-2 top-1/2 -translate-y-1/2 size-5 p-[3px] rounded bg-background ${fromDate ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`} />
                     <Input
+                        data-testid="range-calendar-start-input"
                         placeholder="Start date"
                         className="pl-8"
                         value={fromDate}
@@ -83,6 +84,7 @@ export default function RangeCalendar({
                     />
                     {fromDate && (
                         <X
+                            data-testid="range-calendar-clear-start"
                             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground size-3.5"
                             onClick={() => {
                                 setFromDate("");
@@ -95,6 +97,7 @@ export default function RangeCalendar({
                 <div className="relative">
                     <Calendar1 className={`absolute left-2 top-1/2 -translate-y-1/2 size-5 p-[3px] rounded bg-background ${toDate ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`} />
                     <Input
+                        data-testid="range-calendar-end-input"
                         placeholder="End date"
                         className="pl-8"
                         value={toDate}
@@ -108,6 +111,7 @@ export default function RangeCalendar({
                     />
                     {toDate && (
                         <X
+                            data-testid="range-calendar-clear-end"
                             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground size-3.5"
                             onClick={() => {
                                 setToDate("");
@@ -120,6 +124,7 @@ export default function RangeCalendar({
 
             {/* Calendar */}
             <Calendar
+                data-testid="range-calendar-picker"
                 key={`${value?.from?.toISOString() ?? "none"}-${value?.to?.toISOString() ?? "none"}`}
                 mode="range"
                 numberOfMonths={2}

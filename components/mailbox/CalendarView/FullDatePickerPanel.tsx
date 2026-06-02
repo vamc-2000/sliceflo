@@ -52,12 +52,13 @@ export default function FullDatePickerPanel({
   };
 
   return (
-    <div className="flex w-full items-start">
+    <div data-testid="full-date-picker-panel" className="flex w-full items-start">
       {/* LEFT SIDE SHORTCUTS */}
-      <div className="w-[273px] border-r pl-2 pt-2.5 flex flex-col gap-1">
+      <div data-testid="full-date-picker-shortcuts" className="w-[273px] border-r pl-2 pt-2.5 flex flex-col gap-1">
         {shortcuts.map((s) => (
           <button
             key={s.label}
+            data-testid={`full-date-picker-shortcut-${s.label.toLowerCase().replace(/\s+/g, "-")}`}
             onClick={() => onSelectShortcut(s.value)}
             className="text-left px-2 py-2 rounded-md hover:bg-gray-100 text-sm flex justify-between"
           >
@@ -68,9 +69,10 @@ export default function FullDatePickerPanel({
       </div>
 
       {/* RIGHT SIDE CALENDAR */}
-      <div className="flex-1 p-3 pt-0">
+      <div data-testid="full-date-picker-calendar-wrapper" className="flex-1 p-3 pt-0">
         <div className="-mt-1">
           <Calendar
+            data-testid="full-date-picker-calendar"
             mode="range"
             // selected={startDate && dueDate ? { from: startDate, to: dueDate } : undefined}
             selected={

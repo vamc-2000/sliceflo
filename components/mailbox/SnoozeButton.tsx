@@ -38,30 +38,34 @@ export default function SnoozedButton({ open, onClose, email, onSnoozeSelect }: 
   return (
     <Popover open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <PopoverTrigger asChild>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-12 w-12"
-    >
-      <MdSnooze className="!h-5 !w-5 text-muted-foreground" />
-    </Button>
-    </PopoverTrigger>
+        <Button
+          data-testid="snooze-trigger-btn"
+          variant="ghost"
+          size="icon"
+          className="h-12 w-12"
+        >
+          <MdSnooze className="!h-5 !w-5 text-muted-foreground" />
+        </Button>
+      </PopoverTrigger>
 
-      <PopoverContent 
-        className="w-[310px] p-2 rounded-lg" 
-        side="bottom" 
+      <PopoverContent
+        data-testid="snooze-popover-content"
+        className="w-[310px] p-2 rounded-lg"
+        side="bottom"
         align="start"
         sideOffset={0}
-    >
+      >
         <Input
+          data-testid="snooze-search-input"
           placeholder='Try "Tomorrow at 2 PM"...'
           className="mb-2 bg-muted rounded-lg h-9 text-sm px-2"
         />
 
-        <ScrollArea className="max-h-[300px]">
+        <ScrollArea data-testid="snooze-options-list" className="max-h-[300px]">
           {options.map((opt, idx) => (
             <div
               key={idx}
+              data-testid={`snooze-option-${opt.label.toLowerCase().replace(/\s+/g, "-")}`}
               className="flex justify-between items-center px-2 py-2 rounded-md hover:bg-muted cursor-pointer"
               onClick={handleSelect}
             >
@@ -73,19 +77,23 @@ export default function SnoozedButton({ open, onClose, email, onSnoozeSelect }: 
           {/* Custom date & time with submenu */}
           <Popover>
             <PopoverTrigger asChild>
-              <div className="flex justify-between items-center px-2 py-2 rounded-md hover:bg-muted cursor-pointer">
+              <div
+                data-testid="snooze-custom-date-trigger"
+                className="flex justify-between items-center px-2 py-2 rounded-md hover:bg-muted cursor-pointer"
+              >
                 <span className="font-medium text-foreground">Custom date & time...</span>
                 <ChevronRight className="text-foreground" />
               </div>
             </PopoverTrigger>
 
             <PopoverContent
+              data-testid="snooze-custom-date-popover"
               className="w-[250px] p-0 rounded-lg"
               side="right"
               align="start"
-
             >
               <Calendar
+                data-testid="snooze-custom-calendar"
                 mode="single"
                 selected={date}
                 onSelect={(d) => {

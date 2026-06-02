@@ -267,7 +267,7 @@ export function PortfolioHeader({
 
   return (
     <>
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         {/* ── Main Header Row ── */}
         <div className="flex items-center justify-between px-4 py-1">
 
@@ -387,7 +387,7 @@ export function PortfolioHeader({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-[400px] p-4 border border-b-[5px] border-b-[#001F3F]"
+                  className="w-[400px] p-4 border border-b-[5px] border-b-primary"
                   align="start"
                 >
                   <PortfolioViewersSection
@@ -411,21 +411,21 @@ export function PortfolioHeader({
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="border-b-4 border-b-[#001F3F] p-2">
+              <DropdownMenuContent align="start" className="border-b-4 border-b-primary p-1.5">
 
-                <DropdownMenuItem className="px-2 py-1.5 justify-center text-sm font-medium bg-[#001F3F] text-background rounded-md">
+                <DropdownMenuItem className="px-2 py-1.5 justify-center text-xs font-medium bg-primary text-primary-foreground rounded-md">
                   Sharing & Permissions
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => { setNewName(portfolio.name); setIsRenaming(true); }}>
+                <DropdownMenuItem onClick={() => { setNewName(portfolio.name); setIsRenaming(true); }} className="text-xs">
                   <Pencil className="mr-2 h-4 w-4" /> Rename
                 </DropdownMenuItem>
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger className="text-xs">
                     <Layers className="mr-2 h-4 w-4" /> Group actions
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="border-b-4 border-b-[#001F3F] min-w-[200px]">
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[200px] p-1.5">
                     <DropdownMenuItem
                       onClick={() =>
                         allGroupsCollapsed
@@ -433,12 +433,14 @@ export function PortfolioHeader({
                           : onCollapseAllGroups?.()
                       }
                       disabled={totalGroupsCount === 0}
+                      className="text-xs"
                     >
                       {allGroupsCollapsed ? "Expand all groups" : "Collapse all groups"}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onToggleHideEmptyGroups?.()}
                       disabled={totalGroupsCount === 0}
+                      className="text-xs"
                     >
                       {hideEmptyGroups ? "Show empty groups" : "Hide empty groups"}
                     </DropdownMenuItem>
@@ -448,32 +450,32 @@ export function PortfolioHeader({
                 <DropdownMenuSeparator className="mx-2 my-0" />
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger className="text-xs">
                     <MoreVertical className="mr-2 h-4 w-4" /> More actions
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="border-b-4 border-b-[#001F3F]">
-                    <DropdownMenuItem>Templates</DropdownMenuItem>
-                    <DropdownMenuItem>Automations</DropdownMenuItem>
-                    <DropdownMenuItem>Integrations</DropdownMenuItem>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
+                    <DropdownMenuItem className="text-xs">Templates</DropdownMenuItem>
+                    <DropdownMenuItem className="text-xs">Automations</DropdownMenuItem>
+                    <DropdownMenuItem className="text-xs">Integrations</DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger className="text-xs">
                     <Link className="mr-2 h-4 w-4" /> Copy Portfolio Info
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="border-b-4 border-b-[#001F3F]">
-                    <DropdownMenuItem onClick={handleCopyPortfolioLink}>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
+                    <DropdownMenuItem onClick={handleCopyPortfolioLink} className="text-xs">
                       Portfolio Link
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleCopyPortfolioId}>
+                    <DropdownMenuItem onClick={handleCopyPortfolioId} className="text-xs">
                       Portfolio ID
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
 
                 {onActivityLogClick && (
-                  <DropdownMenuItem onClick={onActivityLogClick}>
+                  <DropdownMenuItem onClick={onActivityLogClick} className="text-xs">
                     <Activity className="mr-2 h-4 w-4" /> Activity log
                   </DropdownMenuItem>
                 )}
@@ -481,35 +483,35 @@ export function PortfolioHeader({
                 <DropdownMenuSeparator className="mx-2 my-0" />
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger className="text-xs">
                     <Upload className="mr-2 h-4 w-4" /> Import / Export
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="border-b-4 border-b-[#001F3F] min-w-[160px]">
-                    <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[160px] p-1.5">
+                    <DropdownMenuItem className="cursor-pointer text-xs">
                       Import
                     </DropdownMenuItem>
                     <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="cursor-pointer">
+                      <DropdownMenuSubTrigger className="cursor-pointer text-xs">
                         Export
                       </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent className="border-b-4 border-b-[#001F3F] min-w-[140px]">
+                      <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[140px] p-1.5">
                         <DropdownMenuItem
                           onClick={() => { onPrint?.(); }}
-                          className="flex items-center gap-2.5 cursor-pointer"
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
                         >
                           <Image src="/images/pdf.svg" alt="PDF" width={20} height={20} className="object-contain" />
                           PDF
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => { onExportCSV?.(); }}
-                          className="flex items-center gap-2.5 cursor-pointer"
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
                         >
                           <Image src="/images/csv.svg" alt="CSV" width={20} height={20} className="object-contain" />
                           CSV
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => { onExportExcel?.(); }}
-                          className="flex items-center gap-2.5 cursor-pointer"
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
                         >
                           <Image src="/images/excel.svg" alt="Excel" width={20} height={20} className="object-contain" />
                           Excel

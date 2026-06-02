@@ -42,7 +42,7 @@ export function CreatePortfolioDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl p-16 gap-0 bg-muted">
         <DialogHeader className="px-6 p-4 gap-0">
-          <DialogTitle className="text-2xl font-semibold text-center text-foreground">
+          <DialogTitle className="text-2xl font-semibold text-foreground">
             Create a new Portfolio?
           </DialogTitle>
           <p className="text-center text-muted-foreground">
@@ -98,14 +98,14 @@ export function CreatePortfolioDialog({
           <div>
             <button
               onClick={handleCreateEmptyPortfolio}
-              className="w-full h-full min-h-xs p-8 rounded-md bg-card shadow-md border border-border transition-all group cursor-pointer hover:bg-muted/50"
+              className="w-full h-full min-h-xs p-8 rounded-md bg-card shadow-md border border-border transition-all group cursor-pointer"
             >
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <div className="relative">
                   <div className="bg-muted p-5 rounded-full group-hover:bg-muted/80 transition-colors">
-                    <Table2 className="w-12 h-12 text-muted-foreground" />
+                    <Table2 className="w-12 h-12 text-foreground" />
                   </div>
-                  <div className="absolute -top-0.5 -right-0.5 bg-accent rounded-full p-1 border-2 border-background">
+                  <div className="absolute -top-0.5 -right-0.5 bg-accent rounded-full p-1 border-2 border-white">
                     <Plus className="w-4 h-4 text-foreground" />
                   </div>
                 </div>

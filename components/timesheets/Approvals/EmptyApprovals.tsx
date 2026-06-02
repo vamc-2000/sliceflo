@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function EmptyApprovals() {
     return (
-        <div className="flex w-full items-center justify-center py-34">
+        <div data-testid="empty-approvals-container" className="flex w-full items-center justify-center py-34">
             <div className="flex flex-col items-center text-center gap-4">
                 {/* Timer illustration */}
                 <div className="relative h-24 w-24">
@@ -26,7 +26,7 @@ export default function EmptyApprovals() {
                 </div>
 
                 {/* CTA button */}
-                <Button className="mt-2 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                <Button data-testid="btn-setup-approvals" className="mt-2 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
                     Setup Timesheet Approvals
                 </Button>
             </div>

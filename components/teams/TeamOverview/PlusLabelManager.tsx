@@ -69,11 +69,13 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
 
   return (
     <div
+      data-testid="label-manager-container"
       className={`w-[280px] bg-card text-card-foreground overflow-hidden rounded-lg ${showBorder ? 'border-b-[5px] border-b-primary' : ''}`}
     >
       {/* Search */}
       <div className="p-2 border-b">
         <input
+          data-testid="input-label-search"
           type="text"
           placeholder="Search labels..."
           value={searchTerm}
@@ -102,6 +104,7 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
                     <span className="text-xs font-medium text-foreground">{label.name}</span>
                   </div>
                   <button
+                    data-testid={`btn-remove-label-${label.id}`}
                     onClick={() => handleDeleteLabel(label.id)}
                     className="text-red-400 hover:text-red-600 p-0.5 rounded transition-colors"
                     type="button"
@@ -127,6 +130,7 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
                 return (
                   <button
                     key={label.id}
+                    data-testid={`btn-toggle-label-${label.id}`}
                     onClick={() => toggleLabel(label)}
                     className={`w-full flex items-center justify-between p-2 rounded text-left transition-all duration-150 ${
                     isSelected ? 'bg-muted' : 'hover:bg-muted/50'
@@ -146,7 +150,12 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
                 )
               })
             ) : (
-              <p className="text-[10px] text-muted-foreground text-center py-2">No labels found</p>
+              <p 
+                data-testid="empty-labels-state"
+                className="text-[10px] text-muted-foreground text-center py-2"
+              >
+                  No labels found
+              </p>
             )}
           </div>
         </div>
@@ -158,6 +167,7 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
           </h4>
           <div className="space-y-2">
             <input
+              data-testid="input-new-label-name"
               type="text"
               value={newLabelName}
               onChange={(e) => setNewLabelName(e.target.value)}
@@ -169,6 +179,7 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
               {availableColors.map((color) => (
                 <button
                   key={color}
+                  data-testid={`btn-select-color-${color.replace('#', '')}`}
                   onClick={() => setNewLabelColor(color)}
                   className={`w-5 h-5 rounded-full border transition-transform hover:scale-110 ${
                     newLabelColor === color ? 'border-foreground ring-1 ring-foreground' : 'border-transparent'
@@ -181,6 +192,7 @@ const PlusLabelManager: React.FC<LabelManagerProps> = ({
             </div>
             <button
               onClick={handleAddLabel}
+              data-testid="btn-create-label"
               disabled={!newLabelName.trim()}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-semibold py-1.5 px-3 rounded shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex items-center justify-center gap-1"
               type="button"

@@ -98,6 +98,7 @@ export default function ProjectTaskPicker({
               return (
                 <AccordionItem key={project.id} value={project.id!}>
                   <AccordionTrigger
+                    data-testid={`project-picker-accordion-${project.id}`}
                     onClick={() => setSelectedProjectId(project.id!)}
                     className="flex items-center justify-between rounded-xl bg-muted px-4 py-3 hover:no-underline cursor-pointer"
                   >
@@ -135,6 +136,7 @@ export default function ProjectTaskPicker({
                     >
                       {projectTasks.map((task) => (
                         <label
+                          data-testid={`project-picker-task-${task.id}`}
                           key={task.id}
                           className={`
                             grid grid-cols-[20px_120px_1fr] items-center

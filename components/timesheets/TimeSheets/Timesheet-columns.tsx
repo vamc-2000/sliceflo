@@ -35,6 +35,7 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
         <Center>
           <div className="flex flex-col items-start leading-tight text-left max-w-[200px] w-full">
             <span
+              data-testid="cell-task-name"
               className="font-medium text-sm text-foreground truncate w-full"
               title={task || ""}
             >
@@ -63,6 +64,7 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
         <Center>
           {html ? (
             <div
+              data-testid="cell-description"
               className="max-w-[220px] truncate text-left text-sm"
               dangerouslySetInnerHTML={{ __html: html }}
             />
@@ -83,6 +85,7 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
       return (
         <Center>
           <Button
+            data-testid="cell-billable-icon"
             variant="outline"
             size="icon"
             className={`h-7 w-7 rounded-full transition-colors

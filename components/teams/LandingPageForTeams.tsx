@@ -27,7 +27,7 @@ export function LandingPageForTeams({
     imageHeight = 400,
 }: LandingPageProps) {
     return (
-        <div className="bg-white px-4 py-3">
+        <div data-testid="landing-page-teams" className="bg-white px-4 py-3">
             {/* <div className="min-h-screen bg-white"> */}
             <div className="flex items-center justify-center px-4 py-1 ">
                 <div className="w-full max-w-[1800px] mx-auto text-center px-5 space-y-1">
@@ -63,6 +63,7 @@ export function LandingPageForTeams({
                     {/* CTA Button */}
                     <div className="py-2">
                         <Button
+                            data-testid="btn-create-team"
                             size="lg"
                             className="bg-[#001F3F] text-white px-5 py-4 rounded-lg font-medium hover:bg-[#002B5C] 
                        transition-all duration-200 text-base sm:text-lg shadow-lg hover:shadow-xl 

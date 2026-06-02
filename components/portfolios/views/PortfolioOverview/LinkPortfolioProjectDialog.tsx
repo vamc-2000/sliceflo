@@ -70,7 +70,7 @@ export default function LinkPortfolioProjectDialog({
               placeholder="Search for project name"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pr-10 placeholder:text-muted-foreground text-foreground w-full border border-border rounded-md h-9 text-xs bg-card"
+              className="pr-10 placeholder:text-muted-foreground text-foreground w-full border-6 border-border rounded-md h-9 text-xs bg-card"
             />
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
               <Search className="w-4 h-4 text-muted-foreground" />
@@ -78,7 +78,7 @@ export default function LinkPortfolioProjectDialog({
           </div>
 
           {/* Table */}
-          <div className="w-full border border-border rounded-md relative">
+          <div className="w-full border-6 border-border rounded-md relative">
             {/* Table Header */}
             <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary">
               <div />
@@ -96,7 +96,7 @@ export default function LinkPortfolioProjectDialog({
                 availableProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="grid grid-cols-[40px_1fr_60px] h-9 items-center px-3 border-t text-xs"
+                    className="grid grid-cols-[40px_1fr_60px] h-11 items-center px-3 border-t text-xs"
                   >
                     <div className="flex items-center">
                       <Checkbox

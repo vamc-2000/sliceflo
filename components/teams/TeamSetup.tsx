@@ -7,7 +7,7 @@ const TeamSetup = () => {
 
   const handleTeamCreationComplete = () => {
     setShowCreateTeam(false)
-  
+
   }
 
   const handleBackToMain = () => {
@@ -17,14 +17,24 @@ const TeamSetup = () => {
   return (
     <>
       {!showCreateTeam ? (
-        <TeamSpaceSidebar onCreateTeam={() => setShowCreateTeam(true)} allTeams={[]} deleteTeam={function (id: string): void {
-                  throw new Error('Function not implemented.')
-              } } renameTeam={function (id: string, newName: string): void {
-                  throw new Error('Function not implemented.')
-              } } />
+        <div data-testid="team-setup-sidebar-view">
+          <TeamSpaceSidebar
+            onCreateTeam={() => setShowCreateTeam(true)}
+            allTeams={[]}
+            deleteTeam={function (id: string): void {
+              throw new Error('Function not implemented.')
+            }}
+            renameTeam={function (id: string, newName: string): void {
+              throw new Error('Function not implemented.')
+            }}
+          />
+        </div>
       ) : (
-        <div className="container mx-auto px-4 py-8">
-          <CreateNewTeam 
+        <div
+          data-testid="team-setup-create-view"
+          className="container mx-auto px-4 py-8"
+        >
+          <CreateNewTeam
             initialStep="setup"
             onComplete={handleTeamCreationComplete}
             onBack={handleBackToMain}

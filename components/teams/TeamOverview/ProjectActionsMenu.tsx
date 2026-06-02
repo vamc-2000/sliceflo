@@ -15,16 +15,19 @@ import {Pencil, Copy, Trash2,} from 'lucide-react'
 interface ProjectActionsMenuProps {
     onEdit?: () => void
     onDetach?: (e?: React.MouseEvent) => void
+    'data-testid'?: string // Optional prop for testing purposes
 }
 
 export default function ProjectActionsMenu({
     onEdit,
     onDetach,
+    'data-testid': testId,
 }: ProjectActionsMenuProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
+                    data-testid={testId || "btn-project-actions-trigger"}
                     className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted"
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -34,6 +37,7 @@ export default function ProjectActionsMenu({
 
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className='border-0 border-b-[2px] border-primary rounded-lg'>
                 <DropdownMenuItem
+                    data-testid={testId ? `${testId}-btn-project-detach` : "btn-project-detach"}
                     onClick={(e) => {
                         e.stopPropagation();
                         onDetach?.(e);

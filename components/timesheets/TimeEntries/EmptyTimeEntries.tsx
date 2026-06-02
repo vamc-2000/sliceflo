@@ -37,11 +37,14 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
     });
 
     return (
-        <div className="p-1 h-full">
+        <div data-testid="empty-time-entries" className="p-1 h-full">
             <div className="h-full flex flex-col">
                 {/* Table wrapper */}
                 <div className="flex-1 overflow-y-auto">
-                    <div className="rounded-md border border-border overflow-hidden">
+                    <div 
+                        data-testid="empty-time-entries-table-wrapper"
+                        className="rounded-md border border-border overflow-hidden"
+                    >
                         <Table>
                             {/* Header */}
                             <TableHeader >
@@ -55,6 +58,7 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
                                     {weekDates.map((date, index) => (
                                         <TableHead
                                             key={index}
+                                            data-testid={`empty-time-entries-day-${days[index].toLowerCase()}`}
                                             className="text-muted-foreground font-normal text-center border-r border-border pb-5 pt-2"
                                         >
                                             <div className="flex items-center gap-1">
@@ -89,9 +93,9 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
 
                             {/* Empty state row */}
                             <TableBody>
-                                <TableRow className="hover:bg-transparent">
+                                <TableRow data-testid="empty-time-entries-row" className="hover:bg-transparent">
                                     <TableCell colSpan={weekHeaders.length} className="py-35">
-                                        <div className="flex flex-col items-center justify-center gap-3">
+                                        <div data-testid="empty-time-entries-state" className="flex flex-col items-center justify-center gap-3">
                                             <div className="relative h-16 w-16">
                                                 <Image
                                                     src="/images/Timesheet/entry-log.svg"
@@ -111,11 +115,11 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
                                             </div>
 
                                             <div className="flex flex-row items-center justify-center gap-3">
-                                                <Button className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg">
+                                                <Button data-testid="btn-add-task" className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg">
                                                     + Add Task
                                                 </Button>
 
-                                                <Button className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg">
+                                                <Button data-testid="btn-add-free-text" className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg">
                                                     + Add free text
                                                 </Button>
                                             </div>

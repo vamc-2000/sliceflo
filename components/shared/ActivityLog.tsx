@@ -96,7 +96,7 @@ function ActivityItem({ log, isLast }: ActivityItemProps) {
   // Split message to bold any word wrapped in **...**
   // Or just show actor bold + rest of message
   return (
-    <div className="flex flex-col">
+    <div data-testid={`activity-item-${log._id}`} className="flex flex-col">
       <div className="flex items-center gap-3">
         {/* Dot */}
         <div className="relative flex items-center justify-center h-5 w-5 flex-shrink-0">
@@ -142,6 +142,7 @@ function DateGroup({ label, items, defaultOpen = true }: DateGroupProps) {
     <div className="mb-1">
       {/* Header row */}
       <button
+        data-testid={`btn-date-group-toggle-${label.toLowerCase().replace(/\s+/g, '-')}`}
         onClick={() => setOpen((v) => !v)}
         className={`
           w-full flex items-center justify-between px-4 py-2.5
@@ -162,6 +163,7 @@ function DateGroup({ label, items, defaultOpen = true }: DateGroupProps) {
 
       {/* Items */}
       <div
+        data-testid={`date-group-items-${label.toLowerCase().replace(/\s+/g, '-')}`}
         className={`
           overflow-hidden transition-all duration-300 ease-in-out
           ${open ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}
@@ -191,7 +193,7 @@ function DateGroup({ label, items, defaultOpen = true }: DateGroupProps) {
 
 function ActivitySkeleton() {
   return (
-    <div className="flex flex-col gap-4 px-4 animate-pulse">
+    <div data-testid="activity-log-skeleton" className="flex flex-col gap-4 px-4 animate-pulse">
       {[1, 2, 3].map((i) => (
         <div key={i} className="flex gap-3">
           <div className="flex flex-col items-center gap-1">
@@ -261,7 +263,7 @@ export default function ActivityLog({ entityType, entityId }: ActivityLogProps) 
   }
 
   return (
-    <div className="flex flex-col gap-1 -mt-2 pb-2">
+    <div data-testid="activity-log-container" className="flex flex-col gap-1 -mt-2 pb-2">
       {groups.map((group, idx) => (
         <DateGroup
           key={group.date}

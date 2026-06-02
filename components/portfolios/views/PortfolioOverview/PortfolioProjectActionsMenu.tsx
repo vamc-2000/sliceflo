@@ -29,7 +29,7 @@ export default function PortfolioProjectActionsMenu({
       <DropdownMenuContent
         align="end"
         onClick={(e) => e.stopPropagation()}
-        className="border-0 border-b-[5px] border-b-primary rounded-lg bg-popover"
+        className="border-0 border-b-[5px] border-primary rounded-lg bg-popover"
       >
         <DropdownMenuItem
           onClick={onDetach}

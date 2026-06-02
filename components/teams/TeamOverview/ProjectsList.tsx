@@ -49,11 +49,14 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ teamId, projects }) => {
   }
 
   if (projects.length === 0) {
-    return <div className="text-muted-foreground text-sm italic py-4">no projects</div>
+    return <div data-testid="empty-projects-list" className="text-muted-foreground text-sm italic py-4">no projects</div>
   }
 
   return (
-    <div className="max-h-[220px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+    <div 
+      data-testid="projects-list-container"
+      className="max-h-[220px] overflow-y-auto space-y-2 pr-1 custom-scrollbar"
+    >
       {projects.map((project) => {
         if (!project.id) return null
 
@@ -62,6 +65,7 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ teamId, projects }) => {
         return (
           <div
             key={projectId}
+            data-testid={`project-row-${projectId}`}
             className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary bg-card text-card-foreground px-5 py-3 hover:bg-muted/50 transition cursor-pointer mr-1"
             onClick={() => router.push(`/project/${projectId}`)}
           >
@@ -84,6 +88,7 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ teamId, projects }) => {
             </div>
 
             <ProjectActionsMenu
+              data-testid={`project-actions-menu-${projectId}`}
               onEdit={() => console.log('Edit project', projectId)}
               onDetach={(e) => handleDetachClick(e, projectId)}
             />
@@ -92,6 +97,7 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ teamId, projects }) => {
       })}
 
       <ConfirmationModal
+        data-testid="modal-detach-project"
         open={isDetachModalOpen}
         onClose={() => setIsDetachModalOpen(false)}
         title="Detach Project"
@@ -105,4 +111,4 @@ const ProjectsList: React.FC<ProjectsListProps> = ({ teamId, projects }) => {
   )
 }
 
-export default ProjectsList
+export default ProjectsList

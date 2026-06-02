@@ -21,6 +21,7 @@ import { Separator } from '../ui/separator'
 import TeamAllWork from './TeamAllWork'
 import { Button } from '../ui/button'
 import { cn } from '@/lib/utils'
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import TeamStandUpCall from './TeamStandUpCall'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import TeamOverviewShell from './TeamOverviewShell'
@@ -211,162 +212,200 @@ export const TeamsDashboard: React.FC = () => {
           </div>
           {/* <Lock size={18} className="text-gray-600" />
           <Tag size={18} className="text-gray-600" /> */}
-          <DropdownMenu open={ellipsisOpen} onOpenChange={setEllipsisOpen}>
-            <DropdownMenuTrigger asChild>
-              <button
-                data-testid={`btn-team-more-menu-${teamIdFromUrl}`}
-                className="flex h-8 w-8 items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              >
-                <Ellipsis className="h-5 w-5 text-foreground" strokeWidth={2.5} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+          <Tooltip>
 
-              <DropdownMenuItem
-                data-testid={`btn-team-settings-${teamIdFromUrl}`}
-                onClick={() => {
-                  setSettingsOpen(true);
-                  setEllipsisOpen(false);
-                }}>
-                <Settings className="mr-2 h-4 w-4" />
-                Team Settings
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem onClick={() => console.log('Copy Shareable Link')}>
+            <DropdownMenu open={ellipsisOpen} onOpenChange={setEllipsisOpen}>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    data-testid={`btn-team-more-menu-${teamIdFromUrl}`}
+                    className="flex h-8 w-8 items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Ellipsis className="h-5 w-5 text-foreground" strokeWidth={2.5} />
+                  </button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>More options</p>
+              </TooltipContent>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem
+                  data-testid={`btn-team-settings-${teamIdFromUrl}`}
+                  onClick={() => {
+                    setSettingsOpen(true);
+                    setEllipsisOpen(false);
+                  }}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Team Settings
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => console.log('Copy Shareable Link')}>
                 <span className="mr-2 w-4 h-4">🔗</span>
                 Copy Shareable Link
               </DropdownMenuItem> */}
-              <DropdownMenuItem
-                data-testid={`btn-copy-team-link-${teamIdFromUrl}`}
-                onClick={() => {
-                  if (displayTeam?.id) {
-                    const shareableUrl = `${window.location.origin}/teams/${encodeURIComponent(displayTeam.id)}`;
-                    navigator.clipboard.writeText(shareableUrl).then(() => {
-                      toast.success('Team link copied!');
-                    }).catch((err) => {
-                      console.error('Failed to copy:', err);
-                      // Fallback for older browsers
-                      const textArea = document.createElement('textarea');
-                      textArea.value = shareableUrl;
-                      document.body.appendChild(textArea);
-                      textArea.select();
-                      document.body.removeChild(textArea);
-                      toast.success('Shareable link copied to clipboard!');
-                    });
-                  }
-                  setEllipsisOpen(false);
-                }}>
-                <span className="mr-2 w-4 h-4">🔗</span>
-                Copy Shareable Link
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  data-testid={`btn-copy-team-link-${teamIdFromUrl}`}
+                  onClick={() => {
+                    if (displayTeam?.id) {
+                      const shareableUrl = `${window.location.origin}/teams/${encodeURIComponent(displayTeam.id)}`;
+                      navigator.clipboard.writeText(shareableUrl).then(() => {
+                        toast.success('Team link copied!');
+                      }).catch((err) => {
+                        console.error('Failed to copy:', err);
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = shareableUrl;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.body.removeChild(textArea);
+                        toast.success('Shareable link copied to clipboard!');
+                      });
+                    }
+                    setEllipsisOpen(false);
+                  }}>
+                  <span className="mr-2 w-4 h-4">🔗</span>
+                  Copy Shareable Link
+                </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="mx-2 my-0" />
-              <DropdownMenuItem
-                data-testid={`btn-open-delete-team-${teamIdFromUrl}`}
-                className="text-red-600 focus:text-red-600"
-                onClick={() => {
-                  setDeleteDialogOpen(true)
-                  setEllipsisOpen(false)
-                }}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Team
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+                <DropdownMenuSeparator className="mx-2 my-0" />
+                <DropdownMenuItem
+                  data-testid={`btn-open-delete-team-${teamIdFromUrl}`}
+                  className="text-red-600 focus:text-red-600"
+                  onClick={() => {
+                    setDeleteDialogOpen(true)
+                    setEllipsisOpen(false)
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Team
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Tooltip>
         </div>
 
         {/* Right group */}
         <div className="flex items-center space-x-2 mr-4">
           {/* Overview Button - Standalone */}
           <div className="bg-muted rounded-lg ">
-            <Button
-              data-testid="btn-tab-overview"
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTabChange('Overview')}
-              className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-md transition-colors cursor-pointer",
-                activeTab === 'Overview'
-                  ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              )}
-              title='Overview'
-            >
-              <House className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="btn-tab-overview"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabChange('Overview')}
+                  className={cn(
+                    "flex h-11 w-11 items-center justify-center rounded-md transition-colors cursor-pointer",
+                    activeTab === 'Overview'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  )}
+                >
+                  <House className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Overview</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Navigation Button Group */}
           <div className="flex items-center bg-muted rounded-md p-1 gap-1">
             {/* Team Members */}
-            <Button
-              data-testid="btn-tab-team-members"
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTabChange('Team Members')}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
-                activeTab === 'Team Members'
-                  ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-              )}
-              title='Team Members'
-            >
-              <Users className="w-4 h-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="btn-tab-team-members"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabChange('Team Members')}
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
+                    activeTab === 'Team Members'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  )}
+                >
+                  <Users className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Team Members</p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* All Work */}
-            <Button
-              data-testid="btn-tab-all-work"
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTabChange('All Work')}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
-                activeTab === 'All Work'
-                  ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-              )}
-              title='All Work'
-            >
-              <Flag className="w-4 h-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="btn-tab-all-work"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabChange('All Work')}
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
+                    activeTab === 'All Work'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  )}
+                  title='All Work'
+                >
+                  <Flag className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>All Work</p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* standup call */}
-            <Button
-              data-testid="btn-tab-standup-call"
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTabChange('StandupCall')}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
-                activeTab === 'StandupCall'
-                  ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-              )}
-              title='Standup Call'
-            >
-              <BsPersonRaisedHand className="w-6 h-4" />
-            </Button>
-
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="btn-tab-standup-call"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabChange('StandupCall')}
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
+                    activeTab === 'StandupCall'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  )}
+                  title='Standup Call'
+                >
+                  <BsPersonRaisedHand className="w-6 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Standup Call</p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* Discussions */}
-            <Button
-              data-testid="btn-tab-discussions"
-              variant="ghost"
-              size="icon"
-              onClick={() => handleTabChange('Discussions')}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
-                activeTab === 'Discussions'
-                  ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-              )}
-              title='Discussions'
-            >
-              <MessageSquare className="w-4 h-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="btn-tab-discussions"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabChange('Discussions')}
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
+                    activeTab === 'Discussions'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  )}
+                  title='Discussions'
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Discussions</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

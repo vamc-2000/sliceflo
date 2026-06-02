@@ -41,15 +41,15 @@ export default function MailHeader({ sortOption, setSortOption, selectedDateRang
   const isFilterActive = selectedFilters.length > 0;
 
   return (
-    <header className="flex items-center justify-between border-b border-border bg-background h-9">
+    <header data-testid="mail-header-root" className="flex items-center justify-between border-b border-border bg-background h-9">
       {/* LEFT SECTION → Mail list header (fixed 390px) */}
-      <div className="flex items-center justify-between w-97.5 px-4">
+      <div data-testid="mail-header-left" className="flex items-center justify-between w-97.5 px-4">
         {/* Left aligned title */}
         {/* <h1 className="text-lg font-semibold text-[#001F3F] p-0">Inbox</h1> */}
-        <h1 className="text-lg font-semibold text-foreground p-0 pl-5">Inbox</h1>
+        <h1 data-testid="mail-header-title" className="text-lg font-semibold text-foreground p-0 pl-5">Inbox</h1>
 
         {/* Right aligned icons */}
-        <div className="flex items-center gap-1">
+        <div data-testid="mail-header-controls" className="flex items-center gap-1">
           <Popover
             open={calendarOpen}
             onOpenChange={(open) => {
@@ -66,6 +66,7 @@ export default function MailHeader({ sortOption, setSortOption, selectedDateRang
                 <TooltipTrigger asChild>
                   <PopoverTrigger asChild>
                     <Button
+                      data-testid="mail-calendar-trigger-btn"
                       variant="ghost"
                       size="icon"
                       className={`h-8 w-8 transition cursor-pointer ${isCalendarActive
@@ -74,6 +75,7 @@ export default function MailHeader({ sortOption, setSortOption, selectedDateRang
                         }`}
                     >
                       <CalendarDays
+                        data-testid="mail-calendar-icon"
                         className={
                           isCalendarActive
                             ? "text-primary-foreground"
@@ -91,10 +93,12 @@ export default function MailHeader({ sortOption, setSortOption, selectedDateRang
               </Tooltip>
             </TooltipProvider>
             <PopoverContent
+              data-testid="mail-calendar-popover"
               side="bottom"
               align="start"
               className="w-auto p-0 border rounded-xl shadow-md">
               <RangeCalendar
+                data-testid="mail-range-calendar"
                 value={{
                   from: selectedDateRange.start ?? undefined,
                   to: selectedDateRange.end ?? undefined,
@@ -110,19 +114,20 @@ export default function MailHeader({ sortOption, setSortOption, selectedDateRang
           </Popover>
 
           <FilterMenu
+            data-testid="mail-filter-menu"
             selectedFilters={selectedFilters}
             onChange={onFiltersChange}
             iconColor={isFilterActive ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))"}
           />
 
           {/* Fixed: Pass props to SortMenu */}
-          <SortMenu sortOption={sortOption} setSortOption={setSortOption} />
+          <SortMenu data-testid="mail-sort-menu" sortOption={sortOption} setSortOption={setSortOption} />
         </div>
       </div>
 
       {/* RIGHT SECTION --> Global actions */}
-      <div className="flex items-center gap-5 pr-4">
-        <SettingsMenu />
+      <div data-testid="mail-header-right" className="flex items-center gap-5 pr-4">
+        <SettingsMenu data-testid="mail-settings-menu" />
       </div>
     </header>
   );

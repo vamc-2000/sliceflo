@@ -98,7 +98,7 @@ export function WeekCalendar({
   const weekEnd = endOfWeek(selectedWeekStart, { weekStartsOn: 1 }); // Monday
 
   return (
-    <div className="w-fit rounded-lg bg-background">
+    <div data-testid="week-calendar" className="w-fit rounded-lg bg-background">
       <CustomCalendarHeader
         month={month}
         setMonth={setMonth}
@@ -110,6 +110,7 @@ export function WeekCalendar({
       <AnimatePresence mode="wait">
         {view === "days" && (
           <motion.div
+            data-testid="week-calendar-view-days"
             key={`days-${month.toISOString()}`}
             variants={slideVariants}
             custom={direction}
@@ -118,6 +119,7 @@ export function WeekCalendar({
             exit="exit"
           >
             <Calendar
+              data-testid="week-calendar-days-grid"
               mode="single"
               month={month}
               onMonthChange={setMonth}
@@ -185,6 +187,7 @@ export function WeekCalendar({
 
         {view === "months" && (
           <motion.div
+            data-testid="week-calendar-view-months"
             key={`months-${month.getFullYear()}`}
             variants={slideVariants}
             custom={direction}
@@ -195,6 +198,7 @@ export function WeekCalendar({
           >
             {Array.from({ length: 12 }).map((_, i) => (
               <button
+                data-testid={`btn-calendar-month-${i}`}
                 key={i}
                 className="rounded-md p-3 hover:bg-gray-200"
                 onClick={() => {
@@ -210,6 +214,7 @@ export function WeekCalendar({
 
         {view === "years" && (
           <motion.div
+            data-testid="week-calendar-view-years"
             key={`years-${Math.floor(month.getFullYear() / 12)}`}
             variants={slideVariants}
             custom={direction}
@@ -222,6 +227,7 @@ export function WeekCalendar({
               const year = month.getFullYear() - 6 + i;
               return (
                 <button
+                  data-testid={`btn-calendar-year-${year}`}
                   key={year}
                   className="rounded-md p-3 hover:bg-gray-200"
                   onClick={() => {

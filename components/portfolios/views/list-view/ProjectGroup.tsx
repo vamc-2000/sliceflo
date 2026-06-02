@@ -33,7 +33,7 @@ export function ProjectGroup({
     <div className="flex flex-col gap-2 overflow-hidden">
       {/* ── Group Header ─────────────────────────────────────────── */}
       <div
-        className="flex items-center justify-between px-4 py-3 bg-muted rounded-l-md"
+        className="flex items-center justify-between px-4 py-2 bg-muted rounded-l-md"
       >
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
@@ -53,7 +53,7 @@ export function ProjectGroup({
             style={{ backgroundColor: color }}
           />
 
-          <h3 className="text-sm font-semibold text-foreground leading-none">
+          <h3 className="text-xs font-semibold text-foreground leading-none">
             {name}
           </h3>
 

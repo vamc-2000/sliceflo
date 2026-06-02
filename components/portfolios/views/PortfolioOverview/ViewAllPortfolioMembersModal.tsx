@@ -67,7 +67,7 @@ const ViewAllPortfolioMembersModal: React.FC<ViewAllPortfolioMembersModalProps> 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="!max-w-2xl !w-full border-0 border-b-[5px] border-b-primary rounded-lg bg-card">
+        <DialogContent className="!max-w-2xl !w-full border-0 border-b-[5px] border-b-[#001F3F] rounded-lg">
           <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle className="text-primary text-sm font-bold">
               {type === 'members'
@@ -83,7 +83,7 @@ const ViewAllPortfolioMembersModal: React.FC<ViewAllPortfolioMembersModalProps> 
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border bg-muted">
-                  <TableHead className="border-r border-border text-center text-primary text-xs">{type === 'members' ? 'Members' : 'Viewers'}</TableHead>
+                  <TableHead className="border-r border-border text-center text-primary">{type === 'members' ? 'Members' : 'Viewers'}</TableHead>
                   <TableHead className="text-center text-primary text-xs">Action</TableHead>
                 </TableRow>
               </TableHeader>

@@ -303,7 +303,7 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                     </GanttProvider>
 
                     {/* Zoom Controls */}
-                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border border-border bg-card shadow-md">
+                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border border-borderbg-card shadow-md">
                         <Button
                             variant="ghost"
                             size="sm"

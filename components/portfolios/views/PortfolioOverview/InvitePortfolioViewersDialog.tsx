@@ -149,7 +149,7 @@ export default function InvitePortfolioViewersDialog({
                     </div>
                     {rows.length > 1 && (
                       <button onClick={() => setRows(rows.filter((_, i) => i !== index))} className="p-1 hover:bg-muted rounded">
-                        <X size={18} className="text-muted-foreground" />
+                        <X size={18} className="text-xs text-muted-foreground" />
                       </button>
                     )}
                   </div>

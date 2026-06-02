@@ -150,7 +150,7 @@ export default function AboutTeam({
 
   return (
     <TooltipProvider>
-      <div className="w-full mb-4">
+      <div data-testid="about-team-container" className="w-full mb-4">
 
         {/* Team Info Grid */}
         <div className="grid grid-cols-[24px_180px_1fr] gap-y-4 items-center mb-6 px-2">
@@ -215,6 +215,7 @@ export default function AboutTeam({
               </PopoverTrigger>
 
               <PopoverContent
+                data-testid="popover-label-manager"
                 className="p-0"
                 align="end"
                 side="bottom"
@@ -236,6 +237,7 @@ export default function AboutTeam({
               localLabels.map((label) => (
                 <span
                   key={label.id}
+                  data-testid={`label-badge-${label.id}`}
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs text-white"
                   style={{ backgroundColor: label.color }}
                 >
@@ -250,6 +252,7 @@ export default function AboutTeam({
           <h3 className="font-semibold text-sm text-foreground">About this Team</h3>
         </div>
         <ProseMirrorEditor
+          data-testid="editor-team-description"
           initialContent={teamDescription || ""}
           mentionableMembers={mentionableMembers}
           onBlur={handleContentChange}

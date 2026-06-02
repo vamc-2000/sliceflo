@@ -53,6 +53,7 @@ export default function TimeSheetsSettings() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          data-testid="btn-timesheet-settings"
           size="icon"
           variant="ghost"
           className="h-9.5 w-9.5 rounded-md border bg-muted text-muted-foreground"
@@ -75,6 +76,7 @@ export default function TimeSheetsSettings() {
 
             <div className="flex items-center gap-1 rounded-md bg-gray-200 px-1 py-1">
               <button
+                data-testid="btn-capacity-daily"
                 onClick={() => setLocalCapacityType("daily")}
                 className={`flex h-7.5 w-20 items-center justify-center rounded-md text-sm ${localCapacityType === "daily"
                   ? "bg-primary text-primary-foreground"
@@ -85,6 +87,7 @@ export default function TimeSheetsSettings() {
               </button>
 
               <button
+                data-testid="btn-capacity-weekly"
                 onClick={() => setLocalCapacityType("weekly")}
                 className={`flex h-7.5 w-20 items-center justify-center rounded-md text-sm ${localCapacityType === "weekly"
                   ? "bg-primary text-primary-foreground"
@@ -103,6 +106,7 @@ export default function TimeSheetsSettings() {
             </Label>
 
             <Input
+              data-testid="input-capacity-hours"
               type="number"
               value={localHours}
               onChange={(e) => setLocalHours(e.target.value)}
@@ -115,7 +119,7 @@ export default function TimeSheetsSettings() {
 
         {/* Save */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="w-24">Save</Button>
+          <Button data-testid="btn-save-settings" onClick={handleSave} className="w-24">Save</Button>
         </div>
       </PopoverContent>
     </Popover>

@@ -173,7 +173,7 @@ export default function SendForApprovalDialog({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="w-[38vw] sm:max-w-6xl max-w-none p-0 gap-0">
+            <DialogContent data-testid="send-for-approval-dialog" className="w-[38vw] sm:max-w-6xl max-w-none p-0 gap-0">
                 {/* Header */}
                 <VisuallyHidden>
                     <DialogTitle>Send Timesheet for Approval</DialogTitle>
@@ -182,7 +182,7 @@ export default function SendForApprovalDialog({
                 <div className="flex items-center justify-between px-6 py-2">
                     <div className="flex items-center gap-3">
                         {/* Week badge */}
-                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-foreground">
+                        <span data-testid="send-for-approval-week-badge" className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-foreground">
                             {weekNumber ? `W${weekNumber}` : "W--"}
                             <OctagonAlert className="h-4 w-4" />
                         </span>
@@ -192,7 +192,10 @@ export default function SendForApprovalDialog({
                             <h2 className="text-base font-semibold text-gray-900">
                                 {weekNumber ? `Week ${weekNumber} Timesheet` : "Weekly Timesheet"}
                             </h2>
-                            <span className="inline-flex self-start items-center mt-0.5 px-2 py-0.5 text-xs font-semibold text-foreground bg-orange-500 rounded-md">
+                            <span 
+                                data-testid="send-for-approval-total-hours"
+                                className="inline-flex self-start items-center mt-0.5 px-2 py-0.5 text-xs font-semibold text-foreground bg-orange-500 rounded-md"
+                            >
                                 {totalHours} h
                             </span>
                         </div>
@@ -208,7 +211,7 @@ export default function SendForApprovalDialog({
                             Tasks Accomplished
                         </h3>
 
-                        <div className="overflow-hidden rounded-md border">
+                        <div data-testid="send-for-approval-tasks-table" className="overflow-hidden rounded-md border">
                             <div className="max-h-38 overflow-y-auto">
                                 <table className="w-full text-sm">
                                     <thead className="bg-muted/50 text-foreground sticky top-0">
@@ -224,13 +227,13 @@ export default function SendForApprovalDialog({
 
                                     <tbody>
                                         {displayTasks.map((task) => (
-                                            <tr key={task.id} className="border-t">
+                                            <tr key={task.id} data-testid={`approval-task-row-${task.id}`} className="border-t">
                                                 <td className="border-r px-4 py-1.5">{task.name}</td>
                                                 <td className="px-4 py-1.5 text-center">{task.time}</td>
                                             </tr>
                                         ))}
                                         {displayTasks.length === 0 && (
-                                            <tr className="border-t text-gray-500 font-normal italic">
+                                            <tr data-testid="approval-task-empty-state" className="border-t text-gray-500 font-normal italic">
                                                 <td colSpan={2} className="px-4 py-4 text-center">
                                                     No tasks recorded for this week.
                                                 </td>
@@ -246,7 +249,7 @@ export default function SendForApprovalDialog({
                     <div className="mt-2">
                         <h3 className="mb-1 text-sm font-semibold text-gray-900">Approver</h3>
 
-                        <div className="rounded-lg border border-gray-200 p-2">
+                        <div data-testid="send-for-approval-approver-section" className="rounded-lg border border-gray-200 p-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4 flex-1">
                                     {approvers.length > 0 ? (
@@ -255,7 +258,7 @@ export default function SendForApprovalDialog({
                                                 {approvers.map((approver) => (
                                                     <Tooltip key={approver.userId}>
                                                         <TooltipTrigger asChild>
-                                                            <div className="cursor-pointer transition-transform hover:scale-105">
+                                                            <div data-testid={`approver-avatar-${approver.userId}`} className="cursor-pointer transition-transform hover:scale-105">
                                                                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                                                                     <AvatarImage
                                                                         src={
@@ -297,7 +300,7 @@ export default function SendForApprovalDialog({
                                             </div>
                                         </TooltipProvider>
                                     ) : (
-                                        <div className="text-sm text-gray-500 italic">
+                                        <div data-testid="approval-no-approver" className="text-sm text-gray-500 italic">
                                             No approver selected
                                         </div>
                                     )}
@@ -309,6 +312,7 @@ export default function SendForApprovalDialog({
                                         defaultView="select"
                                         trigger={
                                             <Button
+                                                data-testid="btn-change-approver"
                                                 variant="ghost"
                                                 className="h-9 px-4 py-2 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-foreground border border-primary/20 rounded-md shadow-sm"
                                             >
@@ -327,8 +331,9 @@ export default function SendForApprovalDialog({
                             Note for Approver
                         </h3>
 
-                        <div className="rounded-md border overflow-hidden w-full">
+                        <div data-testid="approval-note-editor" className="rounded-md border overflow-hidden w-full">
                             <RichTextEditor
+                                data-testid="approval-note-editor"
                                 value={content}
                                 onChange={handleContentChange}
                                 placeholder="Enter your message here..."
@@ -340,11 +345,17 @@ export default function SendForApprovalDialog({
 
                 {/* Footer */}
                 <div className="flex justify-end gap-3 px-6 py-2 mb-1">
-                    <Button variant="outline" onClick={onClose} className="border-primary text-foreground">
+                    <Button 
+                        variant="outline" 
+                        onClick={onClose} 
+                        className="border-primary text-foreground"
+                        data-testid="btn-cancel-send-for-approval"
+                    >
                         Cancel
                     </Button>
 
                     <Button
+                        data-testid="btn-send-for-approval"
                         disabled={isTimesheetsLoading || displayTasks.length === 0 || approvers.length === 0}
                         className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleSendForApproval}

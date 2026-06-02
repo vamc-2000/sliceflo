@@ -43,12 +43,13 @@ export default function CalendarHeader() {
   ];
 
   return (
-    <div className="flex gap-4 p-4">
+    <div data-testid="filter-calendar-container" className="flex gap-4 p-4">
       {/* LEFT SHORTCUT LIST */}
-      <div className="w-40 border-r pr-4">
+      <div data-testid="filter-calendar-shortcuts" className="w-40 border-r pr-4">
         {shortcuts.map((item) => (
           <div
             key={item.label}
+            data-testid={`filter-calendar-shortcut-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
             className="py-1.5 px-2 text-sm rounded-lg hover:bg-accent cursor-pointer"
             onClick={() => setDate(item.value)}
           >
@@ -63,6 +64,7 @@ export default function CalendarHeader() {
 
       {/* RIGHT CALENDAR */}
       <Calendar
+        data-testid="filter-calendar-picker"
         mode="single"
         selected={date}
         onSelect={setDate}

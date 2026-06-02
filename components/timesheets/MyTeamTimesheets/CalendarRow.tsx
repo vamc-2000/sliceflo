@@ -69,10 +69,11 @@ export function CalendarRow({ onAddEntry, selectedWeek, setSelectedWeek, myView,
     const today = new Date();
 
     return (
-        <div className="flex items-center justify-between bg-background px-6 py-1">
+        <div data-testid="calendar-row" className="flex items-center justify-between bg-background px-6 py-1">
             {/* Left */}
             <div className="flex items-center gap-1.5 text-foreground">               {/* Left chevron */}
                 <button
+                    data-testid="btn-calendar-prev"
                     onClick={() => shiftWeek("prev")}
                     disabled={!selectedWeek}
                     className="p-0.5 disabled:opacity-40"
@@ -85,14 +86,14 @@ export function CalendarRow({ onAddEntry, selectedWeek, setSelectedWeek, myView,
                 {/* Date text → opens calendar */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <button className="font-medium px-1">
+                        <button data-testid="btn-week-picker-trigger" className="font-medium px-1">
                             {selectedWeek
                                 ? `${formatShortDate(selectedWeek.start)} - ${formatShortDate(selectedWeek.end)}`
                                 : "Select week"}
                         </button>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-auto p-3" align="start">
+                    <PopoverContent data-testid="popover-week-picker" className="w-auto p-3" align="start">
                         <WeekCalendar
                             selectedYear={currentYear}
                             selectedWeek={selectedWeek}
@@ -106,6 +107,7 @@ export function CalendarRow({ onAddEntry, selectedWeek, setSelectedWeek, myView,
 
                 {/* Right chevron */}
                 <button
+                    data-testid="btn-week-next"
                     onClick={() => shiftWeek("next")}
                     disabled={!selectedWeek}
                     className="p-0.5 disabled:opacity-40"
@@ -116,7 +118,7 @@ export function CalendarRow({ onAddEntry, selectedWeek, setSelectedWeek, myView,
                 </button>
 
                 {weekNumber && (
-                    <span className="text-[15px] font-medium bg-primary/10 text-foreground px-2 py-0.5 rounded-full">
+                    <span data-testid="badge-week-number" className="text-[15px] font-medium bg-primary/10 text-foreground px-2 py-0.5 rounded-full">
                         Week {weekNumber}
                     </span>
                 )}
@@ -125,10 +127,9 @@ export function CalendarRow({ onAddEntry, selectedWeek, setSelectedWeek, myView,
             {/* Right */}
             <div className="flex items-center gap-3">
 
-                {/* Filter pills — LEFT side */}
-                <TeamFilterTabs value={teamFilter} onChange={setTeamFilter} />
-
-
+                <div data-testid="team-filter-tabs-container">
+                    <TeamFilterTabs value={teamFilter} onChange={setTeamFilter} />
+                </div>
             </div>
 
         </div>

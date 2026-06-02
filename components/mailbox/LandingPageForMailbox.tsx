@@ -24,7 +24,7 @@ export function LandingPageForMailbox({
   imageHeight = 400,
 }: LandingPageProps) {
   return (
-    <div className="bg-background p-4">
+    <div data-testid="landing-page-mailbox" className="bg-background p-4">
     {/* <div className="min-h-screen bg-white"> */}
       <div className="flex items-center justify-center px-4 py-1 ">
         <div className="w-full max-w-[1800px] mx-auto text-center px-5 space-y-1">
@@ -42,6 +42,7 @@ export function LandingPageForMailbox({
           {/* Hero image */}
           <div className="flex justify-center">
             <Image
+              data-testid="landing-page-mailbox-image"
               src={imageSrc}
               alt={imageAlt}
               width={570}
@@ -55,6 +56,7 @@ export function LandingPageForMailbox({
           {/* CTA Button */}
           <div className="py-2">
             <Button
+              data-testid="btn-landing-page-mailbox-cta"
               size="lg"
               className="bg-primary text-primary-foreground px-5 py-4 rounded-lg font-semibold hover:bg-primary/90 
                        transition-all duration-200 text-base sm:text-lg shadow-lg hover:shadow-xl 

@@ -64,7 +64,7 @@ export const TeamIcon: React.FC<TeamIconProps> = ({ team, size = 24, className =
   };
 
   return (
-    <div className={`flex-shrink-0 ${className}`}>
+    <div data-testid={`team-icon-${team?.id ?? 'unknown'}`} className={`flex-shrink-0 ${className}`}>
       {renderTeamIcon()}
     </div>
   );

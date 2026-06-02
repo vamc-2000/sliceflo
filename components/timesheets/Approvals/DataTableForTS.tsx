@@ -120,7 +120,7 @@ export function DataTableForTS<TData, TValue>({
   }, [externalFilterValue, filterColumn]);
 
   return (
-    <div className="w-full space-y-4">
+    <div data-testid="datatable-ts-container" className="w-full space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-1 items-center space-x-2">
@@ -129,6 +129,7 @@ export function DataTableForTS<TData, TValue>({
             <div className="relative w-full max-w-sm">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                data-testid="input-global-search"
                 placeholder={searchPlaceholder}
                 value={globalFilter ?? ""}
                 onChange={(e) => setGlobalFilter(e.target.value)}

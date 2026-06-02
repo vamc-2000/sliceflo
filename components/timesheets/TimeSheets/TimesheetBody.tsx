@@ -85,7 +85,7 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
 
   return (
     // <div className="h-full min-h-0">
-    <div className="flex flex-col">
+    <div data-testid="timesheet-body-container" className="flex flex-col">
       {/* {Object.entries(groupedByDate).map(([date, dayEntries]) => { */}
       {sortedGroupedByDate.map(([date, dayEntries]) => {
         const totalMinutes = dayEntries.reduce(
@@ -109,11 +109,13 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
 
         return (
           <div
+            data-testid={`timesheet-day-group-${date}`}
             key={date}
             className="mt-2 rounded-lg border border-border border-l-[5px] border-l-primary"
           >
             {/* HEADER */}
             <button
+              data-testid={`btn-toggle-day-${date}`}
               type="button"
               onClick={() => toggleDay(date)}
               className="flex w-full items-center justify-between px-3 py-2 text-left cursor-pointer"
@@ -192,6 +194,7 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
 
                 <div className="mt-3">
                   <Button
+                    data-testid={`btn-add-entry-day-${date}`}
                     className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     size="sm"
                     onClick={() => onAddEntry(new Date(date + "T00:00:00"))}

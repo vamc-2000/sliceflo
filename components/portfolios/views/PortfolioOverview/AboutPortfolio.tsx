@@ -340,7 +340,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
               <Button
                 variant="secondary"
                 size="sm"
-                className="h-8 px-3 hover:bg-mumted text-xs"
+                className="h-8 px-3 hover:bg-muted text-xs"
               >
                 <Badge
                   className={cn("h-6", statusColors[portfolio.status as string] || statusColors.open)}

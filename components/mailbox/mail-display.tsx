@@ -83,13 +83,14 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center ">
-        <div className="flex items-center gap-2">
+    <div data-testid="mail-display-container" className="flex h-full flex-col">
+      <div data-testid="mail-display-toolbar" className="flex items-center ">
+        <div data-testid="mail-display-actions" className="flex items-center gap-2">
 
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                data-testid="mail-toggle-read-btn"
                 variant="ghost"
                 size="icon"
                 disabled={!mail}
@@ -105,9 +106,9 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
                 }}
               >
                 {selectedMail?.read ? (
-                  <LuMailOpen className="h-4.5! w-4.5! text-muted-foreground" />
+                  <LuMailOpen data-testid="mail-icon-open" className="h-4.5! w-4.5! text-muted-foreground" />
                 ) : (
-                  <MdOutlineMarkEmailUnread className="h-5! w-5! text-muted-foreground" />
+                  <MdOutlineMarkEmailUnread data-testid="mail-icon-unread" className="h-5! w-5! text-muted-foreground" />
                 )}
                 {/* <span className="sr-only">Mark as Unread</span> */}
               </Button>
@@ -128,7 +129,14 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!mail} onClick={() => setDeleteModalOpen(true)} className="group">
+              <Button
+                data-testid="mail-delete-btn"
+                variant="ghost"
+                size="icon"
+                disabled={!mail}
+                onClick={() => setDeleteModalOpen(true)}
+                className="group"
+              >
                 <RiDeleteBin6Line className="h-5! w-5! text-muted-foreground group-hover:text-red-600" />
                 <span className="sr-only">Move to trash</span>
               </Button>
@@ -143,12 +151,12 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
       <Separator />
       {mail ? (
         <ShadContextMenu emailId={mail._id}>
-          <div className="flex flex-1 flex-col">
-            <div className="flex items-start p-4">
-              <h2 className="text-xl font-bold text-foreground">{mail.subject}</h2>
+          <div data-testid="mail-content-wrapper" className="flex flex-1 flex-col">
+            <div data-testid="mail-header" className="flex items-start p-4">
+              <h2 data-testid="mail-subject" className="text-xl font-bold text-foreground">{mail.subject}</h2>
 
               {mail.createdAt && (
-                <div className="ml-auto text-xs text-muted-foreground">
+                <div data-testid="mail-date" className="ml-auto text-xs text-muted-foreground">
                   {format(new Date(mail.createdAt), "PPpp")}
                 </div>
               )}
@@ -156,17 +164,18 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
 
             {mail.body ? (
               <div
+                data-testid="mail-body-html"
                 className="p-6 text-sm leading-relaxed "
                 dangerouslySetInnerHTML={{ __html: mail.body }}
               />
             ) : (
-              <p className="p-6 text-sm leading-relaxed">{mail.body}</p>
+              <p data-testid="mail-body-text" className="p-6 text-sm leading-relaxed">{mail.body}</p>
             )}
 
           </div>
         </ShadContextMenu>
       ) : (
-        <div className="flex flex-1 items-center justify-center ">
+        <div data-testid="mail-empty-state" className="flex flex-1 items-center justify-center ">
           <div className="text-center text-muted-foreground text-sm gap-4">
             <EmptyMailbox />
             You don&apos;t select any email in your inbox
@@ -175,6 +184,7 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
       )}
 
       <ConfirmationModal
+        data-testid="mail-delete-modal"
         open={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         title="Are you sure you want to delete the mail?"

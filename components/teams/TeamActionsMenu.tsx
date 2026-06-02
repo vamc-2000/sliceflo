@@ -33,6 +33,7 @@ export function TeamActionsMenu({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
+                    data-testid={`btn-team-actions-trigger-${teamId}`}
                     type="button"
                     className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded hover:bg-muted"
                     aria-label={`More actions for ${teamName}`}
@@ -51,6 +52,7 @@ export function TeamActionsMenu({
             >
                 {/* 1. Rename Team */}
                 <DropdownMenuItem
+                    data-testid={`btn-team-rename-${teamId}`}
                     onSelect={(e) => {
                         onRename?.(teamId);
                     }}
@@ -61,8 +63,9 @@ export function TeamActionsMenu({
 
                 <DropdownMenuSeparator />
 
-                {/* 2. Invite Members */}
+                {/* 2. Create Portfolio */}
                 <DropdownMenuItem
+                    data-testid={`btn-team-create-portfolio-${teamId}`}
                     onSelect={(e) => {
                         e.preventDefault();
                         onInviteMembers?.(teamId);
@@ -72,8 +75,9 @@ export function TeamActionsMenu({
                     <span className="text-[#001F3F]">Create Portfolio</span>
                 </DropdownMenuItem>
 
-                {/* 3. Favorite / Unfavorite */}
+                {/* 3. Create Projects */}
                 <DropdownMenuItem
+                    data-testid={`btn-team-create-projects-${teamId}`}
                     onSelect={(e) => {
                         e.preventDefault();
                         onCreateProject?.(teamId); 
@@ -83,8 +87,9 @@ export function TeamActionsMenu({
                     <span className="text-[#001F3F]">Create Projects</span>
                 </DropdownMenuItem>
 
-                {/* 4. Archive */}
+                {/* 4. Create Goals */}
                 <DropdownMenuItem
+                    data-testid={`btn-team-create-goals-${teamId}`}
                     onSelect={(e) => {
                         e.preventDefault();
                         onCreateGoal?.(teamId);
@@ -97,6 +102,7 @@ export function TeamActionsMenu({
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
+                    data-testid={`btn-team-send-email-${teamId}`}
                     onSelect={(e) => {
                         e.preventDefault();
                         // onArchive?.(teamId);
@@ -110,6 +116,7 @@ export function TeamActionsMenu({
 
                 {/* 5. Delete */}
                 <DropdownMenuItem
+                    data-testid={`btn-team-delete-${teamId}`}
                     className="text-red-600 focus:text-red-600"
                     onSelect={(e) => {
                         e.preventDefault();

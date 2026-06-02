@@ -75,6 +75,7 @@ export const getApprovalColumns = (
             cell: ({ row }) => (
                 <div className="flex items-center px-0">
                     <span
+                        data-testid={`approval-row-details-${row.original.userId}-${row.original.weekStart}`}
                         className="truncate text-foreground font-medium cursor-pointer hover:underline"
                         onClick={() => onDetailsClick(row.original)}
                     >
@@ -128,6 +129,7 @@ export const getApprovalColumns = (
                 return (
                     <div className="flex justify-center items-center">
                         <div
+                            data-testid={`approval-row-status-${row.original.userId}-${row.original.weekStart}`}
                             className={clsx(
                                 "inline-flex items-center justify-center",
                                 "w-37.5 h-7",
@@ -202,6 +204,7 @@ export default function ApprovalsPage({ onNavigateToTimesheet }: { onNavigateToT
 
                 return (
                     <button
+                        data-testid={`btn-filter-status-${status.toLowerCase()}`}
                         key={status}
                         onClick={() => setStatusFilter(isAll ? null : status)}
                         className={clsx(
@@ -220,7 +223,7 @@ export default function ApprovalsPage({ onNavigateToTimesheet }: { onNavigateToT
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full py-16 text-muted-foreground">
+            <div data-testid="approvals-loading-container" className="flex items-center justify-center h-full py-16 text-muted-foreground">
                 <Loader
                     message="Loading approvals..."
                     size="md"
@@ -237,7 +240,7 @@ export default function ApprovalsPage({ onNavigateToTimesheet }: { onNavigateToT
 
     return (
         <>
-            <div className="px-1 py-2">
+            <div data-testid="approvals-page-container" className="px-1 py-2">
                 <DataTableForTS
                     columns={columns}
                     data={approvalRows}

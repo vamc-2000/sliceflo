@@ -74,6 +74,7 @@ function NoteToolbar() {
     <div className="flex items-center gap-1 px-3 py-2 border-t border-border">
       {TOOLBAR_ACTIONS.map(({ label, icon, className }) => (
         <button
+          data-testid={`btn-note-toolbar-${label.toLowerCase().replace(/\s+/g, '-')}`}
           key={label}
           type="button"
           aria-label={label}
@@ -145,6 +146,7 @@ export function TimesheetReviewModal({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
+        data-testid="timesheet-review-modal"
         className="p-0 gap-0 max-w-[530px] w-full rounded-2xl overflow-hidden max-h-[85vh] flex flex-col"
         // Hide the default DialogContent close button — we render our own
         showCloseButton={false}
@@ -164,7 +166,7 @@ export function TimesheetReviewModal({
               <div className="flex items-start justify-between px-5 pt-5 pb-3">
                 <div className="flex items-center gap-2">
                   {/* Week badge */}
-                  <span className="flex items-center gap-1 text-xs font-semibold bg-muted text-foreground px-2 py-1 rounded-full border border-border">
+                  <span data-testid="timesheet-review-week-badge" className="flex items-center gap-1 text-xs font-semibold bg-muted text-foreground px-2 py-1 rounded-full border border-border">
                     {weekLabel}
                     <span className="text-[10px] text-muted-foreground">ⓘ</span>
                   </span>
@@ -174,13 +176,14 @@ export function TimesheetReviewModal({
                       {action} {weekLabel} Timesheet
                     </h2>
                     {/* Total hours pill */}
-                    <span className="inline-block mt-0.5 text-[11px] font-semibold bg-amber-100 text-amber-600 border border-amber-200 rounded-full px-2 py-0.5">
+                    <span data-testid="timesheet-review-total-hours" className="inline-block mt-0.5 text-[11px] font-semibold bg-amber-100 text-amber-600 border border-amber-200 rounded-full px-2 py-0.5">
                       {totalHrs}
                     </span>
                   </div>
                 </div>
 
                 <button
+                  data-testid="btn-close-timesheet-review-modal"
                   onClick={onClose}
                   className="rounded-md p-1 hover:bg-muted transition-colors text-muted-foreground"
                   aria-label="Close"
@@ -192,7 +195,7 @@ export function TimesheetReviewModal({
               {/* ── Employee ── */}
               <div className="px-5 pb-3">
                 <p className="text-xs font-medium text-muted-foreground mb-1.5">Employee</p>
-                <div className="flex items-center gap-3 border border-border rounded-xl px-4 py-1 bg-background">
+                <div data-testid="timesheet-review-employee" className="flex items-center gap-3 border border-border rounded-xl px-4 py-1 bg-background">
                   <Avatar className="h-9 w-9 shrink-0">
                     <AvatarImage src={profile?.profilePictureUrl ?? undefined} alt={profile?.name} />
                     <AvatarFallback className="text-xs font-semibold">{initials}</AvatarFallback>
@@ -209,7 +212,7 @@ export function TimesheetReviewModal({
               {/* ── Tasks Table ── */}
               <div className="px-5 pb-3">
                 <p className="text-xs font-medium text-muted-foreground mb-1.5">Tasks Submitted</p>
-                <div className="border border-border rounded-xl overflow-hidden">
+                <div data-testid="timesheet-review-tasks-table" className="border border-border rounded-xl overflow-hidden">
                   {/* Scrollable Container with Sticky Header */}
                   <div className="max-h-[170px] overflow-y-auto overflow-x-hidden relative">
                     {/* Table header */}
@@ -222,6 +225,7 @@ export function TimesheetReviewModal({
                       {tableEntries.map((entry, i) => (
                         <div
                           key={i}
+                          data-testid={`timesheet-review-task-row-${i}`}
                           className="grid grid-cols-[1fr_80px] px-4 py-3 items-center"
                         >
                           <div className="flex items-center gap-2 min-w-0">
@@ -246,6 +250,7 @@ export function TimesheetReviewModal({
                 </p>
                 <div className="border border-border rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-shadow">
                   <textarea
+                    data-testid="input-timesheet-review-note"
                     className="w-full min-h-[100px] resize-none px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground bg-background outline-none"
                     placeholder="Enter your message here....."
                     value={note}
@@ -258,6 +263,7 @@ export function TimesheetReviewModal({
               {/* ── Footer ── */}
               <div className="flex justify-end px-5 pt-0 pb-0 shrink-0">
                 <Button
+                  data-testid={`btn-timesheet-review-confirm-${action.toLowerCase()}`}
                   onClick={handleDone}
                   disabled={isSubmitting}
                   className={`px-6 mb-4 text-primary-foreground min-w-[120px] ${action === "Approve"

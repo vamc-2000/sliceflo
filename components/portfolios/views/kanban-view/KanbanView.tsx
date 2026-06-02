@@ -271,7 +271,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             <DropdownMenuContent align="start" className="w-64 p-3 border-b-5 border-b-primary">
               <h3 className="text-sm font-semibold mb-3">Unhide Group</h3>
               {settings.hiddenColumns.length === 0 ? (
-                <p className="text-xs text-gray-500 py-2">No hidden groups</p>
+                <p className="text-xs text-muted-foreground py-2">No hidden groups</p>
               ) : (
                 <div className="space-y-1">
                   {settings.hiddenColumns.map(colId => (
@@ -314,7 +314,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                           autoFocus
                         />
                       ) : (
-                         <>
+                        <>
                            <h3 className="font-semibold text-sm text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
                            <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold">
                              {kanbanData.filter(item => item.column === column.id).length}
@@ -323,7 +323,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                       )}
                     </div>
                     <div className="flex items-center gap-0.5">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => hideColumn(portfolioId, column.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400" onClick={() => hideColumn(portfolioId, column.id)}><Eye className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
                 </KanbanHeader>

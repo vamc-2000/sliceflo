@@ -130,14 +130,18 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
   }, [allTeams, router]);
 
   return (
-    <div className="p-3 w-full bg-[#001F3F] text-white relative">
+    <div 
+      data-testid="team-space-sidebar"
+      className="p-3 w-full bg-[#001F3F] text-white relative"
+    >
       {/* Rename Dialog */}
       <Dialog open={isRenaming} onOpenChange={(open) => !open && setIsRenaming(false)}>
-        <DialogContent className="max-w-sm rounded-lg p-4 bg-white text-gray-800">
+        <DialogContent data-testid="modal-rename-team" className="max-w-sm rounded-lg p-4 bg-white text-gray-800">
           <DialogHeader>
             <DialogTitle>Rename Team</DialogTitle>
           </DialogHeader>
           <input
+            data-testid="input-rename-team"
             type="text"
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
@@ -151,6 +155,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
           />
           <div className="flex justify-end gap-2">
             <Button
+              data-testid="button-cancel-rename"
               variant="outline"
               onClick={() => {
                 setIsRenaming(false);
@@ -159,12 +164,19 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
             >
               Cancel
             </Button>
-            <Button onClick={handleRename} disabled={!renameValue.trim()}>
+            <Button
+              data-testid="button-confirm-rename"
+              onClick={handleRename}
+              disabled={!renameValue.trim()}
+            >
               Rename
             </Button>
           </div>
           <DialogClose asChild>
-            <button className="absolute top-2 right-2 rounded p-1 hover:bg-gray-200 transition">
+            <button 
+              data-testid="btn-close-rename-team-modal"
+              className="absolute top-2 right-2 rounded p-1 hover:bg-gray-200 transition"
+            >
               ✕
             </button>
           </DialogClose>
@@ -174,6 +186,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
       {/* Top Controls */}
       <div className="flex justify-between items-center mb-2">
         <Button
+          data-testid="btn-create-new-team"
           variant="ghost"
           className="flex items-center gap-2 text-[#FFA500] border border-transparent hover:border-[#FFA500]"
           onClick={() => {
@@ -186,11 +199,13 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
 
         <div className="flex gap-2">
           <Search
+            data-testid="btn-toggle-team-search"
             size={14}
             className="cursor-pointer text-white hover:text-gray-300"
             onClick={() => setIsSearching((prev) => !prev)}
           />
           <ArrowDownUp
+            data-testid="btn-toggle-team-sort"
             size={14}
             className="cursor-pointer text-white hover:text-gray-300"
             onClick={() => setSortOldest((p) => !p)}
@@ -201,6 +216,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
       {/* Search Input */}
       {isSearching && (
         <input
+          data-testid="input-team-search"
           autoFocus
           type="text"
           value={searchText}
@@ -212,7 +228,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
 
       {/* Empty State */}
       {allTeams.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-6 text-center">
+        <div data-testid="team-space-empty-state" className="flex flex-col items-center justify-center p-6 text-center">
           <Image src="/assets/Team/TeamEmptys.svg" alt="Empty Team Illustration" width={64} height={64} />
           <p className="mt-3 text-sm font-medium text-white">Your Team is empty</p>
           <p className="text-xs text-white/70">Add Team Members</p>
@@ -222,6 +238,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
         sortedTeams.map((team) => (
           <div
             key={team.id}
+            data-testid={`team-sidebar-row-${team.id}`}
             className="flex justify-between items-center p-2 hover:bg-[#1a2942] cursor-pointer rounded transition-colors"
             onClick={() => {
               const teamName = getTeamName(team);
@@ -252,13 +269,14 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
                 </span>
               </div>
 
-              <span className="truncate text-sm text-white">{getTeamName(team)}</span>
+              <span data-testid={`team-sidebar-name-${team.id}`} className="truncate text-sm text-white">{getTeamName(team)}</span>
             </div>
 
             {/* Options Popover */}
             <Popover open={popoverOpen && selectedTeamId === team.id} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <button
+                  data-testid={`btn-team-sidebar-options-${team.id}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedTeamId(team.id);
@@ -279,6 +297,7 @@ const TeamSpaceSidebar: React.FC<TeamSpaceSidebarProps> = ({
                       <button
                         key={idx}
                         type="button"
+                        data-testid="btn-team-sidebar-rename"
                         onClick={() => {
                           opt.action?.();
                           setPopoverOpen(false);

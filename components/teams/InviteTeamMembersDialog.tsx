@@ -304,25 +304,26 @@ export default function InviteTeamMembersDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[60vw]! w-full p-0 gap-0 bg-card text-card-foreground overflow-hidden border-0 border-b-[5px] border-primary rounded-lg">
+      <DialogContent data-testid="modal-invite-team-members" className="max-w-[60vw]! w-full p-0 gap-0 bg-card text-card-foreground overflow-hidden border-0 border-b-[5px] border-primary rounded-lg">
         {/* Two Column Layout */}
         <div className="flex h-125">
           {/* Left Panel - Invite Form */}
-          <div className="w-1/2 p-8 flex flex-col overflow-y-auto">
-            <DialogTitle className="text-xl font-bold mb-8">
+          <div className="w-1/2 p-6 flex flex-col overflow-y-auto">
+            <DialogTitle className="text-sm font-bold text-foreground mb-6">
               Invite people to your Team:
             </DialogTitle>
 
             {/* Shareable Link */}
             <div className="mb-6">
-              <label className="text-sm mb-2 block">
+              <label className="text-xs mb-2 block">
                 Invite with Shareable link
               </label>
-              <div className="flex items-center border border-border rounded-lg px-3 h-11 bg-muted">
-                <span className="text-sm text-muted-foreground truncate flex-1">
+              <div className="flex items-center border border-border rounded-lg px-3 h-9 bg-muted">
+                <span className="text-xs text-muted-foreground truncate flex-1">
                   {inviteLink}
                 </span>
                 <Button
+                  data-testid="btn-copy-invite-link"
                   variant="ghost"
                   size="icon"
                   onClick={copyInviteLink}
@@ -334,7 +335,7 @@ export default function InviteTeamMembersDialog({
             </div>
 
             <div className="space-y-3 mt-2">
-              <span className="text-muted-foreground font-medium">Invite with email</span>
+              <span className="text-muted-foreground font-medium text-xs">Invite with email</span>
 
               {rows.map((row, index) => (
                 <div key={index} className="w-full space-y-1">
@@ -342,13 +343,13 @@ export default function InviteTeamMembersDialog({
                   {/* Input Row */}
                   <div className="flex items-center gap-2 w-full">
                     <div
-                      className={`flex items-center flex-1 p-1 rounded-md bg-background border ${
-                        row.email && !isValidEmail(row.email)
+                      className={`flex items-center flex-1 p-1 rounded-md bg-background border ${row.email && !isValidEmail(row.email)
                           ? "border-red-500"
                           : "border-input"
                         }`}
                     >
                       <Input
+                        data-testid={`input-invite-email-${index}`}
                         placeholder="Enter email address"
                         value={row.email}
                         onChange={(e) => {
@@ -370,20 +371,21 @@ export default function InviteTeamMembersDialog({
                           setRows(updated);
                         }}
                       >
-                        <SelectTrigger className="w-30 border-0 rounded-md bg-muted text-foreground">
+                        <SelectTrigger data-testid={`select-invite-role-${index}`} className="w-30 border-1 rounded-md bg-muted text-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
 
                         <SelectContent className="border-0 border-b-[5px] border-b-primary rounded-lg">
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="viewer">Viewer</SelectItem>
+                          <SelectItem data-testid="select-role-admin" value="admin">Admin</SelectItem>
+                          <SelectItem data-testid="select-role-member" value="member">Member</SelectItem>
+                          <SelectItem data-testid="select-role-viewer" value="viewer">Viewer</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {rows.length > 1 && (
                       <button
+                        data-testid={`btn-remove-email-row-${index}`}
                         onClick={() => setRows(rows.filter((_, i) => i !== index))}
                         className="p-1 hover:bg-muted rounded"
                       >
@@ -404,7 +406,8 @@ export default function InviteTeamMembersDialog({
               {/* Add More */}
               <div className="flex justify-end">
                 <div
-                  className="text-sm text-primary cursor-pointer hover:underline"
+                  data-testid="btn-add-more-email-row"
+                  className="text-xs text-primary cursor-pointer hover:underline"
                   onClick={() => setRows([...rows, { email: "", role: "" }])}
                 >
                   + Add more
@@ -415,6 +418,7 @@ export default function InviteTeamMembersDialog({
             {/* Add Button */}
             <div className="flex justify-center mt-8">
               <Button
+                data-testid="btn-add-to-team"
                 onClick={handleAddToTeam}
                 disabled={!canAddMembers || isAdding}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-8 py-2"
@@ -435,14 +439,15 @@ export default function InviteTeamMembersDialog({
           <div className="w-1/2 flex flex-col border-l border-border overflow-hidden">
             {/* Header */}
             <div className="px-3 py-4 border-b border-border flex items-center justify-baseline gap-4">
-              <h3 className="text-base font-semibold">Workspace Members</h3>
+              <h3 className="text-xs font-semibold">Workspace Members</h3>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
+                  data-testid="input-members-search"
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 h-9 text-sm w-32"
+                  className="pl-9 h-9 text-xs w-32"
                 />
               </div>
             </div>
@@ -453,8 +458,8 @@ export default function InviteTeamMembersDialog({
                 {filtered.map((u) => (
                   <div
                     key={u.id}
-                    className={`flex items-center gap-3 py-3 px-2 border-b border-border last:border-0 ${
-                      u.selected
+                    data-testid={`member-row-${u.id}`}
+                    className={`flex items-center gap-3 py-3 px-2 border-b border-border last:border-0 ${u.selected
                         ? 'cursor-not-allowed'
                         : 'hover:bg-muted cursor-pointer'
                       }`}
@@ -463,6 +468,7 @@ export default function InviteTeamMembersDialog({
                     {/* prevent checkbox click from bubbling to parent row click */}
                     <div onClick={(e) => e.stopPropagation()}>
                       <Checkbox
+                        data-testid={`checkbox-member-${u.id}`}
                         checked={selected.includes(u.id) || u.selected}
                         onCheckedChange={(checked) => {
                           if (u.selected) return; // cannot toggle existing members
@@ -482,7 +488,7 @@ export default function InviteTeamMembersDialog({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{u.name}</p>
+                      <p className="text-xs font-medium">{u.name}</p>
                       <p className="text-xs text-muted-foreground">{u.username}</p>
                     </div>
                   </div>

@@ -70,7 +70,7 @@ export default function LinkEntityDialog({ open, onClose, type, teamId, teamProj
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-lg w-full h-[380px] flex flex-col">
+            <DialogContent data-testid={`modal-link-${type}`} className="max-w-lg w-full h-[380px] flex flex-col">
                 <DialogHeader className="flex-none">
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
@@ -79,6 +79,7 @@ export default function LinkEntityDialog({ open, onClose, type, teamId, teamProj
                     {/* Input */}
                     <div className="relative w-full flex-none">
                         <Input
+                            data-testid={`input-search-${type}`}
                             placeholder={`Search for ${type} name`}
                             value={query}
                             onChange={e => setQuery(e.target.value)}
@@ -103,17 +104,19 @@ export default function LinkEntityDialog({ open, onClose, type, teamId, teamProj
                         {/* Table Rows */}
                         <div className="h-[132px] overflow-y-auto relative z-10 text-sm text-muted-foreground">
                             {filteredEntities.length === 0 ? (
-                                <div className="h-full flex items-center justify-center italic">
+                                <div data-testid={`empty-${type}-list`} className="h-full flex items-center justify-center italic">
                                     No {type === 'project' ? 'projects' : type === 'goal' ? 'goals' : 'portfolios'} found
                                 </div>
                             ) : (
                                 filteredEntities.map(entity => (
                                     <div
                                         key={entity.id}
+                                        data-testid={`${type}-row-${entity.id}`}
                                         className="grid grid-cols-[40px_1fr_60px] h-11 items-center px-3 border-t first:border-t-0 relative z-10"
                                     >
                                         <div className="flex items-center">
                                             <Checkbox
+                                                data-testid={`checkbox-select-${type}-${entity.id}`}
                                                 checked={selectedIds.has(entity.id)}
                                                 onCheckedChange={() => toggleSelect(entity.id)}
                                             />
@@ -145,6 +148,7 @@ export default function LinkEntityDialog({ open, onClose, type, teamId, teamProj
 
                 <div className="flex justify-between pt-4 mt-auto flex-none">
                     <Button
+                        data-testid={`btn-create-new-${type}`}
                         variant="outline"
                         className='border-border text-muted-foreground w-40 hover:bg-primary hover:text-primary-foreground'
                         onClick={() => {
@@ -159,6 +163,7 @@ export default function LinkEntityDialog({ open, onClose, type, teamId, teamProj
                     </Button>
 
                     <Button
+                        data-testid={`btn-assign-${type}`}
                         disabled={selectedIds.size === 0 || isAssigning}
                         onClick={async () => {
                             try {

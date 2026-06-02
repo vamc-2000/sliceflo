@@ -254,7 +254,7 @@ export function AddTimesheetEntryModal({
                 }
             }}
         >
-            <DialogContent className="sm:max-w-lg border-0 border-b-[5px] border-primary rounded-lg ">
+            <DialogContent data-testid="add-timesheet-modal" className="sm:max-w-lg border-0 border-b-[5px] border-primary rounded-lg ">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
@@ -277,6 +277,7 @@ export function AddTimesheetEntryModal({
                         <Popover open={bOpen} onOpenChange={setBOpen}>
                             <PopoverTrigger asChild>
                                 <Button
+                                    data-testid="btn-select-task-modal"
                                     variant="outline"
                                     className="w-full justify-between bg-muted min-w-0 max-w-[calc(100vw-80px)] sm:max-w-[464px] overflow-hidden whitespace-normal flex items-center shrink"
                                 >
@@ -348,6 +349,7 @@ export function AddTimesheetEntryModal({
                                 /> */}
 
                                 <Input
+                                    data-testid="input-log-hours"
                                     type="number"
                                     min={0}
                                     className="h-8 w-25 border-muted-foreground bg-background"
@@ -369,6 +371,7 @@ export function AddTimesheetEntryModal({
                                 />
 
                                 <Input
+                                    data-testid="input-log-minutes"
                                     type="number"
                                     min={0}
                                     max={59}
@@ -403,6 +406,7 @@ export function AddTimesheetEntryModal({
                             <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
+                                        data-testid="btn-select-date"
                                         variant="outline"
                                         className={`
                                             h-9 px-3 bg-muted text-muted-foreground
@@ -433,6 +437,7 @@ export function AddTimesheetEntryModal({
                             <Popover open={timePopoverOpen} onOpenChange={setTimePopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
+                                        data-testid="btn-select-time-range"
                                         variant="outline"
                                         className={`
                                             h-9 bg-muted text-muted-foreground
@@ -553,6 +558,7 @@ export function AddTimesheetEntryModal({
                     {/* Left side */}
                     <div className="flex items-center gap-2">
                         <Checkbox
+                            data-testid="checkbox-billable"
                             checked={billable}
                             onCheckedChange={(value) => setBillable(Boolean(value))}
                             className="border-primary border-2"
@@ -564,6 +570,7 @@ export function AddTimesheetEntryModal({
 
                     {/* Right side */}
                     <Button
+                        data-testid="btn-submit-timesheet-entry"
                         variant="outline"
                         disabled={!selectedProject || !selectedTask || (logHours * 60 + logMinutes) === 0 || isSubmitting}
                         onClick={handleEntry}

@@ -62,6 +62,7 @@ export function TimesheetRowActions({ row }: TimesheetRowActionsProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            data-testid="btn-row-actions"
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-muted-foreground hover:bg-muted"
@@ -76,6 +77,7 @@ export function TimesheetRowActions({ row }: TimesheetRowActionsProps) {
         >
           
           <DropdownMenuItem
+            data-testid="menu-item-edit-entry"
             className="text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setIsEditModalOpen(true)}
             disabled={["Pending", "Approved"].includes(data.originalEntry.status)}
@@ -85,6 +87,7 @@ export function TimesheetRowActions({ row }: TimesheetRowActionsProps) {
           </DropdownMenuItem>
 
           <DropdownMenuItem
+            data-testid="menu-item-delete-entry"
             className="text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => setOpenDeleteModal(true)}
             disabled={["Pending", "Approved"].includes(data.originalEntry.status)}

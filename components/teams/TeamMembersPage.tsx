@@ -95,6 +95,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
       header: ({ table }) => (
         <div className="flex items-center justify-center">
           <Checkbox
+            data-testid="checkbox-select-all-members"
             checked={table.getIsAllPageRowsSelected()}
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
@@ -104,6 +105,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
       cell: ({ row }) => (
         <div className="flex items-center justify-center">
           <Checkbox
+            data-testid={`checkbox-select-member-${row.original.id}`}
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
             aria-label="Select row"
@@ -121,6 +123,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
         return (
           <div className="flex items-center gap-3">
             <Avatar
+              data-testid={`avatar-member-${member.id}`}
               className="cursor-pointer"
               onClick={() => {
                 setSelectedMember(member);
@@ -204,6 +207,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  data-testid={`btn-member-actions-${member.id}`}
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 flex items-center justify-center cursor-pointer"
@@ -214,6 +218,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
               <DropdownMenuPortal>
                 <DropdownMenuContent align="end" className="border-0 border-b-[5px] border-primary rounded-lg bg-popover text-popover-foreground">
                   <DropdownMenuItem
+                    data-testid={`btn-view-member-details-${member.id}`}
                     onClick={() => {
                       setSelectedMember(member);
                       setOpenModal(true);
@@ -222,6 +227,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                     View Member Details
                   </DropdownMenuItem>
                   <DropdownMenuItem
+                    data-testid={`btn-create-task-${member.id}`}
                     disabled={member.project === "-"}
                     onClick={() => {
                       const firstProject = team?.projects?.[0];
@@ -250,6 +256,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    data-testid={`btn-remove-member-${member.id}`}
                     className="text-destructive"
                     onClick={() => {
                       setMemberToRemove(member);
@@ -271,7 +278,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
 
   if (isInitialLoading) {
     return (
-      <div className="flex h-120 w-full items-center justify-center">
+      <div data-testid="team-members-loading" className="flex h-120 w-full items-center justify-center">
         <Loader message="Loading team members..." size="md" />
       </div>
     );
@@ -401,7 +408,10 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
 
 
   return (
-    <div className="w-full h-full bg-background overflow-y-auto">
+    <div     
+      data-testid="team-members-page"
+      className="w-full h-full bg-background overflow-y-auto"
+    >
       {/* Main Content with DataTable */}
       <div className="px-3 py-2 mr-1">
         <DataTableForTeams
@@ -418,7 +428,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
           toolbarLeft={
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-0 py-2 rounded-md flex items-center text-sm cursor-pointer">
+                <Button data-testid="btn-create-trigger" className="bg-primary hover:bg-primary/90 text-primary-foreground px-0 py-2 rounded-md flex items-center text-sm cursor-pointer">
                   <Plus />
                   Create
                   <span className="h-4 w-px bg-white/30 ml-1" />
@@ -426,12 +436,13 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-35 p-2 border-b-5 border-b-primary rounded-b-lg bg-popover text-popover-foreground" align="start">
-                <button className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors cursor-pointer">
+                <button data-testid="btn-create-portfolio" className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors cursor-pointer">
                   <LayoutDashboard className="h-4 w-4" />
                   Portfolio
                 </button>
 
                 <button
+                  data-testid="btn-create-project"
                   className="flex items-center gap-2 w-full text-left px-1 py-2 text-sm text-foreground hover:bg-muted rounded transition-colors cursor-pointer"
                   onClick={() => router.push(`/teams/${teamId}/create-project`)}
                 >
@@ -440,6 +451,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                 </button>
 
                 <button
+                  data-testid="btn-create-goal" 
                   className="flex items-center gap-2 w-full text-left px-1 py-2 text-foreground text-sm hover:bg-muted rounded transition-colors cursor-pointer"
                   onClick={() => router.push(`/teams/${teamId}/create-goal`)}
                 >
@@ -451,6 +463,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
           }
           toolbarActions={
             <Button
+              data-testid="btn-add-member"
               onClick={() => setOpenInvite(true)}
               className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
             >
@@ -462,6 +475,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
       </div>
 
       <InviteTeamMembersDialog
+        data-testid="modal-invite-team-members"
         open={openInvite}
         onClose={() => setOpenInvite(false)}
         teamName={getTeamName(team) || 'Team'}
@@ -470,12 +484,14 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
       />
 
       <MemberDetailsModal
+        data-testid="modal-member-details"
         open={openModal}
         onClose={() => setOpenModal(false)}
         member={selectedMember}
       />
 
       <ConfirmationModal
+        data-testid="modal-confirm-remove-member"
         open={confirmOpen}
         onClose={() => {
           if (isRemoving) return;
@@ -501,6 +517,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
 
       {isQuickTaskOpen && (
         <QuickTaskCreation
+          data-testid="modal-quick-task-creation"
           open={isQuickTaskOpen}
           onClose={() => setIsQuickTaskOpen(false)}
           projectId={selectedProjectId}

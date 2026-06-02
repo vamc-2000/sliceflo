@@ -48,12 +48,13 @@ const RightPanel = ({ team: propTeam }: RightPanelProps) => {
   ]
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div data-testid="right-panel-container" className="h-full flex flex-col bg-background overflow-hidden">
       {/* Full-width pill tab switcher */}
       <div className="bg-muted p-2 flex items-center gap-1">
         {tabs.map(tab => (
           <button
             key={tab.value}
+            data-testid={`btn-tab-${tab.value}`}
             onClick={() => setActiveTab(tab.value)}
             className={`
               flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer
@@ -72,6 +73,7 @@ const RightPanel = ({ team: propTeam }: RightPanelProps) => {
       <div className="flex-1 min-h-0 overflow-y-auto p-4">
         {activeTab === 'properties' && (
           <AboutTeam
+            data-testid="panel-properties"
             teamName={team?.name}
             teamOwner={ownerWithAvatar}
             teamDescription={team?.description}
@@ -80,7 +82,7 @@ const RightPanel = ({ team: propTeam }: RightPanelProps) => {
           />
         )}
         {activeTab === 'activity' && (
-          <div className="text-sm text-muted-foreground">
+          <div data-testid="panel-activity" className="text-sm text-muted-foreground">
             <ActivityLog entityType="team" entityId={teamId} />
           </div>
         )}

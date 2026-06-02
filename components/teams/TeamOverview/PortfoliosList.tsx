@@ -49,11 +49,14 @@ const PortfoliosList: React.FC<PortfoliosListProps> = ({ teamId, portfolios }) =
   }
 
   if (portfolios.length === 0) {
-    return <div className="text-muted-foreground text-sm italic py-4">no portfolios</div>
+    return <div data-testid="empty-portfolios-list" className="text-muted-foreground text-sm italic py-4">no portfolios</div>
   }
 
   return (
-    <div className="max-h-[220px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+    <div 
+      data-testid="portfolios-list-container"
+      className="max-h-[220px] overflow-y-auto space-y-2 pr-1 custom-scrollbar"
+    >
       {portfolios.map((portfolio) => {
         if (!portfolio.id) return null
 
@@ -62,6 +65,7 @@ const PortfoliosList: React.FC<PortfoliosListProps> = ({ teamId, portfolios }) =
         return (
           <div
             key={portfolioId}
+            data-testid={`portfolio-row-${portfolioId}`}
             className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary bg-card text-card-foreground px-5 py-3 hover:bg-muted/50 transition cursor-pointer mr-1"
             onClick={() => router.push(`/portfolio/${portfolioId}`)}
           >
@@ -87,6 +91,7 @@ const PortfoliosList: React.FC<PortfoliosListProps> = ({ teamId, portfolios }) =
             </div>
 
             <ProjectActionsMenu
+              data-testid={`portfolio-actions-${portfolioId}`}
               onEdit={() => console.log('Edit portfolio', portfolioId)}
               onDetach={(e) => handleDetachClick(e, portfolioId)}
             />
@@ -95,6 +100,7 @@ const PortfoliosList: React.FC<PortfoliosListProps> = ({ teamId, portfolios }) =
       })}
 
       <ConfirmationModal
+        data-testid="modal-detach-portfolio"
         open={isDetachModalOpen}
         onClose={() => setIsDetachModalOpen(false)}
         title="Detach Portfolio"
