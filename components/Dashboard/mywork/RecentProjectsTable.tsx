@@ -96,9 +96,9 @@ export function RecentProjectsTable() {
   };
 
   return (
-    <Card className="rounded-2xl border bg-background shadow-none">
+    <Card className="rounded-2xl border bg-background shadow-none" data-testid="recent-projects-card">
       <CardContent className="p-5">
-        <p className="text-sm font-bold mb-4">Recent Projects</p>
+        <p className="text-sm font-bold mb-4" data-testid="recent-projects-title">Recent Projects</p>
 
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-4">
@@ -107,10 +107,11 @@ export function RecentProjectsTable() {
             value={filter}
             onChange={(e) => { setFilter(e.target.value); setPage(0); }}
             className="h-9 w-[280px] text-sm"
+            data-testid="recent-projects-filter-input"
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-9 gap-1.5 text-sm font-medium">
+              <Button variant="outline" className="h-9 gap-1.5 text-sm font-medium" data-testid="recent-projects-columns-trigger">
                 Columns <ChevronDown className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
@@ -122,6 +123,7 @@ export function RecentProjectsTable() {
                   onCheckedChange={() => toggleCol(field.id)}
                   disabled={field.required}
                   className="text-sm"
+                  data-testid={`recent-projects-column-checkbox-${field.id}`}
                 >
                   {field.label}
                 </DropdownMenuCheckboxItem>
@@ -132,11 +134,11 @@ export function RecentProjectsTable() {
 
         {/* Table */}
         <div className="rounded-xl border overflow-hidden">
-          <Table>
+          <Table data-testid="recent-projects-table">
             <TableHeader>
               <TableRow className="hover:bg-transparent bg-muted/20">
                 <TableHead className="w-12 pl-4 h-8 py-0.5 align-middle">
-                  <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} className="h-4 w-4" />
+                  <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} className="h-4 w-4" data-testid="recent-projects-checkbox-select-all" />
                 </TableHead>
                 {ALL_PORTFOLIO_FIELDS.map(field =>
                   visibleCols.has(field.id) && (
@@ -164,10 +166,11 @@ export function RecentProjectsTable() {
                     <TableRow
                       key={p.id}
                       className={cn("hover:bg-muted/40 transition-colors", isSelected && "bg-muted/30")}
+                      data-testid={`recent-projects-row-${p.id}`}
                     >
                       {/* Checkbox */}
                       <TableCell className="pl-4 py-1 h-9 align-middle">
-                        <Checkbox checked={isSelected} onCheckedChange={() => toggleRow(p.id!)} className="h-4 w-4" />
+                        <Checkbox checked={isSelected} onCheckedChange={() => toggleRow(p.id!)} className="h-4 w-4" data-testid={`recent-projects-checkbox-row-${p.id}`} />
                       </TableCell>
 
                       {ALL_PORTFOLIO_FIELDS.map(field => {
@@ -303,7 +306,7 @@ export function RecentProjectsTable() {
                       <TableCell className="py-1 h-9 align-middle pr-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`recent-projects-actions-trigger-${p.id}`}>
                               <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -323,20 +326,20 @@ export function RecentProjectsTable() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between mt-4" data-testid="recent-projects-pagination">
           <span className="text-xs text-muted-foreground">
             {selected.size} of {filtered.length} row(s) selected.
           </span>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8"
-              onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+              onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} data-testid="recent-projects-page-prev">
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-xs text-muted-foreground px-2">
               {page + 1} / {Math.max(1, totalPages)}
             </span>
             <Button variant="outline" size="icon" className="h-8 w-8"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} data-testid="recent-projects-page-next">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

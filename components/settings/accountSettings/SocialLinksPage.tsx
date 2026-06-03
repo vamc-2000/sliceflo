@@ -36,11 +36,9 @@ const iconMap: Record<SocialPlatform, { icon: IconType; color: string }> = {
 
 const SOCIAL_ICONS: SocialPlatform[] = ["linkedin", "twitter", "facebook", "instagram", "threads"];
 
-//   function to validate platform type
 const isValidSocialPlatform = (value: string): value is SocialPlatform => {
     return ["linkedin", "twitter", "facebook", "instagram", "threads"].includes(value);
 };
-// Add this after iconMap and before SocialLinksForm component
 const platformPlaceholders: Record<SocialPlatform, string> = {
     linkedin: "https://www.linkedin.com/in/your-username",
     twitter: "https://twitter.com/your-username",
@@ -63,9 +61,7 @@ const SocialLinksForm = () => {
 
     useEffect(() => {
         if (profile?.socialLinks && Object.keys(profile.socialLinks).length > 0) {
-            console.log("📦 Social links received:", profile.socialLinks);
 
-            // Convert backend data to array format
             const socialLinksArray: SocialLink[] = [];
 
             Object.entries(profile.socialLinks).forEach(([key, url]) => {
@@ -78,13 +74,10 @@ const SocialLinksForm = () => {
                 }
             });
 
-            //  Use converted array or empty row
             const linksToSet: SocialLink[] =
                 socialLinksArray.length > 0 ? socialLinksArray : [{ platform: "", url: "" }];
 
-            console.log(" Converted links:", linksToSet);
 
-            // Save to local state
             setLinks(linksToSet);
             setInitialLinks(linksToSet);
         }
@@ -125,7 +118,6 @@ const SocialLinksForm = () => {
     };
 
     const handleSave = async () => {
-        // Move all validation checks BEFORE setSaving(true)
         if (links.length === 0 || links.some((l) => !l.platform || !l.url)) {
             toast("error", { title: "Error", description: "Please fill in all fields" });
             return;
@@ -168,20 +160,20 @@ const SocialLinksForm = () => {
     return (
         <div className="w-full space-y-6">
             <div>
-                <h2 className="text-xl font-semibold text-foreground tracking-tight">Social Links</h2>
+                <h2 className="text-xl font-semibold text-foreground tracking-tight" data-testid="social-links-title">Social Links</h2>
                 <p className="text-sm text-muted-foreground">Add your social media profiles</p>
             </div>
 
             <div className="space-y-4">
                 {links.map((link, idx) => (
-                    <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end" data-testid={`social-links-row-${idx}`}>
                         <div className="md:col-span-2">
                             <Label className="text-sm font-medium text-foreground mb-2">Link Name</Label>
                             <Select
                                 value={link.platform}
                                 onValueChange={(value) => handlePlatformChange(idx, value)}
                             >
-                                <SelectTrigger className="h-10 border-l-[3px] border-l-primary">
+                                <SelectTrigger className="h-10 border-l-[3px] border-l-primary" data-testid={`social-links-platform-select-trigger-${idx}`}>
                                     <SelectValue placeholder="Select">
                                         {link.platform && (
                                             <div className="flex items-center justify-center">
@@ -200,6 +192,7 @@ const SocialLinksForm = () => {
                                             value={platform}
                                             disabled={usedPlatforms.includes(platform) && link.platform !== platform}
                                             className="flex items-center justify-center"
+                                            data-testid={`social-links-platform-option-${platform}-${idx}`}
                                         >
                                             <div className="flex items-center justify-center w-full">
                                                 {React.createElement(iconMap[platform].icon, {
@@ -225,6 +218,7 @@ const SocialLinksForm = () => {
                                     value={link.url}
                                     onChange={(e) => handleUrlChange(idx, e.target.value)}
                                     className="h-10 text-foreground"
+                                    data-testid={`social-links-url-input-${idx}`}
                                 />
                                 <Button
                                     variant="ghost"
@@ -232,6 +226,7 @@ const SocialLinksForm = () => {
                                     onClick={() => handleRemove(idx)}
                                     className="h-10 w-10 flex-shrink-0 hover:bg-destructive/10"
                                     disabled={links.length === 1 && !link.platform && !link.url}
+                                    data-testid={`social-links-remove-btn-${idx}`}
                                 >
                                     <Trash className="w-4 h-4 text-destructive" />
                                 </Button>
@@ -246,6 +241,7 @@ const SocialLinksForm = () => {
                     disabled={links.length >= 5 || isAnyRowIncomplete}
                     onClick={handleAdd}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    data-testid="social-links-add-btn"
                 >
                     + Add Link
                 </Button>
@@ -254,6 +250,7 @@ const SocialLinksForm = () => {
                     disabled={saving || !isChanged || isAnyRowIncomplete}
                     onClick={handleSave}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    data-testid="social-links-save-btn"
                 >
                     {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                     {saving ? "Saving..." : "Save"}

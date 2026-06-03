@@ -2,6 +2,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import { useProjectsStore } from '@/stores/projects-store'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -28,6 +29,15 @@ import { useTasksStore } from '@/stores/tasks-store';
 import { getRelationshipIcon } from '@/utils/relationship-utils';
 import { cn } from '@/lib/utils';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
+import { Textarea } from '@/components/ui/textarea'
+import { ChevronDown, History, Paperclip } from 'lucide-react'
+import StatusHistoryModal from './StatusHistoryModal'
 
 interface ProjectOverviewProps {
     project?: any
@@ -40,11 +50,14 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
     activeTab = 'properties',
     onTabChange,
 }) => {
-    const { currentWorkspace } = useWorkspaceStore()
+    const router = useRouter()
+    const { currentWorkspace, workspaceMembers } = useWorkspaceStore()
     const {
         removeMembersFromProject,
         removeViewersFromProject,
         detachPortfoliosFromProject,
+        fetchProjectStatusHistory,
+        postProjectStatusHistory,
     } = useProjectsStore()
     const { portfolios } = usePortfoliosStore()
     const { user: profile } = useProfileStore()
@@ -65,12 +78,26 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
     const [openPortfolioDialog, setOpenPortfolioDialog] = useState(false)
     const [openGoalsDialog, setOpenGoalsDialog] = useState(false)
 
+    // Status Update state variables
+    const [isEditingStatus, setIsEditingStatus] = useState(false)
+    const [statusMessage, setStatusMessage] = useState('')
+    const [selectedStatus, setSelectedStatus] = useState('')
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+
     // Fetch tasks for the project
     useEffect(() => {
         if (projectId) {
             fetchTasks(projectId);
         }
     }, [projectId, fetchTasks]);
+
+    // Fetch project status history on mount / project change if not loaded yet, or when history modal opens
+    useEffect(() => {
+        const hasHistory = !!project?.statusHistory;
+        if (projectId && (!hasHistory || isHistoryOpen)) {
+            fetchProjectStatusHistory(projectId);
+        }
+    }, [projectId, isHistoryOpen, fetchProjectStatusHistory, !!project?.statusHistory]);
 
     // Calculate relationship metrics
     const relationshipMetrics = useMemo(() => {
@@ -203,6 +230,49 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
         await deleteTask(milestoneId);
     };
 
+    const statusConfigs = useMemo(() => {
+        return project?.projectStatusConfig || [];
+    }, [project]);
+
+    const enterEditMode = () => {
+        const currentStatus = project?.currentProjectStatus || (statusConfigs[0]?.value || '');
+        setSelectedStatus(currentStatus);
+        setStatusMessage('');
+        setIsEditingStatus(true);
+    };
+
+    const handleStatusButtonClick = (statusValue: string) => {
+        setSelectedStatus(statusValue);
+        setStatusMessage('');
+        setIsEditingStatus(true);
+    };
+
+    const handlePostUpdate = async () => {
+        if (!selectedStatus || !projectId) return;
+        try {
+            await postProjectStatusHistory(projectId, selectedStatus, statusMessage);
+            setIsEditingStatus(false);
+            setStatusMessage('');
+        } catch (err) {
+            console.error("Failed to post status update:", err);
+        }
+    };
+
+    const resolvedLeader = useMemo(() => {
+        const leaderId = project?.leaders?.[0];
+        if (!leaderId || !workspaceMembers) return undefined;
+        const member = workspaceMembers.find(m => m.userId === leaderId);
+        if (!member) return undefined;
+        const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || "";
+        const avatarUrl = member.profilePicture
+            ? (member.profilePicture.startsWith('http') ? member.profilePicture : `${s3BaseUrl}/${member.profilePicture}`)
+            : '';
+        return {
+            name: member.name || member.email || 'Unknown',
+            avatar: avatarUrl
+        };
+    }, [project?.leaders, workspaceMembers]);
+
     return (
         <div className="h-full w-full overflow-hidden text-xs">
             <ResizablePanelGroup direction="horizontal" className="flex h-full w-full">
@@ -244,44 +314,134 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
 
                         {/* Project Update Section */}
                         <div>
-                            <div>
-                                <h3 className="text-sm font-semibold">Status Update</h3>
-                                <p className="text-xs text-muted-foreground mb-2">
-                                    Summarize progress, blockers, and next steps. Keeps stakeholders aligned without meetings
-                                </p>
+                            <div className="flex items-center justify-between mb-2">
+                                <div>
+                                    <h3 className="text-sm font-semibold text-foreground">Status Update</h3>
+                                    <p className="text-xs text-muted-foreground">
+                                        Summarize progress, blockers, and next steps. Keeps stakeholders aligned without meetings
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsHistoryOpen(true)}
+                                    className="text-xs text-primary hover:text-primary/95 flex items-center gap-1.5 h-8 px-2"
+                                >
+                                    <History className="h-3.5 w-3.5" />
+                                    <span>View history</span>
+                                </Button>
                             </div>
-                            <Card className='p-3'>
-                                <CardContent className='space-y-3 px-0'>
-                                    <div className="grid grid-cols-4 gap-3">
-                                        <Button
-                                            variant="secondary"
-                                            className="h-12 bg-green-100 hover:bg-green-200"
-                                        >
-                                            <span className="text-green-500 font-bold text-xs">On Track</span>
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            className="h-12 bg-red-100 hover:bg-red-200"
-                                        >
-                                            <span className="text-red-500 font-bold text-xs">At Risk</span>
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            className="h-12 bg-orange-100 hover:bg-orange-200"
-                                        >
-                                            <span className="text-orange-500 font-bold text-xs">Off Track</span>
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            className="h-12 bg-blue-100 hover:bg-blue-200"
-                                        >
-                                            <span className="text-blue-500 font-bold text-xs">On Hold</span>
-                                        </Button>
-                                    </div>
-                                    <Button variant="secondary" className="flex items-center w-full py-4 text-xs text-muted-foreground">
-                                        <Edit className="w-4 h-4" />
-                                        Post project status update
-                                    </Button>
+                            <Card className="p-3">
+                                <CardContent className="space-y-3 px-0 pb-0">
+                                    {isEditingStatus ? (
+                                        <div className="flex flex-col gap-3">
+                                            {/* Status Dropdown Trigger */}
+                                            <div className="flex items-center">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            className="h-8 px-3 hover:bg-muted text-xs font-semibold capitalize flex items-center gap-1.5"
+                                                            style={{
+                                                                backgroundColor: (statusConfigs.find((c: any) => c.value === selectedStatus)?.color || '#6b7280') + '15',
+                                                                color: statusConfigs.find((c: any) => c.value === selectedStatus)?.color || '#6b7280',
+                                                            }}
+                                                        >
+                                                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusConfigs.find((c: any) => c.value === selectedStatus)?.color || '#6b7280' }} />
+                                                            <span>{statusConfigs.find((c: any) => c.value === selectedStatus)?.label || selectedStatus || 'Select status'}</span>
+                                                            <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-70" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="start" className="w-40">
+                                                        {statusConfigs.map((level: any) => (
+                                                            <DropdownMenuItem
+                                                                key={level.value}
+                                                                onClick={() => setSelectedStatus(level.value)}
+                                                                className="text-xs"
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: level.color }} />
+                                                                    <span>{level.label}</span>
+                                                                </div>
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+
+                                            {/* Textarea */}
+                                            <Textarea
+                                                placeholder="Write a project status update..."
+                                                value={statusMessage}
+                                                onChange={(e) => setStatusMessage(e.target.value)}
+                                                className="min-h-[80px] text-xs focus-visible:ring-primary"
+                                            />
+
+                                            {/* Actions row */}
+                                            <div className="flex items-center justify-between">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                                                    <Paperclip className="h-4 w-4" />
+                                                </Button>
+                                                <div className="flex items-center gap-2">
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="sm" 
+                                                        onClick={() => setIsEditingStatus(false)}
+                                                        className="h-8 px-3 text-xs"
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button 
+                                                        size="sm" 
+                                                        onClick={handlePostUpdate}
+                                                        disabled={!selectedStatus || !statusMessage.trim()}
+                                                        className="h-8 px-3 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                                                    >
+                                                        Post update
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                {statusConfigs.map((config: any) => {
+                                                    const isActive = project?.currentProjectStatus === config.value;
+                                                    return (
+                                                        <Button
+                                                            key={config._id || config.value}
+                                                            variant="secondary"
+                                                            className={cn(
+                                                                "h-12 transition-all duration-200 flex items-center justify-center rounded-md font-semibold text-xs border relative hover:scale-[1.02] active:scale-[0.98] cursor-pointer",
+                                                                isActive ? "shadow-sm" : "hover:bg-muted"
+                                                            )}
+                                                            style={{
+                                                                borderColor: isActive ? config.color : 'transparent',
+                                                                backgroundColor: isActive ? config.color + '25' : config.color + '0f',
+                                                                color: config.color,
+                                                                borderWidth: '2px'
+                                                            }}
+                                                            onClick={() => handleStatusButtonClick(config.value)}
+                                                        >
+                                                            {isActive && (
+                                                                <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: config.color }} />
+                                                            )}
+                                                            {config.label}
+                                                        </Button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <Button 
+                                                variant="secondary" 
+                                                onClick={enterEditMode}
+                                                className="flex items-center justify-center w-full py-4 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground cursor-pointer"
+                                            >
+                                                <Edit className="w-4 h-4 mr-2" />
+                                                Post project status update
+                                            </Button>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
@@ -459,7 +619,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                             <div className="flex flex-col gap-2">
                                                 <button
                                                     data-testid="projectoverview-create-portfolio-btn"
-                                                    onClick={() => setOpenPortfolioDialog(true)}
+                                                    onClick={() => router.push(`/project/${projectId}/create-portfolio`)}
                                                     className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                                                 >
                                                     <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
@@ -577,6 +737,16 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                 initialTaskType="milestone"
                 onClose={() => setOpenMilestoneCreation(false)}
                 onCreateTask={handleCreateMilestone}
+            />
+
+            <StatusHistoryModal
+                open={isHistoryOpen}
+                onClose={() => setIsHistoryOpen(false)}
+                projectName={project?.name || 'Project'}
+                projectStatusConfigs={statusConfigs}
+                history={project?.statusHistory || []}
+                currentStatusValue={project?.currentProjectStatus || ''}
+                projectLeader={resolvedLeader}
             />
         </div>
     )

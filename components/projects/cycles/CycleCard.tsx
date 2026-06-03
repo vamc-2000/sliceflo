@@ -29,25 +29,25 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false }:
 
   const themes = {
     active: {
-      bg: "bg-[#E5E7EB]", // Darker blue-grey / slate background as in mockup
-      border: "border-gray-300",
-      text: "text-[#001F3F] font-semibold",
-      icon: "text-[#001F3F]",
-      dots: "text-[#001F3F]"
+      bg: "bg-primary/10",
+      border: "border-primary/20",
+      text: "text-primary font-semibold",
+      icon: "text-primary",
+      dots: "text-primary"
     },
     upcoming: {
-      bg: "bg-[#F3F4F6]", // Very light blue-grey / slate as in mockup
-      border: "border-gray-200",
-      text: "text-gray-600 font-semibold",
-      icon: "text-gray-500",
-      dots: "text-gray-400"
+      bg: "bg-muted",
+      border: "border-border",
+      text: "text-muted-foreground font-semibold",
+      icon: "text-muted-foreground",
+      dots: "text-muted-foreground"
     },
     completed: {
-      bg: "bg-[#E8F5E9]", // Light green/emerald as in mockup
-      border: "border-emerald-100",
-      text: "text-[#10B981] font-semibold",
-      icon: "text-[#10B981]",
-      dots: "text-[#10B981]"
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400 font-semibold",
+      icon: "text-emerald-600 dark:text-emerald-400",
+      dots: "text-emerald-600 dark:text-emerald-400"
     }
   };
 
@@ -61,6 +61,7 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false }:
         currentTheme.bg,
         currentTheme.border
       )}
+      data-testid={`cycle-card-${cycle.id}`}
     >
       <div className="flex items-center gap-3 flex-1 pl-2">
         <h3 className={cn("text-xs tracking-tight", currentTheme.text)}>
@@ -72,17 +73,17 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false }:
         {!hideBadges && (
           <>
             {/* Date Range Badge */}
-            <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/60 shadow-sm">
-              <Calendar className="h-3 w-3 text-gray-400" />
-              <span className="text-[10px] font-bold text-gray-500">
+            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
+              <Calendar className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] font-bold text-muted-foreground">
                 {format(startDate, "MMM d")} - {format(endDate, "MMM d, yyyy")}
               </span>
             </div>
 
             {/* Task Count Badge */}
-            <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/60 shadow-sm">
-              <Link2 className="h-3 w-3 text-gray-400" />
-              <span className="text-[10px] font-bold text-gray-500">
+            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
+              <Link2 className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] font-bold text-muted-foreground">
                 {cycle.taskCount || 0} tasks
               </span>
             </div>
@@ -96,20 +97,22 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false }:
               variant="ghost"
               className={cn(
                 "h-7 w-7 p-0 transition-opacity flex items-center justify-center",
-                type === "active" ? "text-[#001F3F]" : "text-gray-400 opacity-40 group-hover:opacity-100",
-                type === "completed" && "text-[#10B981]"
+                type === "active" ? "text-primary" : "text-muted-foreground opacity-40 group-hover:opacity-100",
+                type === "completed" && "text-emerald-600 dark:text-emerald-400"
               )}
+              data-testid={`cycle-card-menu-trigger-${cycle.id}`}
             >
               <MoreHorizontal className="h-4 w-4 font-bold" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(cycle)}>
+            <DropdownMenuItem onClick={() => onEdit(cycle)} data-testid={`cycle-card-edit-${cycle.id}`}>
               Edit Cycle
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
               onClick={() => onDelete(cycle.id)}
+              data-testid={`cycle-card-delete-${cycle.id}`}
             >
               Delete Cycle
             </DropdownMenuItem>

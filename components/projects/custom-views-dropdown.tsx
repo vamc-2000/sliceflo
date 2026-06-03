@@ -1,4 +1,4 @@
-﻿// components/projects/custom-views-dropdown.tsx
+// components/projects/custom-views-dropdown.tsx
 
 "use client";
 
@@ -76,7 +76,7 @@ export function CustomViewsDropdown({ onAdd, projectId }: CustomViewsDropdownPro
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 h-8 rounded text-xs text-muted-foreground bg-background hover:bg-muted hover:text-foreground">
+                <Button variant="ghost" size="sm" className="gap-1 h-8 rounded text-xs text-muted-foreground bg-background hover:bg-muted hover:text-foreground" data-testid="custom-views-more-trigger">
                     More
                     <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -88,6 +88,7 @@ export function CustomViewsDropdown({ onAdd, projectId }: CustomViewsDropdownPro
                         <TabsTrigger
                             value="popular"
                             className="rounded text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                            data-testid="custom-views-tab-popular"
                         >
                             Popular
                         </TabsTrigger>
@@ -113,6 +114,7 @@ export function CustomViewsDropdown({ onAdd, projectId }: CustomViewsDropdownPro
                                         onClick={() => handleViewClick(view.id, view.name, view.iconName)}
                                         disabled={isSelected}
                                         className="flex justify-start items-center gap-2 p-1.5 transition-colors text-left h-auto"
+                                        data-testid={`custom-views-add-${view.id}`}
                                     >
                                         <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                                             <Icon className="h-3 w-3 text-muted-foreground" />

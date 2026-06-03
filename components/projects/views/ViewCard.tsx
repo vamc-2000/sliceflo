@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { MoreHorizontal, Lock, Globe } from "lucide-react";
@@ -96,8 +96,9 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
     return (
         <div
             onClick={onSelect}
-            className="group relative flex items-center justify-between p-4 bg-white border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer rounded-xl"
+            className="group relative flex items-center justify-between p-4 bg-card border border-border hover:border-muted-foreground/30 hover:shadow-md transition-all cursor-pointer rounded-xl"
             style={{ borderLeft: `4px solid ${accentColor}` }}
+            data-testid={`view-card-${view.id}`}
         >
             {/* Left Section: Icon & Name */}
             <div className="flex items-center gap-6 min-w-0">
@@ -111,14 +112,14 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
                     {renderIcon()}
                 </div>
                 <div className="flex flex-col min-w-0">
-                    <h3 className="text-base font-bold text-gray-900 truncate">
+                    <h3 className="text-base font-bold text-foreground truncate">
                         {view.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 font-medium">
                         <span className="truncate max-w-[120px]">{view.type.charAt(0).toUpperCase() + view.type.slice(1)} View</span>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-border">•</span>
                         <span>Grouped by: {getGroupLabel(view.groupBy)}</span>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-border">•</span>
                         <span>{filterCount} {filterCount === 1 ? 'filter' : 'filters'}</span>
                     </div>
                 </div>
@@ -128,17 +129,17 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
             <div className="flex items-center gap-10 text-xs ml-auto">
                 {/* Created Date */}
                 <div className="flex flex-col min-w-[120px]">
-                    <span className="text-[11px] uppercase font-bold text-gray-400 tracking-wider mb-1">Created on</span>
-                    <span className="font-semibold text-gray-700">
+                    <span className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Created on</span>
+                    <span className="font-semibold text-foreground">
                         {view.createdAt ? format(new Date(view.createdAt), "MMM d, yyyy") : "N/A"}
                     </span>
                 </div>
 
                 {/* Privacy */}
                 <div className="flex flex-col min-w-[90px]">
-                    <span className="text-[11px] uppercase font-bold text-gray-400 tracking-wider mb-1">Privacy</span>
+                    <span className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Privacy</span>
                     <div>
-                        <Badge variant="secondary" className="bg-gray-100/80 text-gray-600 font-bold rounded-md px-3 py-1 text-xs">
+                        <Badge variant="secondary" className="bg-muted text-muted-foreground font-bold rounded-md px-3 py-1 text-xs">
                             Public
                         </Badge>
                     </div>
@@ -146,16 +147,16 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
 
                 {/* Created By */}
                 <div className="flex flex-col min-w-[80px]">
-                    <span className="text-[11px] uppercase font-bold text-gray-400 tracking-wider mb-1">Created by</span>
+                    <span className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Created by</span>
                     <div className="flex items-center gap-2.5">
                         {creator?.profilePicture ? (
                             <img
                                 src={creator.profilePicture}
                                 alt={creator.name}
-                                className="h-7 w-7 rounded-full object-cover border border-gray-200 shadow-sm"
+                                className="h-7 w-7 rounded-full object-cover border border-border shadow-sm"
                             />
                         ) : (
-                            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center border border-gray-200 shadow-sm">
+                            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center border border-border shadow-sm">
                                 <span className="text-[11px] font-bold text-white uppercase">
                                     {creator?.name?.charAt(0) || "?"}
                                 </span>
@@ -168,11 +169,11 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
                 <div className="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="h-10 w-10 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full">
+                            <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full" data-testid={`view-card-menu-trigger-${view.id}`}>
                                 <MoreHorizontal className="h-6 w-6" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 p-1">
+                        <DropdownMenuContent align="end" className="w-40 p-1 border-0 border-b-[5px] border-primary">
                             <DropdownMenuItem className="rounded-md cursor-pointer font-medium p-2">
                                 Rename
                             </DropdownMenuItem>
@@ -182,6 +183,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
                             <DropdownMenuItem
                                 onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
                                 className="text-red-600 focus:text-red-700 focus:bg-red-50 rounded-md cursor-pointer font-medium p-2"
+                                data-testid={`view-card-delete-btn-${view.id}`}
                             >
                                 Delete
                             </DropdownMenuItem>

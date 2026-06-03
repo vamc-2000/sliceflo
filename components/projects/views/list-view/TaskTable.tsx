@@ -71,6 +71,7 @@ import {
   ChevronsUpDown,
   Pencil,
   Calendar as CalendarIcon,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -1506,8 +1507,8 @@ export function TaskTable({
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild className="w-full h-full">
                               <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                <span className="truncate w-full text-center">
-                                  {task.cycle?.name || project?.cycles?.find(c => c.id === task.cycleId)?.name || '—'}
+                                <span className="truncate w-full text-center flex items-center justify-center">
+                                  {task.cycle?.name || project?.cycles?.find(c => c.id === task.cycleId)?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
@@ -1559,7 +1560,7 @@ export function TaskTable({
                                   placeholder="Type @ or name..."
                                   value={assigneeSearchQuery}
                                   onChange={(e) => setAssigneeSearchQuery(e.target.value)}
-                                  className="h-8 text-xs placeholder:text-muted-foreground bg-white border border-border"
+                                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
                                   autoFocus
                                 />
                               </div>
@@ -1664,9 +1665,12 @@ export function TaskTable({
                         <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center rounded-xs transition-opacity hover:opacity-90 overflow-hidden"
+                              <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                 style={{ backgroundColor: `${getPriorityColor(task.priority) || '#9CA3AF'}33` }}>
-                                <Flag className="h-4 w-4" style={{ color: getPriorityColor(task.priority) || '#9CA3AF' }} />
+                                <span className={cn("truncate text-xs font-medium", task.priority ? "text-foreground" : "text-muted-foreground")}>
+                                  {taskPriorityConfigs.find(p => p.value === task.priority)?.label || '—'}
+                                </span>
+                                <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(task.priority) || '#9CA3AF' }} />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="p-4 w-[200px] space-y-1">
@@ -1677,10 +1681,9 @@ export function TaskTable({
                                   className="p-0 focus:bg-transparent"
                                 >
                                   <div
-                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
                                     style={{
                                       backgroundColor: `${option.color || '#9CA3AF'}33`,
-                                      color: '#374151'
                                     }}
                                   >
                                     <span className="truncate">
@@ -2193,8 +2196,8 @@ export function TaskTable({
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild className="w-full h-full">
                                 <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                  <span className="truncate w-full text-center">
-                                    {subtask.cycle?.name || project?.cycles?.find(c => c.id === subtask.cycleId)?.name || '—'}
+                                  <span className="truncate w-full text-center flex items-center justify-center">
+                                    {subtask.cycle?.name || project?.cycles?.find(c => c.id === subtask.cycleId)?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                   </span>
                                 </button>
                               </DropdownMenuTrigger>
@@ -2246,7 +2249,7 @@ export function TaskTable({
                                     placeholder="Type @ or name..."
                                     value={assigneeSearchQuery}
                                     onChange={(e) => setAssigneeSearchQuery(e.target.value)}
-                                    className="h-8 text-xs placeholder:text-muted-foreground bg-white border border-border"
+                                    className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
                                     autoFocus
                                   />
                                 </div>
@@ -2351,9 +2354,12 @@ export function TaskTable({
                           <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild className="w-full h-full">
-                                <button className="w-full h-full flex items-center justify-center rounded-xs transition-opacity hover:opacity-90 overflow-hidden"
+                                <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                   style={{ backgroundColor: `${getPriorityColor(subtask.priority) || '#9CA3AF'}33` }}>
-                                  <Flag className="h-4 w-4" style={{ color: getPriorityColor(subtask.priority) || '#9CA3AF' }} />
+                                  <span className={cn("truncate text-xs font-medium", subtask.priority ? "text-foreground" : "text-muted-foreground")}>
+                                    {taskPriorityConfigs.find(p => p.value === subtask.priority)?.label || '—'}
+                                  </span>
+                                  <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(subtask.priority) || '#9CA3AF' }} />
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="p-4 w-[200px] space-y-1">
@@ -2364,10 +2370,9 @@ export function TaskTable({
                                     className="p-0 focus:bg-transparent"
                                   >
                                     <div
-                                      className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                      className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
                                       style={{
                                         backgroundColor: `${option.color || '#9CA3AF'}33`,
-                                        color: '#374151'
                                       }}
                                     >
                                       <span className="truncate">
@@ -2760,8 +2765,8 @@ export function TaskTable({
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild className="w-full h-full">
                                       <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                        <span className="truncate w-full text-center">
-                                          {selCycle?.name || '—'}
+                                        <span className="truncate w-full text-center flex items-center justify-center">
+                                          {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                         </span>
                                       </button>
                                     </DropdownMenuTrigger>
@@ -2813,7 +2818,7 @@ export function TaskTable({
                                           placeholder="Type @ or name..."
                                           value={assigneeSearchQuery}
                                           onChange={(e) => setAssigneeSearchQuery(e.target.value)}
-                                          className="h-8 text-xs placeholder:text-muted-foreground bg-white border border-border"
+                                          className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
                                           autoFocus
                                         />
                                       </div>
@@ -2948,9 +2953,12 @@ export function TaskTable({
                                 <TableCell key={h.key} className="!p-0 text-center" style={{ ...getColumnStyle(h.key, false), height: '1px' }}>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild className="w-full h-full">
-                                      <button className="w-full h-full flex items-center justify-center rounded-xs transition-opacity hover:opacity-90 overflow-hidden"
+                                      <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                         style={{ backgroundColor: `${getPriorityColor(newSubtaskData.priority) || '#9CA3AF'}33` }}>
-                                        <Flag className="h-4 w-4" style={{ color: getPriorityColor(newSubtaskData.priority) || '#9CA3AF' }} />
+                                        <span className={cn("truncate text-xs font-medium", newSubtaskData.priority ? "text-foreground" : "text-muted-foreground")}>
+                                          {taskPriorityConfigs.find(p => p.value === newSubtaskData.priority)?.label || '—'}
+                                        </span>
+                                        <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(newSubtaskData.priority) || '#9CA3AF' }} />
                                       </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
@@ -2961,10 +2969,9 @@ export function TaskTable({
                                           className="p-0 focus:bg-transparent"
                                         >
                                           <div
-                                            className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                            className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
                                             style={{
                                               backgroundColor: `${option.color || '#9CA3AF'}33`,
-                                              color: '#374151'
                                             }}
                                           >
                                             <span className="truncate">
@@ -3241,8 +3248,8 @@ export function TaskTable({
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild className="w-full h-full">
                               <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                <span className="truncate w-full text-center">
-                                  {selCycle?.name || '—'}
+                                <span className="truncate w-full text-center flex items-center justify-center">
+                                  {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
@@ -3294,7 +3301,7 @@ export function TaskTable({
                                   placeholder="Type @ or name..."
                                   value={assigneeSearchQuery}
                                   onChange={(e) => setAssigneeSearchQuery(e.target.value)}
-                                  className="h-8 text-xs placeholder:text-muted-foreground bg-white border border-border"
+                                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
                                   autoFocus
                                 />
                               </div>
@@ -3429,9 +3436,12 @@ export function TaskTable({
                         <TableCell key={h.key} className="!p-0 text-center" style={{ ...getColumnStyle(h.key, false), height: '1px' }}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center rounded-xs transition-opacity hover:opacity-90 overflow-hidden"
+                              <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                 style={{ backgroundColor: `${getPriorityColor(newTaskData.priority) || '#9CA3AF'}33` }}>
-                                <Flag className="h-4 w-4" style={{ color: getPriorityColor(newTaskData.priority) || '#9CA3AF' }} />
+                                <span className={cn("truncate text-xs font-medium", newTaskData.priority ? "text-foreground" : "text-muted-foreground")}>
+                                  {taskPriorityConfigs.find(p => p.value === newTaskData.priority)?.label || '—'}
+                                </span>
+                                <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(newTaskData.priority) || '#9CA3AF' }} />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="p-4 w-[200px] space-y-1">
@@ -3442,10 +3452,9 @@ export function TaskTable({
                                   className="p-0 focus:bg-transparent"
                                 >
                                   <div
-                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
                                     style={{
                                       backgroundColor: `${option.color || '#9CA3AF'}33`,
-                                      color: '#374151'
                                     }}
                                   >
                                     <span className="truncate">

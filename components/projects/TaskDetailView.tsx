@@ -699,6 +699,7 @@ export function TaskDetailView({
 
                 {/* Content */}
                 <DialogPrimitive.Content
+                    data-testid="task-detail-dialog"
                     className="
                         fixed right-0 top-1/2 -translate-y-1/2 z-50
                         bg-card rounded-l-lg shadow-xl
@@ -771,29 +772,29 @@ export function TaskDetailView({
                                         ? format(new Date(currentTask.createdAt), "MMM d, yyyy")
                                         : '—'}
                                 </span>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-more-btn">
                                     <MoreHorizontal className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-branch-btn">
                                     <GitBranch className="h-4 w-4" />
                                 </Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-share-btn">
                                             <Share2 className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary">
-                                        <DropdownMenuItem onClick={handleCopyTaskLink} className="cursor-pointer">
+                                        <DropdownMenuItem onClick={handleCopyTaskLink} className="cursor-pointer" data-testid="task-detail-copy-link-btn">
                                             {isMilestone ? "Milestone Link" : "Task Link"}
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleCopyTaskId} className="cursor-pointer">
+                                        <DropdownMenuItem onClick={handleCopyTaskId} className="cursor-pointer" data-testid="task-detail-copy-id-btn">
                                             {isMilestone ? "Milestone ID" : "Task ID"}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                                 <DialogPrimitive.Close asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-close-btn">
                                         <XIcon className="h-4 w-4" />
                                     </Button>
                                 </DialogPrimitive.Close>
@@ -816,7 +817,7 @@ export function TaskDetailView({
                                                 value={currentTask.taskType || "task"}
                                                 onValueChange={(value) => handleUpdateTask({ taskType: value })}
                                             >
-                                                <SelectTrigger className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2">
+                                                <SelectTrigger data-testid="task-detail-type-select-trigger" className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2">
                                                     <SelectValue>
                                                         {(() => {
                                                             const selectedType =
@@ -843,6 +844,7 @@ export function TaskDetailView({
                                                         <SelectItem
                                                             key={type._id || type.value}
                                                             value={type.value}
+                                                            data-testid={`task-detail-type-option-${type.value}`}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 {renderTaskTypeVisual(type, "w-3.5 h-3.5")}
@@ -861,6 +863,7 @@ export function TaskDetailView({
                                                 variant="ghost" size="icon" className="h-7 w-7"
                                                 onClick={() => navigator.clipboard.writeText(currentTask.id)}
                                                 title={isMilestone ? "Copy full milestone ID" : "Copy full task ID"}
+                                                data-testid="task-detail-copy-full-id-btn"
                                             >
                                                 <Copy className="h-3 w-3" />
                                             </Button>
@@ -889,6 +892,7 @@ export function TaskDetailView({
                                             placeholder={isMilestone ? "Add milestone description with footnote support..." : "Add task description with footnote support..."}
                                             className="task-description-editor"
                                             editable={!isReadOnly}
+                                            data-testid="task-detail-description-editor"
                                         />
                                     </div>
 
@@ -962,6 +966,7 @@ export function TaskDetailView({
                                             <RelationshipDropdown
                                                 variant="action"  // 👈 This gives it the action button styling
                                                 onSelectType={handleSelectRelationType}
+                                                data-testid="task-detail-relation-dropdown"
                                             />
                                         )}
 
@@ -972,6 +977,7 @@ export function TaskDetailView({
                                                 size="sm"
                                                 className="text-xs rounded h-8"
                                                 onClick={() => setIsAddingSubtask(true)}
+                                                data-testid="task-detail-add-subtask-action-btn"
                                             >
                                                 <Plus className="h-3 w-3 mr-1" />
                                                 Subtask
@@ -997,7 +1003,7 @@ export function TaskDetailView({
                                         {(currentTask.linkedDocuments || []).length === 0 && (
                                             <Popover open={isDocSelectorOpen} onOpenChange={setIsDocSelectorOpen}>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className="text-xs rounded h-8">
+                                                    <Button variant="secondary" size="sm" className="text-xs rounded h-8" data-testid="task-detail-add-doc-btn">
                                                         <Plus className="h-3 w-3 mr-1" />
                                                         Document
                                                     </Button>
@@ -1028,6 +1034,7 @@ export function TaskDetailView({
                                                             variant="secondary"
                                                             size="sm"
                                                             className="h-8"
+                                                            data-testid="task-detail-add-doc-section-btn"
                                                         >
                                                             <Plus className="h-3 w-3 mr-1" />
                                                             Add Document
@@ -1089,6 +1096,7 @@ export function TaskDetailView({
                                                                                     return next;
                                                                                 });
                                                                             }}
+                                                                            data-testid={`task-detail-expand-doc-btn-${doc.id}`}
                                                                         >
                                                                             <ChevronDown className={cn("h-4 w-4 transition-transform", expandedLinkedDocs.has(doc.id) && "rotate-180")} />
                                                                         </Button>
@@ -1116,6 +1124,7 @@ export function TaskDetailView({
                                                                         size="sm"
                                                                         onClick={() => handleUnlinkDoc(doc.id)}
                                                                         className="h-8 px-6 rounded-full bg-muted text-muted-foreground border-none hover:bg-red-50 hover:text-red-600 transition-all font-medium text-xs"
+                                                                        data-testid={`task-detail-unlink-doc-btn-${doc.id}`}
                                                                     >
                                                                         Unlink
                                                                     </Button>
@@ -1155,6 +1164,7 @@ export function TaskDetailView({
                                                     <RelationshipDropdown
                                                         variant="section"  // 👈 This gives it the section header styling
                                                         onSelectType={handleSelectRelationType}
+                                                        data-testid="task-detail-relation-section-dropdown"
                                                     />
 
                                                     {/* Close button - only show when empty and selecting */}
@@ -1167,6 +1177,7 @@ export function TaskDetailView({
                                                                 setSelectedRelationType(null);
                                                                 setShowTaskSelector(false);
                                                             }}
+                                                            data-testid="task-detail-relation-cancel-btn"
                                                         >
                                                             <XIcon className="h-4 w-4" />
                                                         </Button>
@@ -1186,6 +1197,7 @@ export function TaskDetailView({
                                                         onSelect={handleSelectTask}
                                                         open={showTaskSelector}
                                                         onOpenChange={setShowTaskSelector}
+                                                        data-testid="task-detail-relation-task-selector"
                                                     />
                                                     <Button
                                                         variant="ghost"
@@ -1194,6 +1206,7 @@ export function TaskDetailView({
                                                             setSelectedRelationType(null);
                                                             setShowTaskSelector(false);
                                                         }}
+                                                        data-testid="task-detail-relation-cancel-btn"
                                                     >
                                                         Cancel
                                                     </Button>
@@ -1229,6 +1242,7 @@ export function TaskDetailView({
                                                                     size="icon"
                                                                     className="h-7 w-7"
                                                                     onClick={() => handleRemoveRelationship(rel.id)}
+                                                                    data-testid={`task-detail-relation-remove-btn-${rel.id}`}
                                                                 >
                                                                     <XIcon className="h-3 w-3" />
                                                                 </Button>
@@ -1254,6 +1268,7 @@ export function TaskDetailView({
                                                         className="h-8"
                                                         onClick={() => setIsAddingSubtask(true)}
                                                         disabled={isAddingSubtask}
+                                                        data-testid="task-detail-add-subtask-btn"
                                                     >
                                                         <Plus className="h-3 w-3 mr-1" />
                                                         Add Subtask
@@ -1292,6 +1307,7 @@ export function TaskDetailView({
                                                                             handleToggleSubtaskComplete(st.id, e.target.checked)
                                                                         );
                                                                     }}
+                                                                    data-testid="task-detail-subtask-checkbox-all"
                                                                 />
                                                             </th>
                                                             <th className="text-left p-3 text-xs font-medium text-muted-foreground">
@@ -1341,6 +1357,7 @@ export function TaskDetailView({
                                                                             }
                                                                         }}
                                                                         autoFocus
+                                                                        data-testid="task-detail-subtask-new-input"
                                                                     />
                                                                 </td>
                                                                 <td className="p-3 text-xs text-muted-foreground">
@@ -1367,6 +1384,7 @@ export function TaskDetailView({
                                                                             onClick={handleAddSubtask}
                                                                             disabled={!newSubtaskName.trim()}
                                                                             title="Save (Enter)"
+                                                                            data-testid="task-detail-subtask-new-save-btn"
                                                                         >
                                                                             <Check className="h-4 w-4" />
                                                                         </Button>
@@ -1379,6 +1397,7 @@ export function TaskDetailView({
                                                                                 setNewSubtaskName("");
                                                                             }}
                                                                             title="Cancel (Esc)"
+                                                                            data-testid="task-detail-subtask-new-cancel-btn"
                                                                         >
                                                                             <XIcon className="h-4 w-4" />
                                                                         </Button>
@@ -1398,6 +1417,7 @@ export function TaskDetailView({
                                                                         onChange={(e) =>
                                                                             handleToggleSubtaskComplete(subtask.id, e.target.checked)
                                                                         }
+                                                                        data-testid={`task-detail-subtask-checkbox-${subtask.id}`}
                                                                     />
                                                                 </td>
                                                                 <td className="p-3 text-xs">
@@ -1451,7 +1471,7 @@ export function TaskDetailView({
                                                                 <td className="p-3">
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="icon" className="h-7 w-7">
+                                                                            <Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`task-detail-subtask-menu-trigger-${subtask.id}`}>
                                                                                 <MoreHorizontal className="h-4 w-4" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
@@ -1459,6 +1479,7 @@ export function TaskDetailView({
                                                                             <DropdownMenuItem
                                                                                 onClick={() => handleDeleteSubtask(subtask.id)}
                                                                                 className="text-red-600"
+                                                                                data-testid={`task-detail-subtask-delete-btn-${subtask.id}`}
                                                                             >
                                                                                 Delete Subtask
                                                                             </DropdownMenuItem>
@@ -1778,6 +1799,7 @@ export function TaskDetailView({
                                         <button
                                             key={tab.value}
                                             onClick={() => setActiveTab(tab.value as any)}
+                                            data-testid={`task-detail-tab-${tab.value}`}
                                             className={`
                                                 flex-1 py-2 rounded-lg text-xs font-semibold transition-all duration-200
                                                 ${activeTab === tab.value
@@ -1807,6 +1829,7 @@ export function TaskDetailView({
                                                             variant="secondary" size="sm"
                                                             className={cn("h-8 px-3 hover:bg-muted text-xs",
                                                                 !currentTask.status && "text-muted-foreground")}
+                                                            data-testid="task-detail-status-trigger"
                                                         >
                                                             {currentTask.status ? (() => {
                                                                 const config = taskStatusConfigs.find(s => s.value === currentTask.status || s.label === currentTask.status);
@@ -1849,6 +1872,7 @@ export function TaskDetailView({
                                                             variant="secondary" size="sm"
                                                             className={cn("h-8 px-3 hover:bg-muted text-xs",
                                                                 !currentTask.priority && "text-muted-foreground")}
+                                                            data-testid="task-detail-priority-trigger"
                                                         >
                                                             {currentTask.priority ? (
                                                                 <span className="flex items-center gap-1.5">
@@ -1894,6 +1918,7 @@ export function TaskDetailView({
                                                             variant="secondary" size="sm"
                                                             className={cn("h-8 px-3 font-normal hover:bg-muted text-xs",
                                                                 !currentTask.startDate && "text-muted-foreground")}
+                                                            data-testid="task-detail-start-date-trigger"
                                                         >
                                                             {currentTask.startDate ? format(new Date(currentTask.startDate), "PP") : "—"}
                                                         </Button>
@@ -1938,6 +1963,7 @@ export function TaskDetailView({
                                                             variant="secondary" size="sm"
                                                             className={cn("h-8 px-3 font-normal hover:bg-muted text-xs",
                                                                 !currentTask.endDate && "text-muted-foreground")}
+                                                            data-testid="task-detail-due-date-trigger"
                                                         >
                                                             {currentTask.endDate ? format(new Date(currentTask.endDate), "PP") : "—"}
                                                         </Button>
@@ -1976,6 +2002,7 @@ export function TaskDetailView({
                                                             variant="secondary" size="sm"
                                                             className={cn("h-8 px-3 hover:bg-muted text-xs",
                                                                 !currentTask.assignee && "text-muted-foreground")}
+                                                            data-testid="task-detail-assignee-trigger"
                                                         >
                                                             {currentTask.assignee ? (() => {
                                                                 const member = workspaceMembers.find(m => m.userId === currentTask.assignee);
@@ -2025,7 +2052,7 @@ export function TaskDetailView({
                                                         onSelect={handleSelectLabel}
                                                         onRemove={handleRemoveLabel}
                                                     >
-                                                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                        <Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-label-picker-trigger">
                                                             <Plus className="h-3 w-3" />
                                                         </Button>
                                                     </LabelPicker>
@@ -2040,6 +2067,7 @@ export function TaskDetailView({
                                                                     key={labelId}
                                                                     label={label}
                                                                     onRemove={() => handleRemoveLabel(labelId)}
+                                                                    removeButtonTestId={`task-detail-label-remove-${labelId}`}
                                                                 />
                                                             );
                                                         })
@@ -2065,6 +2093,7 @@ export function TaskDetailView({
                                                                 size="icon"
                                                                 className="h-6 w-6"
                                                                 title="Add custom field"
+                                                                data-testid="task-detail-add-custom-field-trigger"
                                                             >
                                                                 <Plus className="h-3 w-3" />
                                                             </Button>
@@ -2101,7 +2130,7 @@ export function TaskDetailView({
                                                                         <IconComponent className="h-3.5 w-3.5 shrink-0" />
                                                                         <span className="truncate">{field.name}</span>
                                                                     </Label>
-                                                                    <div className="w-[160px]">
+                                                                    <div className="w-[160px]" data-testid={`task-detail-custom-field-dropdown-${field.id}`}>
                                                                         <CustomFieldDropdown
                                                                             field={fieldData}
                                                                             value={
@@ -2127,6 +2156,7 @@ export function TaskDetailView({
                                                             <button
                                                                 onClick={() => setShowAllCustomFields(prev => !prev)}
                                                                 className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                                                                data-testid="task-detail-custom-field-toggle-show-all"
                                                             >
                                                                 <ChevronDown className={cn(
                                                                     "h-3.5 w-3.5 transition-transform",

@@ -121,7 +121,7 @@ export function Label({
         {/* Field Name */}
         <div className="space-y-2">
           <label htmlFor="field-name" className="text-xs font-medium block">Field Name</label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -136,13 +136,13 @@ export function Label({
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description"
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -199,7 +199,7 @@ export function Label({
                     </svg>
                   </button>
 
-                  <Input
+                  <Input data-testid="custom-field-option-input"
                     value={option.label}
                     onChange={(e) => updateOptionLabel(option.id, e.target.value)}
                     placeholder="Label name"
@@ -211,7 +211,7 @@ export function Label({
                 </div>
 
                 {options.length > 1 && (
-                  <Button
+                  <Button data-testid="custom-field-remove-option-btn"
                     type="button"
                     variant="ghost"
                     size="sm"
@@ -225,7 +225,7 @@ export function Label({
             ))}
           </div>
 
-          <Button
+          <Button data-testid="custom-field-add-option-btn"
             type="button"
             variant="secondary"
             size="sm"
@@ -237,7 +237,7 @@ export function Label({
           </Button>
         </div>
         {/* More Settings Accordion - ALWAYS VISIBLE */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -274,7 +274,7 @@ export function Label({
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -282,7 +282,7 @@ export function Label({
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim() || options.every(opt => opt.label.trim() === '')) || loading}

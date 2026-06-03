@@ -39,6 +39,7 @@ interface RelationshipDropdownProps {
   buttonText?: string;
   size?: "sm" | "default";
   className?: string;
+  "data-testid"?: string;
 }
 
 export function RelationshipDropdown({
@@ -47,6 +48,7 @@ export function RelationshipDropdown({
   buttonText,
   size = "sm",
   className,
+  "data-testid": dataTestId,
 }: RelationshipDropdownProps) {
   const isActionVariant = variant === "action";
   const defaultButtonText = isActionVariant ? "Relationship" : "Add Relationship";
@@ -62,6 +64,7 @@ export function RelationshipDropdown({
               ? `text-xs rounded h-8 ${className || ""}`
               : `h-8 ${className || ""}`
           }
+          data-testid={dataTestId}
         >
           <Plus className="h-3 w-3 mr-1" />
           {buttonText || defaultButtonText}
@@ -72,6 +75,7 @@ export function RelationshipDropdown({
           <DropdownMenuItem
             key={value}
             onClick={() => onSelectType(value)}
+            data-testid={`task-detail-relation-option-${value}`}
           >
             <Icon className={`h-4 w-4 mr-2 shrink-0 ${color}`} />
             {label}

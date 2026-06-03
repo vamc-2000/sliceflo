@@ -115,7 +115,7 @@ export function SelectOne({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 min-h-0">
         <div className="space-y-2">
           <label htmlFor="field-name" className="text-xs font-medium block">Field Name</label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -129,13 +129,13 @@ export function SelectOne({
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description..."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -145,7 +145,7 @@ export function SelectOne({
             <label className="text-xs font-medium">Dropdown Options</label>
 
             {/* Sort toggle button — only for this list */}
-            <button
+            <button data-testid="custom-field-sort-options-btn"
               type="button"
               onClick={() => {
                 setSortAsc(prev => {
@@ -173,7 +173,7 @@ export function SelectOne({
                   <div className="relative flex-1">
 
                     {/* Radio button inside input - Moved to right */}
-                    <button
+                    <button data-testid={`custom-field-color-picker-trigger-${option.id}`}
                       type="button"
                       onClick={() => handleRadioClick(option.id)}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10
@@ -184,7 +184,7 @@ export function SelectOne({
                       }}
                     />
 
-                    <Input
+                    <Input data-testid="custom-field-option-input"
                       value={option.label}
                       onChange={(e) => updateOptionLabel(option.id, e.target.value)}
                       placeholder="Option name"
@@ -196,7 +196,7 @@ export function SelectOne({
                   </div>
 
                   {options.length > 1 && (
-                    <Button
+                    <Button data-testid="custom-field-remove-option-btn"
                       type="button"
                       variant="ghost"
                       size="sm"
@@ -210,7 +210,7 @@ export function SelectOne({
               </div>
             ))}
           </div>
-          <Button
+          <Button data-testid="custom-field-add-option-btn"
             type="button"
             variant="secondary"
             size="sm"
@@ -223,7 +223,7 @@ export function SelectOne({
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -260,7 +260,7 @@ export function SelectOne({
 
       {/* Fixed Footer - This will ALWAYS be visible */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -268,7 +268,7 @@ export function SelectOne({
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim() || options.filter(o => o.label.trim()).length === 0) || loading}

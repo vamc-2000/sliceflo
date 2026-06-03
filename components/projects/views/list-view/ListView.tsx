@@ -1414,6 +1414,7 @@ export function ListView({
                             <Input
                                 placeholder="Search"
                                 className="pl-2 pr-8 rounded text-xs"
+                                data-testid="list-search-input"
                             />
                             <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
                         </div>
@@ -1425,6 +1426,7 @@ export function ListView({
                                     variant="secondary"
                                     size="sm"
                                     className="rounded cursor-pointer gap-2 text-xs"
+                                    data-testid="list-members-trigger"
                                 >
                                     <Users className="h-4 w-4" />
                                     Members
@@ -1452,7 +1454,7 @@ export function ListView({
                         {/* Group By Dropdown */}
                         <DropdownMenu open={showGroupByDropdown} onOpenChange={setShowGroupByDropdown}>
                             <DropdownMenuTrigger asChild>
-                                <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs">
+                                <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs" data-testid="list-groupby-trigger">
                                     <Layers className="h-4 w-4" />
                                     Group by: <span className="capitalize">{groupBy}</span>
                                 </Button>
@@ -1477,6 +1479,7 @@ export function ListView({
                                                 onClick={() => handleGroupByChange(option.value)}
                                                 className={`w-full flex items-center gap-3 p-2 rounded text-xs hover:bg-muted 
         `}
+                                                data-testid={`list-groupby-option-${option.value}`}
                                             >
                                                 {/* Radio */}
                                                 <span
@@ -1499,6 +1502,7 @@ export function ListView({
                                                 key={option.value}
                                                 onClick={() => handleGroupByChange(option.value)}
                                                 className={`w-full flex items-center gap-3 p-2 rounded text-xs hover:bg-muted`}
+                                                data-testid={`list-groupby-option-${option.value}`}
                                             >
                                                 {/* Radio */}
                                                 <span
@@ -1601,6 +1605,7 @@ export function ListView({
                                 size="sm"
                                 className={`rounded cursor-pointer text-xs ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
                                 onClick={() => setShowSortOptions(!showSortOptions)}
+                                data-testid="list-sort-filter-toggle"
                             >
                                 <SlidersVertical className="h-4 w-4" />
                             </Button>
@@ -1611,7 +1616,7 @@ export function ListView({
                                     {/* Sort Dropdown */}
                                     <DropdownMenu open={activeDropdown === 'sort'} onOpenChange={(open) => setActiveDropdown(open ? 'sort' : null)}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="list-sort-trigger">
                                                 <ArrowUpDown className="h-4 w-4" />
                                                 Sort
                                             </Button>
@@ -1648,6 +1653,7 @@ export function ListView({
                                                                 key={field.id}
                                                                 onClick={() => handleFieldSelection(field.id)}
                                                                 className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
+                                                                data-testid={`list-sort-option-${field.id}`}
                                                             >
                                                                 <div
                                                                     // onClick={() => handleFieldSelection(field.id)}
@@ -1688,6 +1694,7 @@ export function ListView({
                                                                     key={field.id}
                                                                     onClick={() => handleFieldSelection(field.id)}
                                                                     className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
+                                                                    data-testid={`list-sort-option-${field.id}`}
                                                                 >
                                                                     {/* <div className="flex items-center gap-2"> */}
                                                                     <div
@@ -1752,6 +1759,7 @@ export function ListView({
                                                         variant="ghost"
                                                         onClick={handleClearAllSort}
                                                         className="justify-start bg-muted text-foreground hover:bg-primary hover:text-primary-foreground text-xs"
+                                                        data-testid="list-sort-clear-btn"
                                                     >
                                                         Clear all sort
                                                     </Button>
@@ -1769,7 +1777,7 @@ export function ListView({
                                         }}
                                     >
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="list-filter-trigger">
                                                 <Funnel className="h-4 w-4" />
                                                 Filter
                                                 {filterConfig.length > 0 && (
@@ -1948,6 +1956,7 @@ export function ListView({
                                                         variant="outline"
                                                         className="w-full text-xs"
                                                         onClick={() => setFilterConfig([])}
+                                                        data-testid="list-filter-clear-btn"
                                                     >
                                                         Clear All Filters
                                                     </Button>
@@ -2165,7 +2174,7 @@ export function ListView({
                                         onOpenChange={(open) => setActiveDropdown(open ? 'display' : null)}
                                     >
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="list-display-trigger">
                                                 <Monitor className="h-4 w-4" />
                                                 Display
                                                 {/* <ChevronDown className="h-4 w-4" /> */}
@@ -2183,6 +2192,7 @@ export function ListView({
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, collapsedSubtasks: !!checked }))
                                                     }
+                                                    data-testid="list-display-collapsed-subtasks-switch"
                                                 />
                                             </div>
 
@@ -2197,6 +2207,7 @@ export function ListView({
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, closedTasks: !!checked }))
                                                     }
+                                                    data-testid="list-display-closed-tasks-switch"
                                                 />
                                             </div>
 
@@ -2211,6 +2222,7 @@ export function ListView({
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, wrapText: !!checked }))
                                                     }
+                                                    data-testid="list-display-wrap-text-switch"
                                                 />
                                             </div>
 
@@ -2225,6 +2237,7 @@ export function ListView({
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, subtaskParentId: !!checked }))
                                                     }
+                                                    data-testid="list-display-subtask-parent-id-switch"
                                                 />
                                             </div>
                                         </DropdownMenuContent>
@@ -2237,7 +2250,7 @@ export function ListView({
                         {/* Hide groups dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="secondary" size="sm" className="gap-2 rounded text-xs">
+                                <Button variant="secondary" size="sm" className="gap-2 rounded text-xs" data-testid="list-unhide-column-trigger">
                                     <EyeOff className="h-4 w-4" />
                                     {/* AFTER — count manual hidden + empty-hidden (deduplicated) */}
                                     {(() => {
@@ -2333,6 +2346,7 @@ export function ListView({
                                                         }
                                                     }}
                                                     className="w-full flex items-center justify-between p-2 rounded hover:bg-muted text-xs"
+                                                    data-testid={`list-unhide-column-option-${group.id}`}
                                                 >
                                                     <div className="flex items-center gap-2">
                                                         <div
@@ -2445,12 +2459,14 @@ export function ListView({
                                                 setNewGroupName('');
                                             }
                                         }}
+                                        data-testid="list-add-group-input"
                                     />
                                     <Button
                                         size="sm"
                                         variant="ghost"
                                         onClick={handleAddNewGroup}
                                         className="bg-primary text-background"
+                                        data-testid="list-add-group-create-btn"
                                     >
                                         Add
                                     </Button>
@@ -2461,6 +2477,7 @@ export function ListView({
                                             setIsAddingNewGroup(false);
                                             setNewGroupName('');
                                         }}
+                                        data-testid="list-add-group-cancel-btn"
                                     >
                                         Cancel
                                     </Button>
@@ -2470,6 +2487,7 @@ export function ListView({
                                     variant="ghost"
                                     className="rounded-none text-background bg-primary flex items-center gap-1 cursor-pointer"
                                     onClick={() => setIsAddingNewGroup(true)}
+                                    data-testid="list-add-group-btn"
                                 >
                                     <Plus className="h-4 w-4" />
                                     Add {groupBy === 'status' ? 'Status' : groupBy === 'priority' ? 'Priority' : 'Option'}

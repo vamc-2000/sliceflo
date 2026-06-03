@@ -11,10 +11,9 @@ export function GoalDetailSkeleton() {
         <Skeleton className="h-3.5 w-24" />
       </div>
 
-      {/* ── 3 Column Grid ── */}
       <div className="grid grid-cols-[220px_1fr_200px] gap-6 mt-2">
 
-        {/* ── Col 1: Goals Report ── */}
+        {/* Goals Report  */}
         <div className="flex flex-col gap-4">
           <Skeleton className="h-4 w-24" />
 
@@ -35,7 +34,7 @@ export function GoalDetailSkeleton() {
           ))}
         </div>
 
-        {/* ── Col 2: Main Content ── */}
+        {/* Main Content*/}
         <div className="flex flex-col gap-5">
 
           {/* Goal header — title + actions */}
@@ -66,7 +65,7 @@ export function GoalDetailSkeleton() {
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-7 w-7 rounded-full" />
             ))}
-            <Skeleton className="h-7 w-7 rounded-full" />  {/* + add button */}
+            <Skeleton className="h-7 w-7 rounded-full" />  
           </div>
 
           {/* Targets section */}
@@ -88,7 +87,7 @@ export function GoalDetailSkeleton() {
           </div>
         </div>
 
-        {/* ── Col 3: Steps & Deadline ── */}
+        {/* Steps & Deadline */}
         <div className="flex flex-col gap-4">
 
           {/* Steps list */}

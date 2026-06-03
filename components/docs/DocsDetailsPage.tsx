@@ -663,8 +663,8 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
         {/* Cover Image Section */}
         <div className="relative flex-shrink-0">
           {currentCover && typeof currentCover === 'string' && (
-            <div className="w-full h-64 relative group" style={getCoverStyle(currentCover)}>
-              <Button onClick={handleRemoveCover} variant="secondary" size="sm" className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-full h-64 relative group" style={getCoverStyle(currentCover)} data-testid="cover-container">
+              <Button onClick={handleRemoveCover} variant="secondary" size="sm" className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity" data-testid="remove-cover-btn">
                 <X className="w-4 h-4 mr-1" />
                 Remove Cover
               </Button>
@@ -679,7 +679,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="icon" className="absolute -bottom-2 -right-2 rounded-full shadow-md hover:shadow-lg transition-all opacity-0 group-hover:opacity-100 h-8 w-8">
+                    <Button variant="outline" size="icon" className="absolute -bottom-2 -right-2 rounded-full shadow-md hover:shadow-lg transition-all opacity-0 group-hover:opacity-100 h-8 w-8" data-testid="edit-cover-icon-btn">
                       <MdOutlineModeEdit className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
@@ -698,7 +698,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
           {/* User Info */}
           <div className="relative flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 no-print">
-              <Avatar className="h-6 w-6">
+              <Avatar className="h-6 w-6" data-testid="user-avatar-trigger">
                 <AvatarImage src={user?.profilePictureUrl || ""} alt={user?.name || "User"} />
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   {user?.name?.charAt(0)?.toUpperCase()}
@@ -707,11 +707,11 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="font-medium">{user?.name || "user"}</span>
                 <span className="text-muted-foreground/60">•</span>
-                <span>Last updated {formatTime(lastUpdated)}</span>
+                <span data-testid="last-updated-text">Last updated {formatTime(lastUpdated)}</span>
                 {docId && (
                   <>
                     <span className="text-muted-foreground/60">•</span>
-                    <span title="Sync status">
+                    <span title="Sync status" data-testid="sync-status-text">
                       {!token && "Sign in to sync"}
                       {token && syncStatus === "disconnected" && "Offline"}
                       {token && syncStatus === "connecting" && "Connecting…"}
@@ -731,7 +731,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                 <span className="text-6xl leading-none block">{currentIcon}</span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="icon" className="absolute -bottom-2 -right-2 rounded-full shadow-md hover:shadow-lg transition-all opacity-0 group-hover:opacity-100 h-8 w-8">
+                    <Button variant="outline" size="icon" className="absolute -bottom-2 -right-2 rounded-full shadow-md hover:shadow-lg transition-all opacity-0 group-hover:opacity-100 h-8 w-8" data-testid="edit-no-cover-icon-btn">
                       <MdOutlineModeEdit className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
@@ -746,9 +746,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
           {/* Title */}
           <div className="mb-4">
             {isEditingTitle ? (
-              <input ref={titleInputRef} type="text" value={currentTitle} onChange={handleTitleChange} onBlur={handleTitleBlur} onKeyDown={handleTitleKeyDown} className="text-4xl font-bold w-full border-none outline-none focus:ring-0 p-0 bg-transparent text-foreground" placeholder="Untitled" />
+              <input ref={titleInputRef} type="text" value={currentTitle} onChange={handleTitleChange} onBlur={handleTitleBlur} onKeyDown={handleTitleKeyDown} className="text-4xl font-bold w-full border-none outline-none focus:ring-0 p-0 bg-transparent text-foreground" placeholder="Untitled" data-testid="doc-title-input" />
             ) : (
-              <h1 onClick={handleTitleClick} className="text-4xl font-bold cursor-text hover:bg-muted/50 px-1 py-2 rounded">
+              <h1 onClick={handleTitleClick} className="text-4xl font-bold cursor-text hover:bg-muted/50 px-1 py-2 rounded" data-testid="doc-title-heading">
                 {displayTitle}
               </h1>
             )}
@@ -756,28 +756,28 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3 flex-wrap mb-8 no-print">
-            <Button variant="outline" size="sm" className="gap-2 shadow-sm" onClick={handleCreateSubPage}>
+            <Button variant="outline" size="sm" className="gap-2 shadow-sm" onClick={handleCreateSubPage} data-testid="create-sub-page-btn">
               <Plus className="w-4 h-4 text-muted-foreground" />
               Create Sub-page
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="export-dropdown-btn">
                   <Download className="w-4 h-4 text-muted-foreground" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => handleExport('html')} className="gap-2">
+                <DropdownMenuItem onClick={() => handleExport('html')} className="gap-2" data-testid="export-html-option">
                   <Globe className="w-4 h-4 text-muted-foreground" />
                   <span>HTML</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExport('markdown')} className="gap-2">
+                <DropdownMenuItem onClick={() => handleExport('markdown')} className="gap-2" data-testid="export-markdown-option">
                   <Hash className="w-4 h-4 text-muted-foreground" />
                   <span>Markdown</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExport('pdf')} className="gap-2">
+                <DropdownMenuItem onClick={() => handleExport('pdf')} className="gap-2" data-testid="export-pdf-option">
                   <FileText className="w-4 h-4 text-muted-foreground" />
                   <span>PDF</span>
                 </DropdownMenuItem>
@@ -809,7 +809,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
             {/* Members Button with Popover */}
             <Popover open={isMembersOpen} onOpenChange={setIsMembersOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="members-popover-trigger">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   Members
                   {docMembers.length > 0 && (
@@ -840,7 +840,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
             {/* Add Emoji Button */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="add-emoji-action-btn">
                   <Smile className="w-4 h-4 text-muted-foreground" />
                   Add Emoji
                 </Button>
@@ -853,7 +853,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
             {/* Add Cover Button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="add-cover-action-btn">
                   <ImageIcon className="w-4 h-4 text-muted-foreground" />
                   Add Cover
                 </Button>
@@ -1013,7 +1013,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                   {hasRelationships ? (
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                        <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="linked-items-trigger">
                           <span className="font-medium text-foreground">Linked Items</span>
                           <span className="bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900/50 min-w-[18px] h-[18px] flex items-center justify-center rounded-sm text-[10px] font-bold px-1">
                             {totalRelationships}
@@ -1025,12 +1025,13 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                           {/* Page Links Section */}
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <h4 className="text-sm font-semibold text-foreground">Page links</h4>
+                              <h4 className="text-sm font-semibold text-foreground" data-testid="page-links-header">Page links</h4>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-6 w-6 p-0"
                                 onClick={() => setShowRelationshipTabs(!showRelationshipTabs)}
+                                data-testid="plus-relationship-btn"
                               >
                                 <Plus className="w-4 h-4 text-muted-foreground" />
                               </Button>
@@ -1048,6 +1049,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                       : "text-muted-foreground hover:text-foreground"
                                       }`}
+                                    data-testid="relationship-tab-project"
                                   >
                                     Project
                                   </Button>
@@ -1058,6 +1060,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                       : "text-muted-foreground hover:text-foreground"
                                       }`}
+                                    data-testid="relationship-tab-team"
                                   >
                                     Teams
                                   </Button>
@@ -1068,6 +1071,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                       : "text-muted-foreground hover:text-foreground"
                                       }`}
+                                    data-testid="relationship-tab-portfolio"
                                   >
                                     Portfolio
                                   </Button>
@@ -1078,6 +1082,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                       : "text-muted-foreground hover:text-foreground"
                                       }`}
+                                    data-testid="relationship-tab-document"
                                   >
                                     Documents
                                   </Button>
@@ -1115,6 +1120,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 }}
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                                data-testid={`checkbox-link-project-${project.id}`}
                                               />
 
                                               <span className="text-sm text-foreground flex-1">
@@ -1158,6 +1164,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 }}
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                                data-testid={`checkbox-link-team-${team.id}`}
                                               />
 
                                               <span className="text-sm text-foreground flex-1">
@@ -1201,6 +1208,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                   }}
                                                   onClick={(e) => e.stopPropagation()}
                                                   className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                                  data-testid={`checkbox-link-portfolio-${portfolio.id}`}
                                                 />
                                                 <span className="text-sm text-foreground flex-1">
                                                   {portfolio.name}
@@ -1247,6 +1255,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 }}
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                                data-testid={`checkbox-link-document-${docItem.id}`}
                                               />
                                               <span className="text-sm text-foreground flex-1">
                                                 {docItem.title}
@@ -1353,7 +1362,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                     // Show Add Relationship button when no relationships exist
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2 shadow-sm">
+                        <Button variant="outline" size="sm" className="gap-2 shadow-sm" data-testid="add-linked-items-trigger">
                           <Plus className="w-4 h-4 text-muted-foreground" />
                           Add Linked Items
                         </Button>
@@ -1368,6 +1377,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                 ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
+                              data-testid="relationship-tab-project"
                             >
                               Project
                             </Button>
@@ -1378,6 +1388,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                 ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
+                              data-testid="relationship-tab-team"
                             >
                               Teams
                             </Button>
@@ -1388,6 +1399,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                 ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
+                              data-testid="relationship-tab-portfolio"
                             >
                               Portfolio
                             </Button>
@@ -1398,6 +1410,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                 ? "text-foreground border-b-2 border-primary -mb-[2px]"
                                 : "text-muted-foreground hover:text-foreground"
                                 }`}
+                              data-testid="relationship-tab-document"
                             >
                               Documents
                             </Button>
@@ -1485,6 +1498,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                        data-testid={`checkbox-link-project-${project.id}`}
                                       />
 
                                       <span className="text-sm text-foreground flex-1">
@@ -1528,6 +1542,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                        data-testid={`checkbox-link-team-${team.id}`}
                                       />
 
                                       <span className="text-sm text-foreground flex-1">
@@ -1571,6 +1586,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                        data-testid={`checkbox-link-portfolio-${portfolio.id}`}
                                       />
 
                                       <span className="text-sm text-foreground flex-1">
@@ -1614,6 +1630,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                         className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                        data-testid={`checkbox-link-document-${doc.id}`}
                                       />
                                       <span className="text-sm text-foreground flex-1">
                                         {doc.title}

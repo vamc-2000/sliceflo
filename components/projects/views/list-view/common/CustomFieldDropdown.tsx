@@ -446,7 +446,7 @@ export function CustomFieldDropdown({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
+          <button data-testid={`custom-field-people-trigger-${field.id}`} className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
             {selectedMember ? (
               <MemberAvatar size="md" name={selectedMember.name} src={selectedMember.profilePicture} />
             ) : (
@@ -454,17 +454,17 @@ export function CustomFieldDropdown({
             )}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+        <DropdownMenuContent data-testid={`custom-field-people-content-${field.id}`} className="p-4 w-[200px] space-y-1">
           {/* ✅ Show guests message */}
           {field.showGuests && (
-            <div className="text-center py-4 text-xs text-muted-foreground bg-muted rounded-xs">
+            <div data-testid="custom-field-people-no-guests" className="text-center py-4 text-xs text-muted-foreground bg-muted rounded-xs">
               No guests available
             </div>
           )}
 
           {/* ✅ Normal member list */}
           {!field.showGuests && availableMembers.length === 0 && (
-            <div className="text-center py-4 text-xs text-muted-foreground bg-muted rounded-xs">
+            <div data-testid="custom-field-people-no-members" className="text-center py-4 text-xs text-muted-foreground bg-muted rounded-xs">
               No members found
             </div>
           )}
@@ -472,7 +472,7 @@ export function CustomFieldDropdown({
           {!field.showGuests && availableMembers.map((member) => {
             const isSelected = member?.userId === currentValue;
             return (
-              <DropdownMenuItem
+              <DropdownMenuItem data-testid={`custom-field-people-option-${member?.userId}`}
                 key={member?.userId}
                 onSelect={() => member?.userId && handleToggleMember(member.userId)}
                 className="p-0 focus:bg-transparent"
@@ -489,7 +489,7 @@ export function CustomFieldDropdown({
           })}
 
           <DropdownMenuSeparator />
-          <DropdownMenuItem
+          <DropdownMenuItem data-testid={`custom-field-people-clear-${field.id}`}
             onSelect={() => onUpdate('')}
             className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
           >
@@ -729,7 +729,7 @@ export function CustomFieldDropdown({
       <div className="w-full">
         <Popover>
           <PopoverTrigger asChild>
-            <Button
+            <Button data-testid={`custom-field-date-trigger-${field.id}`}
               variant="ghost"
               size="sm"
               className={cn("h-8 px-2 w-full font-normal", dateValue ? "justify-start" : "justify-center")}
@@ -743,7 +743,7 @@ export function CustomFieldDropdown({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent data-testid={`custom-field-date-content-${field.id}`} className="w-auto p-0" align="start">
             <Calendar
               mode="single"
               selected={dateValue ? new Date(dateValue) : undefined}
@@ -764,7 +764,7 @@ export function CustomFieldDropdown({
             <div className="px-3 py-2 border-t bg-card flex items-center justify-between">
               {/* Clock icon with direct time input */}
               <div className="relative">
-                <input
+                <input data-testid={`custom-field-date-time-picker-${field.id}`}
                   type="time"
                   value={customTime}
                   onChange={(e) => {
@@ -784,7 +784,7 @@ export function CustomFieldDropdown({
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </label>
               </div>
-              <button
+              <button data-testid={`custom-field-date-clear-${field.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onUpdate('');
@@ -801,7 +801,7 @@ export function CustomFieldDropdown({
               <div className="px-3 pb-3">
                 <div className="w-full h-10 bg-orange-500 text-white font-medium rounded-md flex items-center justify-between px-3 relative">
                   {/* Inline time input - hide clock icon */}
-                  <input
+                  <input data-testid={`custom-field-date-inline-time-${field.id}`}
                     type="time"
                     value={customTime}
                     onChange={(e) => {
@@ -815,7 +815,7 @@ export function CustomFieldDropdown({
                     }}
                     className="bg-transparent border-0 text-white font-medium outline-none flex-1 cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
                   />
-                  <button
+                  <button data-testid={`custom-field-date-inline-time-clear-${field.id}`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -878,7 +878,7 @@ export function CustomFieldDropdown({
     if (isEditing) {
       return (
         <div className="w-full">
-          <Input
+          <Input data-testid={`custom-field-budget-input-${field.id}`}
             type="number"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
@@ -892,7 +892,7 @@ export function CustomFieldDropdown({
     }
 
     return (
-      <div
+      <div data-testid={`custom-field-budget-display-${field.id}`}
         className="w-full px-2 py-1 cursor-pointer hover:bg-muted min-h-[32px] flex items-center"
         onDoubleClick={() => {
           setIsEditing(true);
@@ -933,7 +933,7 @@ export function CustomFieldDropdown({
           maxRating > 5 ? "gap-0.5" : "gap-1"
         )}>
           {Array.from({ length: maxRating }).map((_, index) => (
-            <button
+            <button data-testid={`custom-field-rating-star-${field.id}-${index + 1}`}
               key={index}
               onClick={() => {
                 const newRating = index + 1;
@@ -1024,7 +1024,7 @@ export function CustomFieldDropdown({
 
     return (
       <div className="w-full px-2 py-1 flex items-center justify-center">
-        <button
+        <button data-testid={`custom-field-voting-button-${field.id}`}
           onClick={() => onUpdate(votingValue ? 'false' : 'true')}
           className="text-2xl hover:scale-110 transition-transform"
           style={{
@@ -1219,7 +1219,7 @@ export function CustomFieldDropdown({
         value={selectedValue || ''}
         onValueChange={(newValue) => onUpdate(newValue)}
       >
-        <SelectTrigger className="h-8 w-full border-0 focus:ring-0">
+        <SelectTrigger data-testid={`custom-field-tshirt-trigger-${field.id}`} className="h-8 w-full border-0 focus:ring-0">
           <SelectValue placeholder="Select size">
             {selectedOption && (
               <div className="flex items-center gap-2">
@@ -1232,11 +1232,11 @@ export function CustomFieldDropdown({
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent data-testid={`custom-field-tshirt-content-${field.id}`}>
           {options.map((option, idx) => {
             const label = option.value ?? option.name;
             return (
-              <SelectItem key={label ?? idx} value={label}>
+              <SelectItem data-testid={`custom-field-tshirt-option-${label}`} key={label ?? idx} value={label}>
                 <div className="flex items-center gap-2">
                   <div
                     className="w-3 h-3 rounded-full"

@@ -196,13 +196,14 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
 
                 {/* No config warning */}
                 {noConfig && (
-                    <div className="flex items-center justify-between gap-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-sm text-amber-800">
+                    <div className="flex items-center justify-between gap-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                        <p className="text-sm text-amber-800 dark:text-amber-300">
                             You need a <strong>Cycle Configuration</strong> before creating cycles.
                         </p>
                         <Button
+                            variant="default"
                             size="sm"
-                            className="bg-[#001F3F] text-white hover:bg-[#002B5C] shrink-0"
+                            className="shrink-0"
                             onClick={() => router.push(`/project/${projectId}/cycles/cycle-config/create`)}
                         >
                             Create Config
@@ -210,21 +211,21 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                     </div>
                 )}
 
-                {/* ── Top Info (grey background) ───────────────────────── */}
+                {/* ── Top Info (secondary background) ───────────────────────── */}
                 <div className="rounded-lg p-4 bg-secondary">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         {/* Config selector - only show if multiple exist */}
                         {parallelConfigs.length > 1 ? (
                             <>
                                 <div className="space-y-2 col-span-1">
-                                    <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle configuration <span className="text-red-400">*</span></label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle configuration <span className="text-red-400">*</span></label>
                                     <Select value={cycleConfigId} onValueChange={setCycleConfigId} disabled={noConfig}>
-                                        <SelectTrigger className="h-10 bg-background border-gray-300">
+                                        <SelectTrigger className="h-10 bg-background border-border" data-testid="cycle-config-select-trigger">
                                             <SelectValue placeholder={noConfig ? "No config available" : "Select a config"} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {parallelConfigs.map((cfg) => (
-                                                <SelectItem key={cfg.id} value={cfg.id}>
+                                                <SelectItem key={cfg.id} value={cfg.id} data-testid={`cycle-config-option-${cfg.id}`}>
                                                     {cfg.name}
                                                 </SelectItem>
                                             ))}
@@ -232,45 +233,49 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                                     </Select>
                                 </div>
                                 <div className="space-y-2 col-span-1">
-                                    <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle name <span className="text-red-400">*</span></label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle name <span className="text-red-400">*</span></label>
                                     <Input
                                         placeholder="e.g. Sprint 1"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F]"
+                                        className="h-10 bg-background border-border focus-visible:ring-primary"
+                                        data-testid="cycle-name-input"
                                     />
                                 </div>
                             </>
                         ) : (
                             <div className="space-y-2 md:col-span-2 col-span-1">
-                                <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle name <span className="text-red-400">*</span></label>
+                                <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle name <span className="text-red-400">*</span></label>
                                 <Input
                                     placeholder="e.g. Sprint 1"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F]"
+                                    className="h-10 bg-background border-border focus-visible:ring-primary"
+                                    data-testid="cycle-name-input"
                                 />
                             </div>
                         )}
 
                         {/* Cycle Number */}
                         <div className="space-y-2 col-span-1">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle number</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle number</label>
                             <Input
                                 type="number"
                                 value={cycleNumber}
                                 onChange={(e) => setCycleNumber(parseInt(e.target.value) || 0)}
-                                className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F]"
+                                className="h-10 bg-background border-border focus-visible:ring-primary"
+                                data-testid="cycle-number-input"
                             />
                         </div>
 
                         {/* Cycle Slug */}
                         <div className="space-y-2 col-span-1">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle slug</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle slug</label>
                             <Input
                                 value={slug}
                                 onChange={(e) => setSlug(e.target.value)}
-                                className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F]"
+                                className="h-10 bg-background border-border focus-visible:ring-primary"
+                                data-testid="cycle-slug-input"
                             />
                         </div>
                     </div>
@@ -278,25 +283,35 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Start Date */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Start date</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Start date</label>
                             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
                                         className={cn(
-                                            "w-full h-10 justify-between text-left font-normal bg-background border-gray-300",
+                                            "w-full h-10 justify-between text-left font-normal bg-background border-border",
                                             !startDate && "text-muted-foreground"
                                         )}
+                                        data-testid="cycle-start-date-button"
                                     >
                                         <span>{startDate ? format(startDate, "PP") : "Set date"}</span>
-                                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
                                         selected={startDate}
-                                        onSelect={(d) => { if (d) { setStartDate(d); setStartDateOpen(false); } }}
+                                        onSelect={(d) => {
+                                            if (d) {
+                                                setStartDate(d);
+                                                setStartDateOpen(false);
+                                                if (endDate && d > endDate) {
+                                                    setEndDate(addDays(d, 14));
+                                                }
+                                            }
+                                        }}
+                                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
                                         initialFocus
                                     />
                                 </PopoverContent>
@@ -305,18 +320,19 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
 
                         {/* End Date */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">End date</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">End date</label>
                             <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
                                         className={cn(
-                                            "w-full h-10 justify-between text-left font-normal bg-background border-gray-300",
+                                            "w-full h-10 justify-between text-left font-normal bg-background border-border",
                                             !endDate && "text-muted-foreground"
                                         )}
+                                        data-testid="cycle-end-date-button"
                                     >
                                         <span>{endDate ? format(endDate, "PP") : "Set date"}</span>
-                                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
@@ -324,7 +340,7 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                                         mode="single"
                                         selected={endDate}
                                         onSelect={(d) => { if (d) { setEndDate(d); setEndDateOpen(false); } }}
-                                        disabled={(d) => d <= startDate}
+                                        disabled={(d) => startDate ? d <= startDate : d < new Date(new Date().setHours(0, 0, 0, 0))}
                                         initialFocus
                                     />
                                 </PopoverContent>
@@ -333,14 +349,14 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
 
                         {/* Status */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Status</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Status</label>
                             <Select value={status} onValueChange={(v) => setStatus(v as any)} disabled>
-                                <SelectTrigger className="h-10 bg-background border-gray-300 text-gray-700 opacity-95">
+                                <SelectTrigger className="h-10 bg-background border-border text-foreground opacity-95" data-testid="cycle-status-select-trigger">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {STATUS_OPTIONS.map((opt) => (
-                                        <SelectItem key={opt.value} value={opt.value}>
+                                        <SelectItem key={opt.value} value={opt.value} data-testid={`cycle-status-option-${opt.value}`}>
                                             {opt.label}
                                         </SelectItem>
                                     ))}
@@ -351,15 +367,15 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                 </div>
 
                 {/* ── Description ──────────────────────────────────────── */}
-                <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-background shadow">
+                <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
                     <div className="space-y-3">
                         <div>
-                            <h1 className="font-semibold text-sm text-[#001F3F]">Cycle description</h1>
-                            <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">
+                            <h1 className="font-semibold text-sm text-primary">Cycle description</h1>
+                            <p className="font-medium text-xs text-muted-foreground leading-relaxed">
                                 Add details about this cycle's goals and scope.
                             </p>
                         </div>
-                        <div className="min-h-[150px] border border-gray-200 rounded-md overflow-hidden bg-background relative">
+                        <div className="min-h-[150px] border border-border rounded-md overflow-hidden bg-background relative">
                             <ProseMirrorEditor
                                 initialContent={description}
                                 onBlur={(content) => setDescription(content)}
@@ -376,14 +392,17 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                         variant="outline"
                         onClick={() => onCancel ? onCancel() : router.back()}
                         disabled={isSubmitting}
-                        className="min-w-40 text-[#8E8E93]"
+                        className="min-w-40 text-muted-foreground hover:text-foreground"
+                        data-testid="cycle-cancel-button"
                     >
                         Cancel
                     </Button>
                     <Button
+                        variant="default"
                         onClick={handleSubmit}
                         disabled={isSubmitting || noConfig}
-                        className="min-w-40 bg-[#001F3F] text-white hover:bg-[#002B5C] font-semibold flex items-center justify-center"
+                        className="min-w-40 font-semibold flex items-center justify-center"
+                        data-testid="cycle-submit-button"
                     >
                         {isSubmitting ? (
                             <span className="flex items-center gap-2">

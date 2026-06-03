@@ -853,3 +853,69 @@ export const updateCycleApi = async (projectId: string, cycleId: string, payload
 export const deleteCycleApi = async (projectId: string, cycleId: string): Promise<{ success: boolean; message: string }> => {
   return await axiosInstance.delete(`/project/${projectId}/cycles/${cycleId}`);
 };
+
+// ── Cycle Task Assignment ──────────────────────────────────────────
+
+export interface CycleTasksResponse {
+  success: boolean;
+  action: 'assign' | 'unassign';
+  cycleId: string;
+  requested: number;
+  modified: number;
+  alreadyAssigned: number;
+  notInCycle: number;
+  cycle: Cycle;
+}
+
+/** POST /project/{id}/cycles/{cycleId}/tasks — Bulk assign tasks to a cycle */
+export const assignTasksToCycleApi = async (
+  projectId: string,
+  cycleId: string,
+  taskIds: string[]
+): Promise<CycleTasksResponse> => {
+  return await axiosInstance.post(`/project/${projectId}/cycles/${cycleId}/tasks`, { taskIds });
+};
+
+/** DELETE /project/{id}/cycles/{cycleId}/tasks — Bulk remove tasks from a cycle */
+export const removeTasksFromCycleApi = async (
+  projectId: string,
+  cycleId: string,
+  taskIds: string[]
+): Promise<CycleTasksResponse> => {
+  return await axiosInstance.delete(`/project/${projectId}/cycles/${cycleId}/tasks`, { data: { taskIds } });
+};
+
+// ── Project Status History API ──────────────────────────────────────────
+
+export interface StatusHistoryEntry {
+  _id: string;
+  status: string;
+  message: string;
+  changedBy: string;
+  changedAt: string;
+}
+
+export interface ProjectStatusHistoryResponse {
+  projectId: string;
+  currentProjectStatus: string;
+  history: StatusHistoryEntry[];
+}
+
+export interface PostStatusHistoryResponse {
+  entry: StatusHistoryEntry;
+  currentProjectStatus: string;
+}
+
+export const getProjectStatusHistoryApi = async (
+  projectId: string
+): Promise<ProjectStatusHistoryResponse> => {
+  return await axiosInstance.get(`/project/${projectId}/status-history`);
+};
+
+export const postProjectStatusHistoryApi = async (
+  projectId: string,
+  payload: { status: string; message: string }
+): Promise<PostStatusHistoryResponse> => {
+  return await axiosInstance.post(`/project/${projectId}/status-history`, payload);
+};
+

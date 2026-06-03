@@ -86,7 +86,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -101,13 +101,13 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -118,7 +118,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
             <label className="text-xs font-medium block">Emoji type</label>
             {/* Dropdown integrated in preview box */}
             <Select value={emojiType} onValueChange={setEmojiType}>
-              <SelectTrigger className="h-20 bg-muted border-0 hover:bg-muted transition-colors">
+              <SelectTrigger data-testid="custom-field-rating-emoji-trigger" className="h-20 bg-muted border-0 hover:bg-muted transition-colors">
                 <SelectValue>
                   <div className="flex items-center justify-center">
                     <span className="text-lg">{selectedEmoji?.emoji}</span>
@@ -127,7 +127,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
               </SelectTrigger>
               <SelectContent>
                 {emojiTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                  <SelectItem data-testid={`custom-field-rating-emoji-option-${type.value}`}  key={type.value} value={type.value}>
                     <div className="flex items-center justify-center">
                       <span className="text-lg">{type.emoji}</span>
                     </div>
@@ -141,12 +141,12 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
           <div className="space-y-2">
             <label className="text-xs font-medium block">Number of emoji</label>
             <Select value={maxRating.toString()} onValueChange={(val) => setMaxRating(parseInt(val))}>
-              <SelectTrigger className="h-9">
+              <SelectTrigger data-testid="custom-field-rating-max-trigger" className="h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {ratingOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value.toString()}>
+                  <SelectItem data-testid={`custom-field-rating-max-option-${option.value}`}  key={option.value} value={option.value.toString()}>
                     {option.label}
                   </SelectItem>
                 ))}
@@ -156,7 +156,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -179,7 +179,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -187,7 +187,7 @@ export function RatingField({ onSubmit, onCancel, initialData }: RatingFieldProp
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

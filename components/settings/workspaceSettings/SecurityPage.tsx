@@ -237,7 +237,7 @@ export default function SecurityPage() {
   return (
     <div className="w-full space-y-3">
       <div className="mb-2">
-        <h1 className="text-xl font-semibold text-[var(--primary)] tracking-tight">Security</h1>
+        <h1 className="text-xl font-semibold text-[var(--primary)] tracking-tight" data-testid="security-page-title">Security</h1>
         <p className="text-sm text-muted-foreground">Manage your workspace security settings</p>
       </div>
 
@@ -254,8 +254,10 @@ export default function SecurityPage() {
             <Switch
               checked={invitationLinkEnabled}
               onCheckedChange={setInvitationLinkEnabled}
+              data-testid="security-invitation-switch"
             />
           }
+          data-testid="security-invitation-card"
         >
           <div className="space-y-3">
             <p className="text-sm text-gray-600">
@@ -263,11 +265,11 @@ export default function SecurityPage() {
             </p>
             {invitationLinkEnabled && (
               <div className="flex gap-2">
-                <Input value={invitationLink} readOnly className="flex-1" />
-                <Button variant="outline" size="icon" onClick={handleRegenerateLink}>
+                <Input value={invitationLink} readOnly className="flex-1" data-testid="security-invitation-input" />
+                <Button variant="outline" size="icon" onClick={handleRegenerateLink} data-testid="security-invitation-regenerate-btn">
                   <RotateCw size={16} />
                 </Button>
-                <Button variant="outline" onClick={handleCopyLink}>
+                <Button variant="outline" onClick={handleCopyLink} data-testid="security-invitation-copy-btn">
                   <Copy size={16} className="mr-2" />
                   Copy
                 </Button>
@@ -284,6 +286,7 @@ export default function SecurityPage() {
           isActive={activeSection === "domains"}
           onToggle={() => setActiveSection((prev) => (prev === "domains" ? null : "domains"))}
           showChevron={true}
+          data-testid="security-domains-card"
         >
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
@@ -298,6 +301,7 @@ export default function SecurityPage() {
                     setShowAddDomainForm(true);
                     setIsVerifying(false); // Reset verification state when opening
                   }}
+                  data-testid="security-domains-add-trigger"
                 >
                   + Add Domain
                 </Button>
@@ -309,7 +313,7 @@ export default function SecurityPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label className="text-[11px] font-bold uppercase opacity-60">Domain</Label>
-                    <Input value={newDomainName} readOnly className="bg-muted/50 h-9" />
+                    <Input value={newDomainName} readOnly className="bg-muted/50 h-9" data-testid="security-domains-name-input" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[11px] font-bold uppercase opacity-60">Verification Email</Label>
@@ -322,15 +326,17 @@ export default function SecurityPage() {
                         setVerificationEmail(email);
                         if (email.includes('@')) setNewDomainName(email.split('@')[1].toLowerCase());
                       }}
+                      data-testid="security-domains-email-input"
                     />
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="sm" onClick={resetForm}>Cancel</Button>
+                  <Button variant="ghost" size="sm" onClick={resetForm} data-testid="security-domains-cancel-btn">Cancel</Button>
                   <Button
                     size="sm"
                     onClick={handleInitiateVerification}
                     className="bg-primary text-white"
+                    data-testid="security-domains-save-btn"
                   >
                     Add Domain
                   </Button>
@@ -343,6 +349,7 @@ export default function SecurityPage() {
                 <div
                   key={domain.id}
                   className="flex items-center justify-between p-3 border rounded-lg bg-card"
+                  data-testid={`security-domain-row-${domain.id}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border">
@@ -363,6 +370,7 @@ export default function SecurityPage() {
                       size="icon"
                       onClick={() => handleEditDomain(domain)}
                       className="h-8 w-8 text-gray-400 hover:text-primary hover:bg-gray-100"
+                      data-testid={`security-domain-edit-btn-${domain.id}`}
                     >
                       <Pencil size={14} />
                     </Button>
@@ -371,6 +379,7 @@ export default function SecurityPage() {
                       size="icon"
                       onClick={() => handleDeleteDomain(domain.id)}
                       className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+                      data-testid={`security-domain-delete-btn-${domain.id}`}
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -381,7 +390,7 @@ export default function SecurityPage() {
           </div>
         </SettingsCard>
         <Dialog open={isVerifying} onOpenChange={setIsVerifying}>
-          <DialogContent className="sm:max-w-[550px] p-6">
+          <DialogContent className="sm:max-w-[550px] p-6" data-testid="security-verification-dialog">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">Verification Code</DialogTitle>
               <p className="text-sm text-muted-foreground mt-2">
@@ -397,16 +406,18 @@ export default function SecurityPage() {
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                 className="tracking-[1em] text-center font-mono text-2xl h-14 border-2 focus-visible:ring-primary"
+                data-testid="security-verification-code-input"
               />
             </div>
 
             <div className="flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsVerifying(false)}>
+              <Button variant="ghost" onClick={() => setIsVerifying(false)} data-testid="security-verification-cancel-btn">
                 Cancel
               </Button>
               <Button
                 onClick={handleVerifyAndSave}
                 className="bg-primary text-white px-8 h-10"
+                data-testid="security-verification-verify-btn"
               >
                 Verify
               </Button>

@@ -1,4 +1,4 @@
-﻿// components/projects/ArchiveProjectModal.tsx
+// components/projects/ArchiveProjectModal.tsx
 "use client";
 
 import {
@@ -68,13 +68,14 @@ export default function ArchiveProjectModal({
 
                 {/* Footer Buttons */}
                 <DialogFooter className="mt-6 flex gap-2">
-                    <Button className="flex-1 text-xs" variant="outline" onClick={onClose} disabled={loading}>
+                    <Button className="flex-1 text-xs" variant="outline" onClick={onClose} disabled={loading} data-testid="archive-project-cancel-btn">
                         Cancel
                     </Button>
                     <Button
                         onClick={handleConfirm}
                         disabled={loading}
                         className={cn("bg-primary hover:bg-primary/90 text-primary-foreground flex-1 text-xs")}
+                        data-testid="archive-project-confirm-btn"
                     >
                         {loading ? "Archiving..." : confirmLabel}
                     </Button>

@@ -73,9 +73,9 @@ export default function ProjectViewsPage({
     };
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-white">
+        <div className="flex flex-col h-screen overflow-hidden bg-background">
             <div className="flex-none">
-                <div className="w-full border-b">
+                <div className="w-full">
                     <Breadcrumbs />
                 </div>
                 <ViewsHeader
@@ -86,7 +86,7 @@ export default function ProjectViewsPage({
                 />
             </div>
 
-            <div className="flex-1 overflow-auto bg-white p-6">
+            <div className="flex-1 overflow-auto bg-background p-6">
                 {tailoredViews.length === 0 ? (
                     <LandingPage
                         title="Build tailored views for your Projects"
@@ -122,8 +122,8 @@ export default function ProjectViewsPage({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700">
+                        <AlertDialogCancel data-testid="views-delete-cancel-btn">Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" data-testid="views-delete-confirm-btn">
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -1,4 +1,4 @@
-﻿// components/list-view/customFields/DateField.tsx
+// components/list-view/customFields/DateField.tsx
 
 "use client";
 
@@ -99,7 +99,7 @@ export function DateField({
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -114,13 +114,13 @@ export function DateField({
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -129,16 +129,16 @@ export function DateField({
           <label className="text-xs font-medium block">Default date</label>
           <RadioGroup value={defaultDateType} onValueChange={(value: any) => setDefaultDateType(value)}>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="none" id="none" />
+              <RadioGroupItem data-testid="custom-field-date-radio-none" value="none" id="none" />
               <Label htmlFor="none" className="font-normal cursor-pointer">None</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="today" id="today" />
+              <RadioGroupItem data-testid="custom-field-date-radio-today" value="today" id="today" />
               <Label htmlFor="today" className="font-normal cursor-pointer">Today</Label>
             </div>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="custom" id="custom" />
+                <RadioGroupItem data-testid="custom-field-date-radio-custom" value="custom" id="custom" />
                 <Label htmlFor="custom" className="font-normal cursor-pointer">Custom</Label>
               </div>
               {defaultDateType === 'custom' && (
@@ -181,7 +181,7 @@ export function DateField({
                           <Clock className="h-4 w-4 text-muted-foreground" />
                         </label>
                       </div>
-                      <button
+                      <button data-testid="custom-field-date-clear-btn"
                         onClick={(e) => {
                           e.stopPropagation();
                           setCustomDate(new Date());
@@ -206,7 +206,7 @@ export function DateField({
                             }}
                             className="bg-transparent border-0 text-white font-medium outline-none flex-1 cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
                           />
-                          <button
+                          <button data-testid="custom-field-date-remove-time-btn"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -229,7 +229,7 @@ export function DateField({
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -252,7 +252,7 @@ export function DateField({
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -260,7 +260,7 @@ export function DateField({
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

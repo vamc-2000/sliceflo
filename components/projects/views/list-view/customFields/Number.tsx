@@ -157,7 +157,7 @@ export function Number({
         {/* Field Name */}
         <div className="space-y-2">
           <label htmlFor="field-name" className="text-xs font-medium block">Field name</label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -172,13 +172,13 @@ export function Number({
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -191,7 +191,7 @@ export function Number({
             </SelectTrigger>
             <SelectContent>
               {Object.entries(NUMBER_FORMAT_OPTIONS).map(([key, { label }]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
+                <SelectItem data-testid={`custom-field-number-format-option-${key}`}  key={key} value={key}>{label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -215,12 +215,12 @@ export function Number({
                 value={String(decimalPlaces)}
                 onValueChange={(val) => setDecimalPlaces(parseInt(val))}
               >
-                <SelectTrigger className="h-9">
+                <SelectTrigger data-testid="custom-field-number-decimal-trigger"  className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 11 }, (_, i) => (
-                    <SelectItem key={i} value={String(i)}>{i}</SelectItem>
+                    <SelectItem data-testid={`custom-field-number-decimal-option-${i}`}  key={i} value={String(i)}>{i}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -234,12 +234,12 @@ export function Number({
             <div className="space-y-2 w-32">
               <label className="text-xs font-medium block">Position</label>
               <Select value={labelPosition} onValueChange={(val: any) => setLabelPosition(val)}>
-                <SelectTrigger className="h-9">
+                <SelectTrigger data-testid="custom-field-number-position-trigger" className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="right">Right</SelectItem>
-                  <SelectItem value="left">Left</SelectItem>
+                  <SelectItem data-testid="custom-field-number-position-option-right"  value="right">Right</SelectItem>
+                  <SelectItem data-testid="custom-field-number-position-option-left"  value="left">Left</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -264,12 +264,12 @@ export function Number({
                 value={String(decimalPlaces)}
                 onValueChange={(val) => setDecimalPlaces(parseInt(val))}
               >
-                <SelectTrigger className="h-9">
+                <SelectTrigger data-testid="custom-field-number-decimal-trigger"  className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 11 }, (_, i) => (
-                    <SelectItem key={i} value={String(i)}>{i}</SelectItem>
+                    <SelectItem data-testid={`custom-field-number-decimal-option-${i}`}  key={i} value={String(i)}>{i}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -304,12 +304,12 @@ export function Number({
           <div className="space-y-2">
             <label className="text-xs font-medium block">Currency</label>
             <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger className="h-9">
+              <SelectTrigger data-testid="custom-field-number-currency-trigger" className="h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {CURRENCY_OPTIONS.map((curr) => (
-                  <SelectItem key={curr.code} value={curr.code}>
+                  <SelectItem data-testid={`custom-field-number-currency-option-${curr.code}`}  key={curr.code} value={curr.code}>
                     {curr.symbol} {curr.name} ({curr.code})
                   </SelectItem>
                 ))}
@@ -319,7 +319,7 @@ export function Number({
         )}
 
         {/* More Settings */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -338,10 +338,10 @@ export function Number({
 
       {/* Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
+        <Button data-testid="custom-field-cancel-btn" type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim() || (numberFormat === 'customLabel' && !customLabel.trim())) || loading}

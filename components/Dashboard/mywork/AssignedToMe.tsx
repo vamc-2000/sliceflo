@@ -133,20 +133,20 @@ export function AssignedToMe() {
     <div className="flex flex-col gap-3 h-full overflow-hidden">
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-semibold tracking-tight">Assigned to me</h2>
+          <h2 className="text-sm font-semibold tracking-tight" data-testid="assigned-to-me-title">Assigned to me</h2>
           <Select value={filterType} onValueChange={(val) => setFilterType(val as any)}>
-            <SelectTrigger className="h-7 w-[130px] text-[11px] font-medium bg-background">
+            <SelectTrigger className="h-7 w-[130px] text-[11px] font-medium bg-background" data-testid="assigned-to-me-filter-trigger">
               <SelectValue placeholder="Filter tasks" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-xs">All Tasks</SelectItem>
-              <SelectItem value="overdue" className="text-xs">Overdue</SelectItem>
-              <SelectItem value="today" className="text-xs">Due Today</SelectItem>
-              <SelectItem value="week" className="text-xs">Due This Week</SelectItem>
+              <SelectItem value="all" className="text-xs" data-testid="assigned-to-me-filter-item-all">All Tasks</SelectItem>
+              <SelectItem value="overdue" className="text-xs" data-testid="assigned-to-me-filter-item-overdue">Overdue</SelectItem>
+              <SelectItem value="today" className="text-xs" data-testid="assigned-to-me-filter-item-today">Due Today</SelectItem>
+              <SelectItem value="week" className="text-xs" data-testid="assigned-to-me-filter-item-week">Due This Week</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground">
+        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground" data-testid="assigned-to-me-add-btn-header">
           <Plus className="h-3.5 w-3.5" /> Add Task
         </Button>
       </div>
@@ -156,7 +156,7 @@ export function AssignedToMe() {
           <div className="flex flex-col gap-3 pr-4 pb-4">
             <div className="overflow-hidden rounded-xl border bg-background shadow-none">
               <div className="overflow-x-auto w-full">
-                <Table className="relative border-y border-border text-xs min-w-full">
+                <Table className="relative border-y border-border text-xs min-w-full" data-testid="assigned-to-me-table">
                   <TableHeader>
                     <TableRow className="bg-card hover:bg-card border-b border-border">
                       <TableHead className="!h-9 px-3 py-0 text-left w-10 pl-4 border-r border-border" />
@@ -196,9 +196,9 @@ export function AssignedToMe() {
                         const statusLabel = statusCfg?.label || item.status || "To Do";
 
                         return (
-                          <TableRow key={item.id} className="group bg-card hover:bg-card border-b border-border transition-colors">
+                          <TableRow key={item.id} className="group bg-card hover:bg-card border-b border-border transition-colors" data-testid={`assigned-to-me-task-row-${item.id}`}>
                             <TableCell className="!h-9 px-3 py-0 text-left pl-4 border-r border-border w-10">
-                              <Checkbox className="h-3.5 w-3.5 rounded" />
+                              <Checkbox className="h-3.5 w-3.5 rounded" data-testid={`assigned-to-me-task-checkbox-${item.id}`} />
                             </TableCell>
                             <TableCell className="!h-9 px-3 py-0 text-center border-r border-border text-xs text-muted-foreground font-medium w-28">
                               {formattedId}
@@ -236,7 +236,7 @@ export function AssignedToMe() {
 
                     <TableRow className="hover:bg-transparent">
                       <TableCell className="py-2 pl-4" colSpan={3}>
-                        <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+                        <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground" data-testid="assigned-to-me-add-btn-inline">
                           <Plus className="h-3.5 w-3.5" /> Add Task
                         </button>
                       </TableCell>

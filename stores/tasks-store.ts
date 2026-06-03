@@ -18,6 +18,10 @@ import {
   updateTaskStatusApi,
   assignTaskApi,
 } from '@/lib/api/tasks-api';
+import {
+  assignTasksToCycleApi,
+  removeTasksFromCycleApi,
+} from '@/lib/api/projects-api';
 import { toast } from "@/components/ui/sonner";
 import { retryWithBackoff } from '@/utils/retry';
 
@@ -200,6 +204,10 @@ interface TasksState {
 
   clearAllTasks: () => void;
   reset: () => void;
+
+  // Cycle task bulk assignment
+  assignTasksToCycle: (projectId: string, cycleId: string, taskIds: string[]) => Promise<void>;
+  removeTasksFromCycle: (projectId: string, cycleId: string, taskIds: string[]) => Promise<void>;
 }
 
 
@@ -430,6 +438,36 @@ export const useTasksStore = create<TasksState>()(
             false,
             'tasks/clearAllTasks'
           );
+        },
+
+        assignTasksToCycle: async (projectId: string, cycleId: string, taskIds: string[]) => {
+          try {
+            await assignTasksToCycleApi(projectId, cycleId, taskIds);
+            // Silently refresh so cycleId/cycle fields are up-to-date on every task
+            await get().fetchTasks(projectId, true);
+            toast('success', { title: `${taskIds.length} task${taskIds.length !== 1 ? 's' : ''} added to cycle` });
+          } catch (error: any) {
+            toast('error', {
+              title: 'Failed to add tasks to cycle',
+              description: error?.message,
+            });
+            throw error;
+          }
+        },
+
+        removeTasksFromCycle: async (projectId: string, cycleId: string, taskIds: string[]) => {
+          try {
+            await removeTasksFromCycleApi(projectId, cycleId, taskIds);
+            // Silently refresh so cycleId/cycle fields are cleared on each task
+            await get().fetchTasks(projectId, true);
+            toast('success', { title: `${taskIds.length} task${taskIds.length !== 1 ? 's' : ''} removed from cycle` });
+          } catch (error: any) {
+            toast('error', {
+              title: 'Failed to remove tasks from cycle',
+              description: error?.message,
+            });
+            throw error;
+          }
         },
 
         fetchTasks: async (projectId: string, isSilent: boolean = false) => {

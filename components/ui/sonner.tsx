@@ -2,9 +2,10 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, ToasterProps, toast as sonnerToast } from "sonner"
-import { CheckCircle, AlertTriangle, XCircle, Info, Check, CircleCheck,  } from "lucide-react"
+import { CheckCircle, AlertTriangle, XCircle, Info, Check, CircleCheck, } from "lucide-react"
 import { UserPlus } from "phosphor-react"
 import { FaUserPlus } from "react-icons/fa"
+import { X } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type ToastType = "success" | "error" | "warning" | "info"
@@ -121,6 +122,28 @@ export function toast(type: ToastType, options: ToastOptions) {
           ...styleMap[type],
         }}
       >
+
+        {/* Close Button */}
+        <button
+          onClick={() => sonnerToast.dismiss(toastId)}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#8E8E93",
+          }}
+          aria-label="Close notification"
+        >
+          <X size={16} />
+        </button>
+        
         {/* Icon */}
         <div
           style={{

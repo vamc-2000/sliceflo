@@ -63,7 +63,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md' 
     const dim = size === 'xs' ? 'w-5 h-5 text-[10px]' : size === 'sm' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm';
     if (!name && !src) {
         return (
-            <div className={`${dim} rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 shrink-0`}>
+            <div className={`${dim} rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0`}>
                 <User className="h-3 w-3" />
             </div>
         );
@@ -73,7 +73,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md' 
         <UIAvatar className={cn(dim, "border shrink-0")}>
             {src && <AvatarImage src={src} className="object-cover" />}
             <AvatarFallback
-                className="font-semibold text-white bg-gray-400"
+                className="font-semibold text-primary-foreground bg-muted-foreground"
                 style={{ backgroundColor: name ? getAvatarColor(name) : undefined }}
             >
                 {name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-3 w-3" />}
@@ -179,7 +179,7 @@ export function DraftDetailView({
             <DialogPrimitive.Portal>
                 <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
                 <DialogPrimitive.Content
-                    className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-white rounded-l-lg shadow-xl transition-transform duration-300 ease-in-out data-[state=closed]:translate-x-full data-[state=open]:translate-x-0"
+                    className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-background rounded-l-lg shadow-xl border-l transition-transform duration-300 ease-in-out data-[state=closed]:translate-x-full data-[state=open]:translate-x-0"
                     style={{ width: "1050px", maxWidth: "95vw", height: "100%" }}
                 >
                     <VisuallyHidden asChild>
@@ -191,32 +191,32 @@ export function DraftDetailView({
 
                     <div className="flex flex-col h-full w-full overflow-hidden rounded-lg">
                         {/* UNIFIED HEADER */}
-                        <div className="px-5 py-2 flex items-center justify-between bg-white shrink-0 text-sm border-b">
+                        <div className="px-5 py-2 flex items-center justify-between bg-background shrink-0 text-sm border-b">
                             <div className="flex items-center gap-2">
-                                <span className="text-gray-500 flex items-center gap-1">
+                                <span className="text-muted-foreground flex items-center gap-1">
                                     <span className="hover:underline cursor-pointer">{currentWorkspace?.name || "Workspace"}</span>
                                     <span>/</span>
                                     <span className="hover:underline cursor-pointer">{currentProject?.name || "Project"}</span>
                                     <span>/</span>
                                     {isSubDraft && currentDraft.parentTaskId && (
                                         <>
-                                            <span className="hover:underline cursor-pointer text-gray-500">
+                                            <span className="hover:underline cursor-pointer text-muted-foreground">
                                                 {drafts.find((d) => d.id === currentDraft.parentTaskId)?.title ?? "Parent Draft"}
                                             </span>
                                             <span>/</span>
                                         </>
                                     )}
-                                    <span className="hover:underline cursor-pointer text-gray-700 font-medium truncate max-w-[160px]">
+                                    <span className="hover:underline cursor-pointer text-foreground font-medium truncate max-w-[160px]">
                                         {currentDraft.title}
                                     </span>
                                 </span>
                                 {isSubDraft && (
-                                    <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Sub-Draft</span>
+                                    <span className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">Sub-Draft</span>
                                 )}
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-gray-500">
+                                <span className="text-muted-foreground">
                                     Created {currentDraft.createdAt ? format(new Date(currentDraft.createdAt), "MMM d, yyyy") : "—"}
                                 </span>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -231,7 +231,7 @@ export function DraftDetailView({
                                             <Share2 className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="border-b-4 border-b-[#001F3F]">
+                                    <DropdownMenuContent align="end" className="border-b-4 border-b-primary">
                                         <DropdownMenuItem onClick={handleCopyDraftLink} className="cursor-pointer">Draft Link</DropdownMenuItem>
                                         <DropdownMenuItem onClick={handleCopyDraftId} className="cursor-pointer">Draft ID</DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -247,12 +247,12 @@ export function DraftDetailView({
                         {/* CONTENT AREA */}
                         <div className="flex flex-1 overflow-hidden">
                             {/* Left Panel */}
-                            <div className="flex-1 flex flex-col overflow-hidden bg-white">
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+                            <div className="flex-1 flex flex-col overflow-hidden bg-background">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
                                     <div className="flex items-center shrink-0 flex-wrap gap-3">
                                         <h1 className="text-4xl font-semibold">{currentDraft.title}</h1>
                                         <div className="flex items-center gap-2">
-                                            <div className="flex items-center gap-1.5 h-8 w-auto min-w-[60px] bg-[#001F3F] text-white rounded-md justify-center px-2">
+                                            <div className="flex items-center gap-1.5 h-8 w-auto min-w-[60px] bg-primary text-primary-foreground rounded-md justify-center px-2">
                                                 {(() => {
                                                     const DefaultIcon = getDefaultTaskTypeIcon();
                                                     return (
@@ -275,7 +275,7 @@ export function DraftDetailView({
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-semibold">Description</Label>
                                             <Button variant="ghost" size="icon" className="h-6 w-6">
-                                                <History className="h-3 w-3 text-gray-500" />
+                                                <History className="h-3 w-3 text-muted-foreground" />
                                             </Button>
                                         </div>
                                         <ProseMirrorEditor
@@ -412,8 +412,8 @@ export function DraftDetailView({
 
                             {/* Right Sidebar */}
                             <div className="w-[320px] flex flex-col shrink-0 border-l">
-                                <div className="flex justify-around border-b bg-white shrink-0 p-2">
-                                    <Button variant="ghost" size="sm" className="px-4 py-3 font-medium transition-colors underline underline-offset-8 decoration-[#001F3F] text-[#001F3F]">
+                                <div className="flex justify-around border-b bg-background shrink-0 p-2">
+                                    <Button variant="ghost" size="sm" className="px-4 py-3 font-medium transition-colors underline underline-offset-8 decoration-primary text-primary">
                                         Properties
                                     </Button>
                                 </div>
@@ -421,10 +421,10 @@ export function DraftDetailView({
                                     <div className="space-y-1">
                                         {/* STATUS */}
                                         <div className="flex items-center justify-between py-1">
-                                            <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0"><LayoutTemplate className="h-4 w-4" />Status</Label>
+                                            <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0"><LayoutTemplate className="h-4 w-4" />Status</Label>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.status && "text-gray-400")}>
+                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.status && "text-muted-foreground")}>
                                                         {currentDraft.status ? (() => {
                                                             const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
                                                             return (
@@ -451,10 +451,10 @@ export function DraftDetailView({
 
                                         {/* PRIORITY */}
                                         <div className="flex items-center justify-between py-1">
-                                            <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0"><Flag className="h-4 w-4" />Priority</Label>
+                                            <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0"><Flag className="h-4 w-4" />Priority</Label>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.priority && "text-gray-400")}>
+                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.priority && "text-muted-foreground")}>
                                                         {currentDraft.priority ? (
                                                             <span className="flex items-center gap-1.5">
                                                                 {getPriorityColor(currentDraft.priority) && (
@@ -480,10 +480,10 @@ export function DraftDetailView({
 
                                         {/* START DATE */}
                                         <div className="flex items-center justify-between py-1">
-                                            <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0"><CalendarIcon className="h-4 w-4" />Start Date</Label>
+                                            <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0"><CalendarIcon className="h-4 w-4" />Start Date</Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-gray-200 text-xs", !currentDraft.startDate && "text-gray-400")}>
+                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.startDate && "text-muted-foreground")}>
                                                         {currentDraft.startDate ? format(new Date(currentDraft.startDate), "PP") : "—"}
                                                     </Button>
                                                 </PopoverTrigger>
@@ -502,7 +502,7 @@ export function DraftDetailView({
                                                     />
                                                     {currentDraft.startDate && (
                                                         <div className="p-2 border-t">
-                                                            <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ startDate: undefined })}>Clear date</Button>
+                                                            <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => handleUpdateDraft({ startDate: undefined })}>Clear date</Button>
                                                         </div>
                                                     )}
                                                 </PopoverContent>
@@ -511,10 +511,10 @@ export function DraftDetailView({
 
                                         {/* DUE DATE */}
                                         <div className="flex items-center justify-between py-1">
-                                            <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0"><CalendarIcon className="h-4 w-4" />Due Date</Label>
+                                            <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0"><CalendarIcon className="h-4 w-4" />Due Date</Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-gray-200 text-xs", !currentDraft.dueDate && "text-gray-400")}>
+                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.dueDate && "text-muted-foreground")}>
                                                         {currentDraft.dueDate ? format(new Date(currentDraft.dueDate), "PP") : "—"}
                                                     </Button>
                                                 </PopoverTrigger>
@@ -528,7 +528,7 @@ export function DraftDetailView({
                                                     />
                                                     {currentDraft.dueDate && (
                                                         <div className="p-2 border-t">
-                                                            <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ dueDate: undefined })}>Clear date</Button>
+                                                            <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => handleUpdateDraft({ dueDate: undefined })}>Clear date</Button>
                                                         </div>
                                                     )}
                                                 </PopoverContent>
@@ -537,10 +537,10 @@ export function DraftDetailView({
 
                                         {/* ASSIGNEE */}
                                         <div className="flex items-center justify-between py-1">
-                                            <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0"><User className="h-4 w-4" />Assignee</Label>
+                                            <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0"><User className="h-4 w-4" />Assignee</Label>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.assigneeId && "text-gray-400")}>
+                                                    <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.assigneeId && "text-muted-foreground")}>
                                                         {currentDraft.assigneeId ? (() => {
                                                             const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
                                                             return (

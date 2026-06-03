@@ -58,13 +58,11 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
   const endValue = getEndValue();
   const range = endValue - startValue;
 
-  // Percentage of current value within original start→end range
   const rawPercent = range > 0 ? ((currentValue - startValue) / range) * 100 : 0;
   const percentage = Math.min(100, Math.max(0, Math.round(rawPercent)));
 
   useEffect(() => {
     if (target) {
-      // Initialise currentValue to the most-recent note's number, or start value
       let initial = startValue;
       if (target.notes && target.notes.length > 0) {
         const last = target.notes[target.notes.length - 1];
@@ -99,7 +97,6 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
     try {
       const isDone = currentValue >= endValue;
 
-      // POST /goals/targets/{id}/notes
       await addTargetNote(target.goalId, target.id, {
         note: note.trim() || "Progress update",
         number: currentValue,
@@ -120,13 +117,13 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl bg-card text-card-foreground border-border">
+      <DialogContent className="max-w-xl bg-card text-card-foreground border-border" data-testid="update-target-modal">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center">
               <span className="text-xs text-muted-foreground font-bold">{(target.label || "?").charAt(0).toUpperCase()}</span>
             </div>
-            <span className="text-foreground">{target.label}</span>
+            <span className="text-foreground" data-testid="target-title-display">{target.label}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -143,6 +140,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
                       : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
                   }
                   onClick={() => setCurrentValue(0)}
+                  data-testid="boolean-in-progress-btn"
                 >
                   In progress
                 </Button>
@@ -156,6 +154,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
                       : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
                   }
                   onClick={() => setCurrentValue(1)}
+                  data-testid="boolean-finished-btn"
                 >
                   Finished
                 </Button>
@@ -166,8 +165,8 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
             <div className="space-y-6">
               <div className="space-y-3">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-foreground">{percentage}%</div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <div className="text-4xl font-bold text-foreground" data-testid="target-percent-display">{percentage}%</div>
+                  <p className="text-sm text-muted-foreground mt-1" data-testid="target-values-summary">
                     Current: <span className="font-semibold text-foreground">{currentValue}</span>
                     {" / "}Target: <span className="font-semibold text-foreground">{endValue} {target.type === "currency" ? (target.unit || "INR") : ""}</span>
                   </p>
@@ -175,10 +174,11 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
 
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">Start: {startValue}</span>
-                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden border border-border">
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden border border-border" data-testid="target-progress-track">
                     <div
                       className="h-full bg-primary transition-all duration-300"
                       style={{ width: `${percentage}%` }}
+                      data-testid="target-progress-fill"
                     />
                   </div>
                   <span className="text-sm text-muted-foreground">Target: {endValue}</span>
@@ -192,6 +192,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
                   onClick={handleDecrease}
                   disabled={currentValue <= startValue}
                   className="gap-2 border-border text-foreground hover:bg-muted"
+                  data-testid="target-decrease-btn"
                 >
                   <Minus className="w-4 h-4" />
                   Decrease
@@ -201,6 +202,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
                   onClick={handleIncrease}
                   disabled={currentValue >= endValue}
                   className="gap-2 bg-primary text-primary-foreground hover:opacity-90"
+                  data-testid="target-increase-btn"
                 >
                   <Plus className="w-4 h-4" />
                   Increase
@@ -216,6 +218,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
                   max={endValue}
                   placeholder="#"
                   className="text-center text-lg font-semibold bg-background border-border text-foreground"
+                  data-testid="target-value-input"
                 />
               </div>
             </div>
@@ -229,6 +232,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
               onChange={(e) => setNote(e.target.value)}
               maxLength={250}
               className="min-h-[100px] resize-none bg-background border-border text-foreground placeholder:text-muted-foreground"
+              data-testid="target-note-textarea"
             />
             <div className="text-right text-sm text-muted-foreground mt-1">
               {note.length}/250
@@ -237,7 +241,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
 
           {/* SAVE BUTTON */}
           {isSubmitting ? (
-            <div className="flex justify-center py-2">
+            <div className="flex justify-center py-2" data-testid="saving-loader">
               <Loader message="Saving update..." size="sm" />
             </div>
           ) : (
@@ -246,6 +250,7 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
               size="lg"
               onClick={handleSaveUpdate}
               disabled={isSubmitting}
+              data-testid="target-save-btn"
             >
               Save update
             </Button>

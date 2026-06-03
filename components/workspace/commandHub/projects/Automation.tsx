@@ -734,6 +734,13 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
     }
   };
 
+  const getFieldLabel = (fieldId: string, value: string) => {
+    if (value === "Select") return "Select";
+    const options = getFieldOptions(fieldId);
+    const option = options.find((opt) => opt.value === value);
+    return option ? option.label : value;
+  };
+
   const selectedAssignee = members.find((m) => m.userId === settings.assignCreator.assigneeId) || members[0];
 
   const historyEntries = [
@@ -1151,7 +1158,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                                 disabled={!fieldSetting.enabled}
                               >
                                 <span className="truncate max-w-[55px]">
-                                  {fieldSetting.value}
+                                  {getFieldLabel(field.id, fieldSetting.value)}
                                 </span>
                                 <ChevronDown className="w-3 h-3 text-gray-400 shrink-0" />
                               </button>
@@ -1159,14 +1166,14 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
                             {activeSubDropdown === field.id && fieldSetting.enabled && (
                               <div className="ml-6 p-1.5 bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 rounded-lg space-y-0.5 mt-1 max-h-32 overflow-y-auto">
-                                {getFieldOptions(field.id).map((opt) => (
+                                {getFieldOptions(field.id).map((opt, index) => (
                                   <button
-                                    key={opt.value}
-                                    onClick={() => handleSelectFieldValue(field.id, opt.label)}
+                                    key={`${opt.value}-${index}`}
+                                    onClick={() => handleSelectFieldValue(field.id, opt.value)}
                                     className="w-full text-left px-2 py-1 hover:bg-slate-200/50 dark:hover:bg-slate-700 rounded text-[11px] font-semibold text-slate-750 dark:text-slate-305 flex items-center justify-between cursor-pointer"
                                   >
                                     <span>{opt.label}</span>
-                                    {fieldSetting.value === opt.label && (
+                                    {fieldSetting.value === opt.value && (
                                       <Check className="w-3.5 h-3.5 text-[#001F3F] dark:text-[#E9F2FF] shrink-0" />
                                     )}
                                   </button>

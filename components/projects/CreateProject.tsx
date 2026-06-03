@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
 import { Calendar } from '@/components/ui/calendar'
@@ -380,12 +380,12 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
     const selectedPortfolios = portfolios.filter(p => linkedPortfolios.includes(p.id));
 
     return (
-        <div className="bg-background flex flex-col w-full">
+        <div className="bg-background flex flex-col w-full" data-testid="create-project-container">
             <div className="flex-1 flex flex-col ">
                 <div className="w-full p-6 bg-background">
-                    <div className=" space-y-4">
-
-                        {/* Team Info Section */}
+                    <div className="space-y-4">
+ 
+                        {/* Project Info Section */}
                         <div className="rounded-lg p-4 bg-secondary">
                             <div className="flex items-start gap-4">
                                 {/* Icon Section */}
@@ -395,6 +395,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         type="button"
                                         onClick={() => setShowColorPicker(true)}
                                         className="w-10 h-10 bg-background border border-input rounded-md flex items-center justify-center hover:bg-accent transition-colors overflow-hidden"
+                                        data-testid="project-icon-button"
                                     >
                                         {renderIcon()}
                                     </button>
@@ -420,6 +421,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         onChange={handleProjectNameChange}
                                         placeholder="e.g. Project name"
                                         className="h-10 bg-background"
+                                        data-testid="project-name-input"
                                     />
                                 </div>
 
@@ -432,6 +434,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         placeholder="e.g. PRO"
                                         className="h-10 bg-background uppercase"
                                         readOnly
+                                        data-testid="project-identifier-input"
                                     />
                                 </div>
                                 <div className="w-80">
@@ -444,6 +447,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                     "w-full h-10 bg-background justify-start text-left font-normal",
                                                     !startDate && "text-muted-foreground"
                                                 )}
+                                                data-testid="project-start-date-button"
                                             >
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                                 {startDate ? format(new Date(startDate), "PP") : "Select date"}
@@ -475,6 +479,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                     "w-full h-10 bg-background justify-start text-left font-normal",
                                                     !endDate && "text-muted-foreground"
                                                 )}
+                                                data-testid="project-end-date-button"
                                             >
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                                 {endDate ? format(new Date(endDate), "PP") : "Select date"}
@@ -512,6 +517,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                 variant="outline"
                                                 size="lg"
                                                 className={`w-xs focus-ring-none rounded-sm flex justify-between items-center px-2`}
+                                                data-testid="project-lead-dropdown-trigger"
                                             >
                                                 <div className={` border-dashed border-border rounded-full flex items-center gap-2`}>
                                                     {selectedUser ? (
@@ -544,6 +550,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                     key={member.userId}
                                                     onClick={() => setProjectLeader(member.userId)}
                                                     className="cursor-pointer"
+                                                    data-testid={`project-lead-option-${member.userId}`}
                                                 >
                                                     <div className="flex items-center gap-2 w-full">
                                                         {member.profilePicture ? (
@@ -588,6 +595,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                 variant="ghost"
                                                 size="lg"
                                                 className={`w-xs ${priority ? priorityConfig[priority].badgeColor : 'bg-muted'} focus-ring-none rounded-sm flex justify-start items-center gap-2 px-2`}
+                                                data-testid="project-priority-dropdown-trigger"
                                             >
                                                 {priority ? (
                                                     <>
@@ -612,6 +620,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                     key={p}
                                                     className="justify-between"
                                                     onClick={() => handlePriorityChange(p)}
+                                                    data-testid={`project-priority-option-${p}`}
                                                 >
                                                     <span className="capitalize">{priorityConfig[p].label}</span>
                                                     <div className={`h-6 w-6 rounded-full ${priorityConfig[p].badgeColor} flex items-center justify-center p-0.5`}>
@@ -642,6 +651,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                 variant="outline"
                                                 size="lg"
                                                 className="w-xs rounded-sm flex justify-between items-center px-2"
+                                                data-testid="project-stage-dropdown-trigger"
                                             >
                                                 <div className="flex items-center gap-2">
                                                     {(() => {
@@ -674,7 +684,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         <DropdownMenuContent align="start" className="w-xs border-0 border-b-[5px] border-primary bg-background">
                                             {projectPhases.map((p) => (
                                                 <React.Fragment key={p._id}>
-                                                    <DropdownMenuItem onClick={() => setPhase(p.value)}>
+                                                    <DropdownMenuItem onClick={() => setPhase(p.value)} data-testid={`project-stage-option-${p.value}`}>
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
                                                             <span>{p.label}</span>
@@ -685,9 +695,10 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                             key={child._id}
                                                             className="pl-6"
                                                             onClick={() => setPhase(child.value)}
+                                                            data-testid={`project-stage-option-${child.value}`}
                                                         >
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: child.color }} />
+                                                                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: child.color }} />
                                                                 <span>{child.label}</span>
                                                             </div>
                                                         </DropdownMenuItem>
@@ -717,6 +728,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         size="lg"
                                         onClick={() => setPrivacy('private')}
                                         className={`w-xs ${privacy === 'private' ? 'border-l-4 border-l-primary' : ''} focus-ring-none rounded-sm flex justify-start items-center px-2 py-6`}
+                                        data-testid="project-privacy-private-button"
                                     >
                                         <div className={`h-6 w-6 rounded-full flex items-center justify-center`}>
                                             <LockKeyhole className={`h-6 w-6 text-muted-foreground`} />
@@ -731,6 +743,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                         size="lg"
                                         onClick={() => setPrivacy('public')}
                                         className={`w-xs ${privacy === 'public' ? 'border-l-4 border-l-primary' : ''} focus-ring-none rounded-sm flex justify-start items-center px-2 py-6`}
+                                        data-testid="project-privacy-public-button"
                                     >
                                         <div className={`h-6 w-6 rounded-full flex items-center justify-center`}>
                                             <Users2 className={`h-6 w-6 text-muted-foreground`} />
@@ -773,6 +786,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                             className="w-full rounded-sm flex justify-between items-center px-2"
                                             onClick={() => setPortfolioDropdownOpen((prev) => !prev)}
                                             type="button"
+                                            data-testid="project-portfolios-dropdown-trigger"
                                         >
                                             <span className="text-muted-foreground">
                                                 {linkedPortfolios.length > 0
@@ -799,6 +813,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                                                     checked={isSelected}
                                                                     onChange={() => toggleLinkedPortfolio(portfolio.id)}
                                                                     className="h-4 w-4 accent-primary rounded"
+                                                                    data-testid={`project-portfolio-checkbox-${portfolio.id}`}
                                                                 />
                                                                 <div
                                                                     className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
@@ -981,6 +996,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                 variant="outline"
                                 onClick={handleBack}
                                 className="min-w-40 text-muted-foreground"
+                                data-testid="project-cancel-button"
                             >
                                 Cancel
                             </Button>
@@ -988,6 +1004,7 @@ export const CreateProject = ({ teamId, portfolioId }: CreateProjectProps = {}) 
                                 onClick={handleCreateProject}
                                 disabled={!isFormValid || loading}
                                 className="min-w-40 font-inter text-[14px] font-medium bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-testid="project-submit-button"
                             >
                                 {loading ? (
                                     <span className="flex items-center gap-2">

@@ -218,7 +218,7 @@ const UserSettings: React.FC<{
     }
 
     return (
-        <div className="w-[230px] bg-white dark:bg-neutral-900 rounded-xl shadow-xl overflow-hidden border-b-4 border-[#001F3F] dark:border-neutral-800 transition-colors duration-200">
+        <div className="w-[230px] bg-white dark:bg-neutral-900 rounded-xl shadow-xl overflow-hidden border-b-4 border-[#001F3F] dark:border-neutral-800 transition-colors duration-200" data-testid="user-settings-container">
 
             {/* Header Section -  Big Content */}
             <div className="px-2 py-1.5 bg-white dark:bg-neutral-900 transition-colors duration-200">
@@ -236,7 +236,7 @@ const UserSettings: React.FC<{
                             </div>
 
                             <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-sm text-[#001F3F] dark:text-neutral-100 truncate mb-0.5">
+                                <h3 className="font-bold text-sm text-[#001F3F] dark:text-neutral-100 truncate mb-0.5" data-testid="user-settings-username">
                                     {userName}
                                 </h3>
                                 <StatusDropdown />
@@ -257,6 +257,7 @@ const UserSettings: React.FC<{
                             <PopoverTrigger asChild>
                                 <div
                                     className="flex items-center justify-between px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer transition-colors"
+                                    data-testid="usersettings-theme-trigger"
                                 >
                                     <div className="flex items-center gap-2">
                                         <span className="text-gray-700 dark:text-neutral-400">{item.icon}</span>
@@ -272,7 +273,9 @@ const UserSettings: React.FC<{
                             <PopoverContent
                                 align="end"
                                 side="bottom"
-                                className="w-67 p-3 sm:p-2 border-0 border-b-4 border-[#001F3F] rounded-xl shadow-md bg-white dark:bg-neutral-900 transition-all"         >
+                                className="w-67 p-3 sm:p-2 border-0 border-b-4 border-[#001F3F] rounded-xl shadow-md bg-white dark:bg-neutral-900 transition-all"
+                                data-testid="usersettings-theme-popover"
+                            >
 
                                 <RadioGroup
                                     value={theme}
@@ -283,6 +286,7 @@ const UserSettings: React.FC<{
                                         <div
                                             key={value}
                                             className="flex flex-col items-center justify-center space-y-1 group"
+                                            data-testid={`theme-option-${value}`}
                                         >
                                             <Label
                                                 htmlFor={value}
@@ -312,6 +316,7 @@ const UserSettings: React.FC<{
                             key={item.label}
                             onClick={() => handleNavigation(item.path, item.onClick)}
                             className="flex items-center justify-between px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer transition-colors"
+                            data-testid={`usersettings-item-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                         >
                             <div className="flex items-center gap-2">
                                 <span className="text-gray-700 dark:text-neutral-400">{item.icon}</span>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useEffect, useState, useMemo } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { Search, ChevronDown, ChevronLeft } from 'lucide-react'
+import { Search, ChevronDown, ChevronLeft, Loader2 } from 'lucide-react'
 import { useProjectsStore } from '@/stores/projects-store'
 import { useTasksStore } from '@/stores/tasks-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
@@ -28,11 +28,12 @@ export default function LinkCycleTasksDialog({
   onCreateNewTaskClick,
 }: Props) {
   const { projects, getTaskStatusConfigs } = useProjectsStore()
-  const { tasks, subtasks, updateTask, updateSubtask, fetchTasks } = useTasksStore()
+  const { tasks, subtasks, assignTasksToCycle, fetchTasks } = useTasksStore()
   const { workspaceMembers } = useWorkspaceStore()
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [query, setQuery] = useState('')
   const [collapsedParentIds, setCollapsedParentIds] = useState<Set<string>>(new Set())
+  const [isLinking, setIsLinking] = useState(false)
 
   const project = projects.find((p) => p.id === projectId)
   const projectSlug = project?.slug || 'TASK'
@@ -62,7 +63,8 @@ export default function LinkCycleTasksDialog({
     if (subtask) {
       const parentId = subtask.parentTaskId
       const parent = tasks.find((t) => t.id === parentId)
-      const isParentInActiveCycle = parent ? (parent.cycleId === cycleId || parent.cycle?.id === cycleId) : false
+      // Parent already has a cycle → treat it as unavailable to re-link
+      const isParentInActiveCycle = parent ? !!parent.cycleId : false
 
       setSelectedIds((prev) => {
         const next = new Set(prev)
@@ -107,9 +109,9 @@ export default function LinkCycleTasksDialog({
   const availableTasks = useMemo(() => {
     const list: (Task | Subtask)[] = []
     
-    // Filter available root tasks & subtasks
-    const rootTasks = tasks.filter((t) => t.projectId === projectId && t.cycleId !== cycleId && t.cycle?.id !== cycleId)
-    const subTasks = subtasks.filter((st) => st.projectId === projectId && st.cycleId !== cycleId && st.cycle?.id !== cycleId)
+    // Only show tasks that have NO cycle assigned — a task can only belong to one cycle
+    const rootTasks = tasks.filter((t) => t.projectId === projectId && !t.cycleId)
+    const subTasks = subtasks.filter((st) => st.projectId === projectId && !st.cycleId)
 
     // Helper to check match
     const matchesQuery = (item: Task | Subtask) => {
@@ -194,20 +196,15 @@ export default function LinkCycleTasksDialog({
   }, [availableTasks, collapsedParentIds])
 
   const handleLinkTasks = async () => {
+    if (selectedIds.size === 0 || isLinking) return;
+    setIsLinking(true);
     try {
-      await Promise.all(
-        Array.from(selectedIds).map((id) => {
-          const isSubtask = subtasks.some((st) => st.id === id)
-          if (isSubtask) {
-            return updateSubtask(id, { cycleId })
-          } else {
-            return updateTask(id, { cycleId })
-          }
-        })
-      )
+      await assignTasksToCycle(projectId, cycleId, Array.from(selectedIds));
       onClose()
     } catch (err) {
-      console.error("Failed to link tasks to cycle", err)
+      console.error('Failed to link tasks to cycle', err)
+    } finally {
+      setIsLinking(false);
     }
   }
 
@@ -229,6 +226,7 @@ export default function LinkCycleTasksDialog({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pr-10 placeholder:text-muted-foreground text-foreground w-full border border-border rounded-md h-9 text-xs bg-card"
+              data-testid="link-cycle-tasks-search-input"
             />
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
               <Search className="w-4 h-4 text-muted-foreground" />
@@ -277,6 +275,7 @@ export default function LinkCycleTasksDialog({
                               toggleCollapse(task.id)
                             }}
                             className="hover:bg-muted rounded p-0.5 text-muted-foreground flex items-center justify-center w-4 h-4"
+                            data-testid={`link-cycle-tasks-collapse-btn-${task.id}`}
                           >
                             {collapsedParentIds.has(task.id) ? (
                               <ChevronLeft className="w-3 h-3" />
@@ -290,6 +289,7 @@ export default function LinkCycleTasksDialog({
                         <Checkbox
                           checked={selectedIds.has(task.id)}
                           onCheckedChange={() => toggleSelect(task.id)}
+                          data-testid={`link-cycle-tasks-checkbox-${task.id}`}
                         />
                       </div>
                       <div className="font-semibold text-muted-foreground">
@@ -332,8 +332,9 @@ export default function LinkCycleTasksDialog({
         <div className="flex justify-between pt-4">
           <Button
             variant="outline"
-            className="border-input text-muted-foreground w-40 h-9 text-xs hover:bg-[#001F3F] hover:text-white"
+            className="border-input text-muted-foreground w-40 h-9 text-xs"
             onClick={onCreateNewTaskClick}
+            data-testid="link-cycle-tasks-create-btn"
           >
             Create new task
           </Button>
@@ -343,15 +344,25 @@ export default function LinkCycleTasksDialog({
               variant="outline"
               className="h-9 text-xs"
               onClick={onClose}
+              data-testid="link-cycle-tasks-cancel-btn"
             >
               Cancel
             </Button>
             <Button
-              disabled={selectedIds.size === 0}
+              disabled={selectedIds.size === 0 || isLinking}
               onClick={handleLinkTasks}
-              className="bg-[#001F3F] text-white hover:bg-[#002B5C] h-9 text-xs"
+              variant="default"
+              className="h-9 text-xs"
+              data-testid="link-cycle-tasks-submit-btn"
             >
-              Add Selected Tasks ({selectedIds.size})
+              {isLinking ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Adding...
+                </span>
+              ) : (
+                <>Add Selected Tasks ({selectedIds.size})</>
+              )}
             </Button>
           </div>
         </div>

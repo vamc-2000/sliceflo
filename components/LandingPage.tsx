@@ -67,6 +67,7 @@ export function LandingPage({
                        transition-all duration-200 text-base sm:text-lg shadow-lg hover:shadow-xl 
                        transform hover:-translate-y-0.5"
               onClick={onButtonClick}
+              data-testid="landing-page-cta-btn"
             >
               {buttonText}
             </Button>

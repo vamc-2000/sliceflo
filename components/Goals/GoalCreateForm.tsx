@@ -70,6 +70,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
         visibility: "private",
         assignedTo: [],
         icon: null,
+        assignedTeams: [],
     });
 
     const [endDate, setEndDate] = useState<Date>();
@@ -143,12 +144,12 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                 setFormData(prev => ({
                     ...prev,
                     visibility: 'team',
+                    assignedTo: [teamId],
                     assignedTeams: [teamId]
                 }));
                 setSelectedTeams([teamId]);
                 const teamMemberIds = team.teamMembers?.map((m: any) => m.id) || [];
                 setSelectedMembers(teamMemberIds);
-                setFormData(prev => ({ ...prev, assignedTo: teamMemberIds }));
             }
         }
     }, [teamId, teams]);
@@ -210,6 +211,12 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                 owner: ownerName
             }));
 
+            if (cachedGoal.visibility === 'team') {
+                setSelectedMembers(cachedGoal.assignedTo || []);
+            } else if (cachedGoal.visibility === 'organization') {
+                setSelectedMembers(cachedGoal.assignedTo || []);
+            }
+
             if (cachedGoal.endDate) setEndDate(new Date(cachedGoal.endDate));
             return;
         }
@@ -226,10 +233,15 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                     endDate: goal.endDate || prev.endDate,
                     visibility: (goal.visibility as any) || prev.visibility,
                     assignedTo: goal.assignedTo || prev.assignedTo || [],
-                    assignedTeams: goal.assignedTeams || prev.assignedTeams || [],
-                    icon: goal.icon || prev.icon,
+                    assignedTeams: goal.assignedTeams || prev.assignedTeams || [], icon: goal.icon || prev.icon,
                     owner: ownerName
                 }));
+
+                if (goal.visibility === 'team') {
+                    setSelectedMembers(goal.assignedTo || []);
+                } else if (goal.visibility === 'organization') {
+                    setSelectedMembers(goal.assignedTo || []);
+                }
 
                 if (goal.endDate) setEndDate(new Date(goal.endDate));
             }
@@ -399,17 +411,22 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
 
         setSelectedTeams(newSelectedTeams);
         setFormData(prev => ({ ...prev, assignedTeams: newSelectedTeams }));
-
         const teamMemberIds = team.teamMembers?.map((m: any) => m.id) || [];
         if (checked) {
             const newSelectedMembers = Array.from(new Set([...selectedMembers, ...teamMemberIds]));
             setSelectedMembers(newSelectedMembers);
-            setFormData(prev => ({ ...prev, assignedTo: newSelectedMembers }));
+            setFormData(prev => ({
+                ...prev,
+                assignedTo: newSelectedTeams
+            }));
             setExpandedTeams(prev => ({ ...prev, [teamId]: true }));
         } else {
             const newSelectedMembers = selectedMembers.filter(id => !teamMemberIds.includes(id));
             setSelectedMembers(newSelectedMembers);
-            setFormData(prev => ({ ...prev, assignedTo: newSelectedMembers }));
+            setFormData(prev => ({
+                ...prev,
+                assignedTo: newSelectedTeams
+            }));
         }
     };
 
@@ -471,13 +488,14 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                 cleanedFormData.assignedTo = [userId];
                 cleanedFormData.assignedTeams = [];
             }
+
             else if (formData.visibility === 'team') {
                 cleanedFormData.assignedTeams = selectedTeams.filter(id => id);
-                const teamMembers = selectedMembers.filter((id: any) => id)
-                if (teamMembers.length === 0) {
-                    cleanedFormData.assignedTo = [userId];
+                const teamIds = selectedTeams.filter(id => id);
+                if (teamIds.length === 0) {
+                    cleanedFormData.assignedTo = teamId ? [teamId] : (formData.assignedTo?.filter((id: any) => id).length > 0 ? formData.assignedTo.filter((id: any) => id) : [userId]);
                 } else {
-                    cleanedFormData.assignedTo = teamMembers;
+                    cleanedFormData.assignedTo = teamIds;
                 }
             }
             else if (formData.visibility === 'organization') {
@@ -1069,14 +1087,18 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                                                                                         setFormData((prev: any) => ({
                                                                                                             ...prev,
                                                                                                             assignedTeams: [...(prev.assignedTeams ?? []), team.id],
+                                                                                                            assignedTo: Array.from(
+                                                                                                                new Set([...(prev.assignedTo ?? []), team.id])
+                                                                                                            ),
+                                                                                                        }));
+                                                                                                    } else {
+                                                                                                        setFormData((prev: any) => ({
+                                                                                                            ...prev,
+                                                                                                            assignedTo: Array.from(
+                                                                                                                new Set([...(prev.assignedTo ?? []), team.id])
+                                                                                                            ),
                                                                                                         }));
                                                                                                     }
-                                                                                                    setFormData((prev: any) => ({
-                                                                                                        ...prev,
-                                                                                                        assignedTo: Array.from(
-                                                                                                            new Set([...(prev.assignedTo ?? []), ...alreadySelected])
-                                                                                                        ),
-                                                                                                    }));
                                                                                                     toast("success", { title: "Success", description: `${alreadySelected.length} member(s) from "${team.name}" added` });
                                                                                                     setShowTeamPanel(false);
                                                                                                     setExpandedTeams({});

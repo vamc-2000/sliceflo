@@ -268,6 +268,7 @@ export const CustomKanbanCard = ({
                 e.stopPropagation();   // ✅ prevent bubbling to KanbanCard wrapper
                 if (!isEditingName) onClick?.();
             }}
+            data-testid={`kanban-card-${task.id}`}
             className={cn(
                 "group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow cursor-pointer",
                 isHoverPreview && "pointer-events-none hover:shadow-sm"
@@ -282,7 +283,7 @@ export const CustomKanbanCard = ({
                     {/* Avatar with dropdown */}
                     <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
                         <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")}>
+                            <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")} data-testid={`kanban-card-assignee-trigger-${task.id}`}>
                                 {showAvatar && (
                                     assignedMember ? (
                                         <Avatar className="h-6 w-6">
@@ -328,6 +329,7 @@ export const CustomKanbanCard = ({
                     <Badge
                         variant="secondary"
                         className="text-xs px-2 py-0.5 rounded-sm"
+                        data-testid={`kanban-card-id-badge-${task.id}`}
                         /* style={{
                             backgroundColor: `${statusColor}20`,
                             color: statusColor
@@ -349,7 +351,7 @@ export const CustomKanbanCard = ({
                     {/* Priority with dropdown */}
                     <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                         <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")}>
+                            <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")} data-testid={`kanban-card-priority-trigger-${task.id}`}>
                                 {showPriority && priorityOption ? (
                                     <Badge
                                         variant="secondary"
@@ -479,6 +481,7 @@ export const CustomKanbanCard = ({
                     }}
                     onClick={(e) => e.stopPropagation()}
                     className="text-sm mb-3 border-primary"
+                    data-testid={`kanban-card-name-input-${task.id}`}
                 />
             ) : (
                 <h4
@@ -488,6 +491,7 @@ export const CustomKanbanCard = ({
                         isHoverPreview && "pointer-events-none hover:text-foreground"
                     )}
                     onClick={!isHoverPreview ? handleStartEditName : undefined}
+                    data-testid={`kanban-card-name-text-${task.id}`}
                 >
                     {wrapText && task.name.length > 25
                         ? task.name.substring(0, 25) + "..."
@@ -505,7 +509,7 @@ export const CustomKanbanCard = ({
                 {/* Start Date with picker */}
                 <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
                     <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")}>
+                        <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")} data-testid={`kanban-card-startdate-trigger-${task.id}`}>
                             {showDates && startDateStr ? (
                                 <Badge
                                     variant="secondary"
@@ -536,7 +540,7 @@ export const CustomKanbanCard = ({
                 {/* End Date with picker */}
                 <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
                     <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")}>
+                        <div className={cn("cursor-pointer", isHoverPreview && "pointer-events-none")} data-testid={`kanban-card-enddate-trigger-${task.id}`}>
                             {showDates && endDateStr ? (
                                 <Badge
                                     variant="secondary"
@@ -574,6 +578,7 @@ export const CustomKanbanCard = ({
                             size="sm"
                             onClick={handleAddSubtaskClick}
                             disabled={isAddingSubtask}
+                            data-testid={`kanban-card-add-subtask-btn-${task.id}`}
                             className="h-6 justify-start gap-1 px-2 font-normal"
                         >
                             <Network className="h-4 w-4 rotate-270" />
@@ -588,6 +593,7 @@ export const CustomKanbanCard = ({
                             size="sm"
                             className="flex items-center gap-1.5 rounded-md bg-[#FF9500]/10"
                             onClick={handleToggleSubtasks}
+                            data-testid={`kanban-card-subtask-toggle-${task.id}`}
                         >
                             <div className="flex items-center justify-center h-5 w-5 rounded-full bg-brand-orange text-xs font-medium text-foreground">
                                 {subtasks.length}

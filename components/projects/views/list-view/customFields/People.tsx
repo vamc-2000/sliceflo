@@ -101,7 +101,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
                 {/* Field Name */}
                 <div className="space-y-2">
                     <label className="text-xs font-medium block">Field name</label>
-                    <Input
+                    <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
                         value={fieldName}
                         onChange={(e) => setFieldName(e.target.value)}
@@ -113,12 +113,12 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
                 {/* Description */}
                 <div className="space-y-2">
                     <label className="text-xs font-medium block">Description</label>
-                    <textarea
+                    <textarea data-testid="custom-field-description-input"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Add a description...."
                         rows={2}
-                        className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                 </div>
 
@@ -136,7 +136,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
 
                     {/* RADIO: Show members */}
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input
+                        <input data-testid="custom-field-people-source-members"
                             type="radio"
                             name="people-source"
                             checked={memberSource === 'showMembers'}
@@ -153,7 +153,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
 
                     {/* RADIO: Show guests */}
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input
+                        <input data-testid="custom-field-people-source-guests"
                             type="radio"
                             name="people-source"
                             checked={memberSource === 'showGuests'}
@@ -170,7 +170,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
 
                     {/* RADIO: Include members from team */}
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input
+                        <input data-testid="custom-field-people-source-team"
                             type="radio"
                             name="people-source"
                             checked={memberSource === 'includeFromTeam'}
@@ -197,7 +197,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
                                 <div className="ml-6 space-y-2">
                                     {teams.map((team) => (
                                         <label key={team.id} className="flex items-center gap-2 cursor-pointer">
-                                            <input
+                                            <input data-testid={`custom-field-people-team-option-${team.id}`}
                                                 type="radio"
                                                 name="team-select"
                                                 value={team.id}
@@ -228,7 +228,7 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
                 </div>
 
                 {/* More Settings */}
-                <button
+                <button data-testid="custom-field-more-settings-btn"
                     type="button"
                     onClick={() => setShowMoreSettings(!showMoreSettings)}
                     className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -247,10 +247,10 @@ export function PeopleField({ onSubmit, onCancel, initialData }: PeopleFieldProp
 
             {/* Footer */}
             <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-                <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
+                <Button data-testid="custom-field-cancel-btn" type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
                     Cancel
                 </Button>
-                <Button
+                <Button data-testid="custom-field-submit-btn"
                     type="button"
                     onClick={handleSubmit}
                     disabled={(

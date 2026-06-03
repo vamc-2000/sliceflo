@@ -71,6 +71,7 @@ export default function LinkProjectPortfolioDialog({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pr-10 placeholder:text-muted-foreground text-foreground w-full border border-border rounded-md h-9 text-xs bg-card"
+              data-testid="link-portfolio-search-input"
             />
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
               <Search className="w-4 h-4 text-muted-foreground" />
@@ -102,6 +103,7 @@ export default function LinkProjectPortfolioDialog({
                       <Checkbox
                         checked={selectedIds.has(portfolio.id!)}
                         onCheckedChange={() => toggleSelect(portfolio.id!)}
+                        data-testid={`link-portfolio-checkbox-${portfolio.id}`}
                       />
                     </div>
                     <div className="pr-2 h-full flex items-center text-xs">
@@ -135,6 +137,7 @@ export default function LinkProjectPortfolioDialog({
             variant="outline"
             className='border-input text-muted-foreground w-40 h-9 text-xs hover:bg-primary hover:text-primary-foreground'
             onClick={() => router.push(`/project/${projectId}/create-portfolio`)}
+            data-testid="link-portfolio-create-btn"
           >
             Create new portfolio
           </Button>
@@ -146,6 +149,7 @@ export default function LinkProjectPortfolioDialog({
               onClose()
             }}
             className="bg-primary text-primary-foreground w-40 h-9 text-xs"
+            data-testid="link-portfolio-assign-btn"
           >
             Assign portfolio
           </Button>

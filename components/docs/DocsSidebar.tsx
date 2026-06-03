@@ -1016,15 +1016,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
     //       )}
     //     </div>
 
-    //     {hasChildren && item.isOpen && (
-    //       <div className="overflow-hidden transition-all duration-300 ease-in-out">
-    //         {item.children!.map((child) => renderDocItem(child, level + 1))}
-    //       </div>
-    //     )}
-    //   </div>
-    // );
-  
-     return (
+    return (
       <div className="relative" key={item.id}>
         <div
           className={`
@@ -1046,6 +1038,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                 toggleFolder(item.id);
               }}
               className="w-4 h-4 p-0 flex items-center justify-center flex-shrink-0 hover:bg-transparent"
+              data-testid={`doc-sidebar-toggle-${item.id}`}
             >
               <ChevronRight
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${item.isOpen ? "rotate-90" : ""
@@ -1053,7 +1046,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
               />
             </Button>
           ) : (
-            <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+            <div className="w-4 h-4 flex items-center justify-center flex-shrink-0" data-testid={`doc-sidebar-file-icon-${item.id}`}>
               <FileText className={`w-3.5 h-3.5 ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`} />
             </div>
           )}
@@ -1068,6 +1061,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
               onKeyDown={handleKeyDown}
               className="text-sm flex-1 h-7 px-2 py-1 border-border focus-visible:ring-primary focus-visible:border-primary text-foreground bg-background"
               onClick={(e) => e.stopPropagation()}
+              data-testid={`doc-sidebar-input-${item.id}`}
             />
           ) : (
             <div
@@ -1076,6 +1070,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                 selectDoc(item.id);
               }}
               className="text-sm flex-1 truncate font-medium cursor-pointer"
+              data-testid={`doc-sidebar-item-${item.id}`}
             >
               {item.title}
             </div>
@@ -1096,6 +1091,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                   : "hover:bg-primary/10"
                   }`}
                 title="Add subpage"
+                data-testid={`doc-sidebar-add-subpage-${item.id}`}
               >
                 <Plus
                   className={`w-3.5 h-3.5 transition-colors ${isActive
@@ -1116,6 +1112,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                       }`}
                     title="More options"
                     onClick={(e) => e.stopPropagation()}
+                    data-testid={`doc-sidebar-options-${item.id}`}
                   >
                     <MoreHorizontal
                       className={`w-3.5 h-3.5 transition-colors ${isActive
@@ -1132,23 +1129,23 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onClick={() => handleMenuAction("rename", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("rename", item.id, item.title)} data-testid={`doc-sidebar-action-rename-${item.id}`}>
                     <Edit className="w-4 h-4 mr-2" />
                     <span>Rename</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => handleMenuAction("duplicate", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("duplicate", item.id, item.title)} data-testid={`doc-sidebar-action-duplicate-${item.id}`}>
                     <Copy className="w-4 h-4 mr-2" />
                     <span>Duplicate</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => handleMenuAction("favorite", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("favorite", item.id, item.title)} data-testid={`doc-sidebar-action-favorite-${item.id}`}>
                     <Star className={`w-4 h-4 mr-2 ${documents.get(item.id)?.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
                     <span>{documents.get(item.id)?.isFavorite ? "Unfavourite" : "Mark as Favourite"}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger data-testid={`doc-sidebar-action-link-submenu-${item.id}`}>
                       <Link className="w-4 h-4 mr-2" />
                       <span>Link Page to</span>
                     </DropdownMenuSubTrigger>
@@ -1168,7 +1165,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                             <div className="p-2 space-y-1">
                               <div className="flex items-center justify-between px-2 py-1 mb-1">
                                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-tight">Linked Items</span>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); setShowLinkTabs(true); }}>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); setShowLinkTabs(true); }} data-testid={`doc-sidebar-add-link-btn-${item.id}`}>
                                   <Plus className="w-4 h-4" />
                                 </Button>
                               </div>
@@ -1231,6 +1228,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                   variant="ghost"
                                   className="flex items-center justify-start gap-2 py-1 px-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded w-full text-left h-auto font-normal"
                                   onClick={(e) => { e.stopPropagation(); setShowLinkTabs(true); }}
+                                  data-testid={`doc-sidebar-add-linked-items-inline-${item.id}`}
                                 >
                                   <Plus className="w-3 h-3" />
                                   <span className="text-xs">Add Linked Items</span>
@@ -1249,6 +1247,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                 variant="ghost"
                                 onClick={() => setActiveTab("project")}
                                 className={`px-2 py-2 text-xs font-medium transition-colors rounded-none h-auto ${activeTab === "project" ? "text-foreground border-b-2 border-primary -mb-[2px]" : "text-muted-foreground hover:text-foreground"}`}
+                                data-testid={`doc-sidebar-link-tab-project-${item.id}`}
                               >
                                 Project
                               </Button>
@@ -1256,20 +1255,15 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                 variant="ghost"
                                 onClick={() => setActiveTab("portfolio")}
                                 className={`px-2 py-2 text-xs font-medium transition-colors rounded-none h-auto ${activeTab === "portfolio" ? "text-foreground border-b-2 border-primary -mb-[2px]" : "text-muted-foreground hover:text-foreground"}`}
+                                data-testid={`doc-sidebar-link-tab-portfolio-${item.id}`}
                               >
                                 Portfolio
                               </Button>
-                              {/* <Button
-                                variant="ghost"
-                                onClick={() => setActiveTab("team")}
-                                className={`px-2 py-2 text-xs font-medium transition-colors rounded-none h-auto ${activeTab === "team" ? "text-foreground border-b-2 border-primary -mb-[2px]" : "text-muted-foreground hover:text-foreground"}`}
-                              >
-                                Team
-                              </Button> */}
                               <Button
                                 variant="ghost"
                                 onClick={() => setActiveTab("document")}
                                 className={`px-2 py-2 text-xs font-medium transition-colors rounded-none h-auto ${activeTab === "document" ? "text-foreground border-b-2 border-primary -mb-[2px]" : "text-muted-foreground hover:text-foreground"}`}
+                                data-testid={`doc-sidebar-link-tab-document-${item.id}`}
                               >
                                 Documents
                               </Button>
@@ -1338,7 +1332,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                           </div>
                                           <span className="text-xs text-foreground truncate">{p.name}</span>
                                         </div>
-                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-project-${p.id}`} />
                                       </div>
                                     );
                                   })}
@@ -1352,7 +1346,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                     return (
                                       <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(item.id, p.id!) : handleAddPortfolio(item.id, p.id!)}>
                                         <span className="text-xs text-foreground truncate">{p.name}</span>
-                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-portfolio-${p.id}`} />
                                       </div>
                                     );
                                   })}
@@ -1366,7 +1360,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                     return (
                                       <div key={t.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemoveTeam(item.id, t.id!) : handleAddTeam(item.id, t.id!)}>
                                         <span className="text-xs text-foreground truncate">{t.name}</span>
-                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-team-${t.id}`} />
                                       </div>
                                     );
                                   })}
@@ -1380,7 +1374,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                     return (
                                       <div key={d.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemoveDocument(item.id, d.id) : handleAddDocument(item.id, d.id)}>
                                         <span className="text-xs text-foreground truncate">{d.title}</span>
-                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                                        <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-document-${d.id}`} />
                                       </div>
                                     );
                                   })}
@@ -1394,7 +1388,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                   </DropdownMenuSub>
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onClick={() => handleMenuAction("new-tab", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("new-tab", item.id, item.title)} data-testid={`doc-sidebar-action-new-tab-${item.id}`}>
                     <ExternalLink className="w-4 h-4 mr-2" />
                     <span>Open in new tab</span>
                   </DropdownMenuItem>
@@ -1410,36 +1404,27 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                       }}
                       onClick={(e) => e.stopPropagation()}
                       className="ml-auto data-[state=checked]:bg-primary"
+                      data-testid={`doc-sidebar-action-lock-switch-${item.id}`}
                     />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
-
-
-
-
-
-
-
-                  <DropdownMenuItem onClick={() => handleMenuAction("template", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("template", item.id, item.title)} data-testid={`doc-sidebar-action-template-${item.id}`}>
                     <FileTemplate className="w-4 h-4 mr-2" />
                     <span>Save as Template</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => handleMenuAction("apply-template", item.id, item.title)}>
+                  <DropdownMenuItem onClick={() => handleMenuAction("apply-template", item.id, item.title)} data-testid={`doc-sidebar-action-apply-template-${item.id}`}>
                     <Zap className="w-4 h-4 mr-2" />
                     <span>Apply Template</span>
                   </DropdownMenuItem>
-
-
-
-
 
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
                     onClick={() => handleMenuAction("delete", item.id, item.title)}
                     className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                    data-testid={`doc-sidebar-action-delete-${item.id}`}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     <span>Delete</span>
@@ -1651,7 +1636,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
       <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 overflow-hidden flex-1">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild data-testid="doc-sidebar-header-trigger">
               {/* <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded transition-colors group">
                 <img
                   src="/images/DocsIcon.svg"
@@ -1678,7 +1663,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                 )}
               </div> */}
               <div className="flex items-center gap-2 p-1">
-                <span className="text-sm font-semibold text-foreground">Pages</span>
+                <span className="text-sm font-semibold text-foreground" data-testid="doc-sidebar-header">Pages</span>
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
@@ -1686,15 +1671,15 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                 <Edit className="w-4 h-4 mr-2" />
                 Rename
               </DropdownMenuItem> */}
-              <DropdownMenuItem onClick={() => rootId && triggerTitleEdit(rootId)}>
+              <DropdownMenuItem onClick={() => rootId && triggerTitleEdit(rootId)} data-testid="doc-sidebar-header-rename">
                 <Edit className="w-4 h-4 mr-2" />
                 Rename
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => rootId && handleMenuAction("duplicate", rootId, rootDoc?.title || "")}>
+              <DropdownMenuItem onClick={() => rootId && handleMenuAction("duplicate", rootId, rootDoc?.title || "")} data-testid="doc-sidebar-header-duplicate">
                 <Copy className="w-4 h-4 mr-2" />
                 Duplicate
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => rootId && handleMenuAction("delete", rootId, rootDoc?.title || "")}>
+              <DropdownMenuItem onClick={() => rootId && handleMenuAction("delete", rootId, rootDoc?.title || "")} data-testid="doc-sidebar-header-delete">
                 <Trash2 className="w-4 h-4 mr-2 text-red-500" />
                 <span className="text-red-500">Delete</span>
               </DropdownMenuItem>
@@ -1731,6 +1716,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
             onClick={onCollapse}
             className="h-8 w-8 text-muted-foreground hover:bg-muted"
             title="Collapse sidebar"
+            data-testid="doc-sidebar-collapse-btn"
           >
             <PanelLeftClose className="w-4 h-4" />
           </Button>
@@ -1747,6 +1733,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
             variant="ghost"
             onClick={addNewPage}
             className="w-full justify-start gap-2 px-4 py-2.5 mt-2 text-sm text-muted-foreground hover:bg-muted font-medium h-auto relative before:absolute before:top-0 before:left-4 before:right-4 before:h-px before:bg-gradient-to-r before:from-transparent before:via-border before:to-transparent"
+            data-testid="doc-sidebar-add-page-btn"
           >
             <Plus className="w-4 h-4" />
             <span>Add page</span>

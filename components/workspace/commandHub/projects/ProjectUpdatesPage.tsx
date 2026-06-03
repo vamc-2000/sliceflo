@@ -46,7 +46,6 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
         await updateProjectStatusConfig(projectId, editingStatusId, {
           label: data.name,
           color: data.color,
-          backgroundColor: data.backgroundColor,
           value: data.name.toLowerCase().replace(/\s+/g, "-"),
         });
         toast.success("Status updated");
@@ -54,7 +53,6 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
         await addProjectStatusConfig(projectId, {
           label: data.name,
           color: data.color,
-          backgroundColor: data.backgroundColor,
           value: data.name.toLowerCase().replace(/\s+/g, "-"),
         });
         toast.success("Status created");
@@ -116,7 +114,7 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
           <div
             key={status._id}
             className="flex items-center justify-between p-3 rounded-md hover:shadow-sm transition-shadow"
-            style={{ backgroundColor: status.backgroundColor }}
+            style={{ backgroundColor: status.color + '15' }}
           >
             <div className="flex items-center gap-2.5">
               <div className="w-4 h-4 rounded-full" style={{ backgroundColor: status.color }} />
@@ -151,7 +149,11 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
         onSave={handleSave}
         editingStatus={
           editingStatus
-            ? { name: editingStatus.label, color: editingStatus.color, backgroundColor: editingStatus.backgroundColor }
+            ? {
+                name: editingStatus.label,
+                color: editingStatus.color,
+                backgroundColor: editingStatus.color + '15'
+              }
             : null
         }
       />

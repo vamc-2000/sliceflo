@@ -200,11 +200,13 @@ export const createGoal = async (
       visibility: formData.visibility as GoalVisibility,
       color: formData.color,
       workspaceId: workspaceId, 
+
     };
 
 
     const cleanedAssignedTo = (formData.assignedTo || []).filter(id => id && id.trim() !== '');
     payload.assignedTo = cleanedAssignedTo;
+
 
     if (formData.startDate) {
       payload.startDate = new Date(formData.startDate).getTime();
@@ -212,7 +214,7 @@ export const createGoal = async (
     if (formData.endDate) {
       payload.endDate = new Date(formData.endDate).getTime();
     }
-    if (formData.assignedTeams && formData.assignedTeams.length > 0) {
+   if (formData.assignedTeams && formData.assignedTeams.length > 0) {
       payload.assignedTeams = formData.assignedTeams;
     }
       console.log('createGoal payload:', payload) 
@@ -303,7 +305,7 @@ export const updateGoal = async (
 
     if (formData.visibility !== undefined) payload.visibility = formData.visibility as GoalVisibility;
     if (formData.assignedTo?.length) payload.assignedTo = formData.assignedTo; 
-    if (formData.assignedTeams && formData.assignedTeams.length > 0) {
+   if (formData.assignedTeams && formData.assignedTeams.length > 0) {
       payload.assignedTeams = formData.assignedTeams;
     }
     if (formData.endDate !== undefined) {

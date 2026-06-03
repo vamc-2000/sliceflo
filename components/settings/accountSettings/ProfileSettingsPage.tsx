@@ -261,6 +261,7 @@ const ProfileSettingsPage = () => {
         }
         isActive={activeSection === "personal"}
         onToggle={() => setActiveSection((prev) => (prev === "personal" ? null : "personal"))}
+        data-testid="profile-personal-card"
       >
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Avatar Section */}
@@ -291,6 +292,7 @@ const ProfileSettingsPage = () => {
                   onClick={handleDeletePicture}
                   disabled={isUploading}
                   className="absolute bottom-0 left-0 w-6 h-6 rounded-full shadow flex items-center justify-center bg-card hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="profile-avatar-delete-btn"
                 >
                   <Trash size={12} className="text-red-600" />
                 </button>
@@ -302,6 +304,7 @@ const ProfileSettingsPage = () => {
                   onClick={() => setIsModalOpen(true)}
                   className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isUploading}
+                  data-testid="profile-avatar-upload-btn"
                 >
                   +
                 </button>
@@ -332,6 +335,7 @@ const ProfileSettingsPage = () => {
                 value={localProfile.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 className="md:col-span-2"
+                data-testid="profile-name-input"
               />
             </div>
 
@@ -345,6 +349,7 @@ const ProfileSettingsPage = () => {
                 value={localProfile.email}
                 disabled
                 className="md:col-span-2 bg-muted cursor-not-allowed border-none"
+                data-testid="profile-email-input"
               />
             </div>
 
@@ -360,6 +365,7 @@ const ProfileSettingsPage = () => {
                   value={localProfile.workPhone}
                   onChange={(e) => handleInputChange("workPhone", e.target.value)}
                   className={phoneError.workPhone ? "border-red-500" : ""}
+                  data-testid="profile-work-phone-input"
                 />
                 {phoneError.workPhone && (
                   <p className="text-xs text-red-500 mt-1">{phoneError.workPhone}</p>
@@ -379,6 +385,7 @@ const ProfileSettingsPage = () => {
                   value={localProfile.personalPhone}
                   onChange={(e) => handleInputChange("personalPhone", e.target.value)}
                   className={phoneError.personalPhone ? "border-red-500" : ""}
+                  data-testid="profile-personal-phone-input"
                 />
                 {phoneError.personalPhone && (
                   <p className="text-xs text-red-500 mt-1">{phoneError.personalPhone}</p>
@@ -398,6 +405,7 @@ const ProfileSettingsPage = () => {
                 value={localProfile.about}
                 onChange={(e) => handleInputChange("about", e.target.value)}
                 className="md:col-span-2 resize-none"
+                data-testid="profile-about-input"
               />
             </div>
           </div>
@@ -421,6 +429,7 @@ const ProfileSettingsPage = () => {
         }
         isActive={activeSection === "job"}
         onToggle={() => setActiveSection((prev) => (prev === "job" ? null : "job"))}
+        data-testid="profile-job-card"
       >
         <div className="space-y-4">
 
@@ -437,12 +446,12 @@ const ProfileSettingsPage = () => {
                 value={localProfile.industry}
                 onValueChange={(value) => handleInputChange("industry", value)}
               >
-                <SelectTrigger className="w-full font-inter text-[14px] font-normal leading-5">
+                <SelectTrigger className="w-full font-inter text-[14px] font-normal leading-5" data-testid="profile-industry-select-trigger">
                   <SelectValue placeholder="Choose an option" />
                 </SelectTrigger>
                 <SelectContent>
                   {industryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value} data-testid={`profile-industry-option-${option.value}`}>
                       {option.label}
                     </SelectItem>
                   ))}
@@ -464,12 +473,12 @@ const ProfileSettingsPage = () => {
                 value={localProfile.department}
                 onValueChange={(value) => handleInputChange("department", value)}
               >
-                <SelectTrigger className="w-full font-inter text-[14px] font-normal leading-5">
+                <SelectTrigger className="w-full font-inter text-[14px] font-normal leading-5" data-testid="profile-department-select-trigger">
                   <SelectValue placeholder="Choose an option" />
                 </SelectTrigger>
                 <SelectContent>
                   {departmentOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value} data-testid={`profile-department-option-${option.value}`}>
                       {option.label}
                     </SelectItem>
                   ))}
@@ -492,6 +501,7 @@ const ProfileSettingsPage = () => {
               value={localProfile.jobRole}
               onChange={(e) => handleInputChange("jobRole", e.target.value)}
               className="md:col-span-2 font-inter text-[16px] font-normal leading-5"
+              data-testid="profile-job-role-input"
             />
           </div>
 
@@ -503,7 +513,7 @@ const ProfileSettingsPage = () => {
             <div className="md:col-span-2 space-y-3">
               <div className="flex flex-wrap gap-2 p-3 border rounded-md min-h-[42px] bg-card">
                 {selectedSkills.map((skill, idx) => (
-                  <Badge key={idx} variant="default" className="bg-primary text-white font-inter text-[12px]">
+                  <Badge key={idx} variant="default" className="bg-primary text-white font-inter text-[12px]" data-testid={`profile-skill-badge-${skill}`}>
                     {skill}
                     <button
                       onClick={() => {
@@ -512,6 +522,7 @@ const ProfileSettingsPage = () => {
                         handleInputChange("skills", updated);
                       }}
                       className="ml-1 hover:text-gray-300"
+                      data-testid={`profile-skill-badge-remove-${skill}`}
                     >
                       ×
                     </button>
@@ -539,6 +550,7 @@ const ProfileSettingsPage = () => {
                     }
                   }}
                   className="flex-1 outline-none text-sm min-w-[120px] font-inter"
+                  data-testid="profile-skills-text-input"
                 />
               </div>
 
@@ -560,6 +572,7 @@ const ProfileSettingsPage = () => {
                       }}
                       className={`font-inter text-[12px] font-medium leading-4 ${isSelected ? "bg-primary text-primary-foreground" : "text-foreground"
                         }`}
+                      data-testid={`profile-skill-option-${skill}`}
                     >
                       {skill}
                     </Button>
@@ -580,6 +593,7 @@ const ProfileSettingsPage = () => {
           disabled={isSaving || !hasChanges || !!phoneError.workPhone || !!phoneError.personalPhone}
           className="font-inter text-[14px] font-medium leading-5 px-8 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           style={{ letterSpacing: "0" }}
+          data-testid="profile-save-btn"
         >
           {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSaving ? "Saving.." : "Save"}

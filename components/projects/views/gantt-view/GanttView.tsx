@@ -1027,12 +1027,13 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                             <Input
                                 placeholder="Search"
                                 className="pl-2 pr-8 rounded text-xs"
+                                data-testid="gantt-search-input"
                             />
                             <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
                         </div>
                         <Popover open={isMembersOpen} onOpenChange={setIsMembersOpen}>
                             <PopoverTrigger asChild>
-                                <Button variant="secondary" size="sm" className="rounded cursor-pointer gap-2 text-xs">
+                                <Button variant="secondary" size="sm" className="rounded cursor-pointer gap-2 text-xs" data-testid="gantt-members-trigger">
                                     <Users className="h-4 w-4" />
                                     Members
                                     {projectMembers.length > 0 && <Badge variant="secondary" className="ml-1">{projectMembers.length}</Badge>}
@@ -1061,6 +1062,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                 size="sm"
                                 className={cn("rounded cursor-pointer text-xs", showSortOptions && "bg-primary text-primary-foreground hover:bg-primary")}
                                 onClick={() => setShowSortOptions(!showSortOptions)}
+                                data-testid="gantt-sort-filter-toggle"
                             >
                                 <SlidersVertical className="h-4 w-4" />
                             </Button>
@@ -1070,7 +1072,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                     {/* Sort Dropdown */}
                                     <DropdownMenu open={activeDropdown === 'sort'} onOpenChange={(open) => setActiveDropdown(open ? 'sort' : null)}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="gantt-sort-trigger">
                                                 <ArrowUpDown className="h-4 w-4" />
                                                 Sort
                                             </Button>
@@ -1137,7 +1139,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                             </div>
                                             {hasSelectedSortFields && (
                                                 <div className="px-4 py-2 border-t">
-                                                    <Button size="sm" variant="ghost" onClick={handleClearAllSort} className="justify-start bg-muted text-foreground hover:bg-primary hover:text-primary-foreground text-xs">
+                                                    <Button size="sm" variant="ghost" onClick={handleClearAllSort} className="justify-start bg-muted text-foreground hover:bg-primary hover:text-primary-foreground text-xs" data-testid="gantt-sort-clear-btn">
                                                         Clear all sort
                                                     </Button>
                                                 </div>
@@ -1148,7 +1150,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                     {/* Filter Dropdown */}
                                     <DropdownMenu open={activeDropdown === 'filter'} onOpenChange={(open) => setActiveDropdown(open ? 'filter' : null)}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="gantt-filter-trigger">
                                                 <Funnel className="h-4 w-4" />
                                                 Filter
                                                 {filterConfig.length > 0 && (
@@ -1310,6 +1312,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                         variant="outline"
                                                         className="w-full text-xs"
                                                         onClick={() => setFilterConfig([])}
+                                                        data-testid="gantt-filter-clear-btn"
                                                     >
                                                         Clear All Filters
                                                     </Button>
@@ -1327,7 +1330,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                     {/* Display Dropdown */}
                                     <DropdownMenu open={activeDropdown === 'display'} onOpenChange={(open) => setActiveDropdown(open ? 'display' : null)}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                                            <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="gantt-display-trigger">
                                                 <Monitor className="h-4 w-4" />
                                                 Display
                                             </Button>
@@ -1344,6 +1347,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, collapsedSubtasks: !!checked }))
                                                     }
+                                                    data-testid="gantt-display-collapsed-subtasks-switch"
                                                 />
                                             </div>
 
@@ -1358,6 +1362,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, closedTasks: !!checked }))
                                                     }
+                                                    data-testid="gantt-display-closed-tasks-switch"
                                                 />
                                             </div>
 
@@ -1372,6 +1377,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, wrapText: !!checked }))
                                                     }
+                                                    data-testid="gantt-display-wrap-text-switch"
                                                 />
                                             </div>
 
@@ -1386,6 +1392,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                     onCheckedChange={(checked) =>
                                                         setDisplayOptions(prev => ({ ...prev, subtaskParentId: !!checked }))
                                                     }
+                                                    data-testid="gantt-display-subtask-parent-id-switch"
                                                 />
                                             </div>
                                         </DropdownMenuContent>
@@ -1400,6 +1407,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         <div
                             onClick={() => setShowConnectors(prev => !prev)}
                             className="flex items-center gap-1.5 h-8 px-2 rounded border border-border bg-card hover:border-primary transition-colors duration-150 cursor-pointer select-none"
+                            data-testid="gantt-connectors-toggle"
                         >
                             <Cable className={`h-3.5 w-3.5 transition-colors duration-150 ${showConnectors ? 'text-primary' : 'text-muted-foreground'}`} />
                             <span className={`text-xs font-medium transition-colors duration-150 ${showConnectors ? 'text-primary' : 'text-muted-foreground'}`}>Connectors</span>
@@ -1412,18 +1420,18 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                             />
                         </div>
 
-                        <Button variant="secondary" size="sm" onClick={() => handleNavigate('today')} className="h-8 px-2 rounded text-xs font-medium">Today</Button>
+                        <Button variant="secondary" size="sm" onClick={() => handleNavigate('today')} className="h-8 px-2 rounded text-xs font-medium" data-testid="gantt-nav-today">Today</Button>
                         <div className="flex items-center gap-1">
-                            <Button onClick={() => handleNavigate('prev')} variant="ghost" size="icon" className="h-8 w-8"><ChevronLeft className="h-4 w-4" /></Button>
+                            <Button onClick={() => handleNavigate('prev')} variant="ghost" size="icon" className="h-8 w-8" data-testid="gantt-nav-prev"><ChevronLeft className="h-4 w-4" /></Button>
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Button variant="ghost" className="h-8 px-3 text-xs font-semibold hover:bg-muted flex items-center gap-1">{getDateLabel()}</Button>
+                                    <Button variant="ghost" className="h-8 px-3 text-xs font-semibold hover:bg-muted flex items-center gap-1" data-testid="gantt-nav-datepicker-btn">{getDateLabel()}</Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-3" align="center">
                                     <CustomGanttCalendarPicker selectedDate={currentDate} onDateSelect={(newDate) => setCurrentDate(newDate)} range={range} currentLabel={getDateLabel()} />
                                 </PopoverContent>
                             </Popover>
-                            <Button onClick={() => handleNavigate('next')} variant="ghost" size="icon" className="h-8 w-8"><ChevronRight className="h-4 w-4" /></Button>
+                            <Button onClick={() => handleNavigate('next')} variant="ghost" size="icon" className="h-8 w-8" data-testid="gantt-nav-next"><ChevronRight className="h-4 w-4" /></Button>
                         </div>
                     </div>
                 </div>
@@ -1512,6 +1520,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                 size="sm"
                                 onClick={() => setZoom(z => Math.min(200, z + 10))}
                                 disabled={zoom >= 200} className="h-9 w-9"
+                                data-testid="gantt-zoom-in-btn"
                             >
                                 <Plus className="h-4 w-4" />
                             </Button>
@@ -1522,6 +1531,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                 onClick={() => setZoom(z => Math.max(100, z - 10))}
                                 disabled={zoom <= 100}
                                 className="h-9 w-9"
+                                data-testid="gantt-zoom-out-btn"
                             >
                                 <Minus className="h-4 w-4" />
                             </Button>

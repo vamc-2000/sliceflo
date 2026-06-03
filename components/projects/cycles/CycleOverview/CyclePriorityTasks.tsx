@@ -21,10 +21,7 @@ export function CyclePriorityTasks({ isEmpty, projectId, tasks, cycleId }: Cycle
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
     const [quickTaskOpen, setQuickTaskOpen] = useState(false);
 
-    // Filter for Priority Tasks (e.g., non-low priority)
-    const priorityTasks = tasks.filter(t =>
-        t.priority?.toLowerCase() !== 'low'
-    );
+    const priorityTasks = tasks;
 
     const handleCreateTask = async (taskData: any) => {
         await addTask({
@@ -50,15 +47,17 @@ export function CyclePriorityTasks({ isEmpty, projectId, tasks, cycleId }: Cycle
     return (
         <div className="flex flex-col space-y-2">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">Priority Tasks</h3>
+                <h3 className="text-sm font-semibold text-foreground">Priority Tasks</h3>
                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
                         {priorityTasks.length} tasks
                     </span>
                     <Button
+                        variant="default"
                         size="sm"
-                        className="bg-[#001F3F] text-white hover:bg-[#002B5C] text-xs h-8 px-4 shadow-sm rounded-md"
+                        className="text-xs h-8 px-4 shadow-sm rounded-md"
                         onClick={() => setLinkDialogOpen(true)}
+                        data-testid="cycle-priority-add-existing-btn"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         <span>Add existing tasks</span>
@@ -67,18 +66,20 @@ export function CyclePriorityTasks({ isEmpty, projectId, tasks, cycleId }: Cycle
             </div>
 
             {isPriorityEmpty ? (
-                <div className="bg-[#F8F9FB] rounded-md p-6 flex flex-col min-h-[240px] border-b-4 border-gray-300 relative overflow-hidden">
+                <div className="bg-muted/40 rounded-md p-6 flex flex-col min-h-[240px] border-b-4 border-border relative overflow-hidden">
                     <div className="flex-1 flex flex-col items-center justify-center text-center">
-                        <div className="w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center mb-4">
-                            <LayoutList className="h-8 w-8 text-gray-200" strokeWidth={1.5} />
+                        <div className="w-16 h-16 bg-background rounded-xl shadow-lg flex items-center justify-center mb-4">
+                            <LayoutList className="h-8 w-8 text-muted-foreground/30" strokeWidth={1.5} />
                         </div>
-                        <p className="text-gray-400 text-xs max-w-[280px] mb-4">
+                        <p className="text-muted-foreground text-xs max-w-[280px] mb-4">
                             Add or mark tasks as priority to track them here.
                         </p>
                         <Button
+                            variant="default"
                             size="sm"
-                            className="bg-[#001F3F] text-white hover:bg-[#002B5C] text-xs h-8 px-4 shadow-sm rounded-md"
+                            className="text-xs h-8 px-4 shadow-sm rounded-md"
                             onClick={() => setLinkDialogOpen(true)}
+                            data-testid="cycle-priority-empty-add-btn"
                         >
                             Add existing tasks
                         </Button>

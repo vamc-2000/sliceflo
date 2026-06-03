@@ -73,7 +73,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
         <div className="h-full w-full bg-white border-l border-gray-200 flex flex-col">
             {/* Panel Header */}
             <div className="flex items-center justify-between p-4 flex-shrink-0 bg-white border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900 truncate pr-8">
+                <h2 className="text-lg font-semibold text-gray-900 truncate pr-8" data-testid="page-details-panel-title">
                     {currentTitle}
                 </h2>
                 <Button
@@ -81,6 +81,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                     size="icon"
                     onClick={onClose}
                     className="h-8 w-8 absolute right-2 top-2"
+                    data-testid="page-details-panel-close-btn"
                 >
                     <X className="h-5 w-5" />
                 </Button>
@@ -96,7 +97,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-semibold text-gray-900">Document links</Label>
-                                <span className="bg-[#fdf2e9] text-[#F68C1F] border border-[#F68C1F] min-w-[18px] h-[18px] flex items-center justify-center rounded-sm text-[10px] font-bold px-1">
+                                <span className="bg-[#fdf2e9] text-[#F68C1F] border border-[#F68C1F] min-w-[18px] h-[18px] flex items-center justify-center rounded-sm text-[10px] font-bold px-1" data-testid="page-details-panel-doc-links-count">
                                     {linkedProjects.length + linkedTeams.length + linkedPortfolios.length + linkedDocuments.length}
                                 </span>
                             </div>
@@ -106,7 +107,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                                 <div className="space-y-2 pl-1">
                                     {/* Projects */}
                                     {linkedProjects.map((project) => (
-                                        <div key={project.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={project.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-doc-link-project-${project.id}`}>
                                             <span className="text-sm">📦</span>
                                             <span className="text-sm text-gray-600">{project.name}</span>
                                         </div>
@@ -114,7 +115,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Portfolios */}
                                     {linkedPortfolios.map((portfolio) => (
-                                        <div key={portfolio.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={portfolio.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-doc-link-portfolio-${portfolio.id}`}>
                                             <span className="text-sm">📂</span>
                                             <span className="text-sm text-gray-600">{portfolio.name}</span>
                                         </div>
@@ -122,7 +123,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Teams */}
                                     {linkedTeams.map((team) => (
-                                        <div key={team.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={team.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-doc-link-team-${team.id}`}>
                                             <span className="text-xs">👥</span>
                                             <span className="text-sm text-gray-600">{team.name}</span>
                                         </div>
@@ -130,14 +131,14 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Documents */}
                                     {linkedDocuments.map((doc) => (
-                                        <div key={doc.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={doc.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-doc-link-document-${doc.id}`}>
                                             <span className="text-sm">📄</span>
                                             <span className="text-sm text-gray-600">{doc.title}</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-xs text-gray-400 italic pl-1">No document links</div>
+                                <div className="text-xs text-gray-400 italic pl-1" data-testid="page-details-panel-no-doc-links">No document links</div>
                             )}
                         </div>
 
@@ -145,7 +146,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-semibold text-gray-900">Page links</Label>
-                                <span className="bg-[#fdf2e9] text-[#F68C1F] border border-[#F68C1F] min-w-[18px] h-[18px] flex items-center justify-center rounded-sm text-[10px] font-bold px-1">
+                                <span className="bg-[#fdf2e9] text-[#F68C1F] border border-[#F68C1F] min-w-[18px] h-[18px] flex items-center justify-center rounded-sm text-[10px] font-bold px-1" data-testid="page-details-panel-page-links-count">
                                     {pageLinkedProjects.length + pageLinkedTeams.length + pageLinkedPortfolios.length + pageLinkedDocuments.length}
                                 </span>
                             </div>
@@ -155,7 +156,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                                 <div className="space-y-2 pl-1">
                                     {/* Projects */}
                                     {pageLinkedProjects.map((project) => (
-                                        <div key={project.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={project.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-page-link-project-${project.id}`}>
                                             <span className="text-sm">📦</span>
                                             <span className="text-sm text-gray-600">{project.name}</span>
                                         </div>
@@ -163,7 +164,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Portfolios */}
                                     {pageLinkedPortfolios.map((portfolio) => (
-                                        <div key={portfolio.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={portfolio.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-page-link-portfolio-${portfolio.id}`}>
                                             <span className="text-sm">📂</span>
                                             <span className="text-sm text-gray-600">{portfolio.name}</span>
                                         </div>
@@ -171,7 +172,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Teams */}
                                     {pageLinkedTeams.map((team) => (
-                                        <div key={team.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={team.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-page-link-team-${team.id}`}>
                                             <span className="text-xs">👥</span>
                                             <span className="text-sm text-gray-600">{team.name}</span>
                                         </div>
@@ -179,14 +180,14 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
 
                                     {/* Documents */}
                                     {pageLinkedDocuments.map((doc) => (
-                                        <div key={doc.id} className="flex items-center gap-2 text-gray-500">
+                                        <div key={doc.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-page-link-document-${doc.id}`}>
                                             <span className="text-sm">📄</span>
                                             <span className="text-sm text-gray-600">{doc.title}</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-xs text-gray-400 italic pl-1">No page links</div>
+                                <div className="text-xs text-gray-400 italic pl-1" data-testid="page-details-panel-no-page-links">No page links</div>
                             )}
                         </div>
                     </div>

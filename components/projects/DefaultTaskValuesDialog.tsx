@@ -1,4 +1,4 @@
-﻿// components/projects/DefaultTaskValuesDialog.tsx
+// components/projects/DefaultTaskValuesDialog.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -88,7 +88,7 @@ export function DefaultTaskValuesDialog({
                         </div>
                         <Popover open={priorityOpen} onOpenChange={setPriorityOpen}>
                             <PopoverTrigger asChild>
-                                <button className={valueBtnCls}>
+                                <button className={valueBtnCls} data-testid="default-task-priority-btn">
                                     <span
                                         className="flex items-center justify-center w-6 h-6 rounded-full"
                                         style={{
@@ -120,6 +120,7 @@ export function DefaultTaskValuesDialog({
                                                 setPriorityOpen(false);
                                             }}
                                             className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-muted text-left"
+                                            data-testid={`default-task-priority-option-${p.value}`}
                                         >
                                             <span
                                                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -141,7 +142,7 @@ export function DefaultTaskValuesDialog({
                         </div>
                         <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                             <PopoverTrigger asChild>
-                                <button className={valueBtnCls}>
+                                <button className={valueBtnCls} data-testid="default-task-startdate-btn">
                                     <span className={`w-full text-center ${values.startDate ? "text-foreground" : "text-muted-foreground text-xs"}`}>
                                         {values.startDate
                                             ? format(new Date(values.startDate), "d MMM")
@@ -171,7 +172,7 @@ export function DefaultTaskValuesDialog({
                         </div>
                         <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                             <PopoverTrigger asChild>
-                                <button className={valueBtnCls}>
+                                <button className={valueBtnCls} data-testid="default-task-enddate-btn">
                                     <span className={`w-full text-center ${values.endDate ? "text-foreground" : "text-muted-foreground text-xs"}`}>
                                         {values.endDate
                                             ? format(new Date(values.endDate), "d MMM")
@@ -201,7 +202,7 @@ export function DefaultTaskValuesDialog({
                         </div>
                         <Popover open={assigneeOpen} onOpenChange={setAssigneeOpen}>
                             <PopoverTrigger asChild>
-                                <button className={valueBtnCls}>
+                                <button className={valueBtnCls} data-testid="default-task-assignee-btn">
                                     {selectedMember ? (
                                         <>
                                             <span className="flex items-center justify-center gap-2 min-w-0 flex-1">
@@ -234,6 +235,7 @@ export function DefaultTaskValuesDialog({
                                                 setAssigneeOpen(false);
                                             }}
                                             className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-muted text-left"
+                                            data-testid={`default-task-assignee-option-${member.userId}`}
                                         >
                                             {member.profilePicture ? (
                                                 <img
@@ -263,17 +265,19 @@ export function DefaultTaskValuesDialog({
                         size="sm"
                         onClick={handleClearAll}
                         className="text-muted-foreground"
+                        data-testid="default-task-clear-btn"
                     >
                         Clear all
                     </Button>
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={onClose}>
+                        <Button variant="ghost" size="sm" onClick={onClose} data-testid="default-task-cancel-btn">
                             Cancel
                         </Button>
                         <Button
                             size="sm"
                             onClick={handleSave}
                             className="bg-primary text-primary-foreground hover:bg-primary/90 px-5"
+                            data-testid="default-task-save-btn"
                         >
                             Save
                         </Button>

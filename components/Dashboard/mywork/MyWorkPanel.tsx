@@ -127,10 +127,10 @@ export function MyWorkPanel() {
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
         <div>
-          <h2 className="text-sm font-bold tracking-tight">Workload Analytics</h2>
+          <h2 className="text-sm font-bold tracking-tight" data-testid="mywork-panel-title">Workload Analytics</h2>
           <p className="text-[11px] text-muted-foreground">Real-time status of your assigned tasks</p>
         </div>
-        <div className="flex items-center gap-1 text-[11px] bg-muted/50 px-2 py-0.5 rounded-md border text-muted-foreground font-medium">
+        <div className="flex items-center gap-1 text-[11px] bg-muted/50 px-2 py-0.5 rounded-md border text-muted-foreground font-medium" data-testid="mywork-panel-workload-badge">
           <Sparkles className="h-3 w-3 text-amber-500 animate-pulse" />
           Active Workload
         </div>
@@ -138,9 +138,9 @@ export function MyWorkPanel() {
 
       <div className="flex-1 overflow-hidden flex flex-col gap-4">
         {/* Row 1: Completion Ring & Metrics Summary */}
-        <div className="grid grid-cols-[110px_1fr] gap-4 p-3.5 rounded-xl border bg-muted/20 shrink-0">
+        <div className="grid grid-cols-[110px_1fr] gap-4 p-3.5 rounded-xl border bg-muted/20 shrink-0" data-testid="mywork-panel-summary-card">
           {/* Progress Circular Gauge */}
-          <div className="flex flex-col items-center justify-center relative">
+          <div className="flex flex-col items-center justify-center relative" data-testid="mywork-panel-circular-progress">
             <svg width="90" height="90" className="-rotate-90">
               {/* Background Ring */}
               <circle
@@ -181,7 +181,7 @@ export function MyWorkPanel() {
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-3 gap-2 align-middle">
             {/* Active Tasks Card */}
-            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-blue-500/30 transition-colors">
+            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-blue-500/30 transition-colors" data-testid="mywork-panel-active-stats">
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
                 <Clock className="h-3 w-3 text-blue-500 shrink-0" />
                 <span>Active</span>
@@ -193,7 +193,7 @@ export function MyWorkPanel() {
             </div>
 
             {/* Urgent Card */}
-            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-red-500/30 transition-colors">
+            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-red-500/30 transition-colors" data-testid="mywork-panel-urgent-stats">
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
                 <AlertTriangle className="h-3 w-3 text-red-500 shrink-0" />
                 <span>Urgent</span>
@@ -205,7 +205,7 @@ export function MyWorkPanel() {
             </div>
 
             {/* Due Soon Card */}
-            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-amber-500/30 transition-colors">
+            <div className="flex flex-col justify-center p-2 rounded-lg bg-background border hover:border-amber-500/30 transition-colors" data-testid="mywork-panel-due-soon-stats">
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
                 <Calendar className="h-3 w-3 text-amber-500 shrink-0" />
                 <span>Due 3d</span>
@@ -225,10 +225,11 @@ export function MyWorkPanel() {
             onValueChange={(v) => setActiveTab(v as any)}
             className="w-full h-full flex flex-col min-h-0"
           >
-            <TabsList className="h-8 p-0.5 bg-muted/40 rounded-lg flex shrink-0 border border-border/50">
+            <TabsList className="h-8 p-0.5 bg-muted/40 rounded-lg flex shrink-0 border border-border/50" data-testid="mywork-panel-tabs-list">
               <TabsTrigger
                 value="priority"
                 className="text-[10px] py-1 rounded-md flex-1 data-[state=active]:bg-background data-[state=active]:shadow-sm font-medium"
+                data-testid="mywork-panel-tab-priority"
               >
                 <BarChart2 className="h-3 w-3 mr-1" />
                 Priority Load
@@ -236,6 +237,7 @@ export function MyWorkPanel() {
               <TabsTrigger
                 value="project"
                 className="text-[10px] py-1 rounded-md flex-1 data-[state=active]:bg-background data-[state=active]:shadow-sm font-medium"
+                data-testid="mywork-panel-tab-project"
               >
                 <Briefcase className="h-3 w-3 mr-1" />
                 By Project
@@ -248,7 +250,7 @@ export function MyWorkPanel() {
                 <TabsContent value="priority" className="mt-0 h-full">
                   <div className="space-y-3.5 pr-2">
                     {/* High Priority Tracker */}
-                    <div className="space-y-1">
+                    <div className="space-y-1" data-testid="mywork-panel-priority-high">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-semibold text-foreground flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-red-500" />
@@ -269,7 +271,7 @@ export function MyWorkPanel() {
                     </div>
 
                     {/* Medium Priority Tracker */}
-                    <div className="space-y-1">
+                    <div className="space-y-1" data-testid="mywork-panel-priority-medium">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-semibold text-foreground flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-amber-500" />
@@ -290,7 +292,7 @@ export function MyWorkPanel() {
                     </div>
 
                     {/* Low Priority Tracker */}
-                    <div className="space-y-1">
+                    <div className="space-y-1" data-testid="mywork-panel-priority-low">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-semibold text-foreground flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -311,7 +313,7 @@ export function MyWorkPanel() {
                     </div>
 
                     {/* No Priority Tracker */}
-                    <div className="space-y-1">
+                    <div className="space-y-1" data-testid="mywork-panel-priority-none">
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-semibold text-foreground flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-slate-400" />
@@ -345,7 +347,7 @@ export function MyWorkPanel() {
                         const projPercent = item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
 
                         return (
-                          <div key={item.id} className="space-y-1 bg-background border p-2.5 rounded-xl hover:shadow-xs transition-shadow">
+                          <div key={item.id} className="space-y-1 bg-background border p-2.5 rounded-xl hover:shadow-xs transition-shadow" data-testid={`mywork-panel-project-card-${item.id}`}>
                             <div className="flex items-center justify-between text-[11px] font-medium">
                               <div className="flex items-center gap-2 min-w-0">
                                 <span className="w-2 h-2 rounded-full shrink-0 animate-pulse" style={{ backgroundColor: item.color }} />

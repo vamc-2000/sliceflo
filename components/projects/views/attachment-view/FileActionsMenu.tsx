@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { Share2, Trash2, Ellipsis, Pen, Shield, Link2, Archive, Users, ShieldUser, Download } from "lucide-react";
@@ -67,36 +67,36 @@ export function FileActionsDropdown({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Ellipsis className="h-4 w-4 text-[#001F3F]" strokeWidth={2.8} />
+                <Button data-testid={`file-actions-trigger-${fileId}`} variant="ghost" size="icon" className="h-8 w-8">
+                    <Ellipsis className="h-4 w-4 text-primary" strokeWidth={2} />
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-58 border-0 border-b-[5px] border-[#001F3F] text-[#001F3F]">
-                <DropdownMenuItem onClick={() => onDownload?.(fileId)}>
-                    <Download className="h-4 w-4 mr-2 text-[#001F3F]" />
+            <DropdownMenuContent data-testid={`file-actions-content-${fileId}`} align="end" className="w-58 border-0 border-b-[5px] border-b-primary text-foreground">
+                <DropdownMenuItem data-testid={`file-actions-download-${fileId}`} onClick={() => onDownload?.(fileId)}>
+                    <Download className="h-4 w-4 mr-2 text-primary" />
                     Download
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => console.log("Rename clicked")}>
-                    <Pen className="h-4 w-4 mr-2 text-[#001F3F]" />
+                <DropdownMenuItem data-testid={`file-actions-rename-${fileId}`} onClick={() => console.log("Rename clicked")}>
+                    <Pen className="h-4 w-4 mr-2 text-primary" />
                     Rename
                 </DropdownMenuItem>
 
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-[#001F3F]">
-                        <Shield className="h-4 w-4 mr-2 text-[#001F3F]" />
+                    <DropdownMenuSubTrigger data-testid={`file-actions-privacy-trigger-${fileId}`} className="text-foreground">
+                        <Shield className="h-4 w-4 mr-2 text-primary" />
                         Attachment Privacy
                     </DropdownMenuSubTrigger>
 
-                    <DropdownMenuSubContent className="w-44 text-[#001F3F] border-0 border-b-[5px] border-[#001F3F]">
-                        <DropdownMenuItem onClick={() => console.log("Private")}>
-                            <ShieldUser className="h-4 w-4 mr-2 text-[#001F3F]" />
+                    <DropdownMenuSubContent className="w-44 text-foreground border-0 border-b-[5px] border-b-primary">
+                        <DropdownMenuItem data-testid={`file-actions-privacy-only-me-${fileId}`} onClick={() => console.log("Private")}>
+                            <ShieldUser className="h-4 w-4 mr-2 text-primary" />
                             Only me
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={() => console.log("Public")}>
-                            <Users className="h-4 w-4 mr-2 text-[#001F3F]" />
+                        <DropdownMenuItem data-testid={`file-actions-privacy-everyone-${fileId}`} onClick={() => console.log("Public")}>
+                            <Users className="h-4 w-4 mr-2 text-primary" />
                             Everyone
                         </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -105,13 +105,13 @@ export function FileActionsDropdown({
                 <Separator />
 
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-[#001F3F]">
-                        <Link2 className="h-4 w-4 mr-2 text-[#001F3F]" />
+                    <DropdownMenuSubTrigger data-testid={`file-actions-attach-to-task-trigger-${fileId}`} className="text-foreground">
+                        <Link2 className="h-4 w-4 mr-2 text-primary" />
                         Attach to task
                     </DropdownMenuSubTrigger>
 
                     <DropdownMenuSubContent
-                        className="w-95 p-0 border-0 border-b-[5px] border-[#001F3F] text-[#001F3F]"
+                        className="w-95 p-0 border-0 border-b-[5px] border-b-primary text-foreground"
                     >
                         <div className="max-h-64 overflow-y-auto">
 
@@ -126,9 +126,9 @@ export function FileActionsDropdown({
                                 <div className="border rounded-md overflow-hidden">
                                     <div className="divide-y">
                                         {/* Table Header */}
-                                        <div className="grid grid-cols-[1fr_100px] items-center text-xs font-semibold border-b bg-[#E3EFFF]">
+                                        <div className="grid grid-cols-[1fr_100px] items-center text-xs font-semibold border-b bg-muted">
                                             <div className="px-4 py-2 flex items-center gap-3">
-                                                <input type="checkbox" className="w-4 h-4" />
+                                                <input type="checkbox" className="w-4 h-4 rounded border-border accent-primary focus:ring-primary cursor-pointer bg-background" />
                                                 Tasks
                                             </div>
                                             <div className="px-4 py-2 border-l text-center">
@@ -145,7 +145,7 @@ export function FileActionsDropdown({
                                                 >
                                                     {/* Task Column */}
                                                     <div className="px-4 py-2 flex items-center gap-3 min-w-0">
-                                                        <input type="checkbox" className="w-4 h-4" />
+                                                        <input type="checkbox" className="w-4 h-4 rounded border-border accent-primary focus:ring-primary cursor-pointer bg-background" />
                                                         <span className="text-xs truncate">{task.name}</span>
                                                     </div>
 
@@ -182,16 +182,16 @@ export function FileActionsDropdown({
 
                 <Separator />
 
-                <DropdownMenuItem onClick={() => onShare?.(fileId)}>
-                    <Archive className="h-4 w-4 mr-2 text-[#001F3F]" />
+                <DropdownMenuItem data-testid={`file-actions-archive-${fileId}`} onClick={() => onShare?.(fileId)}>
+                    <Archive className="h-4 w-4 mr-2 text-primary" />
                     Archive Attachment
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                    className="focus:text-destructive text-[#EC221F]"
+                <DropdownMenuItem data-testid={`file-actions-delete-${fileId}`}
+                    className="focus:text-destructive text-destructive"
                     onClick={() => onDelete?.(fileId)}
                 >
-                    <Trash2 className="h-4 w-4 mr-2 text-[#EC221F]" />
+                    <Trash2 className="h-4 w-4 mr-2 text-destructive" />
                     Delete Attachment
                 </DropdownMenuItem>
             </DropdownMenuContent>

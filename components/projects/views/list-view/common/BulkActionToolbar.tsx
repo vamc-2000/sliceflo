@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { X, Copy, Upload, Repeat, MoveRight, Circle, UserPlus, Trash2, LayoutTemplate, Flag } from "lucide-react";
@@ -70,7 +70,7 @@ function StatusDropdown({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors">
+                <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors" data-testid="list-bulk-status-trigger">
                     <Icon className="h-4 w-4" />
                     <span className="text-xs leading-none">{label}</span>
                 </button>
@@ -120,7 +120,7 @@ function PriorityDropdown({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors">
+                <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors" data-testid="list-bulk-priority-trigger">
                     <Icon className="h-4 w-4" />
                     <span className="text-xs leading-none">{label}</span>
                 </button>
@@ -226,6 +226,7 @@ export function BulkActionToolbar({
                 <button
                     onClick={onDuplicate}
                     className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors"
+                    data-testid="list-bulk-duplicate-btn"
                 >
                     <Copy className="h-4 w-4" />
                     <span className="text-xs leading-none">Duplicate</span>
@@ -234,7 +235,7 @@ export function BulkActionToolbar({
                 {/* ✅ Export with upward dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors">
+                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors" data-testid="list-bulk-export-trigger">
                             <Upload className="h-4 w-4" />
                             <span className="text-xs leading-none">Export</span>
                         </button>
@@ -262,7 +263,7 @@ export function BulkActionToolbar({
                 {/* ✅ Convert To with upward dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors">
+                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors" data-testid="list-bulk-convert-trigger">
                             <Repeat className="h-4 w-4" />
                             <span className="text-xs leading-none">Convert to</span>
                         </button>
@@ -319,7 +320,7 @@ export function BulkActionToolbar({
                 {/* ✅ Assignee — project members list (upward) */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors">
+                        <button className="flex flex-col items-center justify-center gap-1 px-4 h-full hover:bg-card/10 transition-colors" data-testid="list-bulk-assignee-trigger">
                             <UserPlus className="h-4 w-4" />
                             <span className="text-xs leading-none">Assignee</span>
                         </button>
@@ -369,6 +370,7 @@ export function BulkActionToolbar({
                 <button
                     onClick={onDelete}
                     className="flex flex-col items-center justify-center gap-1 px-4 h-full transition-colors hover:bg-red-500/20 hover:text-red-400"
+                    data-testid="list-bulk-delete-btn"
                 >
                     <Trash2 className="h-4 w-4" />
                     <span className="text-xs leading-none">Delete</span>
@@ -379,6 +381,7 @@ export function BulkActionToolbar({
                     <button
                         onClick={onClearSelection}
                         className="flex items-center justify-center px-3 h-full hover:bg-card/10 transition-colors"
+                        data-testid="list-bulk-clear-btn"
                     >
                         <X className="h-4 w-4" />
                     </button>

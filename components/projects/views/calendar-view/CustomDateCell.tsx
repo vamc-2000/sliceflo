@@ -65,6 +65,7 @@ export function CustomDateCell({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      data-testid={`calendar-date-cell-${value.toISOString().split('T')[0]}`}
     >
 
       {/* Original calendar cell content */}
@@ -97,6 +98,7 @@ export function CustomDateCell({
             pointerEvents: 'auto'
           }}
           aria-label="Add task"
+          data-testid={`calendar-date-cell-add-task-btn-${value.toISOString().split('T')[0]}`}
         >
           <Plus className="h-4 w-4" />
         </button>

@@ -188,15 +188,15 @@ export default function UserManagementPage() {
   const UserActionsMenu = ({ member }: { member: Member }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted" data-testid={`user-management-actions-trigger-${member.userId}`}>
           <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => toast("success", { title: "Success", description: "Activation email sent" })}>
+        <DropdownMenuItem onClick={() => toast("success", { title: "Success", description: "Activation email sent" })} data-testid={`user-management-action-send-activation-${member.userId}`}>
           Send activation email
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast("info", { title: "Info", description: "Edit email functionality coming soon" })}>
+        <DropdownMenuItem onClick={() => toast("info", { title: "Info", description: "Edit email functionality coming soon" })} data-testid={`user-management-action-edit-email-${member.userId}`}>
           Edit email
         </DropdownMenuItem>
 
@@ -212,6 +212,7 @@ export default function UserManagementPage() {
             );
             toast("success", { title: "Success", description: "User deactivated" });
           }}
+          data-testid={`user-management-action-deactivate-${member.userId}`}
         >
           Deactivate User
         </DropdownMenuItem>
@@ -221,13 +222,14 @@ export default function UserManagementPage() {
             setCurrentUserId(member.userId);
             setOpenDeleteDialog(true);
           }}
+          data-testid={`user-management-action-delete-${member.userId}`}
         >
           Delete user
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={() => toast("success", { title: "Success", description: "2FA reset" })}>
+        <DropdownMenuItem onClick={() => toast("success", { title: "Success", description: "2FA reset" })} data-testid={`user-management-action-reset-2fa-${member.userId}`}>
           Reset two-factor Authentication
         </DropdownMenuItem>
 
@@ -247,6 +249,7 @@ export default function UserManagementPage() {
             table.toggleAllPageRowsSelected(!!e.target.checked)
           }
           className="h-4 w-4 rounded border-border"
+          data-testid="user-management-select-all"
         />
       ),
       cell: ({ row }) => (
@@ -256,6 +259,7 @@ export default function UserManagementPage() {
           onChange={(e) => row.toggleSelected(!!e.target.checked)}
           className="h-4 w-4 rounded border-border"
           disabled={row.original.role === "owner"}
+          data-testid={`user-management-select-row-${row.original.userId}`}
         />
       ),
       enableSorting: false,
@@ -391,7 +395,7 @@ export default function UserManagementPage() {
     <div className="w-full space-y-2">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-foreground tracking-tight">
+        <h2 className="text-lg font-semibold text-foreground tracking-tight" data-testid="user-management-title">
           Workspace Members
         </h2>
         <p className="text-xs text-muted-foreground">
@@ -420,6 +424,7 @@ export default function UserManagementPage() {
               size="sm"
               className="bg-primary hover:bg-primary/90 h-8 text-primary-foreground"
               onClick={() => setOpenInviteDialog(true)}
+              data-testid="user-management-invite-btn"
             >
               Invite
             </Button>
@@ -428,6 +433,7 @@ export default function UserManagementPage() {
               size="sm"
               className="h-8 border-border text-foreground hover:bg-muted"
               onClick={() => setOpenBulkInviteDialog(true)}
+              data-testid="user-management-bulk-invite-btn"
             >
               Bulk Invite
             </Button>

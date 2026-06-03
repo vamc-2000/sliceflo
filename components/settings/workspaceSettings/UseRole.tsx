@@ -8,18 +8,19 @@ export default function UseRole() {
         <div className="w-full space-y-4">
             {/* Header */}
             <div>
-                <h2 className="text-[16px] font-semibold text-foreground tracking-tight">User Roles</h2>
+                <h2 className="text-[16px] font-semibold text-foreground tracking-tight" data-testid="user-roles-title">User Roles</h2>
                 <p className="text-[12px] text-muted-foreground leading-relaxed">
                     Centrally managed roles that define workspace access levels and permissions.
                 </p>
             </div>
 
             {/* Roles List */}
-            <div className="grid gap-2">
+            <div className="grid gap-2" data-testid="user-roles-list">
                 {workspaceRoles.map((role) => (
                     <div
                         key={role.id}
                         className="flex items-center justify-between px-4 py-3 bg-muted/30 dark:bg-muted/10 rounded-xl border border-border/50 transition-all hover:bg-muted/50 hover:border-border group"
+                        data-testid={`user-role-item-${role.id}`}
                     >
                         <div className="flex flex-col">
                             <span className="text-[14px] font-medium text-foreground group-hover:text-primary transition-colors">

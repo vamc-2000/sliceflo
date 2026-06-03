@@ -31,12 +31,12 @@ export default function ActivityLogs() {
   if (!user?.id && !error) {
     return (
       <div className="w-full max-w-4xl">
-        <h2 className="text-xl font-semibold mb-1">Activity log</h2>
+        <h2 className="text-xl font-semibold mb-1" data-testid="activity-log-title">Activity log</h2>
         <p className="text-sm text-muted-foreground mb-4">
           Track recent actions across your workspaces.
         </p>
         <Separator className="mb-2" />
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8" data-testid="activity-log-loading">
           <p className="text-sm text-muted-foreground">
             Loading user information...
           </p>
@@ -47,14 +47,14 @@ export default function ActivityLogs() {
 
   return (
     <div className="w-full max-w-5xl">
-      <h2 className="text-xl font-semibold mb-1 text-foreground">Activity log</h2>
+      <h2 className="text-xl font-semibold mb-1 text-foreground" data-testid="activity-log-title">Activity log</h2>
       <p className="text-sm text-muted-foreground mb-4">
         Terminal-style activity feed.
       </p>
       <Separator className="mb-2" />
 
       {loading && (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8" data-testid="activity-log-loading">
           <p className="text-sm text-muted-foreground">
             Loading activity logs...
           </p>
@@ -62,14 +62,14 @@ export default function ActivityLogs() {
       )}
 
       {error && !loading && (
-        <div className="flex items-center gap-2 text-sm text-red-700 py-4">
+        <div className="flex items-center gap-2 text-sm text-red-700 py-4" data-testid="activity-log-error">
           <AlertCircle className="h-5 w-5" />
           <span>{error}</span>
         </div>
       )}
 
       {!loading && !error && activityLogs.length > 0 && (
-        <div className="rounded-md px-0 py-1 text-[11px] md:text-xs overflow-x-auto">
+        <div className="rounded-md px-0 py-1 text-[11px] md:text-xs overflow-x-auto" data-testid="activity-log-list">
           {activityLogs.map((log) => {
             const actor = log.actor;
             const d = new Date(log.time);
@@ -85,19 +85,20 @@ export default function ActivityLogs() {
               <div
                 key={log._id}
                 className="flex items-start gap-1 px-2 py-1 text-[14px] md:text-xs text-foreground hover:bg-muted rounded-md transition"
+                data-testid={`activity-log-row-${log._id}`}
               >
                 {/* Timestamp */}
-                <span className="min-w-[150px] text-emerald-500 dark:text-emerald-400">
+                <span className="min-w-[150px] text-emerald-500 dark:text-emerald-400" data-testid={`activity-log-row-time-${log._id}`}>
                   [{timestamp}]
                 </span>
 
                 {/* Tag */}
-                <span className="min-w-[80px] text-primary font-semibold">
+                <span className="min-w-[80px] text-primary font-semibold" data-testid={`activity-log-row-tag-${log._id}`}>
                   [{tag}]
                 </span>
 
                 {/* Event */}
-                <span className="flex-1 text-muted-foreground leading-relaxed">
+                <span className="flex-1 text-muted-foreground leading-relaxed" data-testid={`activity-log-row-text-${log._id}`}>
                   {eventText}
                 </span>
               </div>
@@ -107,7 +108,7 @@ export default function ActivityLogs() {
       )}
 
       {!loading && !error && activityLogs.length === 0 && (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8" data-testid="activity-log-empty">
           <p className="text-sm text-muted-foreground">
             No activity logs found.
           </p>

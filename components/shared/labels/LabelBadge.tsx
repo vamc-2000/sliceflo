@@ -9,12 +9,14 @@ interface LabelBadgeProps {
   };
   onRemove?: (id: string) => void;
   className?: string;
+  removeButtonTestId?: string;
 }
 
 export const LabelBadge: React.FC<LabelBadgeProps> = ({
   label,
   onRemove,
   className = "",
+  removeButtonTestId,
 }) => {
   return (
     <div
@@ -38,6 +40,7 @@ export const LabelBadge: React.FC<LabelBadgeProps> = ({
           }}
           className="hover:bg-foreground/10 rounded-full p-0.5 transition-colors text-current"
           aria-label={`Remove ${label.name} label`}
+          data-testid={removeButtonTestId}
         >
           <X className="w-3 h-3" />
         </button>

@@ -284,6 +284,7 @@ export default function AdvancedFiltersNew({
                     value={criteria.value}
                     onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
                     className="w-full px-3 py-2 text-xs border-b border-input bg-transparent focus:outline-none"
+                    data-testid={`advanced-filters-value-input-${criteria.id}`}
                 >
                     <option value="">Select value</option>
                     {options.map(opt => (
@@ -304,6 +305,7 @@ export default function AdvancedFiltersNew({
                                 "w-full justify-start text-left font-normal border-0 border-b border-input rounded-none px-3",
                                 !criteria.value && "text-muted-foreground"
                             )}
+                            data-testid={`advanced-filters-value-input-${criteria.id}`}
                         >
                             <Clock className="mr-2 h-4 w-4" />
                             {criteria.value ? format(new Date(criteria.value), "PPP") : <span>Pick a date</span>}
@@ -330,6 +332,7 @@ export default function AdvancedFiltersNew({
                     onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
                     placeholder="Enter number"
                     className="border-0 border-b border-input rounded-none focus-visible:ring-0"
+                    data-testid={`advanced-filters-value-input-${criteria.id}`}
                 />
             );
         }
@@ -342,13 +345,17 @@ export default function AdvancedFiltersNew({
                 onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
                 placeholder="Enter value"
                 className="border-0 border-b border-input rounded-none focus-visible:ring-0"
+                data-testid={`advanced-filters-value-input-${criteria.id}`}
             />
         );
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="w-full max-w-150! max-h-[80vh] overflow-y-auto border-0 border-b-5 border-primary px-4 py-3">
+            <DialogContent
+                className="w-full max-w-150! max-h-[80vh] overflow-y-auto border-0 border-b-5 border-primary px-4 py-3"
+                data-testid="advanced-filters-modal"
+            >
                 <DialogHeader>
                     <DialogTitle className="text-base">Filters</DialogTitle>
                 </DialogHeader>
@@ -361,6 +368,7 @@ export default function AdvancedFiltersNew({
                     <TabsList className="bg-transparent p-0 h-auto gap-6 shadow-none ring-0 focus:outline-none focus-visible:outline-none">
                         <TabsTrigger
                             value="advanced"
+                            data-testid="advanced-filters-tab-advanced"
                             className="
                                 bg-transparent px-0 pb-1 text-xs font-medium rounded-none border-0 border-b-2 border-transparent
                                 data-[state=active]:border-primary
@@ -415,7 +423,11 @@ export default function AdvancedFiltersNew({
 
                         {/* Criteria List */}
                         {filterBlock.children.map((criteria, index) => (
-                            <div key={criteria.id} className="flex items-center gap-2">
+                            <div
+                                key={criteria.id}
+                                className="flex items-center gap-2"
+                                data-testid={`advanced-filters-criteria-${criteria.id}`}
+                            >
                                 {/* Operator label */}
                                 <div className="w-16">
                                     {index === 0 ? (
@@ -439,15 +451,24 @@ export default function AdvancedFiltersNew({
                                                     shadow-none
                                                     focus:ring-0
                                                     "
+                                                    data-testid={`advanced-filters-operator-trigger-${criteria.id}`}
                                                 >
                                                     <SelectValue />
                                                 </SelectTrigger>
 
                                                 <SelectContent className="min-w-12">
-                                                    <SelectItem value="AND" className="justify-center text-xs">
+                                                    <SelectItem
+                                                        value="AND"
+                                                        className="justify-center text-xs"
+                                                        data-testid={`advanced-filters-operator-option-${criteria.id}-AND`}
+                                                    >
                                                         AND
                                                     </SelectItem>
-                                                    <SelectItem value="OR" className="justify-center text-xs">
+                                                    <SelectItem
+                                                        value="OR"
+                                                        className="justify-center text-xs"
+                                                        data-testid={`advanced-filters-operator-option-${criteria.id}-OR`}
+                                                    >
                                                         OR
                                                     </SelectItem>
                                                 </SelectContent>
@@ -467,7 +488,10 @@ export default function AdvancedFiltersNew({
                                         });
                                     }}
                                 >
-                                    <SelectTrigger className="flex-1 px-3 py-2 text-xs bg-transparent border-0 border-b-2 border-input rounded-none shadow-none focus:ring-0">
+                                    <SelectTrigger
+                                        className="flex-1 px-3 py-2 text-xs bg-transparent border-0 border-b-2 border-input rounded-none shadow-none focus:ring-0"
+                                        data-testid={`advanced-filters-field-trigger-${criteria.id}`}
+                                    >
                                         <SelectValue placeholder="Field" />
                                     </SelectTrigger>
 
@@ -483,6 +507,7 @@ export default function AdvancedFiltersNew({
                                                     value={field.id}
                                                     disabled={isGrouped}
                                                     className={cn("text-xs", isGrouped && "opacity-50 cursor-not-allowed")}
+                                                    data-testid={`advanced-filters-field-option-${criteria.id}-${field.id}`}
                                                 >
                                                     {field.name}
                                                 </SelectItem>
@@ -505,6 +530,7 @@ export default function AdvancedFiltersNew({
 
                                     <SelectTrigger
                                         className="flex-1 px-3 py-2 text-xs bg-transparent border-0 border-b-2 border-input rounded-none shadow-none focus:ring-0 disabled:opacity-50"
+                                        data-testid={`advanced-filters-condition-trigger-${criteria.id}`}
                                     >
                                         <SelectValue placeholder="Condition" />
                                     </SelectTrigger>
@@ -515,6 +541,7 @@ export default function AdvancedFiltersNew({
                                                 key={cond}
                                                 value={cond}
                                                 className="text-xs"
+                                                data-testid={`advanced-filters-condition-option-${criteria.id}-${cond}`}
                                             >
                                                 {filterConditions[cond]?.title || cond}
                                             </SelectItem>
@@ -534,6 +561,7 @@ export default function AdvancedFiltersNew({
                                     onClick={() => removeCriteria(criteria.id)}
                                     disabled={filterBlock.children.length === 1}
                                     className="text-muted-foreground hover:text-red-600"
+                                    data-testid={`advanced-filters-remove-btn-${criteria.id}`}
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
@@ -544,6 +572,7 @@ export default function AdvancedFiltersNew({
                             size="sm"
                             variant="ghost"
                             onClick={addCriteria}
+                            data-testid="advanced-filters-add-btn"
                             className="
                                 w-full justify-start gap-2 px-0 text-muted-foreground text-xs
                                 hover:bg-transparent
@@ -588,6 +617,7 @@ export default function AdvancedFiltersNew({
                                 <Button
                                     onClick={handleApply}
                                     disabled={!isValid()}
+                                    data-testid="advanced-filters-apply-btn"
                                     className="
                                     bg-primary text-primary-foreground text-xs
                                     hover:bg-primary/90

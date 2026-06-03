@@ -70,22 +70,24 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
     );
 
     return (
-        <div className="w-[360px] flex-none bg-white border-l border-gray-200 flex flex-col p-4 space-y-4">
+        <div className="w-[360px] flex-none bg-card border-l border-border flex flex-col p-4 space-y-4">
             <Tabs defaultValue="assignees" className="w-full flex flex-col flex-1">
-                <TabsList className="w-full grid grid-cols-2 bg-[#F2F4F7] h-9 p-1 rounded-lg">
+                <TabsList className="w-full grid grid-cols-2 bg-muted h-9 p-1 rounded-lg">
                     <TabsTrigger
                         value="assignees"
                         className="text-xs font-semibold rounded-md transition-all
-                            data-[state=active]:bg-[#001F3F] data-[state=active]:text-white data-[state=active]:shadow-sm
-                            data-[state=inactive]:text-gray-500 data-[state=inactive]:bg-transparent"
+                            data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm
+                            data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent"
+                        data-testid="cycle-right-tab-assignees"
                     >
                         Assignees
                     </TabsTrigger>
                     <TabsTrigger
                         value="labels"
                         className="text-xs font-semibold rounded-md transition-all
-                            data-[state=active]:bg-[#001F3F] data-[state=active]:text-white data-[state=active]:shadow-sm
-                            data-[state=inactive]:text-gray-500 data-[state=inactive]:bg-transparent"
+                            data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm
+                            data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent"
+                        data-testid="cycle-right-tab-labels"
                     >
                         Labels
                     </TabsTrigger>
@@ -94,8 +96,8 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
                 <TabsContent value="assignees" className="flex-1 flex flex-col pt-0 overflow-hidden">
                     {isEmpty || activeMembers.length === 0 ? (
                         <div className="flex-1 w-full flex items-center justify-center">
-                            <div className="w-40 h-40 border border-gray-100 rounded-3xl flex items-center justify-center bg-white shadow-gray-400">
-                                <UserCircle2 className="h-16 w-16 text-gray-200" strokeWidth={1} />
+                            <div className="w-40 h-40 border border-border rounded-3xl flex items-center justify-center bg-card shadow-gray-400/10">
+                                <UserCircle2 className="h-16 w-16 text-muted-foreground/30" strokeWidth={1} />
                             </div>
                         </div>
                     ) : (
@@ -109,30 +111,30 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
                                 return (
                                     <div
                                         key={member.userId}
-                                        className="flex items-center justify-between p-3 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
+                                        className="flex items-center justify-between p-3 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-all duration-200"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <Avatar className="h-9 w-9 border border-gray-100">
+                                            <Avatar className="h-9 w-9 border border-border">
                                                 <AvatarImage src={member.avatar || ""} alt={member.name} />
-                                                <AvatarFallback className="text-xs bg-slate-100 text-slate-600 font-bold">
+                                                <AvatarFallback className="text-xs bg-muted text-muted-foreground font-bold">
                                                     {member.name ? member.name.charAt(0).toUpperCase() : "?"}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <div className="text-sm font-semibold text-gray-900">{member.name}</div>
-                                                <div className="text-xs text-gray-400 font-medium">
+                                                <div className="text-sm font-semibold text-foreground">{member.name}</div>
+                                                <div className="text-xs text-muted-foreground font-medium">
                                                     {totalCount} {totalCount === 1 ? "Task" : "Tasks"}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-1.5 w-24">
-                                            <span className="text-xs text-gray-400 font-medium">{progress}%</span>
-                                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                            <span className="text-xs text-muted-foreground font-medium">{progress}%</span>
+                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                                                 <div
                                                     className="h-full rounded-full transition-all duration-300"
                                                     style={{
                                                         width: `${progress}%`,
-                                                        backgroundColor: "#001F3F"
+                                                        backgroundColor: "var(--primary)"
                                                     }}
                                                 />
                                             </div>
@@ -147,8 +149,8 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
                 <TabsContent value="labels" className="flex-1 flex flex-col pt-0 overflow-hidden">
                     {isEmpty || activeLabels.length === 0 ? (
                         <div className="flex-1 w-full flex items-center justify-center">
-                            <div className="w-40 h-40 border border-gray-100 rounded-3xl flex items-center justify-center bg-white shadow-gray-400">
-                                <Tag className="h-16 w-16 text-gray-200" strokeWidth={1} />
+                            <div className="w-40 h-40 border border-border rounded-3xl flex items-center justify-center bg-card shadow-gray-400/10">
+                                <Tag className="h-16 w-16 text-muted-foreground/30" strokeWidth={1} />
                             </div>
                         </div>
                     ) : (
@@ -165,7 +167,7 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
                                 return (
                                     <div
                                         key={label.id}
-                                        className="flex items-center justify-between p-3 rounded-xl border border-gray-100 border-l-[4px] bg-white shadow-sm hover:shadow-md transition-all duration-200"
+                                        className="flex items-center justify-between p-3 rounded-xl border border-border border-l-[4px] bg-card shadow-sm hover:shadow-md transition-all duration-200"
                                         style={{ borderLeftColor: label.color || "#cbd5e1" }}
                                     >
                                         <div className="flex items-center gap-3">
@@ -182,20 +184,20 @@ export function CycleRightPanel({ isEmpty, project, tasks }: CycleRightPanelProp
                                                 />
                                             </div>
                                             <div>
-                                                <div className="text-sm font-semibold text-gray-900">{label.name}</div>
-                                                <div className="text-xs text-gray-400 font-medium">
+                                                <div className="text-sm font-semibold text-foreground">{label.name}</div>
+                                                <div className="text-xs text-muted-foreground font-medium">
                                                     {totalCount} {totalCount === 1 ? "Task" : "Tasks"}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-1.5 w-24">
-                                            <span className="text-xs text-gray-400 font-medium">{progress}%</span>
-                                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                            <span className="text-xs text-muted-foreground font-medium">{progress}%</span>
+                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                                                 <div
                                                     className="h-full rounded-full transition-all duration-300"
                                                     style={{
                                                         width: `${progress}%`,
-                                                        backgroundColor: label.color || "#001F3F"
+                                                        backgroundColor: label.color || "var(--primary)"
                                                     }}
                                                 />
                                             </div>

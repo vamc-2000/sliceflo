@@ -69,8 +69,8 @@ export function CycleConfigSettings({
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full text-sm">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="general">General Settings</TabsTrigger>
-            <TabsTrigger value="parallel">Parallel Cycles</TabsTrigger>
+            <TabsTrigger value="general" data-testid="cycle-settings-tab-general">General Settings</TabsTrigger>
+            <TabsTrigger value="parallel" data-testid="cycle-settings-tab-parallel">Parallel Cycles</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4 py-4">
@@ -85,6 +85,7 @@ export function CycleConfigSettings({
                 checked={config?.enabled}
                 onCheckedChange={(checked) => handleUpdateGeneral({ enabled: checked })}
                 disabled={isLoading}
+                data-testid="cycle-settings-enable-switch"
               />
             </div>
 
@@ -96,6 +97,7 @@ export function CycleConfigSettings({
                   value={config?.defaultDurationDays || 7}
                   onChange={(e) => handleUpdateGeneral({ defaultDurationDays: parseInt(e.target.value) })}
                   disabled={isLoading}
+                  data-testid="cycle-settings-duration-input"
                 />
               </div>
               <div className="space-y-2">
@@ -105,6 +107,7 @@ export function CycleConfigSettings({
                   value={config?.coolingPeriodDays || 0}
                   onChange={(e) => handleUpdateGeneral({ coolingPeriodDays: parseInt(e.target.value) })}
                   disabled={isLoading}
+                  data-testid="cycle-settings-cooling-input"
                 />
               </div>
             </div>
@@ -116,6 +119,7 @@ export function CycleConfigSettings({
                   checked={config?.allowOverlappingCycles}
                   onCheckedChange={(checked) => handleUpdateGeneral({ allowOverlappingCycles: checked })}
                   disabled={isLoading}
+                  data-testid="cycle-settings-overlapping-switch"
                 />
               </div>
               <div className="flex items-center justify-between space-x-2">
@@ -124,6 +128,7 @@ export function CycleConfigSettings({
                   checked={config?.enforceCoolingPeriod}
                   onCheckedChange={(checked) => handleUpdateGeneral({ enforceCoolingPeriod: checked })}
                   disabled={isLoading}
+                  data-testid="cycle-settings-enforce-cooling-switch"
                 />
               </div>
             </div>
@@ -137,7 +142,7 @@ export function CycleConfigSettings({
                   Create multiple independent cycle streams (e.g., Mobile vs Web).
                 </p>
               </div>
-              <Button size="sm" onClick={() => console.log("Create Parallel")} disabled={isLoading}>
+              <Button size="sm" onClick={() => console.log("Create Parallel")} disabled={isLoading} data-testid="cycle-settings-add-stream-btn">
                 <Plus className="h-4 w-4 mr-1" /> <span className="text-xs">Add Stream</span>
               </Button>
             </div>
@@ -155,6 +160,7 @@ export function CycleConfigSettings({
                       size="sm"
                       className="text-destructive h-8 w-8 p-0"
                       onClick={() => deleteParallelCycleConfig(projectId, pc.id)}
+                      data-testid={`cycle-settings-delete-stream-${pc.id}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

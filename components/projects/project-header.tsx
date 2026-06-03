@@ -418,6 +418,7 @@ export function ProjectHeader({
                                 disabled={isUpdatingIcon} // ✅ Disable during update
                                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                                 title="Change project icon"
+                                data-testid="project-header-icon-picker-btn"
                             >
                                 <ProjectIconAvatar
                                     project={project}
@@ -460,6 +461,7 @@ export function ProjectHeader({
                                                 setIsRenaming(false);
                                             }
                                         }}
+                                        data-testid="project-header-rename-input"
                                     />
                                     <Button
                                         variant="ghost"
@@ -469,6 +471,7 @@ export function ProjectHeader({
                                             renameProject(projectId, newName);
                                             setIsRenaming(false);
                                         }}
+                                        data-testid="project-header-rename-confirm"
                                     >
                                         <Check className="h-4 w-4" />
                                     </Button>
@@ -480,12 +483,13 @@ export function ProjectHeader({
                                             setNewName(project.name);
                                             setIsRenaming(false);
                                         }}
+                                        data-testid="project-header-rename-cancel"
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ) : (
-                                <h1 className="text-lg font-semibold text-foreground">{project.name}</h1>
+                                <h1 className="text-lg font-semibold text-foreground" data-testid="project-header-name">{project.name}</h1>
                             )}
                         </div>
 
@@ -544,6 +548,7 @@ export function ProjectHeader({
                                 style={{
                                     backgroundColor: (currentPriorityConfig?.color || "#6b7280") + "15"
                                 }}
+                                data-testid="project-header-priority"
                             >
                                 <Flag
                                     className="h-4 w-4"
@@ -599,6 +604,7 @@ export function ProjectHeader({
                             <div
                                 className={`h-8 bg-muted-foreground/20 text-xs px-2 flex items-center gap-1 ${project.startDate && project.endDate ? "rounded-md" : "rounded-full"
                                     }`}
+                                data-testid="project-header-dates"
                             >
                                 <Calendar className="h-4 w-4" />
                                 {project.startDate && project.endDate &&
@@ -662,6 +668,7 @@ export function ProjectHeader({
                                     status === "on-hold" && "bg-orange-100 text-orange-700",
                                     !status && "bg-muted text-muted-foreground"
                                 )}
+                                data-testid="project-header-status"
                             >
                                 {status || "No status"}
                             </div>
@@ -669,7 +676,7 @@ export function ProjectHeader({
                             {/* Viewers */}
                             <Popover open={isViewersOpen} onOpenChange={setIsViewersOpen}>
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" size="sm" className="gap-2 h-8 text-xs">
+                                    <Button variant="outline" size="sm" className="gap-2 h-8 text-xs" data-testid="project-header-viewers-btn">
                                         <Users className="h-4 w-4" />
                                         Viewers {viewers.length > 0 && `(${viewers.length})`}
                                     </Button>
@@ -692,13 +699,13 @@ export function ProjectHeader({
                         {/* More Options */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded h-8 w-8">
+                                <Button variant="ghost" size="icon" className="rounded h-8 w-8" data-testid="project-header-more-options-trigger">
                                     <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="border-b-4 border-b-primary p-1.5">
 
-                                <DropdownMenuItem className="p-1.5 justify-center text-xs font-medium bg-primary text-primary-foreground rounded-md">
+                                <DropdownMenuItem className="p-1.5 justify-center text-xs font-medium bg-primary text-primary-foreground rounded-md" data-testid="project-header-menu-permissions">
                                     Sharing & Permissions
                                 </DropdownMenuItem>
                                 <TestLoaderDropdown />
@@ -706,6 +713,7 @@ export function ProjectHeader({
                                 <DropdownMenuItem
                                     onClick={() => setIsRenaming(true)}
                                     className="text-xs"
+                                    data-testid="project-header-menu-rename"
                                 >
                                     <Pencil className="mr-2 h-3.5 w-3.5" />
                                     Rename
@@ -727,7 +735,7 @@ export function ProjectHeader({
                                 </DropdownMenuItem> */}
 
                                 <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs">
+                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-group-actions">
                                         <Layers className="mr-2 h-3.5 w-3.5" />
                                         Group actions
                                     </DropdownMenuSubTrigger>
@@ -741,6 +749,7 @@ export function ProjectHeader({
                                             }
                                             disabled={totalGroupsCount === 0}
                                             className="text-xs"
+                                            data-testid="project-header-menu-group-toggle"
                                         >
                                             {allGroupsCollapsed ? "Expand all groups" : "Collapse all groups"}
                                         </DropdownMenuItem>
@@ -749,6 +758,7 @@ export function ProjectHeader({
                                             onClick={() => onToggleHideEmptyGroups?.()}
                                             disabled={totalGroupsCount === 0}
                                             className="text-xs"
+                                            data-testid="project-header-menu-group-empty-toggle"
                                         >
                                             {hideEmptyGroups ? "Show empty groups" : "Hide empty groups"}
                                         </DropdownMenuItem>
@@ -759,25 +769,25 @@ export function ProjectHeader({
                                 <DropdownMenuSeparator className="mx-2 my-0" />
 
                                 <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs">
+                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-more-actions">
                                         <MoreVertical className="mr-2 h-3.5 w-3.5" />
                                         More actions
                                     </DropdownMenuSubTrigger>
                                     <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
-                                        <DropdownMenuItem className="text-xs">
+                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-templates">
                                             Templates
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-xs">
+                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-automatons">
                                             Automatons
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-xs">
+                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-integrations">
                                             Integrations
                                         </DropdownMenuItem>
                                     </DropdownMenuSubContent>
                                 </DropdownMenuSub>
 
                                 <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs">
+                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-copy-info">
                                         <Link className="mr-2 h-3.5 w-3.5" />
                                         Copy Project Info
                                     </DropdownMenuSubTrigger>
@@ -785,12 +795,14 @@ export function ProjectHeader({
                                         <DropdownMenuItem
                                             onClick={handleCopyProjectLink}
                                             className="cursor-pointer text-xs"
+                                            data-testid="project-header-menu-copy-link"
                                         >
                                             Project Link
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={handleCopyProjectId}
                                             className="cursor-pointer text-xs"
+                                            data-testid="project-header-menu-copy-id"
                                         >
                                             Project ID
                                         </DropdownMenuItem>
@@ -868,7 +880,7 @@ export function ProjectHeader({
                                 <DropdownMenuSeparator className="mx-2 my-0" />
 
                                 <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs">
+                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-import-export">
                                         <Upload className="mr-2 h-3.5 w-3.5" />
                                         Import / Export
                                     </DropdownMenuSubTrigger>
@@ -877,17 +889,19 @@ export function ProjectHeader({
                                         <DropdownMenuItem
                                             onClick={() => setImportOpen(true)}
                                             className="cursor-pointer text-xs"
+                                            data-testid="project-header-menu-import"
                                         >
                                             Import
                                         </DropdownMenuItem>
                                         <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger className="cursor-pointer text-xs">
+                                            <DropdownMenuSubTrigger className="cursor-pointer text-xs" data-testid="project-header-menu-export">
                                                 Export
                                             </DropdownMenuSubTrigger>
                                             <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[140px]">
                                                 <DropdownMenuItem
                                                     onClick={() => { onPrint?.(); }}
                                                     className="flex items-center gap-2.5 cursor-pointer text-xs"
+                                                    data-testid="project-header-menu-export-pdf"
                                                 >
                                                     <Image src="/images/pdf.svg" alt="PDF" width={16} height={16} className="object-contain" />
                                                     PDF
@@ -895,6 +909,7 @@ export function ProjectHeader({
                                                 <DropdownMenuItem
                                                     onClick={() => { onExportCSV?.(); }}
                                                     className="flex items-center gap-2.5 cursor-pointer text-xs"
+                                                    data-testid="project-header-menu-export-csv"
                                                 >
                                                     <Image src="/images/csv.svg" alt="CSV" width={16} height={16} className="object-contain" />
                                                     CSV
@@ -902,6 +917,7 @@ export function ProjectHeader({
                                                 <DropdownMenuItem
                                                     onClick={() => { onExportExcel?.(); }}
                                                     className="flex items-center gap-2.5 cursor-pointer text-xs"
+                                                    data-testid="project-header-menu-export-excel"
                                                 >
                                                     <Image src="/images/excel.svg" alt="Excel" width={16} height={16} className="object-contain" />
                                                     Excel
@@ -917,6 +933,7 @@ export function ProjectHeader({
                                 <DropdownMenuItem
                                     onClick={() => setShowArchiveModal(true)}
                                     className="text-xs"
+                                    data-testid="project-header-menu-archive"
                                 >
                                     <Archive className="mr-2 h-3.5 w-3.5" />
                                     Archive Project
@@ -927,6 +944,7 @@ export function ProjectHeader({
                                     className="text-destructive focus:text-destructive text-xs"
                                     onClick={handleDelete}
                                     disabled={isLoading}
+                                    data-testid="project-header-menu-delete"
                                 >
                                     {isLoading ? (
                                         <>

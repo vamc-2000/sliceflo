@@ -34,7 +34,8 @@ export default function ProjectDetailsPage({
         projects,
         activeViewIds,
         customViews,
-        fetchCycles
+        fetchCycles,
+        fetchProjectStatusHistory,
     } = useProjectsStore();
     const searchParams = useSearchParams();
     const activeViewFromQuery = searchParams.get('view');
@@ -93,6 +94,7 @@ export default function ProjectDetailsPage({
                 await fetchProjectById(id);
                 await fetchViews(id);
                 await fetchCycles(id);
+                await fetchProjectStatusHistory(id);
                 setIsProjectReady(true);
             };
             loadProjectData();

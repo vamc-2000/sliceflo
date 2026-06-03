@@ -10,7 +10,7 @@ export default function Page({
     const { id } = use(params);
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-white">
+        <div className="flex flex-col h-screen overflow-hidden bg-background">
             <div className="flex-none border-b">
                 <Breadcrumbs />
             </div>

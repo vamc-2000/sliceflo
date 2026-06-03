@@ -33,54 +33,56 @@ export function CyclesHeader({
     };
 
     return (
-        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-white">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
             {/* Left Section */}
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-3">
                     <ProjectIconAvatar project={project} size="md" className="rounded-md" />
-                    <h1 className="text-base font-semibold text-gray-900">{project.name}</h1>
+                    <h1 className="text-base font-semibold text-foreground">{project.name}</h1>
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
 
                 {cycle ? (
                     <div className="flex items-center gap-2">
-                        <Link href={`/project/${projectId}/cycles`} className="flex items-center gap-2 hover:opacity-80">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100/70 border border-gray-200/50 shadow-sm">
-                                <CalendarRange className="h-4 w-4 text-gray-700" strokeWidth={2.5} />
+                        <Link href={`/project/${projectId}/cycles`} className="flex items-center gap-2 hover:opacity-80" data-testid="cycles-header-back-link">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/70 border border-border/50 shadow-sm">
+                                <CalendarRange className="h-4 w-4 text-foreground" strokeWidth={2.5} />
                             </div>
-                            <span className="text-base font-semibold text-gray-500">Cycles</span>
+                            <span className="text-base font-semibold text-muted-foreground">Cycles</span>
                         </Link>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                        <span className="text-base font-semibold text-gray-900">{cycle.name}</span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-base font-semibold text-foreground">{cycle.name}</span>
                     </div>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100/70 border border-gray-200/50 shadow-sm">
-                            <CalendarRange className="h-4 w-4 text-gray-700" strokeWidth={2.5} />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/70 border border-border/50 shadow-sm">
+                            <CalendarRange className="h-4 w-4 text-foreground" strokeWidth={2.5} />
                         </div>
-                        <span className="text-base font-semibold text-gray-900">Cycles</span>
+                        <span className="text-base font-semibold text-foreground">Cycles</span>
                     </div>
                 )}
             </div>
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
-                <Button
+                {/* <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 gap-2 px-3 border-gray-200 text-xs text-gray-600 hover:bg-gray-50"
+                    className="h-8 gap-2 px-3 text-xs"
                     onClick={handleConfigClick}
                 >
                     <Settings2 className="h-4 w-4" />
                     <span className="text-xs">{hasConfig ? "Config" : "Setup Config"}</span>
-                </Button>
+                </Button> */}
 
                 <Link href={`/project/${projectId}/cycles/create`}>
                     <Button
+                        variant="default"
                         size="sm"
-                        className="h-8 gap-2 px-3 bg-[#001F3F] text-xs text-white hover:bg-[#002B5C] shadow-sm rounded-md"
+                        className="h-8 gap-2 px-3 text-xs shadow-sm rounded-md"
                         disabled={!hasConfig}
+                        data-testid="cycles-header-new-btn"
                     >
                         <Plus className="h-4 w-4" />
                         <span className="text-xs">New Cycle</span>

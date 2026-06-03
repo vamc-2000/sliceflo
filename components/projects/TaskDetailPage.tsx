@@ -367,23 +367,23 @@ export function TaskDetailPage({
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Created {currentTask.createdAt ? format(new Date(currentTask.createdAt), "MMM d, yyyy") : "—"}</span>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-more-btn">
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-branch-btn">
                         <GitBranch className="h-4 w-4" />
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-share-btn">
                                 <Share2 className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary">
-                            <DropdownMenuItem onClick={handleCopyTaskLink} className="cursor-pointer">
+                            <DropdownMenuItem onClick={handleCopyTaskLink} className="cursor-pointer" data-testid="task-detail-copy-link-btn">
                                 {isMilestone ? "Milestone Link" : "Task Link"}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleCopyTaskId} className="cursor-pointer">
+                            <DropdownMenuItem onClick={handleCopyTaskId} className="cursor-pointer" data-testid="task-detail-copy-id-btn">
                                 {isMilestone ? "Milestone ID" : "Task ID"}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -407,7 +407,7 @@ export function TaskDetailPage({
                             {/* Meta row: type selector + task ID + copy — above the title */}
                             <div className="flex items-center gap-2">
                                 <Select value={currentTask.taskType || "task"} onValueChange={(v) => handleUpdateTask({ taskType: v })}>
-                                    <SelectTrigger className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2">
+                                    <SelectTrigger data-testid="task-detail-type-select-trigger" className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2">
                                         <SelectValue>
                                             {(() => {
                                                 const t = taskTypes.find((t) => t.value === (currentTask.taskType || "task"));
@@ -423,7 +423,7 @@ export function TaskDetailPage({
                                             const Icon = getTaskTypeIcon(type);
                                             const Default = getDefaultTaskTypeIcon();
                                             return (
-                                                <SelectItem key={type._id} value={type.value}>
+                                                <SelectItem key={type._id} value={type.value} data-testid={`task-detail-type-option-${type.value}`}>
                                                     <div className="flex items-center gap-2">
                                                         {Icon ? <Icon className="w-3.5 h-3.5" style={{ color: getTaskTypeIconColor(type) }} /> : <Default className="w-3.5 h-3.5 text-muted-foreground" />}
                                                         <span className="text-xs">{type.label}</span>
@@ -434,7 +434,7 @@ export function TaskDetailPage({
                                     </SelectContent>
                                 </Select>
                                 <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{formatTaskId(projectSlug, currentTask.taskNumber)}</span>
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigator.clipboard.writeText(currentTask.id)} title={isMilestone ? "Copy full milestone ID" : "Copy full task ID"}><Copy className="h-3 w-3" /></Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigator.clipboard.writeText(currentTask.id)} title={isMilestone ? "Copy full milestone ID" : "Copy full task ID"} data-testid="task-detail-copy-full-id-btn"><Copy className="h-3 w-3" /></Button>
                             </div>
 
                             {/* Task Title — full width below meta row */}
@@ -453,23 +453,24 @@ export function TaskDetailPage({
                                 placeholder={isMilestone ? "Add milestone description with footnote support..." : "Add task description with footnote support..."}
                                 className="task-description-editor"
                                 editable={!isReadOnly}
+                                data-testid="task-detail-description-editor"
                             />
                         </div>
 
                         {/* Action Buttons */}
                         <div className="flex items-center gap-2 flex-wrap">
                             {relationships.length === 0 && !selectedRelationType && (
-                                <RelationshipDropdown variant="action" onSelectType={handleSelectRelationType} />
+                                <RelationshipDropdown variant="action" onSelectType={handleSelectRelationType} data-testid="task-detail-relation-dropdown" />
                             )}
                             {!isSubtask && taskSubtasks.length === 0 && !isAddingSubtask && (
-                                <Button variant="secondary" size="sm" className="text-xs rounded h-8" onClick={() => setIsAddingSubtask(true)}>
+                                <Button variant="secondary" size="sm" className="text-xs rounded h-8" onClick={() => setIsAddingSubtask(true)} data-testid="task-detail-add-subtask-action-btn">
                                     <Plus className="h-3 w-3 mr-1" /> Subtask
                                 </Button>
                             )}
                             {(currentTask.linkedDocuments || []).length === 0 && (
                                 <Popover open={isDocSelectorOpen} onOpenChange={setIsDocSelectorOpen}>
                                     <PopoverTrigger asChild>
-                                        <Button variant="secondary" size="sm" className="text-xs rounded h-8"><Plus className="h-3 w-3 mr-1" />Document</Button>
+                                        <Button variant="secondary" size="sm" className="text-xs rounded h-8" data-testid="task-detail-add-doc-btn"><Plus className="h-3 w-3 mr-1" />Document</Button>
                                     </PopoverTrigger>
                                     {renderDocSelectorContent()}
                                 </Popover>
@@ -489,7 +490,7 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-semibold">Linked Documents</h3>
                                     <Popover open={isDocSelectorOpen} onOpenChange={setIsDocSelectorOpen}>
-                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className="h-8"><Plus className="h-3 w-3 mr-1" />Add Document</Button></PopoverTrigger>
+                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className="h-8" data-testid="task-detail-add-doc-section-btn"><Plus className="h-3 w-3 mr-1" />Add Document</Button></PopoverTrigger>
                                         {renderDocSelectorContent()}
                                     </Popover>
                                 </div>
@@ -516,7 +517,7 @@ export function TaskDetailPage({
                                                     </Link>
                                                     <div className="flex items-center gap-3">
                                                         {!doc.parentId && (
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => setExpandedLinkedDocs((p) => { const n = new Set(p); n.has(doc.id) ? n.delete(doc.id) : n.add(doc.id); return n; })}>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => setExpandedLinkedDocs((p) => { const n = new Set(p); n.has(doc.id) ? n.delete(doc.id) : n.add(doc.id); return n; })} data-testid={`task-detail-expand-doc-btn-${doc.id}`}>
                                                                 <ChevronDown className={cn("h-4 w-4 transition-transform", expandedLinkedDocs.has(doc.id) && "rotate-180")} />
                                                             </Button>
                                                         )}
@@ -526,7 +527,7 @@ export function TaskDetailPage({
                                                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-foreground text-primary-foreground text-[10px] rounded opacity-0 group-hover/creator:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{creator.name}</div>
                                                             </div>
                                                         )}
-                                                        <Button variant="outline" size="sm" onClick={() => removeTaskDocument(currentTask.id, doc.id)} className="h-8 px-6 rounded-full bg-muted text-muted-foreground border-none hover:bg-red-50 hover:text-red-600 transition-all font-medium text-xs">Unlink</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => removeTaskDocument(currentTask.id, doc.id)} className="h-8 px-6 rounded-full bg-muted text-muted-foreground border-none hover:bg-red-50 hover:text-red-600 transition-all font-medium text-xs" data-testid={`task-detail-unlink-doc-btn-${doc.id}`}>Unlink</Button>
                                                     </div>
                                                 </div>
                                                 {!doc.parentId && expandedLinkedDocs.has(doc.id) && (
@@ -549,17 +550,17 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-semibold">Relationships</h3>
                                     <div className="flex items-center gap-2">
-                                        <RelationshipDropdown variant="section" onSelectType={handleSelectRelationType} />
+                                        <RelationshipDropdown variant="section" onSelectType={handleSelectRelationType} data-testid="task-detail-relation-section-dropdown" />
                                         {relationships.length === 0 && selectedRelationType && (
-                                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setSelectedRelationType(null); setShowTaskSelector(false); }}><XIcon className="h-4 w-4" /></Button>
+                                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setSelectedRelationType(null); setShowTaskSelector(false); }} data-testid="task-detail-relation-cancel-btn"><XIcon className="h-4 w-4" /></Button>
                                         )}
                                     </div>
                                 </div>
                                 {selectedRelationType && (
                                     <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
                                         <span className="text-xs text-muted-foreground">Select task for {getRelationshipLabel(selectedRelationType)}</span>
-                                        <TaskSelector tasks={projectTasks.filter((t) => t.id !== currentTask.id)} currentTaskId={currentTask.id} onSelect={handleSelectTask} open={showTaskSelector} onOpenChange={setShowTaskSelector} />
-                                        <Button variant="ghost" size="sm" onClick={() => { setSelectedRelationType(null); setShowTaskSelector(false); }}>Cancel</Button>
+                                        <TaskSelector tasks={projectTasks.filter((t) => t.id !== currentTask.id)} currentTaskId={currentTask.id} onSelect={handleSelectTask} open={showTaskSelector} onOpenChange={setShowTaskSelector} data-testid="task-detail-relation-task-selector" />
+                                        <Button variant="ghost" size="sm" onClick={() => { setSelectedRelationType(null); setShowTaskSelector(false); }} data-testid="task-detail-relation-cancel-btn">Cancel</Button>
                                     </div>
                                 )}
                                 {relationships.length > 0 && (
@@ -576,7 +577,7 @@ export function TaskDetailPage({
                                                             <span className="text-xs font-medium">{target?.name || "Unknown Task"}</span>
                                                         </div>
                                                     </div>
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleRemoveRelationship(rel.id)}><XIcon className="h-3 w-3" /></Button>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleRemoveRelationship(rel.id)} data-testid={`task-detail-relation-remove-btn-${rel.id}`}><XIcon className="h-3 w-3" /></Button>
                                                 </div>
                                             );
                                         })}
@@ -591,7 +592,7 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xs font-semibold">Subtasks</h3>
                                     <div className="flex items-center gap-2">
-                                        <Button variant="secondary" size="sm" className="h-8" onClick={() => setIsAddingSubtask(true)} disabled={isAddingSubtask}><Plus className="h-3 w-3 mr-1" />Add Subtask</Button>
+                                        <Button variant="secondary" size="sm" className="h-8" onClick={() => setIsAddingSubtask(true)} disabled={isAddingSubtask} data-testid="task-detail-add-subtask-btn"><Plus className="h-3 w-3 mr-1" />Add Subtask</Button>
                                         {taskSubtasks.length === 0 && <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setIsAddingSubtask(false); setNewSubtaskName(""); }}><XIcon className="h-4 w-4" /></Button>}
                                     </div>
                                 </div>
@@ -600,7 +601,7 @@ export function TaskDetailPage({
                                         <thead className="bg-muted/50">
                                             <tr className="border-b">
                                                 <th className="text-left p-3 text-xs font-medium text-muted-foreground w-12">
-                                                    <input type="checkbox" className="rounded border-input" checked={taskSubtasks.length > 0 && taskSubtasks.every((s) => s.completed)} disabled={taskSubtasks.length === 0} onChange={(e) => taskSubtasks.forEach((s) => updateSubtask(s.id, { completed: e.target.checked }))} />
+                                                    <input type="checkbox" className="rounded border-input" checked={taskSubtasks.length > 0 && taskSubtasks.every((s) => s.completed)} disabled={taskSubtasks.length === 0} onChange={(e) => taskSubtasks.forEach((s) => updateSubtask(s.id, { completed: e.target.checked }))} data-testid="task-detail-subtask-checkbox-all" />
                                                 </th>
                                                 {["Task", "ID", "Assignee", "Status", "Start Date", "End Date"].map((h) => (
                                                     <th key={h} className="text-left p-3 text-xs font-medium text-muted-foreground">{h}</th>
@@ -614,21 +615,21 @@ export function TaskDetailPage({
                                                     <td className="p-3"><input type="checkbox" disabled className="rounded border-input opacity-50" /></td>
                                                     <td className="p-3">
                                                         <Input value={newSubtaskName} onChange={(e) => setNewSubtaskName(e.target.value)} placeholder="Type subtask name..." className="h-8 border-blue-300 focus-visible:ring-blue-500"
-                                                            onKeyDown={(e) => { if (e.key === "Enter" && newSubtaskName.trim()) handleAddSubtask(); else if (e.key === "Escape") { setIsAddingSubtask(false); setNewSubtaskName(""); } }} autoFocus />
+                                                            onKeyDown={(e) => { if (e.key === "Enter" && newSubtaskName.trim()) handleAddSubtask(); else if (e.key === "Escape") { setIsAddingSubtask(false); setNewSubtaskName(""); } }} autoFocus data-testid="task-detail-subtask-new-input" />
                                                     </td>
                                                     <td className="p-3 text-xs text-muted-foreground opacity-50">Auto-generated</td>
                                                     <td colSpan={4} className="p-3 text-xs text-muted-foreground opacity-50">—</td>
                                                     <td className="p-3">
                                                         <div className="flex gap-1">
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:bg-green-50" onClick={handleAddSubtask} disabled={!newSubtaskName.trim()}><Check className="h-4 w-4" /></Button>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:bg-red-50" onClick={() => { setIsAddingSubtask(false); setNewSubtaskName(""); }}><XIcon className="h-4 w-4" /></Button>
+                                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:bg-green-50" onClick={handleAddSubtask} disabled={!newSubtaskName.trim()} data-testid="task-detail-subtask-new-save-btn"><Check className="h-4 w-4" /></Button>
+                                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:bg-red-50" onClick={() => { setIsAddingSubtask(false); setNewSubtaskName(""); }} data-testid="task-detail-subtask-new-cancel-btn"><XIcon className="h-4 w-4" /></Button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             )}
                                             {taskSubtasks.map((subtask) => (
                                                 <tr key={subtask.id} className="border-b hover:bg-muted/20">
-                                                    <td className="p-3"><input type="checkbox" className="rounded border-input" checked={subtask.completed} onChange={(e) => updateSubtask(subtask.id, { completed: e.target.checked })} /></td>
+                                                    <td className="p-3"><input type="checkbox" className="rounded border-input" checked={subtask.completed} onChange={(e) => updateSubtask(subtask.id, { completed: e.target.checked })} data-testid={`task-detail-subtask-checkbox-${subtask.id}`} /></td>
                                                     <td className="p-3 text-xs"><span className={cn(subtask.completed && "line-through text-muted-foreground")}>{subtask.name}</span></td>
                                                     <td className="p-3 text-xs text-muted-foreground">{formatTaskId(projectSlug, subtask.taskNumber)}</td>
                                                     <td className="p-3 text-xs">
@@ -651,9 +652,9 @@ export function TaskDetailPage({
                                                     <td className="p-3 text-xs text-muted-foreground">{subtask.endDate ? format(new Date(subtask.endDate), "MMM dd, yyyy") : "—"}</td>
                                                     <td className="p-3">
                                                         <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`task-detail-subtask-menu-trigger-${subtask.id}`}><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem onClick={() => deleteSubtask(subtask.id)} className="text-red-600">Delete Subtask</DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => deleteSubtask(subtask.id)} className="text-red-600" data-testid={`task-detail-subtask-delete-btn-${subtask.id}`}>Delete Subtask</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
                                                     </td>
@@ -680,6 +681,7 @@ export function TaskDetailPage({
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
+                                data-testid={`task-detail-tab-${tab}`}
                                 className={`
                                     flex-1 py-2 rounded-lg text-xs font-semibold transition-all duration-200
                                     ${activeTab === tab
@@ -700,7 +702,7 @@ export function TaskDetailPage({
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><LayoutTemplate className="h-4 w-4" />Status</Label>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.status && "text-muted-foreground")}>
+                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.status && "text-muted-foreground")} data-testid="task-detail-status-trigger">
                                                 {currentTask.status ? (() => { const c = taskStatusConfigs.find((s) => s.value === currentTask.status || s.label === currentTask.status); return <span className="flex items-center gap-1.5">{c && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.color }} />}{c?.label || currentTask.status}</span>; })() : "—"}
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -716,7 +718,7 @@ export function TaskDetailPage({
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><Flag className="h-4 w-4" />Priority</Label>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.priority && "text-muted-foreground")}>
+                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.priority && "text-muted-foreground")} data-testid="task-detail-priority-trigger">
                                                 {currentTask.priority ? <span className="flex items-center gap-1.5">{getPriorityColor(currentTask.priority) && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: getPriorityColor(currentTask.priority) }} />}{currentTask.priority}</span> : "—"}
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -731,7 +733,7 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between py-1">
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Start Date</Label>
                                     <Popover>
-                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.startDate && "text-muted-foreground")}>{currentTask.startDate ? format(new Date(currentTask.startDate), "PP") : "—"}</Button></PopoverTrigger>
+                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.startDate && "text-muted-foreground")} data-testid="task-detail-start-date-trigger">{currentTask.startDate ? format(new Date(currentTask.startDate), "PP") : "—"}</Button></PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="end">
                                             <Calendar
                                                 mode="single"
@@ -756,7 +758,7 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between py-1">
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Due Date</Label>
                                     <Popover>
-                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.endDate && "text-muted-foreground")}>{currentTask.endDate ? format(new Date(currentTask.endDate), "PP") : "—"}</Button></PopoverTrigger>
+                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.endDate && "text-muted-foreground")} data-testid="task-detail-due-date-trigger">{currentTask.endDate ? format(new Date(currentTask.endDate), "PP") : "—"}</Button></PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="end">
                                             <Calendar
                                                 mode="single"
@@ -774,7 +776,7 @@ export function TaskDetailPage({
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><User className="h-4 w-4" />Assignee</Label>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.assignee && "text-muted-foreground")}>
+                                            <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentTask.assignee && "text-muted-foreground")} data-testid="task-detail-assignee-trigger">
                                                 {currentTask.assignee ? (() => {
                                                     const member = workspaceMembers.find(m => m.userId === currentTask.assignee);
                                                     const name = member?.name || currentTask.assignee;
@@ -815,7 +817,7 @@ export function TaskDetailPage({
                                             onSelect={handleSelectLabel}
                                             onRemove={handleRemoveLabel}
                                         >
-                                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                                            <Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-label-picker-trigger">
                                                 <Plus className="h-3 w-3" />
                                             </Button>
                                         </LabelPicker>
@@ -830,6 +832,7 @@ export function TaskDetailPage({
                                                         key={labelId}
                                                         label={label}
                                                         onRemove={() => handleRemoveLabel(labelId)}
+                                                        removeButtonTestId={`task-detail-label-remove-${labelId}`}
                                                     />
                                                 );
                                             })
@@ -843,7 +846,7 @@ export function TaskDetailPage({
                                     <div className="flex items-center justify-between py-1">
                                         <p className="text-xs font-semibold uppercase tracking-wide">Custom Fields</p>
                                         <Popover open={showAddFieldPopover} onOpenChange={setShowAddFieldPopover}>
-                                            <PopoverTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6"><Plus className="h-3 w-3" /></Button></PopoverTrigger>
+                                            <PopoverTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-add-custom-field-trigger"><Plus className="h-3 w-3" /></Button></PopoverTrigger>
                                             <PopoverContent className="w-[300px] p-0 flex flex-col" align="end" style={{ height: "480px" }}>
                                                 <FieldTypeSelectContent projectId={projectId} onFieldCreated={() => setShowAddFieldPopover(false)} onBack={() => setShowAddFieldPopover(false)} />
                                             </PopoverContent>
@@ -858,7 +861,7 @@ export function TaskDetailPage({
                                                 return (
                                                     <div key={field.id} className="flex items-center justify-between py-1">
                                                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0 max-w-[45%]"><IconComponent className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{field.name}</span></Label>
-                                                        <div className="w-[160px]">
+                                                        <div className="w-[160px]" data-testid={`task-detail-custom-field-dropdown-${field.id}`}>
                                                             <CustomFieldDropdown field={fd} value={currentTask.customFieldValues?.[field.id] || (field.type === "select-many" || field.type === "label" ? [] : "")}
                                                                 onUpdate={(v) => handleUpdateTask({ customFieldValues: { ...currentTask.customFieldValues, [field.id]: v } })} task={currentTask} />
                                                         </div>
@@ -866,7 +869,7 @@ export function TaskDetailPage({
                                                 );
                                             })}
                                             {customFields.length > CUSTOM_FIELDS_PREVIEW_COUNT && (
-                                                <button onClick={() => setShowAllCustomFields((p) => !p)} className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors">
+                                                <button onClick={() => setShowAllCustomFields((p) => !p)} className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors" data-testid="task-detail-custom-field-toggle-show-all">
                                                     <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", showAllCustomFields && "rotate-180")} />
                                                     {showAllCustomFields ? "Show less" : `Show ${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT} more field${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT > 1 ? "s" : ""}`}
                                                 </button>

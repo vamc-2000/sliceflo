@@ -17,7 +17,7 @@ interface CycleOverviewProps {
 
 export function CycleOverview({ isEmpty, tasks, project, cycleId }: CycleOverviewProps) {
     return (
-        <div className="flex-1 flex overflow-hidden h-full">
+        <div data-testid="cycle-overview-container" className="flex-1 flex overflow-hidden h-full">
             {/* Left Side: Dashboard */}
             <div className="flex-1 overflow-auto p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">

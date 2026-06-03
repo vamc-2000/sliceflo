@@ -91,7 +91,7 @@ export function Header() {
         : "U";
 
     return (
-        <header className="flex items-center justify-between px-4 py-1.5 bg-header transition-colors duration-300 border-b border-border/10">
+        <header className="flex items-center justify-between px-4 py-1.5 bg-header transition-colors duration-300 border-b border-border/10" data-testid="header-container">
             <div className="flex items-center">
                           <Image
                             src="/sidebarlogo.png"
@@ -102,6 +102,7 @@ export function Header() {
                                 "transition-all duration-200",
                                 mounted && theme === "light" && "filter invert hue-rotate-180 grayscale-0 contrast-125"
                             )}
+                            data-testid="header-logo"
                           />
                         </div>
 
@@ -111,7 +112,7 @@ export function Header() {
                         <div className={cn(
                             "relative group cursor-pointer transition-all duration-300 ease-in-out overflow-hidden",
                             isSearchOpen ? "w-[500px]" : "w-90"
-                        )}>
+                        )} data-testid="header-search-trigger">
                             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                                 <Search className="h-4 w-4 text-header-foreground/50 group-hover:text-header-foreground transition-colors" />
                             </div>
@@ -120,14 +121,14 @@ export function Header() {
                             </div>
                         </div>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0 w-[500px] shadow-2xl border-border/50 animate-in fade-in zoom-in-95 duration-200" align="start" sideOffset={4}>
+                    <PopoverContent className="p-0 w-[500px] shadow-2xl border-border/50 animate-in fade-in zoom-in-95 duration-200" align="start" sideOffset={4} data-testid="header-search-popover">
                         <Command className="rounded-xl border shadow-md">
-                            <CommandInput placeholder="Search commands..." className="h-12" />
+                            <CommandInput placeholder="Search commands..." className="h-12" data-testid="header-search-input" />
                             <CommandList className="max-h-[450px] scrollbar-none">
-                                <CommandEmpty>No results found.</CommandEmpty>
+                                <CommandEmpty data-testid="header-search-empty">No results found.</CommandEmpty>
                                 
                                 <CommandGroup heading="Create" className="px-2">
-                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer">
+                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer" data-testid="search-create-workitem-btn">
                                         <Briefcase className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">New work item</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -142,6 +143,7 @@ export function Header() {
                                             router.push("/project");
                                             setSearchOpen(false);
                                         }}
+                                        data-testid="search-create-project-btn"
                                     >
                                         <FolderPlus className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">New project</span>
@@ -151,7 +153,7 @@ export function Header() {
                                             <kbd className="h-5 min-w-[20px] items-center justify-center rounded border bg-muted px-1.5 font-mono text-[10px] flex">P</kbd>
                                         </div>
                                     </CommandItem>
-                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer">
+                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer" data-testid="search-create-workspace-btn">
                                         <PlusSquare className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">New workspace</span>
                                     </CommandItem>
@@ -164,7 +166,8 @@ export function Header() {
                                     onSelect={() => {
                                             router.push("/project");
                                             setSearchOpen(false);
-                                        }}>
+                                        }}
+                                    data-testid="search-open-project-btn">
                                         <Folder className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Open a project</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -178,7 +181,8 @@ export function Header() {
                                    onSelect={() => {
                                             router.push("/settings?tab=workspace&section=general");
                                             setSearchOpen(false);
-                                        }}>
+                                        }}
+                                    data-testid="search-open-settings-btn">
                                         <Settings className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Open a workspace setting</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -187,7 +191,7 @@ export function Header() {
                                             <kbd className="h-5 min-w-[20px] items-center justify-center rounded border bg-muted px-1.5 font-mono text-[10px] flex">S</kbd>
                                         </div>
                                     </CommandItem>
-                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer">
+                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer" data-testid="search-open-workspace-btn">
                                         <Layout className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Open a workspace</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -202,6 +206,7 @@ export function Header() {
                                             router.push("/dashboard");
                                             setSearchOpen(false);
                                         }}
+                                        data-testid="search-goto-home-btn"
                                     >
                                         <Home className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Go to home</span>
@@ -215,7 +220,8 @@ export function Header() {
                                     onSelect={() => {
                                             router.push("/mailbox");
                                             setSearchOpen(false);
-                                        }}>
+                                        }}
+                                    data-testid="search-goto-inbox-btn">
                                         <Mail className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Go to inbox</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -228,7 +234,8 @@ export function Header() {
                                     onSelect={() => {
                                             router.push("/mywork");
                                             setSearchOpen(false);
-                                        }}>
+                                        }}
+                                    data-testid="search-goto-mywork-btn">
                                         <User className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Go to your work</span>
                                         <div className="ml-auto flex items-center gap-1.5">
@@ -237,7 +244,7 @@ export function Header() {
                                             <kbd className="h-5 min-w-[20px] items-center justify-center rounded border bg-muted px-1.5 font-mono text-[10px] flex">Y</kbd>
                                         </div>
                                     </CommandItem>
-                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer">
+                                    <CommandItem className="rounded-lg flex items-center gap-2 py-2.5 cursor-pointer" data-testid="search-goto-allworkitems-btn">
                                         <Layers className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm font-medium">Go to all work items</span>
                                     </CommandItem>
@@ -245,7 +252,7 @@ export function Header() {
                             </CommandList>
                             <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/20">
                                 <span className="text-xs text-muted-foreground font-medium">Workspace level</span>
-                                <Switch className="scale-75" />
+                                <Switch className="scale-75" data-testid="search-workspace-switch" />
                             </div>
                         </Command>
                     </PopoverContent>
@@ -258,18 +265,19 @@ export function Header() {
                     variant="outline"
                     size="sm"
                     className="bg-header-foreground/10 text-header-foreground border-header-foreground/20 hover:bg-header-foreground/20 transition-all font-inter text-[12px] h-8"
+                    data-testid="header-create-new-btn"
                 >
                     <Plus className="mr-1.5 h-3.5 w-3.5" />
                     Create New
                 </Button>
 
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" data-testid="header-notifications-btn">
                     <Bell className="h-5 w-5 text-muted-foreground" />
                 </Button>
 
                 <Popover open={isUserPopOpen} onOpenChange={setUserPopOpen}>
                     <PopoverTrigger asChild>
-                        <button className="focus:outline-none">
+                        <button className="focus:outline-none" data-testid="header-user-avatar-btn">
                             <Avatar className="w-9 h-9">
                                 <AvatarImage 
                                     src={fullProfileUrl?.trim() ? fullProfileUrl : undefined} 
@@ -286,6 +294,7 @@ export function Header() {
                         className="p-0 w-auto border-none shadow-xl"
                         align="end"
                         sideOffset={5}
+                        data-testid="header-user-settings-popover"
                     >
                         <UserSettings
                             onClose={() => setUserPopOpen(false)}

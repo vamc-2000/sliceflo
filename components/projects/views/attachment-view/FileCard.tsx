@@ -1,4 +1,4 @@
-﻿// components/projects/views/attachment-view/FileCard.tsx
+// components/projects/views/attachment-view/FileCard.tsx
 "use client";
 
 import { Download, MoreVertical, Share2, Trash2, FileText, Film, FileSpreadsheet, Ellipsis } from "lucide-react";
@@ -43,8 +43,8 @@ const getFileIconBg = (type: string) => {
         case 'jpg':   
         case 'mp4':   
         case 'xlsx':  
-        case 'doc':   return 'text-[#8E8E93]';
-        default:      return 'bg-gray-100 text-gray-600 border-gray-200';
+        case 'doc':   return 'text-muted-foreground';
+        default:      return 'bg-muted text-muted-foreground border-border';
     }
 };
 
@@ -52,13 +52,13 @@ export function FileCard({ file, checked, onCheckedChange, onDownload, onDelete,
     return (
         <div className="w-full flex items-center gap-4">
             {/* Checkbox */}
-            <input
+            <input data-testid={`file-card-checkbox-${file.id}`}
                 type="checkbox"
                 checked={checked ?? false}
                 onChange={e => onCheckedChange?.(file.id, e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-[#8E8E93] accent-[#001F3F] text-[#001F3F] focus:ring-primary cursor-pointer"
+                className="mt-1 h-4 w-4 rounded border-border accent-primary focus:ring-primary cursor-pointer bg-background"
             />
-            <div className="w-full flex items-center gap-4 group border rounded-md px-3 py-2 hover:border-primary/30 hover:shadow-sm transition-all bg-background cursor-pointer"
+            <div data-testid={`file-card-container-${file.id}`} className="w-full flex items-center gap-4 group bg-card shadow-sm border border-border rounded-lg px-3 py-2.5 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => onView?.(file.id)}
             >
                 {/* File Icon */}                
@@ -86,16 +86,20 @@ export function FileCard({ file, checked, onCheckedChange, onDownload, onDelete,
                                                 className="text-xs px-1 py-0.5"
                                             >
                                                 {tag}
-                                            </Badge>
+                                             </Badge>
                                         ))}
                                     </div>
                                 )}
                             </div>
-                            <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
                                 {file.attachedTo && (
-                                    <span>Attached to {file.attachedTo}</span>
+                                    <>
+                                        <span>Attached to {file.attachedTo}</span>
+                                        <span className="text-muted-foreground/50">•</span>
+                                    </>
                                 )}
                                 <span>Uploaded by {file.uploadedBy.name}</span>
+                                <span className="text-muted-foreground/50">•</span>
                                 <span>{file.size}</span>
                             </div>
                         </div>
@@ -118,16 +122,16 @@ export function FileCard({ file, checked, onCheckedChange, onDownload, onDelete,
                             </Button>
                         )}
 
-                        <Button
+                        <Button data-testid={`file-card-download-button-${file.id}`}
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 hover:bg-transparent pl-2"
+                            className="h-8 w-8 hover:bg-transparent pl-2 text-primary"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onDownload?.(file.id);
                             }}
                         >
-                            <Download className="h-4 w-4 text-[#001F3F]" strokeWidth={2.8} />
+                            <Download className="h-4 w-4" strokeWidth={2} />
                         </Button>
 
                         <div onClick={(e) => e.stopPropagation()}>

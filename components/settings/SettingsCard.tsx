@@ -15,6 +15,7 @@ interface SettingsCardProps {
     children: React.ReactNode;
     actionButton?: React.ReactNode;
     showChevron?: boolean;
+    "data-testid"?: string;
 }
 
 export const SettingsCard: React.FC<SettingsCardProps> = ({
@@ -27,9 +28,10 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     children,
     actionButton,
     showChevron = true,
+    "data-testid": dataTestId,
 }) => {
     return (
-        <Card id={id} className="border rounded-lg overflow-hidden border-l-4 border-l-primary bg-card font-inter  transition-colors duration-200">
+        <Card id={id} className="border rounded-lg overflow-hidden border-l-4 border-l-primary bg-card font-inter  transition-colors duration-200" data-testid={dataTestId}>
             <CardHeader
                 className="cursor-pointer transition-colors p-2"
                 onClick={onToggle}

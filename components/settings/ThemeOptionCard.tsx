@@ -8,6 +8,7 @@ interface ThemeOptionCardProps {
     isSelected: boolean;
     onClick: () => void;
     borderColor?: string;
+    "data-testid"?: string;
 }
 
 export const ThemeOptionCard: React.FC<ThemeOptionCardProps> = ({
@@ -15,6 +16,7 @@ export const ThemeOptionCard: React.FC<ThemeOptionCardProps> = ({
     imageSrc,
     isSelected,
     onClick,
+    "data-testid": dataTestId,
 }) => {
     return (
         <div className="flex flex-col items-center gap-2 p-1">
@@ -25,6 +27,7 @@ export const ThemeOptionCard: React.FC<ThemeOptionCardProps> = ({
                     ? "border-[var(--primary)] shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                     : "border-border shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-border"
                     }`}
+                data-testid={dataTestId}
             >
                 {/* Inner image box with border — square-ish */}
                 <div

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Funnel } from "lucide-react";
 import {
@@ -50,9 +50,9 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
     const [search, setSearch] = useState("");
 
     const tagColors: Record<string, string> = {
-        "Tag option 1": "bg-[#dafbe1] text-[#34C759] border border-[#34C759] hover:bg-[#dafbe1]",
-        "Tag option 2": "bg-[#fbdaff] text-[#CB30E0] border border-[#CB30E0] hover:bg-[#fbdaff]",
-        "Tag option 3": "bg-[#ffd8d5] text-[#FF3B30] border border-[#FF3B30] hover:bg-[#ffd8d5]",
+        "Tag option 1": "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30",
+        "Tag option 2": "bg-purple-500/10 text-purple-600 border border-purple-500/20 hover:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/30",
+        "Tag option 3": "bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/15",
     };
 
     const tags = ["Tag option 1", "Tag option 2", "Tag option 3"];
@@ -82,27 +82,27 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
-                    variant="outline"
-                    className="h-9 bg-[#E5E5EA] text-[#8E8E93] rounded-md"
+                    variant="secondary"
+                    className="h-9 rounded-md text-xs"
                 >
-                    <Funnel className="h-4 w-4 mr-2 " />
+                    <Funnel className="h-4 w-4 mr-2" />
                     Filter
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-56 text-[#001F3F] border-0 border-b-[5px] border-[#001F3F]">
+            <DropdownMenuContent align="start" className="w-56 bg-popover border border-border border-b-[5px] border-b-primary text-popover-foreground">
 
                 {/* Attachment Type Submenu */}
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger
                         className={`rounded-none cursor-pointer transition-colors ${activeFilters?.attachmentType && activeFilters.attachmentType.length > 0
-                            ? 'border-l-2 border-[#001F3F] pl-2 text-[#001F3F]'
+                            ? 'border-l-2 border-primary pl-2 text-primary font-semibold'
                             : ''
                             }`}
                     >
                         Attachment Type
                     </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-[#001F3F]">
+                    <DropdownMenuSubContent className="bg-popover border border-border border-b-[5px] border-b-primary text-popover-foreground">
                         {uniqueExtensions.map(ext => (
                             <DropdownMenuItem
                                 key={ext}
@@ -110,7 +110,7 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                                 className={`rounded-none cursor-pointer transition-colors ${(Array.isArray(activeFilters?.attachmentType)
                                         ? activeFilters.attachmentType.includes(ext)
                                         : activeFilters?.attachmentType === ext)
-                                        ? 'border-l-2 border-[#001F3F] pl-2 text-[#001F3F]'
+                                        ? 'border-l-2 border-primary pl-2 text-primary font-semibold'
                                         : ''
                                     }`}
                             >
@@ -125,19 +125,19 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger
                         className={`rounded-none cursor-pointer transition-colors ${activeFilters?.user
-                            ? 'border-l-2 border-[#001F3F] pl-2 text-[#001F3F]'
+                            ? 'border-l-2 border-primary pl-2 text-primary font-semibold'
                             : ''
                             }`}
                     >
                         User
                     </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="w-56 border-0 border-b-[5px] border-[#001F3F] max-h-75 overflow-y-auto">
+                    <DropdownMenuSubContent className="w-56 bg-popover border border-border border-b-[5px] border-b-primary text-popover-foreground max-h-75 overflow-y-auto">
                         {mappedMembers.map(member => (
                             <DropdownMenuItem
                                 key={member.id}
                                 onClick={() => onFilterChange?.("user", member.id)}
                                 className={`cursor-pointer rounded-none transition-colors ${activeFilters?.user === member.id
-                                    ? 'border-0 border-l-2 border-[#001F3F] text-[#001F3F]'
+                                    ? 'border-0 border-l-2 border-primary text-primary font-semibold'
                                     : 'hover:bg-muted'
                                     }`}
                             >
@@ -146,8 +146,8 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                                         <img src={member.avatar} alt={member.name} className="w-5 h-5 rounded-full object-cover shrink-0" />
                                     ) : (
                                         <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium shrink-0 ${activeFilters?.user === member.id
-                                            ? 'bg-white text-[#001F3F]'
-                                            : 'bg-blue-100 text-blue-600'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-primary/10 text-primary'
                                             }`}>
                                             {member.name.charAt(0).toUpperCase()}
                                         </div>
@@ -166,7 +166,7 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                         Labels
                     </DropdownMenuSubTrigger>
 
-                    <DropdownMenuSubContent className="w-56 p-2 space-y-2 border-0 border-b-[5px] border-[#001F3F]">
+                    <DropdownMenuSubContent className="w-56 p-2 space-y-2 bg-popover border border-border border-b-[5px] border-b-primary text-popover-foreground">
                         {/* Search Input */}
                         <div className="mb-2">
                             <Input
@@ -188,7 +188,7 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                                         onClick={() => onFilterChange?.("tag", tag)}
                                         className={`w-full rounded-md px-3 py-2 text-xs font-medium 
                                             flex items-center justify-center text-center
-                                            ${tagColors[tag] || "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"}
+                                            ${tagColors[tag] || "bg-muted text-muted-foreground border border-border hover:bg-muted/80"}
                                         `}
                                     >
                                         {tag}
@@ -200,7 +200,7 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
                                 </div>
                             )}
                         </div>
-                        <div className="bg-[#001F3F] text-white text-center rounded p-1.5 text-xs">
+                        <div className="bg-primary text-primary-foreground text-center rounded p-1.5 text-xs cursor-pointer hover:bg-primary/90">
                             + Add new Tag
                         </div>
                     </DropdownMenuSubContent>
@@ -210,7 +210,7 @@ export function FilterDropdown({ onFilterChange, onClearFilters, attachments = [
 
                 <DropdownMenuItem
                     onClick={onClearFilters}
-                    className="text-[#8E8E93]"
+                    className="text-muted-foreground"
                 >
                     Clear all filters
                 </DropdownMenuItem>

@@ -25,6 +25,7 @@ interface TaskSelectorProps {
   onSelect: (taskId: string) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  "data-testid"?: string;
 }
 
 export function TaskSelector({
@@ -33,19 +34,20 @@ export function TaskSelector({
   onSelect,
   open,
   onOpenChange,
+  "data-testid": dataTestId,
 }: TaskSelectorProps) {
   const availableTasks = tasks.filter((t) => t.id !== currentTaskId);
 
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" data-testid={dataTestId}>
           Select Task
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput placeholder="Search tasks..." />
+          <CommandInput placeholder="Search tasks..." data-testid="task-detail-relation-selector-search" />
           <CommandEmpty>No task found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
             {availableTasks.map((task) => (
@@ -55,6 +57,7 @@ export function TaskSelector({
                   onSelect(task.id);
                   onOpenChange(false);
                 }}
+                data-testid={`task-detail-relation-selector-option-${task.id}`}
               >
                 <Check
                   className={cn(

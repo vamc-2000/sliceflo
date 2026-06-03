@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -120,6 +120,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                         className="p-2 rounded-md bg-muted hover:bg-muted transition"
                         onClick={() => setIsAttachModalOpen(true)}
                         disabled={isUploading}
+                        data-testid="task-attachments-add-more-btn"
                     >
                         <Paperclip className="h-5 w-5 text-muted-foreground" />
                     </button>
@@ -140,6 +141,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                     onClick={() => setIsAttachModalOpen(true)}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
+                    data-testid="task-attachments-upload-zone"
                 >
                     <div className="flex flex-col items-center gap-2">
                         <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
@@ -156,6 +158,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                                         // handleFileClick();
                                         setIsAttachModalOpen(true)
                                     }}
+                                    data-testid="task-attachments-choose-file-btn"
                                 >
                                     choose file
                                 </span>{" "}
@@ -223,6 +226,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                                         size="icon"
                                         onClick={() => console.log("Download", file.id)}
                                         className="bg-muted rounded-full h-6 w-6"
+                                        data-testid={`task-attachment-download-${file.id}`}
                                     >
                                         <Download className="h-2 w-2 text-muted-foreground" />
                                     </Button>
@@ -231,6 +235,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                                         size="icon"
                                         onClick={() => toggleExpand(file.id)}
                                         className="bg-muted rounded-full h-6 w-6"
+                                        data-testid={`task-attachment-maximize-${file.id}`}
                                     >
                                         <Maximize2 className="h-2 w-2 text-muted-foreground" />
                                     </Button>
@@ -239,6 +244,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                                         size="icon"
                                         onClick={() => console.log("Delete", file.id)}
                                         className="bg-muted rounded-full h-6 w-6"
+                                        data-testid={`task-attachment-delete-${file.id}`}
                                     >
                                         <Trash2 className="h-2 w-2 text-destructive" />
                                     </Button>
@@ -252,6 +258,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                             <button
                                 onClick={() => setShowAll(!showAll)}
                                 className="text-xs text-muted-foreground text-center font-medium hover:underline"
+                                data-testid="task-attachments-show-all-btn"
                             >
                                 {showAll
                                     ? "Show less"

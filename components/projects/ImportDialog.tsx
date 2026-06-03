@@ -1,4 +1,4 @@
-﻿// components/projects/ImportDialog.tsx
+// components/projects/ImportDialog.tsx
 "use client";
 
 import { useState } from "react";
@@ -96,6 +96,7 @@ export function ImportDialog({ open, onClose, projectId }: ImportDialogProps) {
                     <button
                         onClick={onClose}
                         className="p-1 rounded hover:bg-muted transition-colors"
+                        data-testid="import-dialog-back-btn"
                     >
                         <ArrowLeft className="h-4 w-4" />
                     </button>
@@ -121,7 +122,7 @@ export function ImportDialog({ open, onClose, projectId }: ImportDialogProps) {
                             }
                         `}
                     >
-                        <label htmlFor="import-file-upload" className="cursor-pointer flex flex-col items-center gap-3">
+                        <label htmlFor="import-file-upload" className="cursor-pointer flex flex-col items-center gap-3" data-testid="import-dialog-dropzone-label">
                             {/* Green circle upload icon — matches Image 2 */}
                             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
                                 <Download className="h-6 w-6 text-green-600" />
@@ -149,6 +150,7 @@ export function ImportDialog({ open, onClose, projectId }: ImportDialogProps) {
                                 accept=".csv,.xls,.xlsx"
                                 className="hidden"
                                 onChange={handleFileChange}
+                                data-testid="import-dialog-file-input"
                             />
                         </label>
                     </div>
@@ -165,7 +167,7 @@ export function ImportDialog({ open, onClose, projectId }: ImportDialogProps) {
                                     {item.status === "uploading" ? (
                                         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground flex-shrink-0" />
                                     ) : (
-                                        <button onClick={() => handleRemove(idx)}>
+                                        <button onClick={() => handleRemove(idx)} data-testid={`import-dialog-remove-file-${idx}`}>
                                             <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                                         </button>
                                     )}
@@ -238,7 +240,7 @@ function SourceChip({
     label: string;
 }) {
     return (
-        <button className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-background transition-colors">
+        <button className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-background transition-colors" data-testid={`import-dialog-source-${label.toLowerCase().replace(/\s+/g, '-')}`}>
             <Image src={iconSrc} alt={label} width={14} height={14} />
             {label}
         </button>

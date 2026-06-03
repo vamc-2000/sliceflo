@@ -60,7 +60,7 @@ export function ColorPalette({ currentColor, onSelect, onClose, excludeColors = 
                 {/* Color Grid */}
                 <div className="grid grid-cols-7 gap-1.5">
                     {filteredColors.map((color) => (
-                        <button
+                        <button data-testid={`color-palette-option-${color}`}
                             key={color}
                             type="button"
                             onClick={() => onSelect(color)}
@@ -82,9 +82,9 @@ export function ColorPalette({ currentColor, onSelect, onClose, excludeColors = 
 
                 {/* Pencil — custom color picker */}
                 <div className="mt-2 pt-2 border-t border-border">
-                    <label className="cursor-pointer flex items-center gap-1 text-muted-foreground hover:text-muted-foreground">
+                    <label data-testid="color-palette-custom-label" className="cursor-pointer flex items-center gap-1 text-muted-foreground hover:text-muted-foreground">
                         <Pencil className="h-4 w-4" />
-                        <input
+                        <input data-testid="color-palette-custom-input"
                             type="color"
                             className="sr-only"
                             value={currentColor === 'transparent' ? '#ffffff' : currentColor}

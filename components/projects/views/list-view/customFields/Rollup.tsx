@@ -52,7 +52,7 @@ export function RollupField({ onSubmit, onCancel }: RollupFieldProps) {
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             id="field-name"
             value={fieldName}
             onChange={(e) => setFieldName(e.target.value)}
@@ -66,18 +66,18 @@ export function RollupField({ onSubmit, onCancel }: RollupFieldProps) {
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -100,7 +100,7 @@ export function RollupField({ onSubmit, onCancel }: RollupFieldProps) {
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -108,7 +108,7 @@ export function RollupField({ onSubmit, onCancel }: RollupFieldProps) {
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

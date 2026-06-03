@@ -3,6 +3,9 @@ import {
   Workspace,
   WorkspaceCustomFieldConfig,
   ProjectPhase,
+  ProjectExport,
+  ListExportsResponse,
+  ExportDownloadResponse,
 } from "@/types/workspace.types";
 import axiosInstance from "./axios-instance";
 
@@ -188,4 +191,32 @@ export const deleteChildProjectPhaseApi = async (
   await axiosInstance.delete(
     `/workspace/${workspaceId}/project-state-config/${stateId}?isChild=true&parentStateId=${parentStateId}`
   );
+};
+
+// POST - export project
+export const exportProjectApi = async (projectId: string): Promise<ProjectExport> => {
+  const response = await axiosInstance.post<ProjectExport>(`/project/${projectId}/export`);
+  return response;
+};
+
+// GET - list exports for current user
+export const getExportsApi = async (params: {
+  projectId?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<ListExportsResponse> => {
+  const response = await axiosInstance.get<ListExportsResponse>('/exports', { params });
+  return response;
+};
+
+// GET - get export details
+export const getExportDetailsApi = async (exportId: string): Promise<ProjectExport> => {
+  const response = await axiosInstance.get<ProjectExport>(`/exports/${exportId}`);
+  return response;
+};
+
+// GET - get download URL for export
+export const getExportDownloadApi = async (exportId: string): Promise<ExportDownloadResponse> => {
+  const response = await axiosInstance.get<ExportDownloadResponse>(`/exports/${exportId}/download`);
+  return response;
 };

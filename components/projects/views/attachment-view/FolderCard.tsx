@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { ChevronRight, ChevronDown, Folder, Download, ChevronUp } from "lucide-react";
@@ -56,24 +56,24 @@ export function FolderCard({
         <div className="space-y-2">
             <div className="w-full flex items-center gap-4">
                 {/* ✅ Folder checkbox — controls all children */}
-                <input
+                <input data-testid={`folder-card-checkbox-${taskName}`}
                     type="checkbox"
                     checked={allChecked}
                     ref={el => {
                         if (el) el.indeterminate = someChecked; // ✅ show dash when partially checked
                     }}
                     onChange={handleFolderCheckbox}
-                    className="mt-1 h-4 w-4 rounded border-[#8E8E93] accent-[#001F3F] text-[#001F3F] focus:ring-primary cursor-pointer"
+                    className="mt-1 h-4 w-4 rounded border-border accent-primary focus:ring-primary cursor-pointer bg-background"
                 />
 
-                <div className="w-full flex items-center gap-3 border rounded-md px-3 py-2 hover:border-primary/30 hover:shadow-sm transition-all bg-background">
+                <div className="w-full flex items-center gap-3 bg-card shadow-sm border border-border rounded-lg px-3 py-2.5 hover:border-primary/30 hover:shadow-md transition-all">
                     {/* Folder icon + name */}
-                    <div
+                    <div data-testid={`folder-card-container-${taskName}`}
                         onClick={() => setOpen(!open)}
                         className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
                     >
                         {/* <Folder className="w-6 h-6 text-yellow-500 shrink-0" /> */}
-                        <div className="shrink-0 flex items-center justify-center  rounded-full p-2 border border-[#E3EFFF] bg-[#F6FAFF]">
+                        <div className="shrink-0 flex items-center justify-center rounded-full p-2 border border-primary/20 bg-primary/5">
                             <Folder className="w-6 h-6 text-yellow-500" />
                         </div>
                         <div className="flex flex-col min-w-0">
@@ -104,13 +104,13 @@ export function FolderCard({
                                     </div>
                                 )}
                             </div>
-                            <button
+                            <button data-testid={`folder-card-toggle-button-${taskName}`}
                                 onClick={() => setOpen(!open)}
-                                className="text-[#001F3F] hover:text-foreground transition-colors mr-1"
+                                className="text-primary hover:text-foreground transition-colors mr-1"
                             >
                                 {open
-                                    ? <ChevronDown className="w-4 h-4" strokeWidth={2.8} />
-                                    : <ChevronUp className="w-4 h-4" strokeWidth={2.8} />
+                                    ? <ChevronDown className="w-4 h-4" strokeWidth={2} />
+                                    : <ChevronUp className="w-4 h-4" strokeWidth={2} />
                                 }
                             </button>
                         </div>

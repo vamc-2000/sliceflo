@@ -1,4 +1,4 @@
-﻿// components/projects/ExportDialog.tsx
+// components/projects/ExportDialog.tsx
 "use client";
 
 import {
@@ -82,6 +82,7 @@ export function ExportDialog({
                             key={opt.id}
                             onClick={() => handleExport(opt.id)}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-xs hover:bg-muted transition-colors text-left"
+                            data-testid={`export-dialog-option-${opt.id}`}
                         >
                             {/* Colored rounded square badge — matches Image 3 */}
                             <Image

@@ -89,22 +89,24 @@ export default function Developer() {
               <Button
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="sm"
+                data-testid="developer-tokens-generate-trigger"
               >
                 Generate Personal Access Token
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleGenerateToken}>
+              <DropdownMenuItem onClick={handleGenerateToken} data-testid="developer-tokens-generate-item">
                 Generate New Token
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         }
+        data-testid="developer-tokens-card"
       >
         <div className="w-full overflow-x-auto">
           <div className="rounded-lg border border-border">
-            <Table>
+            <Table data-testid="developer-tokens-table">
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead className="text-center font-semibold text-xs uppercase text-primary">
@@ -129,7 +131,7 @@ export default function Developer() {
               </TableHeader>
               <TableBody>
                 {tokens.map((token) => (
-                  <TableRow key={token.id} className="hover:bg-muted">
+                  <TableRow key={token.id} className="hover:bg-muted" data-testid={`developer-token-row-${token.id}`}>
                     <TableCell className="text-left">
                       <div>
                         <div className="font-semibold text-sm text-primary">
@@ -165,6 +167,7 @@ export default function Developer() {
                           size="icon"
                           onClick={() => handleDeleteToken(token.id)}
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          data-testid={`developer-token-delete-btn-${token.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { Workspace, CustomField, Label, WorkspaceMember, ProjectPhase, WorkspaceCustomFieldConfig } from '@/types/workspace.types';
+import { Workspace, CustomField, Label, WorkspaceMember, ProjectPhase, WorkspaceCustomFieldConfig, ProjectExport, ListExportsResponse, ExportDownloadResponse } from '@/types/workspace.types';
 import {
   createWorkspace,
   getWorkspaces,
@@ -19,6 +19,10 @@ import {
   updateChildProjectPhaseApi,
   deleteProjectPhaseApi,
   deleteChildProjectPhaseApi,
+  exportProjectApi,
+  getExportsApi,
+  getExportDetailsApi,
+  getExportDownloadApi,
 } from '@/lib/api/workspace-api';
 import { labelsApi } from '@/lib/api/labels-api';
 import { CreateLabelRequest } from '@/types/labels.types';
@@ -30,8 +34,11 @@ interface WorkspaceStoreState {
   workspaceMembers: WorkspaceMember[];
   workspaceCustomFieldsConfig: Record<string, WorkspaceCustomFieldConfig[]>;
   projectPhases: ProjectPhase[];
+  exports: ProjectExport[];
+  currentExport: ProjectExport | null;
   isLoadingPhases: boolean;
   isLoading: boolean;
+  isLoadingExports: boolean;
   isWorkspaceSwitching: boolean;
   error: string | null;
 
@@ -91,6 +98,12 @@ interface WorkspaceStoreState {
   deleteProjectPhase: (workspaceId: string, stateId: string) => Promise<void>;
   deleteChildPhase: (workspaceId: string, stateId: string, parentId: string) => Promise<void>;
 
+  // Export Actions
+  exportProject: (projectId: string) => Promise<ProjectExport>;
+  fetchExports: (params: { projectId?: string; limit?: number; offset?: number }) => Promise<ListExportsResponse>;
+  fetchExportDetails: (exportId: string) => Promise<ProjectExport>;
+  downloadExport: (exportId: string) => Promise<ExportDownloadResponse>;
+
   // Utility Actions
   setLoading: (isLoading: boolean) => void;
   setIsWorkspaceSwitching: (isSwitching: boolean) => void;
@@ -109,8 +122,11 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       workspaceMembers: [],
       workspaceCustomFieldsConfig: {},
       projectPhases: [],
+      exports: [],
+      currentExport: null,
       isLoadingPhases: false,
       isLoading: false,
+      isLoadingExports: false,
       isWorkspaceSwitching: false,
       error: null,
 
@@ -681,6 +697,87 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
               : p
           )
         }));
+      },
+
+      // ========== EXPORT ACTIONS ==========
+      exportProject: async (projectId: string) => {
+        set({ isLoadingExports: true, error: null });
+        try {
+          const newExport = await exportProjectApi(projectId);
+          set((state) => ({
+            exports: [newExport, ...state.exports],
+            isLoadingExports: false,
+          }));
+          return newExport;
+        } catch (error: any) {
+          console.error("Export Project Error:", error);
+          const errMsg = error.response?.data?.message || "Failed to start export";
+          set({
+            error: errMsg,
+            isLoadingExports: false,
+          });
+          throw error;
+        }
+      },
+
+      fetchExports: async (params) => {
+        set({ isLoadingExports: true, error: null });
+        try {
+          const response = await getExportsApi(params);
+          set({
+            exports: response.exports || [],
+            isLoadingExports: false,
+          });
+          return response;
+        } catch (error: any) {
+          console.error("Fetch Exports Error:", error);
+          const errMsg = error.response?.data?.message || "Failed to fetch exports";
+          set({
+            error: errMsg,
+            isLoadingExports: false,
+          });
+          throw error;
+        }
+      },
+
+      fetchExportDetails: async (exportId: string) => {
+        set({ isLoadingExports: true, error: null });
+        try {
+          const exportDetails = await getExportDetailsApi(exportId);
+          set((state) => ({
+            currentExport: exportDetails,
+            exports: state.exports.map((exp) =>
+              exp.id === exportId ? exportDetails : exp
+            ),
+            isLoadingExports: false,
+          }));
+          return exportDetails;
+        } catch (error: any) {
+          console.error("Fetch Export Details Error:", error);
+          const errMsg = error.response?.data?.message || "Failed to fetch export details";
+          set({
+            error: errMsg,
+            isLoadingExports: false,
+          });
+          throw error;
+        }
+      },
+
+      downloadExport: async (exportId: string) => {
+        set({ isLoadingExports: true, error: null });
+        try {
+          const downloadResponse = await getExportDownloadApi(exportId);
+          set({ isLoadingExports: false });
+          return downloadResponse;
+        } catch (error: any) {
+          console.error("Download Export Error:", error);
+          const errMsg = error.response?.data?.message || "Failed to fetch download url";
+          set({
+            error: errMsg,
+            isLoadingExports: false,
+          });
+          throw error;
+        }
       },
 
       // ========== UTILITY ACTIONS ==========

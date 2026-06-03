@@ -100,7 +100,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -115,13 +115,13 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -132,7 +132,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
           <div className="flex items-center gap-2">
             {/* First Field Selector */}
             <Select value={field1} onValueChange={setField1}>
-              <SelectTrigger className="h-9 flex-1">
+              <SelectTrigger data-testid="custom-field-formula-field1-trigger" className="h-9 flex-1">
                 <SelectValue placeholder="Select field" />
               </SelectTrigger>
               <SelectContent>
@@ -142,7 +142,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
                   </div>
                 ) : (
                   numberFields.map((field) => (
-                    <SelectItem key={field.id} value={field.id}>
+                    <SelectItem data-testid={`custom-field-formula-field1-option-${field.id}`}  key={field.id} value={field.id}>
                       {field.name}
                     </SelectItem>
                   ))
@@ -161,7 +161,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
               </SelectTrigger>
               <SelectContent>
                 {operators.map((op) => (
-                  <SelectItem key={op.value} value={op.value}>
+                  <SelectItem data-testid={`custom-field-formula-operator-option-${op.value}`}  key={op.value} value={op.value}>
                     <div className="flex items-center gap-2">
                       <span className="text-base font-semibold">{op.label}</span>
                       <span className="text-xs text-muted-foreground">{op.name}</span>
@@ -173,7 +173,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
 
             {/* Second Field Selector */}
             <Select value={field2} onValueChange={setField2}>
-              <SelectTrigger className="h-9 flex-1">
+              <SelectTrigger data-testid="custom-field-formula-field2-trigger" className="h-9 flex-1">
                 <SelectValue placeholder="Select field" />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +183,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
                   </div>
                 ) : (
                   numberFields.map((field) => (
-                    <SelectItem key={field.id} value={field.id}>
+                    <SelectItem data-testid={`custom-field-formula-field2-option-${field.id}`}  key={field.id} value={field.id}>
                       {field.name}
                     </SelectItem>
                   ))
@@ -204,7 +204,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -227,7 +227,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -235,7 +235,7 @@ export function FormulaField({ availableFields, onSubmit, onCancel, initialData 
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim() || !field1 || !field2) || loading}

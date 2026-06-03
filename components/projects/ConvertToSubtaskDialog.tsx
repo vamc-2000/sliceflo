@@ -1,4 +1,4 @@
-﻿// components/projects/ConvertToSubtaskDialog.tsx
+// components/projects/ConvertToSubtaskDialog.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -179,7 +179,7 @@ export function ConvertToSubtaskDialog({
                         value={selectedParentTaskId}
                         onValueChange={setSelectedParentTaskId}
                     >
-                        <SelectTrigger className="w-full text-xs border-border focus:ring-1 focus:ring-ring">
+                        <SelectTrigger className="w-full text-xs border-border focus:ring-1 focus:ring-ring" data-testid="convert-subtask-parent-select">
                             <SelectValue
                                 placeholder={
                                     parentOptions.length === 0
@@ -190,7 +190,7 @@ export function ConvertToSubtaskDialog({
                         </SelectTrigger>
                         <SelectContent>
                             {parentOptions.map((t) => (
-                                <SelectItem key={t.id} value={t.id}>
+                                <SelectItem key={t.id} value={t.id} data-testid={`convert-subtask-parent-option-${t.id}`}>
                                     {t.name}
                                 </SelectItem>
                             ))}
@@ -208,6 +208,7 @@ export function ConvertToSubtaskDialog({
                             if (e.key === "Escape") onClose();
                         }}
                         className="border-0 border-b border-border rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-ring text-xs placeholder:text-muted-foreground"
+                        data-testid="convert-subtask-name-input"
                     />
                 </div>
 
@@ -227,6 +228,7 @@ export function ConvertToSubtaskDialog({
                                             ? "border-blue-200 bg-blue-50 text-blue-700"
                                             : "border-border text-muted-foreground"
                                     )}
+                                    data-testid="convert-subtask-duedate-btn"
                                 >
                                     {endDate ? format(new Date(endDate), "MMM d, yyyy") : "Set due date"}
                                 </Button>
@@ -265,6 +267,7 @@ export function ConvertToSubtaskDialog({
                                     size="icon"
                                     className="h-8 w-8 p-0 rounded-full"
                                     title={selectedPriority?.label ?? "No priority"}
+                                    data-testid="convert-subtask-priority-btn"
                                 >
                                     <PriorityFlag color={selectedPriority?.color} />
                                 </Button>
@@ -284,6 +287,7 @@ export function ConvertToSubtaskDialog({
                                             "w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs",
                                             priority === p.value && "bg-muted font-medium"
                                         )}
+                                        data-testid={`convert-subtask-priority-option-${p.value}`}
                                     >
                                         <Flag
                                             className="h-3.5 w-3.5 flex-shrink-0"
@@ -303,6 +307,7 @@ export function ConvertToSubtaskDialog({
                                     size="icon"
                                     className="h-8 w-8 p-0 rounded-full"
                                     title={selectedAssignee?.name ?? "Unassigned"}
+                                    data-testid="convert-subtask-assignee-btn"
                                 >
                                     {selectedAssignee ? (
                                         <Avatar className="h-7 w-7">
@@ -335,6 +340,7 @@ export function ConvertToSubtaskDialog({
                                             "w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs",
                                             assignee === m.userId && "bg-muted font-medium"
                                         )}
+                                        data-testid={`convert-subtask-assignee-option-${m.userId}`}
                                     >
                                         <Avatar className="h-6 w-6">
                                             <AvatarFallback
@@ -357,6 +363,7 @@ export function ConvertToSubtaskDialog({
                         onClick={handleConfirm}
                         disabled={!selectedParentTaskId || !name.trim()}
                         className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 h-8 text-xs rounded-lg"
+                        data-testid="convert-subtask-confirm-btn"
                     >
                         Create
                     </Button>

@@ -1,4 +1,4 @@
-﻿// components/list-view/customFields/Budget.tsx
+// components/list-view/customFields/Budget.tsx
 
 "use client";
 
@@ -88,7 +88,7 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -103,13 +103,13 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -119,12 +119,12 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
           <div className="space-y-2">
             <label className="text-xs font-medium block">Currency</label>
             <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger className="h-9">
+              <SelectTrigger data-testid="custom-field-budget-currency-trigger" className="h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {currencies.map((curr) => (
-                  <SelectItem key={curr.value} value={curr.value}>
+                  <SelectItem data-testid={`custom-field-budget-currency-option-${curr.value}`} key={curr.value} value={curr.value}>
                     {curr.label}
                   </SelectItem>
                 ))}
@@ -142,7 +142,7 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -165,7 +165,7 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -173,7 +173,7 @@ export function BudgetField({ onSubmit, onCancel, initialData }: BudgetFieldProp
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

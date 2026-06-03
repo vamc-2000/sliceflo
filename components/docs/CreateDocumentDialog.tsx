@@ -167,7 +167,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
     const creator = getDocCreator(doc.id);
 
     return (
-      <div key={doc.id} className="w-full">
+      <div key={doc.id} className="w-full" data-testid={`doc-tree-node-${doc.id}`}>
         <div
           className={cn(
             "flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 transition-colors group cursor-pointer",
@@ -176,7 +176,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
           onClick={() => level === 0 && toggleExpand(doc.id)}
         >
           {level === 0 && (
-            <div className="p-0.5 rounded text-gray-400">
+            <div className="p-0.5 rounded text-gray-400" data-testid={`doc-tree-expand-${doc.id}`}>
               {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
             </div>
           )}
@@ -211,6 +211,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
               "border-gray-300 data-[state=checked]:bg-[#0b213e] data-[state=checked]:border-[#0b213e] h-5 w-5 rounded",
               isLinked && "opacity-50 cursor-not-allowed data-[state=checked]:bg-gray-300 data-[state=checked]:border-gray-300"
             )}
+            data-testid={`doc-tree-checkbox-${doc.id}`}
           />
         </div>
 
@@ -237,7 +238,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl p-8 gap-0 bg-gray-50">
+      <DialogContent className="sm:max-w-3xl p-8 gap-0 bg-gray-50" data-testid="create-document-dialog">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="text-2xl font-semibold text-center">
             Create a new Document?
@@ -253,6 +254,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
             <button
               onClick={handleUseTemplates}
               className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-[#eef5ff] hover:bg-[#e5f1ff] transition-all cursor-pointer gap-6"
+              data-testid="use-templates-btn"
             >
               <div className="w-28 h-28 rounded-full bg-[#ffcd3c] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
                 <div className="relative">
@@ -271,6 +273,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
             <button
               onClick={handleCreateEmptyDocument}
               className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-white transition-all cursor-pointer gap-6"
+              data-testid="create-empty-document-btn"
             >
               <div className="w-28 h-28 rounded-full bg-[#f1f4f9] flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative shadow-inner">
                 <FileText className="w-12 h-12 text-gray-400" />
@@ -294,7 +297,10 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex h-10 w-fit min-w-[140px] items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-2 text-sm text-gray-400 shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all hover:border-gray-200 outline-none gap-2">
+                <button 
+                  className="flex h-10 w-fit min-w-[140px] items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-2 text-sm text-gray-400 shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all hover:border-gray-200 outline-none gap-2"
+                  data-testid="select-existing-doc-trigger"
+                >
                   <span>Select Doc</span>
                   <ChevronDownIcon className="h-4 w-4 opacity-50" />
                 </button>
@@ -303,6 +309,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
                 className="w-80 p-0 bg-white border border-gray-100 shadow-xl rounded-xl"
                 align="start"
                 onCloseAutoFocus={(e) => e.preventDefault()} // Prevent closing on selection if desired, or handle appropriately
+                data-testid="select-existing-doc-menu"
               >
                 <div className="p-4 border-b">
                   <h3 className="text-sm font-semibold">Select Document</h3>
@@ -326,6 +333,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
                     }}
                     disabled={selectedDocs.size === 0}
                     className="w-full h-8 bg-[#0b213e] text-white rounded-lg text-sm font-semibold hover:bg-[#162e4d] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-center"
+                    data-testid="add-selected-docs-btn"
                   >
                     Add Selected
                   </Button>

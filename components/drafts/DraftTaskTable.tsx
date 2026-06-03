@@ -126,7 +126,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md';
   const dim = size === 'sm' ? 'w-7 h-7 ' : 'w-8 h-8 text-sm';
   if (!name && !src) {
     return (
-      <div className={`${dim} rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400`}>
+      <div className={`${dim} rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground`}>
         <User className="h-3 w-3" />
       </div>
     );
@@ -136,7 +136,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md';
     <UIAvatar className={cn(dim, "border shrink-0")}>
       {src && <AvatarImage src={src} className="object-cover" />}
       <AvatarFallback
-        className="font-semibold text-white bg-gray-400"
+        className="font-semibold text-primary-foreground bg-muted-foreground"
         style={{ backgroundColor: name ? getAvatarColor(name) : undefined }}
       >
         {name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-3 w-3" />}
@@ -149,8 +149,8 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md';
 function PriorityFlag({ priority, color }: { priority?: string; color?: string }) {
   if (!priority) {
     return (
-      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-600/20">
-        <Flag className="h-4 w-4 text-gray-600" />
+      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted">
+        <Flag className="h-4 w-4 text-muted-foreground" />
       </div>
     );
   }
@@ -266,7 +266,7 @@ export function DraftTaskTable({
     if (!active) {
       return (
         <ChevronsUpDown
-          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-gray-200 rounded p-0.5"
+          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-muted rounded p-0.5"
           onClick={() => onSortChange?.(fieldId, fieldType)}
         />
       );
@@ -274,7 +274,7 @@ export function DraftTaskTable({
     const Icon = active.direction === 'asc' ? ArrowUp : ArrowDown;
     return (
       <Icon
-        className="h-5 w-5 cursor-pointer text-[#001F3F] rounded-md p-0.5 bg-[#001F3F]/10"
+        className="h-5 w-5 cursor-pointer text-primary rounded-md p-0.5 bg-primary/10"
         onClick={() => onSortChange?.(fieldId, fieldType)}
       />
     );
@@ -928,10 +928,10 @@ export function DraftTaskTable({
         position: 'sticky',
         left: `${leftOffset}px`,
         zIndex: isHeader ? 20 : 10,
-        backgroundColor: isHeader ? 'transparent' : 'white',
+        backgroundColor: isHeader ? 'transparent' : 'var(--background)',
         minWidth: `${config.width}px`,
         width: `${config.width}px`,
-        borderRight: '1px solid #E5E7EB',
+        borderRight: '1px solid var(--border)',
       };
 
       // The checkbox cell carries the group-color left accent border
@@ -954,15 +954,15 @@ export function DraftTaskTable({
         position: 'sticky',
         left: `${leftOffset}px`,
         zIndex: isHeader ? 20 : 10,
-        backgroundColor: isHeader ? '#F9FAFB' : 'inherit',
+        backgroundColor: isHeader ? 'var(--muted)' : 'inherit',
         minWidth: `${w}px`,
         width: `${w}px`,
-        borderRight: '1px solid #E5E7EB',
+        borderRight: '1px solid var(--border)',
         boxShadow: '2px 0 4px rgba(0,0,0,0.04)',
       };
     }
     const w = columnWidths[columnId] ?? DEFAULT_COL_WIDTH;
-    return { minWidth: `${w}px`, width: `${w}px`, borderRight: "1px solid #E5E7EB" };
+    return { minWidth: `${w}px`, width: `${w}px`, borderRight: "1px solid var(--border)" };
   };
 
   const shouldShowColumn = (columnId: string): boolean => {
@@ -1007,18 +1007,18 @@ export function DraftTaskTable({
   };
 
   //   Shared cell styles  
-  const headerCellCls = "h-9 font-semibold text-gray-500 uppercase tracking-wide px-3 select-none";
-  const bodyCellCls = "px-3 py-2.5";
+  const headerCellCls = "font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1 select-none";
+  const bodyCellCls = "px-3 py-2 text-xs";
 
   return (
     <>
       <div className="relative">
         <div className="overflow-x-auto rounded-tl-sm">
-          <Table className="relative border-y border-gray-200 text-sm">
+          <Table className="relative border-y border-border text-xs">
 
             {/*   Column Headers   */}
             <TableHeader>
-              <TableRow className="hover:bg-transparent border-b border-gray-200">
+              <TableRow className="hover:bg-transparent border-b border-border">
                 {/* Checkbox */}
                 <TableHead className={headerCellCls} style={getColumnStyle('checkbox', true, groupColor)}>
                   <div className="flex items-center pl-1">
@@ -1087,13 +1087,13 @@ export function DraftTaskTable({
 
                 {/* Actions Column Header (sticky) */}
                 <TableHead
-                  className={cn("w-[240px] text-center")}
+                  className={cn("w-[240px] text-center text-xs")}
                   style={{
                     position: 'sticky',
                     right: 0,
                     zIndex: 20,
-                    backgroundColor: 'white',
-                    borderLeft: '1px solid #E5E7EB',
+                    backgroundColor: 'var(--background)',
+                    borderLeft: '1px solid var(--border)',
                     boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                     padding: 4,
                     margin: 0,
@@ -1131,7 +1131,7 @@ export function DraftTaskTable({
                     {/*   Main Task Row   */}
                     <TableRow
                       key={task.id}
-                      className="group hover:bg-blue-50/50 border-b border-gray-100 transition-colors"
+                      className="group hover:bg-muted/50 dark:hover:bg-blue-950/20 border-b border-border transition-colors"
                     // style={{ borderLeft: `4px solid ${groupColor}` }}
                     >
 
@@ -1140,7 +1140,7 @@ export function DraftTaskTable({
                         <div className="flex items-center gap-1">
                           <button
                             className={cn(
-                              "flex items-center justify-center w-4 h-4 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors",
+                              "flex items-center justify-center w-4 h-4 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
                               (!hasSubtasks || displayOptions.collapsedSubtasks) && "invisible"
                             )}
                             onClick={() => toggleTaskExpansion(task.id)}
@@ -1159,7 +1159,7 @@ export function DraftTaskTable({
                       </TableCell>
 
                       {/* Slug Cell */}
-                      <TableCell className={cn(bodyCellCls, "text-center text-gray-400")} style={getColumnStyle('projectSlug', false)}>
+                      <TableCell className={cn(bodyCellCls, "text-center text-muted-foreground text-xs")} style={getColumnStyle('projectSlug', false)}>
                         {projectSlug}
                       </TableCell>
 
@@ -1171,7 +1171,7 @@ export function DraftTaskTable({
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span
                             className={cn(
-                              "text-sm text-gray-800 min-w-0 flex-1",
+                              "text-xs text-foreground min-w-0 flex-1",
                               // drafts have no completed state
                               displayOptions.wrapText ? "truncate" : "whitespace-normal break-words"
                             )}
@@ -1181,7 +1181,7 @@ export function DraftTaskTable({
                           {/* Hover actions */}
                           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                             <button
-                              className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-0.5"
+                              className="px-1.5 py-0.5 text-primary hover:bg-muted rounded flex items-center gap-0.5"
                               onClick={() => {
                                 setNewSubtaskData(prev => ({
                                   ...prev,
@@ -1197,7 +1197,7 @@ export function DraftTaskTable({
                               Sub Task
                             </button>
                             <button
-                              className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600"
+                              className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
                               onClick={async () => {
                                 setSelectedTaskForDetail(task);
                                 setShowTaskDetail(true);
@@ -1295,7 +1295,7 @@ export function DraftTaskTable({
                         <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('status', false)}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-gray-100 transition-colors text-gray-700 border border-gray-200">
+                              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-muted transition-colors text-foreground border border-border">
                                 {(() => {
                                   console.log('Rendering status for task:', task.name, 'with status value:', task.status);
                                   console.log("taskStatusConfig", taskStatusConfigs)
@@ -1307,15 +1307,15 @@ export function DraftTaskTable({
                                       {cfg.label}
                                     </span>
                                   ) : (
-                                    <span className="text-gray-400">-</span>
+                                    <span className="text-muted-foreground">-</span>
                                   );
                                 })()}
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent className="text-xs">
                               {taskStatusConfigs.map(config => (
                                 <DropdownMenuItem key={config._id} onSelect={() => updateTask(task.id, { status: config.value })}>
-                                  {config.color && <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: config.color }} />}
+                                  {config.color && <div className="w-2.5 h-2.5 rounded-full mr-2 text-xs" style={{ backgroundColor: config.color }} />}
                                   {config.label}
                                 </DropdownMenuItem>
                               ))}
@@ -1370,11 +1370,11 @@ export function DraftTaskTable({
                         <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                              <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {task.startDate ? (
                                   <span className="font-medium">{formatDate(task.startDate)}</span>
                                 ) : (
-                                  <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                  <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                 )}
                               </button>
                             </PopoverTrigger>
@@ -1397,11 +1397,11 @@ export function DraftTaskTable({
                         <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                              <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {task.endDate ? (
                                   <span className="font-medium">{formatDate(task.endDate)}</span>
                                 ) : (
-                                  <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                  <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                 )}
                               </button>
                             </PopoverTrigger>
@@ -1473,8 +1473,8 @@ export function DraftTaskTable({
                           position: 'sticky',
                           right: 0,
                           zIndex: 10,
-                          backgroundColor: 'white',
-                          borderLeft: '1px solid #E5E7EB',
+                          backgroundColor: 'var(--background)',
+                          borderLeft: '1px solid var(--border)',
                           boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                           padding: '0 8px',
                           margin: 0,
@@ -1484,7 +1484,7 @@ export function DraftTaskTable({
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="h-8 px-3 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            className="h-8 px-3 text-xs"
                             onClick={() => handleMoveToProject(task as unknown as DraftResponse)}
                           >
                             Move to project
@@ -1495,7 +1495,7 @@ export function DraftTaskTable({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-gray-400 hover:text-[#001F3F] hover:bg-gray-100"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -1531,7 +1531,7 @@ export function DraftTaskTable({
                       return (
                         <TableRow
                           key={subtask.id}
-                          className="group hover:bg-blue-50/30 border-b border-gray-100 transition-colors"
+                          className="group hover:bg-blue-50/30 dark:hover:bg-blue-950/20 border-b border-border transition-colors"
                         >
                           {/* Subtask Checkbox */}
                           <TableCell className={bodyCellCls} style={getColumnStyle('checkbox', false, groupColor, true)}>
@@ -1545,7 +1545,7 @@ export function DraftTaskTable({
                           </TableCell>
 
                           {/* Subtask Slug */}
-                          <TableCell className={cn(bodyCellCls, "text-center text-gray-400")} style={getColumnStyle('projectSlug', false)}>
+                          <TableCell className={cn(bodyCellCls, "text-center text-muted-foreground")} style={getColumnStyle('projectSlug', false)}>
                             {projectSlug}
                           </TableCell>
 
@@ -1553,7 +1553,7 @@ export function DraftTaskTable({
                           <TableCell className={bodyCellCls} style={getColumnStyle('task', false)}>
                             <div className="flex items-center gap-2 min-w-0 group/sub">
                               <div className="flex flex-col min-w-0 flex-1">
-                                <span className={cn("text-sm text-gray-700")}>
+                                <span className={cn("text-sm text-foreground")}>
                                   {subtask.name}
                                 </span>
                               </div>
@@ -1561,7 +1561,7 @@ export function DraftTaskTable({
                               {/* hover action to open subtask detail */}
                               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                                 <button
-                                  className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600"
+                                  className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
                                   onClick={async () => {
                                     setSelectedSubtaskForDetail(subtask);
                                     setShowSubtaskDetail(true);
@@ -1660,7 +1660,7 @@ export function DraftTaskTable({
                             <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('status', false)}>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-gray-100 transition-colors text-gray-700 border border-gray-200">
+                                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-muted transition-colors text-foreground border border-border">
                                     {(() => {
                                       const cfg = taskStatusConfigs.find(c => c.value === subtask.status);
                                       return cfg ? (
@@ -1669,7 +1669,7 @@ export function DraftTaskTable({
                                           {cfg.label}
                                         </span>
                                       ) : (
-                                        <span className="text-gray-400"> </span>
+                                        <span className="text-muted-foreground"> </span>
                                       );
                                     })()}
                                   </button>
@@ -1719,11 +1719,11 @@ export function DraftTaskTable({
                             <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
                               <Popover>
                                 <PopoverTrigger asChild>
-                                  <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                                  <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                     {subtask.startDate ? (
                                       <span className="font-medium">{formatDate(subtask.startDate)}</span>
                                     ) : (
-                                      <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                      <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                     )}
                                   </button>
                                 </PopoverTrigger>
@@ -1746,11 +1746,11 @@ export function DraftTaskTable({
                             <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
                               <Popover>
                                 <PopoverTrigger asChild>
-                                  <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                                  <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                     {subtask.endDate ? (
                                       <span className="font-medium">{formatDate(subtask.endDate)}</span>
                                     ) : (
-                                      <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                      <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                     )}
                                   </button>
                                 </PopoverTrigger>
@@ -1812,8 +1812,8 @@ export function DraftTaskTable({
                               position: 'sticky',
                               right: 0,
                               zIndex: 10,
-                              backgroundColor: 'white',
-                              borderLeft: '1px solid #E5E7EB',
+                              backgroundColor: 'var(--background)',
+                              borderLeft: '1px solid var(--border)',
                               boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                               padding: '0 8px',
                               margin: 0,
@@ -1823,7 +1823,7 @@ export function DraftTaskTable({
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                className="h-8 px-3 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                className="h-8 px-3 text-xs"
                                 onClick={() => handleMoveToProject(subtask as unknown as DraftResponse)}
                               >
                                 Move to project
@@ -1834,7 +1834,7 @@ export function DraftTaskTable({
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-gray-400 hover:text-[#001F3F] hover:bg-gray-100"
+                                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                                   >
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
@@ -1847,7 +1847,7 @@ export function DraftTaskTable({
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
                                     onSelect={() => setDeleteSubtaskConfirmId(subtask.id)}
-                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     <span>Delete</span>
@@ -1864,12 +1864,12 @@ export function DraftTaskTable({
                     {isExpanded && (
                       addingSubtaskToTask === task.id && (
                         /* INPUT state   shown after clicking "Add Subtask" */
-                        <TableRow className="border-b border-gray-100">
+                        <TableRow className="border-b border-border">
                           {/* Add Subtask Checkbox Placeholder */}
                           <TableCell className={bodyCellCls} style={getColumnStyle('checkbox', false, `${groupColor}44`)}>
                             <div className="flex items-center justify-end gap-1">
                               <div className="w-4 h-4 invisible" /> {/* expand-toggle spacer */}
-                              <div className="w-4 h-4 rounded border-2 border-gray-300 flex-shrink-0" />
+                              <div className="w-4 h-4 rounded border-2 border-border flex-shrink-0" />
                             </div>
                           </TableCell>
 
@@ -1954,21 +1954,19 @@ export function DraftTaskTable({
 
                             //   Status  
                             if (h.key === 'status') {
-                              console.log("newSubtaskData", newSubtaskData)
                               const selStatus = taskStatusConfigs.find(s => s.value === newSubtaskData.status);
-                              console.log("newSubtaskData selStatus", selStatus)
                               return (
                                 <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                      <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-gray-100 transition-colors text-gray-700 border border-gray-200">
+                                      <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-muted transition-colors text-foreground border border-border">
                                         {selStatus ? (
                                           <span className="flex items-center gap-1.5">
                                             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: selStatus.color }} />
                                             {selStatus.label}
                                           </span>
                                         ) : (
-                                          <span className="text-gray-400">-</span>
+                                          <span className="text-muted-foreground">-</span>
                                         )}
                                       </button>
                                     </DropdownMenuTrigger>
@@ -2028,11 +2026,11 @@ export function DraftTaskTable({
                                 <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
                                   <Popover>
                                     <PopoverTrigger asChild>
-                                      <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                                      <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.startDate ? (
                                           <span className="font-medium">{format(newSubtaskData.startDate, 'd MMM')}</span>
                                         ) : (
-                                          <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                          <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
                                       </button>
                                     </PopoverTrigger>
@@ -2044,9 +2042,9 @@ export function DraftTaskTable({
                                         initialFocus
                                       />
                                       {newSubtaskData.startDate && (
-                                        <div className="border-t border-gray-100 p-2">
+                                        <div className="border-t border-border p-2">
                                           <button
-                                            className="w-full text-xs text-gray-400 hover:text-gray-600 py-1 rounded hover:bg-gray-50"
+                                            className="w-full text-xs text-muted-foreground hover:text-foreground py-1 rounded hover:bg-muted"
                                             onClick={() => setNewSubtaskData(prev => ({ ...prev, startDate: undefined }))}
                                           >
                                             Clear date
@@ -2065,11 +2063,11 @@ export function DraftTaskTable({
                                 <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
                                   <Popover>
                                     <PopoverTrigger asChild>
-                                      <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-2 py-1 rounded cursor-pointer transition-colors">
+                                      <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.endDate ? (
                                           <span className="font-medium">{format(newSubtaskData.endDate, 'd MMM')}</span>
                                         ) : (
-                                          <Clock className="h-3.5 w-3.5 text-gray-300 mx-auto" />
+                                          <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
                                       </button>
                                     </PopoverTrigger>
@@ -2081,9 +2079,9 @@ export function DraftTaskTable({
                                         initialFocus
                                       />
                                       {newSubtaskData.endDate && (
-                                        <div className="border-t border-gray-100 p-2">
+                                        <div className="border-t border-border p-2">
                                           <button
-                                            className="w-full text-xs text-gray-400 hover:text-gray-600 py-1 rounded hover:bg-gray-50"
+                                            className="w-full text-xs text-muted-foreground hover:text-foreground py-1 rounded hover:bg-muted"
                                             onClick={() => setNewSubtaskData(prev => ({ ...prev, endDate: undefined }))}
                                           >
                                             Clear date
@@ -2150,15 +2148,15 @@ export function DraftTaskTable({
                               position: 'sticky',
                               right: 0,
                               zIndex: 10,
-                              backgroundColor: 'white',
-                              borderLeft: '1px solid #E5E7EB',
+                              backgroundColor: 'var(--background)',
+                              borderLeft: '1px solid var(--border)',
                               boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                             }}
                           >
                             <div className="flex gap-1">
                               <button
                                 onClick={() => handleSaveSubtask(task.id)}
-                                className="px-2 py-1 bg-[#001F3F] text-white rounded hover:bg-[#001F3F]/90 transition-colors"
+                                className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
                               >
                                 Save
                               </button>
@@ -2167,7 +2165,7 @@ export function DraftTaskTable({
                                   setAddingSubtaskToTask(null);
                                   setNewSubtaskData({ name: '', taskType: 'subtask', assignee: '', startDate: new Date(), endDate: undefined, priority: '', status: '', customFieldValues: {} });
                                 }}
-                                className="px-2 py-1 border border-gray-200 rounded hover:bg-gray-100 transition-colors"
+                                className="px-2 py-1 border border-border rounded hover:bg-muted transition-colors"
                               >
                                 Cancel
                               </button>
@@ -2188,12 +2186,12 @@ export function DraftTaskTable({
                 <TableCell className="p-0" style={getColumnStyle('checkbox', false, `${groupColor}44`)} />
                 <TableCell style={getColumnStyle('projectSlug', false)} className={bodyCellCls} />
                 <TableCell
-                  className={cn(bodyCellCls, "cursor-pointer hover:bg-gray-50 transition-colors")}
+                  className={cn(bodyCellCls, "cursor-pointer hover:bg-muted transition-colors")}
                   style={getColumnStyle('task', false)}
                   colSpan={headers.length + 3}
                 >
-                  <div className="flex items-center gap-2 text-gray-400 hover:text-gray-600 font-medium text-sm">
-                    <Plus className="h-4 w-4" />
+                  <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-medium text-xs">
+                    <Plus className="h-3 w-3" />
                     <span>Draft a task</span>
                   </div>
                 </TableCell>

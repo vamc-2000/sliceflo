@@ -646,7 +646,7 @@ export function TaskGroup({
         {/* Left: chevron + dot + name + menu + count badge */}
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
-          <button
+          <button data-testid={`task-group-collapse-button-${group.id}`}
             onClick={onToggleCollapse}
             className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted transition-colors text-muted-foreground"
           >
@@ -695,7 +695,7 @@ export function TaskGroup({
           {/* ··· menu */}
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="ml-1 flex items-center justify-center w-5 h-5 rounded text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors">
+              <button data-testid={`task-group-menu-trigger-${group.id}`} className="ml-1 flex items-center justify-center w-5 h-5 rounded text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors">
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
@@ -706,14 +706,14 @@ export function TaskGroup({
                   Add {getGroupByLabel()}
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => setIsEditingName(true)} className="gap-2 text-xs">
+              <DropdownMenuItem data-testid={`task-group-menu-rename-${group.id}`} onClick={() => setIsEditingName(true)} className="gap-2 text-xs">
                 <Pencil className="h-3.5 w-3.5" />
                 Rename {getGroupByLabel()}
               </DropdownMenuItem>
 
               {/* Assign color — DropdownMenuSub stays open on hover, no cursor-leave issue */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="gap-2 text-xs">
+                <DropdownMenuSubTrigger data-testid={`task-group-menu-color-trigger-${group.id}`} className="gap-2 text-xs">
                   <Palette className="h-3.5 w-3.5" />
                   Assign color
                 </DropdownMenuSubTrigger>
@@ -726,7 +726,7 @@ export function TaskGroup({
                   {/* Color grid — 2 rows matching the image */}
                   <div className="grid grid-cols-6 gap-2">
                     {COLOR_PALETTE.map((color) => (
-                      <button
+                      <button data-testid={`task-group-menu-color-option-${color}-${group.id}`}
                         key={color}
                         onClick={() => handleColorSelect(color)}
                         className="w-6 h-6 rounded-full transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-ring ring-offset-background"
@@ -750,7 +750,7 @@ export function TaskGroup({
                 </DropdownMenuSubContent>
               </DropdownMenuSub> */}
               <DropdownMenuSeparator className="mx-2 my-0" />
-              <DropdownMenuItem onClick={() => onHideGroup?.(group.id)} className="gap-2 text-xs">
+              <DropdownMenuItem data-testid={`task-group-menu-hide-${group.id}`} onClick={() => onHideGroup?.(group.id)} className="gap-2 text-xs">
                 <Eye className="h-3.5 w-3.5" />
                 Hide {getGroupByLabel()}
               </DropdownMenuItem>
@@ -802,7 +802,7 @@ export function TaskGroup({
                 <Archive className="h-3.5 w-3.5" />
                 Archive {getGroupByLabel()}
               </DropdownMenuItem> */}
-              <DropdownMenuItem
+              <DropdownMenuItem data-testid={`task-group-menu-delete-${group.id}`}
                 className="gap-2 text-xs text-red-600 focus:text-red-600"
                 onClick={handleDeleteGroup}
                 disabled={!canDeleteGroup()}

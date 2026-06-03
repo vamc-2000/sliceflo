@@ -16,7 +16,7 @@ export function PersonalListPanel() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <List className="h-4 w-4 text-blue-500" />
-        <h3 className="text-sm font-bold">Personal List</h3>
+        <h3 className="text-sm font-bold" data-testid="personal-list-title">Personal List</h3>
       </div>
       <div className="flex flex-col gap-1.5">
         {myProjects.map((p) => {
@@ -26,6 +26,7 @@ export function PersonalListPanel() {
             <div
               key={p.id}
               className="group flex items-center justify-between p-2 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-border cursor-pointer"
+              data-testid={`personal-list-project-row-${p.id}`}
             >
               <div className="flex items-center gap-3 min-w-0">
 
@@ -80,7 +81,7 @@ export function PersonalListPanel() {
         })}
 
         {myProjects.length === 0 && (
-          <p className="text-[10px] text-muted-foreground px-2">No projects yet.</p>
+          <p className="text-[10px] text-muted-foreground px-2" data-testid="personal-list-empty">No projects yet.</p>
         )}
       </div>
     </div>

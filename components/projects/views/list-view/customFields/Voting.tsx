@@ -76,7 +76,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -91,13 +91,13 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -105,7 +105,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
         <div className="space-y-2">
           <label className="text-xs font-medium block">Emoji type</label>
           <Select value={emojiType} onValueChange={setEmojiType}>
-            <SelectTrigger className="h-9">
+            <SelectTrigger data-testid="custom-field-voting-emoji-trigger" className="h-9">
               <SelectValue>
                 <div className="flex items-center gap-2">
                   <span className="text-base">{selectedEmoji?.emoji}</span>
@@ -115,7 +115,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
             </SelectTrigger>
             <SelectContent>
               {emojiTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
+                <SelectItem data-testid={`custom-field-voting-emoji-option-${type.value}`}  key={type.value} value={type.value}>
                   <div className="flex items-center gap-2">
                     <span className="text-base">{type.emoji}</span>
                     <span>{type.label}</span>
@@ -127,7 +127,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -150,7 +150,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -158,7 +158,7 @@ export function VotingField({ onSubmit, onCancel, initialData }: VotingFieldProp
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

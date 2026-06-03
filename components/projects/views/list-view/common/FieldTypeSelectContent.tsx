@@ -1,4 +1,4 @@
-﻿// components/projects/views/list-view/common/FieldTypeSelectContent.tsx
+// components/projects/views/list-view/common/FieldTypeSelectContent.tsx
 
 "use client";
 
@@ -171,6 +171,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
           size="sm"
           onClick={handleBackToList}
           className="h-6 w-6 p-0"
+          data-testid="field-create-back-to-list-btn"
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -214,6 +215,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
           size="sm"
           onClick={onBack}
           className="h-6 w-6 p-0"
+          data-testid="field-create-back-btn"
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
@@ -229,6 +231,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
               ? "text-foreground"
               : "text-muted-foreground hover:text-foreground"
           )}
+          data-testid="field-create-tab-regular"
         >
           Regular
           {activeTab === "regular" && (
@@ -243,6 +246,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
               ? "text-foreground"
               : "text-muted-foreground hover:text-foreground"
           )}
+          data-testid="field-create-tab-special"
         >
           Special
           {activeTab === "special" && (
@@ -259,6 +263,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search fields..."
             className="pl-8 h-8 text-xs border-input bg-muted"
+            data-testid="field-create-search-input"
           />
         </div>
       </div>
@@ -271,6 +276,7 @@ export function FieldTypeSelectContent({ projectId, onFieldCreated, onBack }: Fi
               key={field.type + field.label}
               onClick={() => handleSelectType(field.type)}
               className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-muted"
+              data-testid={`field-create-type-option-${field.type}`}
             >
               <Icon className={cn("h-4 w-4", field.color)} />
               <span className="text-xs">{field.label}</span>

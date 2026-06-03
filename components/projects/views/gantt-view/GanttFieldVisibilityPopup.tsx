@@ -135,6 +135,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                 : 'hover:bg-muted/50 cursor-pointer'
                 }`}
             onClick={() => !field.required && handleToggle(field.id, field.isSystem, field.required || false)}
+            data-testid={`gantt-field-visibility-row-${field.id}`}
         >
             <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -160,6 +161,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                 onCheckedChange={() => !field.required && handleToggle(field.id, field.isSystem, field.required || false)}
                 onClick={(e) => e.stopPropagation()}
                 className="flex-shrink-0"
+                data-testid={`gantt-field-visibility-switch-${field.id}`}
             />
         </div>
     );
@@ -212,6 +214,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full h-8 pl-8 pr-2 text-xs border rounded-md outline-none focus:ring-1 focus:ring-primary"
+                                    data-testid="gantt-field-visibility-search"
                                 />
                             </div>
                         </div>
@@ -229,6 +232,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                                         <button
                                             className="text-xs text-primary hover:underline"
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleHideAll(); }}
+                                            data-testid="gantt-field-visibility-hide-all"
                                         >
                                             Hide all
                                         </button>
@@ -249,6 +253,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                                         <button
                                             className="text-xs text-primary hover:underline"
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleShowAll(); }}
+                                            data-testid="gantt-field-visibility-unhide-all"
                                         >
                                             Unhide all
                                         </button>
@@ -274,6 +279,7 @@ export function GanttFieldVisibilityPopup({ projectId, children }: GanttFieldVis
                                 size="sm"
                                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-3 h-8"
                                 onClick={handleCreateFieldClick}
+                                data-testid="gantt-field-visibility-create-btn"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Create field

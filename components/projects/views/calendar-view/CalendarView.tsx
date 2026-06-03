@@ -239,6 +239,7 @@ const CustomToolbar = ({
                         <Input
                             placeholder="Search"
                             className="pl-2 pr-8 rounded text-xs"
+                            data-testid="calendar-search-input"
                         />
                         <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
                     </div>
@@ -250,7 +251,9 @@ const CustomToolbar = ({
                                 variant="secondary"
                                 size="sm"
                                 className="rounded cursor-pointer gap-2 text-xs"
+                                data-testid="calendar-members-trigger"
                             >
+                                <img src="/icons/users.svg" className="h-4 w-4 hidden" alt="users" />
                                 <Users className="h-4 w-4" />
                                 Members
                                 {projectMembers.length > 0 && (
@@ -312,6 +315,7 @@ const CustomToolbar = ({
                         }
                     }}
                     className="h-8 px-2 rounded text-xs font-medium"
+                    data-testid="calendar-today-btn"
                 >
                     Today
                 </Button>
@@ -323,6 +327,7 @@ const CustomToolbar = ({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        data-testid="calendar-prev-btn"
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -332,6 +337,7 @@ const CustomToolbar = ({
                             <Button
                                 variant="ghost"
                                 className="h-8 px-3 text-xs font-semibold hover:bg-muted flex items-center gap-1"
+                                data-testid="calendar-datepicker-trigger"
                             >
                                 {label}
                             </Button>
@@ -353,6 +359,7 @@ const CustomToolbar = ({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        data-testid="calendar-next-btn"
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -371,6 +378,7 @@ const CustomToolbar = ({
                                 ? "bg-primary shadow-sm text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
+                        data-testid="calendar-view-month-btn"
                     >
                         Month
                     </Button>
@@ -384,6 +392,7 @@ const CustomToolbar = ({
                                 ? "bg-primary shadow-sm text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
+                        data-testid="calendar-view-sprint-btn"
                     >
                         Sprint
                     </Button>
@@ -397,6 +406,7 @@ const CustomToolbar = ({
                                 ? "bg-primary shadow-sm text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
+                        data-testid="calendar-view-week-btn"
                     >
                         Week
                     </Button>
@@ -410,6 +420,7 @@ const CustomToolbar = ({
                                 ? "bg-primary shadow-sm text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground"
                         )}
+                        data-testid="calendar-view-day-btn"
                     >
                         Day
                     </Button>
@@ -425,6 +436,7 @@ const CustomToolbar = ({
                             ? "bg-primary shadow-sm text-primary-foreground"
                             : "text-muted-foreground hover:text-foreground"
                     )}
+                    data-testid="calendar-unscheduled-toggle-btn"
                 >
                     Unscheduled
                     <Badge
@@ -439,7 +451,7 @@ const CustomToolbar = ({
                 </Button>
 
                 {/* Settings Icon */}
-                <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8 ml-1" data-testid="calendar-settings-btn">
                     <Settings className="h-4 w-4" />
                 </Button>
             </div>
@@ -469,6 +481,7 @@ const UnscheduledTasksPanel = ({
                     size="icon"
                     onClick={onShowUnscheduled}
                     className="bg-transparent"
+                    data-testid="calendar-unscheduled-panel-close-btn"
                 >
                     <ChevronsRight className="h-4 w-4 text-foreground" />
                 </Button>
@@ -496,6 +509,7 @@ const UnscheduledTasksPanel = ({
                             {tasks.map((task) => (
                                 <div
                                     key={task.id}
+                                    data-testid={`calendar-unscheduled-task-item-${task.id}`}
                                     className="group flex items-center gap-2 p-2 rounded hover:bg-muted cursor-move border border-transparent hover:border-border transition-all"
                                     draggable
                                     onDragStart={(e) => {
@@ -521,9 +535,10 @@ const UnscheduledTasksPanel = ({
                                         className="h-4 w-4 rounded border-input"
                                         checked={task.completed}
                                         onChange={() => { }}
+                                        data-testid={`calendar-unscheduled-task-checkbox-${task.id}`}
                                     />
 
-                                    <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
+                                    <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" data-testid={`calendar-unscheduled-task-grip-${task.id}`} />
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
@@ -541,6 +556,7 @@ const UnscheduledTasksPanel = ({
                                         size="sm"
                                         onClick={() => onSchedule(task.id)}
                                         className="h-7 px-2 text-xs"
+                                        data-testid={`calendar-unscheduled-task-schedule-btn-${task.id}`}
                                     >
                                         Schedule
                                     </Button>

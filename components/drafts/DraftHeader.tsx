@@ -56,15 +56,15 @@ export function DraftHeader({
   const activeFilterCount = Object.values(activeFilters).filter(Boolean).length;
 
   return (
-    <div className="border-b border-gray-200 bg-white">
-      <div className="flex items-center justify-between px-4 py-2">
+    <div className="border-b border-border bg-background">
+      <div className="flex items-center justify-between px-4 py-1.5">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-50 rounded-lg ml-4">
-              <SquarePen className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-blue-50 dark:bg-blue-950/40 rounded-lg ml-4">
+              <SquarePen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 leading-none">Draft</h1>
+              <h1 className="text-xl font-semibold text-foreground leading-none">Draft</h1>
             </div>
           </div>
 
@@ -72,10 +72,10 @@ export function DraftHeader({
             <div className="relative w-64">
               <Input
                 placeholder="Search"
-                className="pl-8 h-9 border-gray-200 focus:ring-blue-500"
+                className="pl-8 border-border focus:ring-primary text-xs"
                 onChange={(e) => onSearchChange(e.target.value)}
               />
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             </div>
 
             <DropdownMenu>
@@ -83,31 +83,31 @@ export function DraftHeader({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 gap-2 bg-[#F2F2F7] text-[#8E8E93] border-gray-200 hover:bg-gray-100 relative"
+                  className="gap-2 bg-muted text-muted-foreground border-border hover:bg-muted/80 relative text-xs"
                 >
                   <Filter className="h-4 w-4" />
                   Filter
                   {activeFilterCount > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#001F3F] text-[10px] text-white">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                       {activeFilterCount}
                     </span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48 border-0 border-b-[5px] border-[#001F3F] rounded-lg">
+              <DropdownMenuContent align="start" className="w-40 border-0 border-b-[5px] border-primary rounded-lg text-xs">
                 {/* Project Submenu */}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="flex items-center relative">
                     {activeFilters.project && (
-                      <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                      <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full text-xs" />
                     )}
-                    <span>Project</span>
+                    <span className="text-xs">Project</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-[#001F3F] rounded-lg">
-                      <DropdownMenuItem onClick={() => onFilterChange('project', undefined)} className="relative">
+                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-primary rounded-lg">
+                      <DropdownMenuItem onClick={() => onFilterChange('project', undefined)} className="relative text-xs">
                         {!activeFilters.project && (
-                          <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                          <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                         )}
                         All Projects
                       </DropdownMenuItem>
@@ -116,10 +116,10 @@ export function DraftHeader({
                         <DropdownMenuItem
                           key={p.id}
                           onClick={() => onFilterChange('project', p.name)}
-                          className="relative"
+                          className="relative text-xs"
                         >
                           {activeFilters.project === p.name && (
-                            <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                            <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                           )}
                           {p.name}
                         </DropdownMenuItem>
@@ -132,15 +132,15 @@ export function DraftHeader({
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="flex items-center relative">
                     {activeFilters.assignee && (
-                      <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                      <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
-                    <span>Assignee</span>
+                    <span className="text-xs">Assignee</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-[#001F3F] rounded-lg">
-                      <DropdownMenuItem onClick={() => onFilterChange('assignee', undefined)} className="relative">
+                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-primary rounded-lg text-xs">
+                      <DropdownMenuItem onClick={() => onFilterChange('assignee', undefined)} className="relative text-xs">
                         {!activeFilters.assignee && (
-                          <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                          <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                         )}
                         All Assignees
                       </DropdownMenuItem>
@@ -152,7 +152,7 @@ export function DraftHeader({
                           className="flex items-center gap-2 relative"
                         >
                           {activeFilters.assignee === a.name && (
-                            <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                            <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                           )}
                           <Avatar className="h-6 w-6">
                             <AvatarImage src={a.avatar} alt={a.name} />
@@ -169,15 +169,15 @@ export function DraftHeader({
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="flex items-center relative">
                     {activeFilters.priority && (
-                      <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                      <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
-                    <span>Priority</span>
+                    <span className="text-xs">Priority</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-[#001F3F] rounded-lg">
-                      <DropdownMenuItem onClick={() => onFilterChange('priority', undefined)} className="relative">
+                    <DropdownMenuSubContent className="border-0 border-b-[5px] border-primary rounded-lg text-xs">
+                      <DropdownMenuItem onClick={() => onFilterChange('priority', undefined)} className="relative text-xs">
                         {!activeFilters.priority && (
-                          <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                          <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                         )}
                         All Priorities
                       </DropdownMenuItem>
@@ -186,10 +186,10 @@ export function DraftHeader({
                         <DropdownMenuItem
                           key={p}
                           onClick={() => onFilterChange('priority', p)}
-                          className="relative capitalize"
+                          className="relative text-xs capitalize"
                         >
                           {activeFilters.priority === p && (
-                            <div className="absolute left-0 w-[3px] h-full bg-[#001F3F] rounded-r-full" />
+                            <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                           )}
                           {p}
                         </DropdownMenuItem>
@@ -202,7 +202,7 @@ export function DraftHeader({
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-center justify-center font-medium bg-[#001F3F] text-white hover:bg-[#002F5F] focus:bg-[#002F5F] focus:text-white"
+                      className="text-center text-xs justify-center font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground"
                       onClick={onClearFilters}
                     >
                       Clear All Filters
@@ -216,7 +216,7 @@ export function DraftHeader({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 font-bold border border-red-100"
+                className="h-8 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 font-bold border border-destructive/20"
                 onClick={onDeleteClick}
               >
                 <Trash2 className="h-4 w-4" />
@@ -226,12 +226,12 @@ export function DraftHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
-            className="h-9 gap-2 bg-[#001F3F] hover:bg-[#002F5F] text-white"
+            className="h-8 gap-2 px-2 py-0.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground"
             onClick={onDraftTask}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3 w-3" />
             Draft a task
           </Button>
         </div>

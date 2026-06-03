@@ -120,6 +120,7 @@ export function CustomCalendarPicker({ selectedDate, onDateSelect, view = 'month
               }
             }
           }}
+          data-testid="calendar-picker-prev-btn"
         >
           <ChevronLeft />
         </button>
@@ -147,6 +148,7 @@ export function CustomCalendarPicker({ selectedDate, onDateSelect, view = 'month
               }
             }
           }}
+          data-testid="calendar-picker-mode-btn"
         >
           {headerLabel}
         </button>
@@ -180,6 +182,7 @@ export function CustomCalendarPicker({ selectedDate, onDateSelect, view = 'month
               }
             }
           }}
+          data-testid="calendar-picker-next-btn"
         >
           <ChevronRight />
         </button>
@@ -239,6 +242,7 @@ export function CustomCalendarPicker({ selectedDate, onDateSelect, view = 'month
                   setMonth(new Date(month.getFullYear(), i, 1));
                   setPickerMode("date-grid");
                 }}
+                data-testid={`calendar-picker-month-option-${i}`}
               >
                 {format(new Date(0, i), "MMM")}
               </button>
@@ -266,6 +270,7 @@ export function CustomCalendarPicker({ selectedDate, onDateSelect, view = 'month
                     setMonth(new Date(year, month.getMonth(), 1));
                     setPickerMode("date-grid");
                   }}
+                  data-testid={`calendar-picker-year-option-${year}`}
                 >
                   {year}
                 </button>

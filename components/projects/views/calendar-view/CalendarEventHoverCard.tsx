@@ -1,4 +1,4 @@
-﻿// components/projects/views/calendar-view/CalendarEventHoverCard.tsx
+// components/projects/views/calendar-view/CalendarEventHoverCard.tsx
 
 'use client';
 import { useState } from 'react';
@@ -124,6 +124,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
                     "rounded-lg bg-card p-2 shadow-md border border-border border-l-4 w-3xs pointer-events-auto"
                 )}
                 style={{ borderLeftColor: borderColor }}
+                data-testid={`calendar-event-hovercard-${task.id}`}
             >
                 {/* Top row: Avatar, Task ID, Priority - ALWAYS SHOW */}
                 <div className="flex items-center justify-between gap-2 mb-2">
@@ -154,6 +155,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
                                 backgroundColor: `${borderColor}20`,
                                 color: borderColor
                             }}
+                            data-testid={`calendar-event-hovercard-id-badge-${task.id}`}
                         >
                             {formatTaskId(projectSlug, task.taskNumber)}
                         </Badge>
@@ -163,6 +165,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
                             <Badge
                                 variant="secondary"
                                 className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border-none"
+                                data-testid={`calendar-event-hovercard-parent-id-badge-${task.id}`}
                             >
                                 {formatTaskId(projectSlug, parentTask.taskNumber)}
                             </Badge>
@@ -170,7 +173,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
 
                         <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                             <PopoverTrigger asChild>
-                                <div className="cursor-pointer">
+                                <div className="cursor-pointer" data-testid={`calendar-event-hovercard-priority-trigger-${task.id}`}>
                                     {priorityOption ? (
                                         <Badge
                                             variant="secondary"
@@ -203,6 +206,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
                                                 onClick={() => handlePriorityChange(priority.value)}
                                                 style={{ color: priority.color }}
                                                 className="w-full flex justify-between items-center gap-2 px-2 py-1 rounded hover:bg-muted text-xs transition-colors"
+                                                data-testid={`calendar-event-hovercard-priority-option-${priority.value}-${task.id}`}
                                             >
                                                 <span>{priority.label}</span>
                                                 <Badge
@@ -287,7 +291,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
                 </div>
 
                 {/* Task Name - ALWAYS show */}
-                <h3 className="text-sm text-foreground mb-3 line-clamp-2">
+                <h3 className="text-sm text-foreground mb-3 line-clamp-2" data-testid={`calendar-event-hovercard-name-text-${task.id}`}>
                     {task.name}
                 </h3>
 

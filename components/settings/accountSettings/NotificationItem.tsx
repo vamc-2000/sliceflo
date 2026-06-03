@@ -7,6 +7,7 @@ interface NotificationItemProps {
     description?: string;
     onChange?: (checked: boolean) => void;
     disabled?: boolean;
+    "data-testid"?: string;
 }
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ 
@@ -14,7 +15,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     checked, 
     description,
     onChange, 
-    disabled 
+    disabled,
+    "data-testid": dataTestId
 }) => {
     return (
         <div className="space-y-1.5">
@@ -25,6 +27,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                     className="mr-3"
                     aria-label={label}
                     disabled={disabled}
+                    data-testid={dataTestId}
                 />
                 <Label className="text-sm cursor-pointer font-medium text-[var(--primary)] dark:text-white">
                     {label}

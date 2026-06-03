@@ -1,4 +1,4 @@
-﻿// components/DuplicateTaskDialog.tsx
+// components/DuplicateTaskDialog.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -127,6 +127,7 @@ const DuplicateTaskDialog: React.FC<DuplicateTaskDialogProps> = ({
                     "flex cursor-pointer items-center gap-2 text-xs",
                     disabled && "opacity-40 cursor-not-allowed"
                 )}
+                data-testid={`duplicate-task-field-${field.id}-checkbox`}
             >
                 <div
                     onClick={() => !disabled && toggleField(field.id)}
@@ -171,6 +172,7 @@ const DuplicateTaskDialog: React.FC<DuplicateTaskDialogProps> = ({
                                     setHasNameChanged(e.target.value !== originalTaskName);
                                 }}
                                 className="h-10"
+                                data-testid="duplicate-task-name-input"
                             />
                         </div>
 
@@ -193,6 +195,7 @@ const DuplicateTaskDialog: React.FC<DuplicateTaskDialogProps> = ({
                                                     ? "bg-primary text-primary-foreground"
                                                     : "text-muted-foreground "
                                             )}
+                                            data-testid={`duplicate-task-mode-${m}`}
                                         >
                                             {m === "system" ? "System" : "Customize"}
                                         </Button>
@@ -217,6 +220,7 @@ const DuplicateTaskDialog: React.FC<DuplicateTaskDialogProps> = ({
                                                 type="button"
                                                 onClick={toggleAll}
                                                 className="flex items-center gap-1.5 text-xs font-medium text-primary"
+                                                data-testid="duplicate-task-toggle-all"
                                             >
                                                 <div className={cn(
                                                     "flex h-4 w-4 items-center justify-center rounded border",
@@ -246,11 +250,12 @@ const DuplicateTaskDialog: React.FC<DuplicateTaskDialogProps> = ({
                 </div>
 
                 <DialogFooter className="flex items-center justify-between px-6 py-3">
-                    <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
+                    <Button variant="ghost" onClick={onClose} disabled={loading} data-testid="duplicate-task-cancel-btn">Cancel</Button>
                     <Button
                         onClick={handleDuplicate}
                         disabled={!newName.trim() || loading || !hasNameChanged}
                         className="text-primary-foreground bg-primary hover:bg-primary/90 text-primary-foreground font-medium min-w-[110px]"
+                        data-testid="duplicate-task-submit-btn"
                     >
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Duplicate"}
                     </Button>

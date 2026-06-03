@@ -119,6 +119,7 @@ export function EditCustomFieldPopup({
             onClick={e => e.stopPropagation()}
             className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground flex-shrink-0"
             title={`Edit ${field.name}`}
+            data-testid={`edit-custom-field-trigger-${field.id}`}
           >
             <Pencil className="h-3 w-3" />
           </button>
@@ -128,6 +129,7 @@ export function EditCustomFieldPopup({
         className="w-[280px]                                                   p-0 flex flex-col h-[450px] border-b-[5px] border-b-primary"
         align={align}
         onClick={e => e.stopPropagation()}
+        data-testid={`edit-custom-field-content-${field.id}`}
       >
         {/* Header */}
         <div className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5 border-b bg-background">

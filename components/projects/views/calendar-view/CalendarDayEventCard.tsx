@@ -1,4 +1,4 @@
-﻿// components/projects/views/calendar-view/CalendarDayEventCard.tsx
+// components/projects/views/calendar-view/CalendarDayEventCard.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -193,6 +193,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
             className="rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow"
             onClick={onClick}
             style={{ borderLeftColor: getBorderColor(liveTask) }}
+            data-testid={`calendar-event-card-${task.id}`}
         >
             {/* Top row */}
             <div className="flex items-center justify-between gap-2 mb-2">
@@ -200,7 +201,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                     {/* Avatar with Popover */}
                     <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
                         <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <div className="cursor-pointer">
+                            <div className="cursor-pointer" data-testid={`calendar-event-card-assignee-trigger-${task.id}`}>
                                 {assignedMember ? (
                                     <Avatar className="h-6 w-6">
                                         <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-semibold">
@@ -228,6 +229,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                                         key={member.userId}
                                         onClick={() => handleAssigneeChange(member.userId)}
                                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                                        data-testid={`calendar-event-card-assignee-option-${member.userId}-${task.id}`}
                                     >
                                         <Avatar className="h-5 w-5">
                                             <AvatarFallback className="text-xs">
@@ -249,6 +251,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                             backgroundColor: `${getBorderColor(liveTask)}20`,
                             color: getBorderColor(liveTask)
                         }}
+                        data-testid={`calendar-event-card-id-badge-${task.id}`}
                     >
                         {formatTaskId(projectSlug, task.taskNumber)}
                     </Badge>
@@ -258,6 +261,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                         <Badge
                             variant="secondary"
                             className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border-none"
+                            data-testid={`calendar-event-card-parent-id-badge-${task.id}`}
                         >
                             {formatTaskId(projectSlug, parentTask.taskNumber)}
                         </Badge>
@@ -266,7 +270,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                     {/* Priority with Popover */}
                     <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                         <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <div className="cursor-pointer">
+                            <div className="cursor-pointer" data-testid={`calendar-event-card-priority-trigger-${task.id}`}>
                                 {priorityOption ? (
                                     <Badge
                                         variant="secondary"
@@ -302,6 +306,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                                             }}
                                             style={{ color: priority.color }}
                                             className="w-full flex justify-between items-center gap-2 px-2 py-1 rounded hover:bg-muted text-xs transition-colors"
+                                            data-testid={`calendar-event-card-priority-option-${priority.value}-${task.id}`}
                                         >
                                             <span>{priority.label}</span>
                                             <Badge
@@ -383,7 +388,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                 </div>
 
                 {/* More Options */}
-                <div>
+                <div data-testid={`calendar-event-card-more-btn-${task.id}`}>
                     <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />
                 </div>
             </div>
@@ -405,11 +410,13 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                     }}
                     onClick={(e) => e.stopPropagation()}
                     className="text-sm mb-3 border-primary text-foreground"
+                    data-testid={`calendar-event-card-name-input-${task.id}`}
                 />
             ) : (
                 <h4
-                    className="text-sm text-foreground mb-3 line-clamp-2 hover:text-primary transition-colors"
+                    className="text-sm text-foreground mb-3 line-clamp-2 hover:text-primary transition-colors cursor-pointer"
                     onClick={handleStartEditName}
+                    data-testid={`calendar-event-card-name-text-${task.id}`}
                 >
                     {liveTask.name}
                 </h4>
@@ -424,7 +431,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                 {/* Start Date with Popover */}
                 <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
                     <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <div className="cursor-pointer">
+                        <div className="cursor-pointer" data-testid={`calendar-event-card-startdate-trigger-${task.id}`}>
                             {liveTask.startDate ? (
                                 <Badge
                                     variant="secondary"
@@ -458,7 +465,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
                 {/* End Date (Due Date) with Popover */}
                 <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
                     <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <div className="cursor-pointer">
+                        <div className="cursor-pointer" data-testid={`calendar-event-card-enddate-trigger-${task.id}`}>
                             {liveTask.endDate ? (() => {
                                 const dateInfo = formatDateOrDaysRemaining(liveTask.endDate);
                                 return dateInfo ? (

@@ -257,8 +257,8 @@ export default function GeneralPage() {
     <div className={`w-full space-y-6 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
 
       <div className="space-y-2">
-        <h3 className="text-base font-semibold text-foreground">Organization</h3>
-        <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg transition-colors">
+        <h3 className="text-base font-semibold text-foreground" data-testid="general-org-title">Organization</h3>
+        <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg transition-colors" data-testid="general-org-box">
           <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">SF</span>
           </div>
@@ -268,7 +268,7 @@ export default function GeneralPage() {
 
       {/* Workspaces Section */}
       <div className="space-y-2">
-        <h3 className="text-base font-semibold text-foreground">Workspaces</h3>
+        <h3 className="text-base font-semibold text-foreground" data-testid="general-workspaces-title">Workspaces</h3>
 
         {ownedWorkspaces.map((ws) => (
           <SettingsCard
@@ -310,27 +310,6 @@ export default function GeneralPage() {
                           </AvatarFallback>
                         </Avatar>
                       )}
-
-                      {/* Render up to 2 other members */}
-                      {/* {otherMembers.slice(0, 2).map((member: any) => (
-                        <Avatar 
-                          key={member.userId} 
-                          className="inline-block h-6 w-6 rounded-full ring-2 ring-background cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => handleOpenProfile(member)}
-                        >
-                          <AvatarImage src={member.profilePictureUrl} />
-                          <AvatarFallback className="text-[10px]">
-                            {member.email?.charAt(0).toUpperCase() || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))} */}
-
-                      {/* Show count of remaining members */}
-                      {/* {otherMembers.length > 2 && (
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[10px] font-medium ring-2 ring-background">
-                          +{otherMembers.length - 2}
-                        </div>
-                      )} */}
                     </>
                   );
                 })()}
@@ -338,6 +317,7 @@ export default function GeneralPage() {
             }
             isActive={activeSection === ws.id}
             onToggle={() => setActiveSection((prev) => (prev === ws.id ? null : ws.id!))}
+            data-testid={`general-owned-workspace-card-${ws.id}`}
           >
             {/* Form Section */}
             <div className="flex items-end gap-4 py-2">
@@ -361,6 +341,7 @@ export default function GeneralPage() {
                     fileInputRef.current?.click();
                   }}
                   className="w-12 h-10 bg-card border border-border rounded-md flex items-center justify-center hover:bg-muted transition-colors cursor-pointer relative overflow-hidden"
+                  data-testid={`general-workspace-icon-trigger-${ws.id}`}
                 >
                   {editData[ws.id!]?.iconPreview ? (
                     <Image src={editData[ws.id!].iconPreview!} alt="Workspace icon" fill className="object-cover" />
@@ -379,6 +360,7 @@ export default function GeneralPage() {
                   onChange={(e) => handleInputChange(ws.id!, 'name', e.target.value)}
                   placeholder="e.g. Marketing"
                   className="w-full h-10 px-3 bg-card border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground transition-colors"
+                  data-testid={`general-workspace-name-input-${ws.id}`}
                 />
               </div>
 
@@ -400,6 +382,7 @@ export default function GeneralPage() {
                     ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-70'
                     : 'bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary'
                     }`}
+                  data-testid={`general-workspace-slug-input-${ws.id}`}
                 />
               </div>
             </div>
@@ -414,6 +397,7 @@ export default function GeneralPage() {
                     if (!editData[ws.id!]?.isDefault) handleDefaultToggle(ws.id!, checked);
                   }}
                   className="mt-1"
+                  data-testid={`general-workspace-default-switch-${ws.id}`}
                 />
                 <div className="flex-1">
                   <Label htmlFor={`default-owned-${ws.id}`} className="text-sm font-semibold text-foreground cursor-pointer">
@@ -442,12 +426,14 @@ export default function GeneralPage() {
               <button
                 onClick={() => handleDeleteWorkspace(ws)} // Pass the whole object
                 className="text-sm text-red-600 hover:text-red-700 underline dark:text-red-400 dark:hover:text-red-300"
+                data-testid={`general-workspace-delete-btn-${ws.id}`}
               >
                 Delete workspace
               </button>
               <Button
                 onClick={() => handleUpdateWorkspace(ws.id!)}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                data-testid={`general-workspace-update-btn-${ws.id}`}
               >
                 Update workspace
               </Button>
@@ -480,7 +466,6 @@ export default function GeneralPage() {
                       <div className="flex -space-x-2 overflow-hidden">
                         {(() => {
                           const owner = members.find((m) => m.role === "owner");
-                          const otherMembers = members.filter((m) => m.role !== "owner").slice(0, 2);
                           return (
                             <>
                               {owner && (
@@ -494,23 +479,6 @@ export default function GeneralPage() {
                                   </AvatarFallback>
                                 </Avatar>
                               )}
-                              {/* {otherMembers.map((m: any) => (
-                                <Avatar 
-                                  key={m.userId} 
-                                  className="inline-block h-6 w-6 rounded-full ring-2 ring-background cursor-pointer hover:opacity-80 transition-opacity"
-                                  onClick={() => handleOpenProfile(m)}
-                                >
-                                  <AvatarImage src={m.profilePictureUrl} alt={m.email} />
-                                  <AvatarFallback className="text-[10px] bg-muted text-muted-foreground">
-                                    {m.email?.charAt(0).toUpperCase() || "U"}
-                                  </AvatarFallback>
-                                </Avatar>
-                              ))} */}
-                              {/* {members.length > 3 && (
-                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[10px] font-medium ring-2 ring-background">
-                                  +{members.length - 3}
-                                </div>
-                              )} */}
                             </>
                           );
                         })()}
@@ -522,13 +490,14 @@ export default function GeneralPage() {
                   }
                   isActive={activeSection === ws.id}
                   onToggle={() => setActiveSection((prev) => (prev === ws.id ? null : ws.id!))}
+                  data-testid={`general-shared-workspace-card-${ws.id}`}
                 >
                   {/* Icon + Name + Identifier - one row */}
                   <div className="flex items-end gap-4 py-2">
                     {/* Icon */}
                     <div className="flex-shrink-0 space-y-2">
                       <label className="block text-xs font-medium text-muted-foreground uppercase opacity-70 px-1">Icon</label>
-                      <div className="w-12 h-10 bg-card border border-border rounded-md flex items-center justify-center relative overflow-hidden opacity-70">
+                      <div className="w-12 h-10 bg-card border border-border rounded-md flex items-center justify-center relative overflow-hidden opacity-70" data-testid={`general-shared-workspace-icon-preview-${ws.id}`}>
                         {ws.icon ? (
                           <Image src={ws.icon} alt="Workspace icon" fill className="object-cover" />
                         ) : (
@@ -541,14 +510,18 @@ export default function GeneralPage() {
                     <div className="flex-1 space-y-2">
                       <label className="block text-xs font-medium text-muted-foreground uppercase opacity-70">Workspace name</label>
                       <input type="text" value={ws.name} readOnly
-                        className="w-full h-10 px-3 bg-muted border border-input rounded-md text-sm text-muted-foreground cursor-not-allowed opacity-70" />
+                        className="w-full h-10 px-3 bg-muted border border-input rounded-md text-sm text-muted-foreground cursor-not-allowed opacity-70"
+                        data-testid={`general-shared-workspace-name-input-${ws.id}`}
+                      />
                     </div>
 
                     {/* Identifier */}
                     <div className="flex-1 space-y-2">
                       <label className="block text-xs font-medium text-muted-foreground uppercase opacity-70">Workspace identifier</label>
                       <input type="text" value={ws.slug ?? ""} readOnly
-                        className="w-full h-10 px-3 bg-muted border border-input rounded-md text-sm text-muted-foreground cursor-not-allowed opacity-70" />
+                        className="w-full h-10 px-3 bg-muted border border-input rounded-md text-sm text-muted-foreground cursor-not-allowed opacity-70"
+                        data-testid={`general-shared-workspace-slug-input-${ws.id}`}
+                      />
                     </div>
                   </div>
 
@@ -565,6 +538,7 @@ export default function GeneralPage() {
                           if (!editData[ws.id!]?.isDefault) handleDefaultToggle(ws.id!, checked);
                         }}
                         className="mt-1"
+                        data-testid={`general-shared-workspace-default-switch-${ws.id}`}
                       />
                       <div className="flex-1">
                         <Label htmlFor={`default-shared-${ws.id}`} className="text-sm font-semibold text-foreground cursor-pointer">
@@ -583,6 +557,7 @@ export default function GeneralPage() {
                     <Button
                       onClick={() => handleUpdateWorkspace(ws.id!)}
                       className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                      data-testid={`general-shared-workspace-update-btn-${ws.id}`}
                     >
                       Update workspace
                     </Button>

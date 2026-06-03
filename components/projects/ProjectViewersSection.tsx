@@ -259,6 +259,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
               <button
                 onClick={() => { setShowAddInterface(false); setSearchQuery(""); }}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-1"
+                data-testid="project-viewers-back-btn"
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
               </button>
@@ -267,12 +268,14 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
               <TabsTrigger
                 value="teams"
                 className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary text-xs"
+                data-testid="project-viewers-tab-teams"
               >
                 Teams
               </TabsTrigger>
               <TabsTrigger
                 value="members"
                 className="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary text-xs"
+                data-testid="project-viewers-tab-members"
               >
                 Members
               </TabsTrigger>
@@ -286,6 +289,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-8 rounded-md text-xs"
+                data-testid="project-viewers-search-teams"
               />
             </div>
 
@@ -316,7 +320,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* Chevron */}
-                          <button onClick={(e) => { e.stopPropagation(); toggleTeamExpand(team.id); }}>
+                          <button onClick={(e) => { e.stopPropagation(); toggleTeamExpand(team.id); }} data-testid={`project-viewers-team-expand-btn-${team.id}`}>
                             <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
                           </button>
 
@@ -350,6 +354,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                           onCheckedChange={(checked) => toggleTeamSelect(team.id, Boolean(checked))}
                           onClick={(e) => e.stopPropagation()}
                           className="border-input"
+                          data-testid={`project-viewers-team-checkbox-${team.id}`}
                         />
                       </div>
 
@@ -373,6 +378,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                                     disabled={isLoading || addedTeams.has(team.id)}
                                     onCheckedChange={(checked) => toggleTeamMemberSelect(team.id, member.id, Boolean(checked))}
                                     className="border-input"
+                                    data-testid={`project-viewers-team-member-checkbox-${team.id}-${member.id}`}
                                   />
                                 </div>
                               ))}
@@ -412,6 +418,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                                     setIsLoading(false);
                                   }
                                 }}
+                                data-testid={`project-viewers-team-add-selected-btn-${team.id}`}
                               >
                                 Add Selected
                               </Button>
@@ -435,6 +442,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-8 rounded-md text-xs"
+                data-testid="project-viewers-search-available"
               />
             </div>
             <div className="space-y-0.5 max-h-80 overflow-y-auto pr-1">
@@ -470,6 +478,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                       onClick={() => handleAddMember(member.userId)}
                       disabled={isLoading}
                       className="shrink-0 h-8 w-8 group-hover:opacity-100 transition-opacity"
+                      data-testid={`project-viewers-add-member-btn-${member.userId}`}
                     >
                       <Plus className="h-5 w-5 border-2 border-current rounded-full p-0.5" />
                     </Button>
@@ -525,6 +534,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 h-8 text-xs"
+            data-testid="project-viewers-search"
           />
         </div>
       )}
@@ -559,6 +569,7 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
                 disabled={isLoading}
                 className="text-muted-foreground hover:text-destructive shrink-0 h-8 w-8"
                 title="Remove viewer"
+                data-testid={`project-viewers-remove-btn-${viewer?.userId}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -571,10 +582,10 @@ const ProjectViewersSection: React.FC<ProjectViewersSectionProps> = ({
 
       {/* Action Buttons Row */}
       <div className="grid grid-cols-2 gap-2">
-        <Button size="sm" onClick={onInviteClick} className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs">
+        <Button size="sm" onClick={onInviteClick} className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs" data-testid="project-viewers-invite-btn">
           <Plus className="h-4 w-4 mr-1" /> Invite
         </Button>
-        <Button size="sm" onClick={() => setShowAddInterface(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs">
+        <Button size="sm" onClick={() => setShowAddInterface(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs" data-testid="project-viewers-add-btn">
           <Plus className="h-4 w-4 mr-1" /> Add
         </Button>
       </div>

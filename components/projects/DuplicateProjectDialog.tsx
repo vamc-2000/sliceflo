@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -54,6 +54,7 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
           type="button"
           onClick={toggleAll}
           className="flex items-center gap-1.5 text-xs font-medium text-primary"
+          data-testid="duplicate-project-fields-toggle-all"
         >
           <div
             className={cn(
@@ -83,6 +84,7 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
                 <label
                   key={field.id}
                   className="flex cursor-pointer items-center gap-2 text-xs"
+                  data-testid={`duplicate-project-field-checkbox-${field.id}`}
                 >
                   <div
                     onClick={() => toggleField(field.id)}
@@ -230,6 +232,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 className="h-9 text-xs"
+                data-testid="duplicate-project-name-input"
               />
             </div>
 
@@ -254,6 +257,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
                             ? "bg-primary text-primary-foreground"
                             : "bg-transparent text-muted-foreground hover:bg-muted"
                         )}
+                        data-testid={`duplicate-project-option-${opt.value}`}
                       >
                         {opt.label}
                       </button>
@@ -290,6 +294,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
             onClick={onClose}
             disabled={loading}
             className="h-9 text-xs"
+            data-testid="duplicate-project-cancel-btn"
           >
             Cancel
           </Button>
@@ -297,6 +302,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
             onClick={handleDuplicate}
             disabled={!newName.trim() || loading}
             className="text-primary-foreground bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-9 text-xs"
+            data-testid="duplicate-project-submit-btn"
           >
             {loading ? (
               <>

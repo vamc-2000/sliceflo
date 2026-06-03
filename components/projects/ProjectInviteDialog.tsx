@@ -1,4 +1,4 @@
-﻿// components/projects/ProjectInviteDialog.tsx
+// components/projects/ProjectInviteDialog.tsx
 
 "use client";
 
@@ -97,6 +97,7 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({
               size="icon"
               onClick={copyLinkToClipboard}
               className="shrink-0 cursor-pointer"
+              data-testid="project-invite-copy-btn"
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -116,6 +117,7 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({
                     <X
                       className="h-3 w-3 cursor-pointer hover:text-destructive"
                       onClick={() => handleRemoveEmail(email)}
+                      data-testid={`project-invite-email-chip-remove-${email}`}
                     />
                   </Badge>
                 ))}
@@ -129,6 +131,7 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({
               onChange={(e) => setInviteEmail(e.target.value)}
               onKeyDown={handleKeyDown}
               className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-muted-foreground placeholder:text-muted-foreground text-xs h-7"
+              data-testid="project-invite-email-input"
             />
           </div>
           
@@ -143,6 +146,7 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({
             onClick={handleSendInvite}
             disabled={emailList.length === 0 || inviteLoading}
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-9 text-xs"
+            data-testid="project-invite-submit-btn"
           >
             {inviteLoading ? (
               <>

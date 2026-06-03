@@ -118,15 +118,16 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
 
     if (showAddInterface) {
         return (
-            <div className="space-y-3">
+            <div className="space-y-3" data-testid="add-members-container">
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => { setShowAddInterface(false); setSearchQuery(""); }}
                         className="p-1 hover:bg-gray-100 rounded"
+                        data-testid="back-button"
                     >
                         <ChevronRight className="h-4 w-4 rotate-180" />
                     </button>
-                    <span className="text-sm font-medium">Add Members</span>
+                    <span className="text-sm font-medium" data-testid="add-members-title">Add Members</span>
                 </div>
 
                 <div className="relative">
@@ -136,40 +137,45 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-9 h-9"
+                        data-testid="search-workspace-members-input"
                     />
                 </div>
 
-                <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                <div className="space-y-1 max-h-64 overflow-y-auto pr-1" data-testid="available-members-list">
                     {filteredAvailable.length === 0 ? (
-                        <div className="text-center py-8 text-sm text-muted-foreground">
+                        <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-available-members-state">
                             No members found
                         </div>
                     ) : (
-                        filteredAvailable.map((member: any) => (
-                            <div key={member.userId || member.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors">
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <Avatar className="h-8 w-8 shrink-0">
-                                        <AvatarImage src={member.image} />
-                                        <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
-                                            {member.initials}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="min-w-0">
-                                        <p className="text-xs font-medium truncate">{member.name}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate">{member.email}</p>
+                        filteredAvailable.map((member: any) => {
+                            const memberId = member.userId || member.id;
+                            return (
+                                <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`available-member-item-${memberId}`}>
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <Avatar className="h-8 w-8 shrink-0" data-testid={`available-member-avatar-${memberId}`}>
+                                            <AvatarImage src={member.image} />
+                                            <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                                {member.initials}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-medium truncate" data-testid={`available-member-name-${memberId}`}>{member.name}</p>
+                                            <p className="text-[10px] text-muted-foreground truncate" data-testid={`available-member-email-${memberId}`}>{member.email}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
                                     onClick={() => handleAdd(member.userId || member.id)}
-                                    disabled={isLoading}
-                                    className="h-8 w-8 text-green-600 hover:text-green-700"
-                                >
-                                    <Plus className="h-4 w-4 border-2 border-current rounded-full p-0.5" />
-                                </Button>
-                            </div>
-                        ))
+                                        disabled={isLoading}
+                                        className="h-8 w-8 text-green-600 hover:text-green-700"
+                                        data-testid={`add-member-btn-${memberId}`}
+                                    >
+                                        <Plus className="h-4 w-4 border-2 border-current rounded-full p-0.5" />
+                                    </Button>
+                                </div>
+                            );
+                        })
                     )}
                 </div>
             </div>
@@ -177,26 +183,30 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="members-container">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Members</span>
+                    <span className="text-sm font-medium" data-testid="members-title">Members</span>
                     {/* Avatar Stack */}
-                    <div className="flex items-center -space-x-2">
-                        {memberDetails.slice(0, 4).map((member: any, index) => (
-                            <Avatar
-                                key={member.userId || member.id}
-                                className="h-7 w-7 border-2 border-white ring-1 ring-gray-200"
-                                style={{ zIndex: index + 1 }}
-                            >
-                                <AvatarImage src={member.image} alt={member.name} />
-                                <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
-                                    {member.initials}
-                                </AvatarFallback>
-                            </Avatar>
-                        ))}
+                    <div className="flex items-center -space-x-2" data-testid="members-avatars-group">
+                        {memberDetails.slice(0, 4).map((member: any, index) => {
+                            const memberId = member.userId || member.id;
+                            return (
+                                <Avatar
+                                key={memberId}
+                                    className="h-7 w-7 border-2 border-white ring-1 ring-gray-200"
+                                    style={{ zIndex: index + 1 }}
+                                    data-testid={`member-avatar-${memberId}`}
+                                >
+                                    <AvatarImage src={member.image} alt={member.name} />
+                                    <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                        {member.initials}
+                                    </AvatarFallback>
+                                </Avatar>
+                            );
+                        })}
                         {memberDetails.length > 4 && (
-                            <div className="h-7 w-7 rounded-full bg-gray-100 border-2 border-white ring-1 ring-gray-200 flex items-center justify-center" style={{ zIndex: 5 }}>
+                            <div className="h-7 w-7 rounded-full bg-gray-100 border-2 border-white ring-1 ring-gray-200 flex items-center justify-center" style={{ zIndex: 5 }} data-testid="members-extra-count">
                                 <span className="text-[10px] font-medium text-gray-600">+{memberDetails.length - 4}</span>
                             </div>
                         )}
@@ -211,60 +221,57 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-9"
+                    data-testid="search-assigned-members-input"
                 />
             </div>
 
-            <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+            <div className="space-y-1 max-h-64 overflow-y-auto pr-1" data-testid="assigned-members-list">
                 {filteredCurrent.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-muted-foreground">
+                    <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-assigned-members-state">
                         {searchQuery ? "No members found" : "No members added yet"}
                     </div>
                 ) : (
-                    filteredCurrent.map((member: any) => (
-                        <div key={member.userId || member.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors">
-                            <div className="flex items-center gap-3 min-w-0">
-                                <Avatar className="h-8 w-8 shrink-0">
-                                    <AvatarImage src={member.image} />
-                                    <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
-                                        {member.initials}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="min-w-0">
-                                    <p className="text-xs font-medium truncate">{member.name}</p>
-                                    <p className="text-[10px] text-muted-foreground truncate">{member.email}</p>
+                    filteredCurrent.map((member: any) => {
+                        const memberId = member.userId || member.id;
+                        return (
+                            <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`assigned-member-item-${memberId}`}>
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <Avatar className="h-8 w-8 shrink-0" data-testid={`assigned-member-avatar-${memberId}`}>
+                                        <AvatarImage src={member.image} />
+                                        <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                            {member.initials}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-medium truncate" data-testid={`assigned-member-name-${memberId}`}>{member.name}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate" data-testid={`assigned-member-email-${memberId}`}>{member.email}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="icon"
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
                                 onClick={() => handleRemove(member.userId || member.id)}
-                                disabled={isLoading}
-                                className="h-8 w-8 text-muted-foreground hover:text-red-600"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    ))
+                                    disabled={isLoading}
+                                    className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                                    data-testid={`remove-member-btn-${memberId}`}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        );
+                    })
                 )}
             </div>
 
             <Separator />
 
             <div className="grid grid-cols-1 gap-2">
-                {/* <Button
-                    variant="default"
-                    size="sm"
-                    onClick={onInviteClick}
-                    className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white text-xs h-8"
-                >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Invite
-                </Button> */}
                 <Button
                     variant="default"
                     size="sm"
                     onClick={() => setShowAddInterface(true)}
                     className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white text-xs h-8"
+                    data-testid="open-add-interface-btn"
                 >
                     <Plus className="h-3 w-3 mr-1" />
                     Add

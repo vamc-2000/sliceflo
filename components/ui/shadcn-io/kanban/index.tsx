@@ -69,9 +69,9 @@ export type KanbanBoardProps = {
   children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export const KanbanBoard = ({ id, children, className, style }: KanbanBoardProps) => {
+export const KanbanBoard = ({ id, children, className, style, ...props }: KanbanBoardProps) => {
   const { isOver, setNodeRef } = useDroppable({
     id,
   });
@@ -85,6 +85,7 @@ export const KanbanBoard = ({ id, children, className, style }: KanbanBoardProps
       )}
       ref={setNodeRef}
       style={style}
+      {...props}
     >
       {children}
     </div>

@@ -76,7 +76,7 @@ export default function CleanUp() {
     <div className="w-full space-y-2">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight">Clean Up</h2>
+        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight" data-testid="cleanup-title">Clean Up</h2>
         <p className="text-xs text-[#8E8E93]">Manage archived and deleted items</p>
       </div>
 
@@ -90,9 +90,10 @@ export default function CleanUp() {
         }
         isActive={activeSection === "archive"}
         onToggle={() => setActiveSection((prev) => (prev === "archive" ? null : "archive"))}
+        data-testid="cleanup-archive-card"
       >
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-border rounded-lg">
+          <table className="w-full border-collapse border border-border rounded-lg" data-testid="cleanup-archive-table">
             <thead>
               <tr className="bg-[#F6FAFF]">
                 <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
@@ -114,13 +115,13 @@ export default function CleanUp() {
             </thead>
             <tbody>
               {archiveItems.map((item, index) => (
-                <tr key={index} className="hover:bg-muted">
+                <tr key={index} className="hover:bg-muted" data-testid={`cleanup-archive-row-${index}`}>
                   <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
                     {item.name}
                   </td>
                   <td className="border border-border px-3 py-2 text-center">
                     <div className="flex justify-center">
-                      <Avatar className="h-8 w-8">
+                       <Avatar className="h-8 w-8">
                         <AvatarImage src={item.creator} />
                         <AvatarFallback>U</AvatarFallback>
                       </Avatar>
@@ -138,6 +139,7 @@ export default function CleanUp() {
                         size="sm"
                         className="bg-[var(--primary)] hover:bg-[var(--primary)] text-white h-7 px-3 text-xs"
                         onClick={() => toast("info", { title: "Info", description: "View item functionality" })}
+                        data-testid={`cleanup-archive-see-items-btn-${index}`}
                       >
                         <Eye className="w-3 h-3 mr-1" />
                         See Items
@@ -146,6 +148,7 @@ export default function CleanUp() {
                         size="sm"
                         className="bg-[var(--primary)] hover:bg-[var(--primary)] text-white h-7 px-3 text-xs"
                         onClick={() => toast("success", { title: "Success", description: "Item unarchived" })}
+                        data-testid={`cleanup-archive-unarchive-btn-${index}`}
                       >
                         <RotateCcw className="w-3 h-3 mr-1" />
                         Unarchive
@@ -169,9 +172,10 @@ export default function CleanUp() {
         }
         isActive={activeSection === "deleted"}
         onToggle={() => setActiveSection((prev) => (prev === "deleted" ? null : "deleted"))}
+        data-testid="cleanup-deleted-card"
       >
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-border rounded-lg">
+          <table className="w-full border-collapse border border-border rounded-lg" data-testid="cleanup-deleted-table">
             <thead>
               <tr className="bg-[#F6FAFF]">
                 <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
@@ -193,7 +197,7 @@ export default function CleanUp() {
             </thead>
             <tbody>
               {deleteItems.map((item, index) => (
-                <tr key={index} className="hover:bg-muted">
+                <tr key={index} className="hover:bg-muted" data-testid={`cleanup-deleted-row-${index}`}>
                   <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
                     {item.name}
                   </td>
@@ -217,6 +221,7 @@ export default function CleanUp() {
                         size="sm"
                         className="bg-red-600 hover:bg-red-700 text-white h-7 px-3 text-xs"
                         onClick={() => toast("success", { title: "Success", description: "Item restored" })}
+                        data-testid={`cleanup-deleted-restore-btn-${index}`}
                       >
                         <Eye className="w-3 h-3 mr-1" />
                         Restore

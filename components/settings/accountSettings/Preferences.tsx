@@ -249,17 +249,18 @@ export default function PreferencesPage() {
                 >
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {themeOptions.map((option) => (
-                            <ThemeOptionCard
-                                key={option.theme}
-                                theme={option.theme}
-                                label={option.label}
-                                imageSrc={option.imageSrc}
-                                isSelected={selectedTheme === option.theme}
-                                onClick={() => {
-                                    setSelectedTheme(option.theme);
-                                    setTheme(option.theme);
-                                }}
-                            />
+                             <ThemeOptionCard
+                                 key={option.theme}
+                                 theme={option.theme}
+                                 label={option.label}
+                                 imageSrc={option.imageSrc}
+                                 isSelected={selectedTheme === option.theme}
+                                 onClick={() => {
+                                     setSelectedTheme(option.theme);
+                                     setTheme(option.theme);
+                                 }}
+                                 data-testid={`preferences-theme-option-${option.theme}`}
+                             />
                         ))}
                     </div>
                 </SettingsCard>
@@ -292,12 +293,12 @@ export default function PreferencesPage() {
                                     value={localPreferences.timeFormat || undefined}
                                     onValueChange={(value) => handleChange("timeFormat", value)}
                                 >
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full" data-testid="preferences-time-format-select-trigger">
                                         <SelectValue placeholder="Choose an option" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {["12h", "24h"].map((option) => (
-                                            <SelectItem key={option} value={option}>
+                                            <SelectItem key={option} value={option} data-testid={`preferences-time-format-option-${option}`}>
                                                 {option}
                                             </SelectItem>
                                         ))}
@@ -316,12 +317,12 @@ export default function PreferencesPage() {
                                     value={localPreferences.timeZone || undefined}
                                     onValueChange={(value) => handleChange("timeZone", value)}
                                 >
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full" data-testid="preferences-timezone-select-trigger">
                                         <SelectValue placeholder="Choose an option" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {timezones.map((tz) => (
-                                            <SelectItem key={tz} value={tz}>
+                                            <SelectItem key={tz} value={tz} data-testid={`preferences-timezone-option-${tz}`}>
                                                 {tz}
                                             </SelectItem>
                                         ))}
@@ -340,12 +341,12 @@ export default function PreferencesPage() {
                                     value={localPreferences.dateFormat || undefined}
                                     onValueChange={(value) => handleChange("dateFormat", value)}
                                 >
-                                    <SelectTrigger className="w-full">
+                                    <SelectTrigger className="w-full" data-testid="preferences-date-format-select-trigger">
                                         <SelectValue placeholder="Choose an option" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {["YYYY-MM-DD", "MM-DD-YYYY", "DD-MM-YYYY"].map((format) => (
-                                            <SelectItem key={format} value={format}>
+                                            <SelectItem key={format} value={format} data-testid={`preferences-date-format-option-${format}`}>
                                                 {format}
                                             </SelectItem>
                                         ))}
@@ -385,6 +386,7 @@ export default function PreferencesPage() {
                                                             checked={localPreferences.weekendDays.includes(day)}
                                                             onCheckedChange={() => toggleDay(day)}
                                                             aria-label={`Toggle ${day} as weekend`}
+                                                            data-testid={`preferences-weekend-switch-${day}`}
                                                         />
                                                     </div>
                                                 </TableCell>
@@ -423,12 +425,12 @@ export default function PreferencesPage() {
                                 value={localPreferences.language || undefined}
                                 onValueChange={(value) => handleChange("language", value)}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full" data-testid="preferences-language-select-trigger">
                                     <SelectValue placeholder="Choose an option" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {languages.map((lang) => (
-                                        <SelectItem key={lang} value={lang}>
+                                        <SelectItem key={lang} value={lang} data-testid={`preferences-language-option-${lang}`}>
                                             {lang}
                                         </SelectItem>
                                     ))}
@@ -470,6 +472,7 @@ export default function PreferencesPage() {
                             <Switch
                                 checked={localPreferences.toastMessage}
                                 onCheckedChange={(checked) => handleChange("toastMessage", checked)}
+                                data-testid="preferences-toast-switch"
                             />
                         </div>
 
@@ -486,6 +489,7 @@ export default function PreferencesPage() {
                             <Switch
                                 checked={localPreferences.keyboardShortcuts}
                                 onCheckedChange={(checked) => handleChange("keyboardShortcuts", checked)}
+                                data-testid="preferences-keyboard-shortcuts-switch"
                             />
                         </div>
 
@@ -510,6 +514,7 @@ export default function PreferencesPage() {
                                                 : "w-12 h-12 flex items-center justify-center font-inter font-normal rounded-lg cursor-pointer leading-none transition-all duration-200 bg-muted text-muted-foreground border-b-[3px] border-b-transparent hover:bg-muted/80"
                                         }
                                         style={{ fontSize: `${fontSize}px` }}
+                                        data-testid={`preferences-fontsize-btn-${size}`}
                                     >
                                         {label}
                                     </button>
@@ -525,6 +530,7 @@ export default function PreferencesPage() {
                         onClick={handleSave}
                         disabled={isSaving || !isChanged}
                         className="font-inter text-[14px] font-medium leading-5 px-8 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                        data-testid="preferences-save-btn"
                     >
                         {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                         {isSaving ? "Saving..." : "Save"}

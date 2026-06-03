@@ -131,6 +131,7 @@ export function ViewTabs({ projectId }: ViewTabsProps) {
           router.push(`?${params.toString()}`);
         }}
         title={OVERVIEW_VIEW.name}
+        data-testid="view-tab-overview"
       >
         <OverviewIcon className="h-4 w-4" />
       </Button>
@@ -157,6 +158,7 @@ export function ViewTabs({ projectId }: ViewTabsProps) {
                 router.push(`?${params.toString()}`);
               }}
               title={defaultView.name}
+              data-testid={`view-tab-${defaultView.id}`}
             >
               <Icon className="h-4 w-4" />
             </Button>
@@ -179,6 +181,7 @@ export function ViewTabs({ projectId }: ViewTabsProps) {
               router.push(`?${params.toString()}`);
             }}
             title={customViewForProject.name}
+            data-testid={`view-tab-custom-${customViewForProject.id}`}
           >
             {(() => {
               // ✅ Get icon component from iconMap using stored icon name

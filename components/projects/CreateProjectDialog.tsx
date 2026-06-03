@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import * as React from "react"
 import { FileSpreadsheet, FileText, Plus, LayoutGrid, Table2 } from "lucide-react"
@@ -87,6 +87,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             <button
               onClick={handleImportFromSpreadsheet}
               className="w-full flex justify-start p-4 rounded-md bg-muted hover:bg-muted/80 transition-colors text-left group cursor-pointer"
+              data-testid="create-project-dialog-import-btn"
             >
               <div className="flex items-center gap-4">
                 <div className="bg-card py-2 rounded-lg w-20">
@@ -102,6 +103,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             <button
               onClick={handleUseTemplates}
               className="w-full flex justify-start p-4 rounded-md bg-muted hover:bg-muted/80 transition-colors text-left group cursor-pointer"
+              data-testid="create-project-dialog-templates-btn"
             >
               <div className="flex items-center gap-4">
                 <div className="bg-card p-2 rounded-lg w-20">
@@ -119,6 +121,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             <button
               onClick={handleCreateEmptyBoard}
               className="w-full h-full min-h-xs p-8 rounded-md bg-card shadow-md border border-border transition-all group cursor-pointer hover:bg-muted/50"
+              data-testid="create-project-dialog-empty-btn"
             >
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <div className="relative">

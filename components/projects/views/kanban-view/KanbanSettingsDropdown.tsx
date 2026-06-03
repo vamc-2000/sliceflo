@@ -34,7 +34,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" data-testid="kanban-settings-trigger">
           <Settings className="h-4 w-4" />
           View Settings
         </Button>
@@ -46,6 +46,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
           onCheckedChange={(checked) =>
             updateCardSettings(projectId, { showAvatar: checked })
           }
+          data-testid="kanban-settings-avatar-checkbox"
         >
           Show Assignee Avatar
         </DropdownMenuCheckboxItem>
@@ -54,6 +55,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
           onCheckedChange={(checked) =>
             updateCardSettings(projectId, { showDates: checked })
           }
+          data-testid="kanban-settings-dates-checkbox"
         >
           Show Dates
         </DropdownMenuCheckboxItem>
@@ -62,6 +64,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
           onCheckedChange={(checked) =>
             updateCardSettings(projectId, { showPriority: checked })
           }
+          data-testid="kanban-settings-priority-checkbox"
         >
           Show Priority Badge
         </DropdownMenuCheckboxItem>
@@ -70,6 +73,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
           onCheckedChange={(checked) =>
             updateCardSettings(projectId, { showSubtasks: checked })
           }
+          data-testid="kanban-settings-subtasks-checkbox"
         >
           Show Subtask Count
         </DropdownMenuCheckboxItem>
@@ -86,6 +90,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
             key={config._id}
             checked={!settings.hiddenColumns.includes(config.label)}
             onCheckedChange={() => toggleColumnVisibility(projectId, config.label)}
+            data-testid={`kanban-settings-column-visibility-${config.label}`}
           >
             <div className="flex items-center gap-2">
               <div

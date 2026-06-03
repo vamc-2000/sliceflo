@@ -186,6 +186,7 @@ export default function SessionHistory() {
           onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
           className="h-4 w-4 rounded border-border"
           disabled={sessions.every((s) => s.isCurrentSession)}
+          data-testid="session-history-select-all"
         />
       ),
       cell: ({ row }) => (
@@ -195,6 +196,7 @@ export default function SessionHistory() {
           onChange={(e) => row.toggleSelected(!!e.target.checked)}
           className="h-4 w-4 rounded border-border"
           disabled={row.original.isCurrentSession}
+          data-testid={`session-history-select-row-${row.original.id}`}
         />
       ),
       enableSorting: false,
@@ -216,7 +218,7 @@ export default function SessionHistory() {
         const browser = parseBrowserInfo(row.original.browserInfo);
         const os = parseOS(row.original.browserInfo);
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-testid={`session-history-device-${row.original.id}`}>
             {getDeviceIcon(row.getValue("deviceType"))}
             <div>
               <div className="text-[14px] font-medium text-[var(--primary)]">{browser}</div>
@@ -230,7 +232,7 @@ export default function SessionHistory() {
       accessorKey: "ipAddress",
       header: "IP Address",
       cell: ({ row }) => (
-        <code className="text-[12px] bg-[var(--muted)] px-2 py-1 rounded-md text-[var(--primary)] font-medium">
+        <code className="text-[12px] bg-[var(--muted)] px-2 py-1 rounded-md text-[var(--primary)] font-medium" data-testid={`session-history-ip-${row.original.id}`}>
           {row.getValue("ipAddress")}
         </code>
       ),
@@ -275,6 +277,7 @@ export default function SessionHistory() {
                 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 border-none shadow-none"
                 : "bg-muted text-muted-foreground border-none shadow-none"
             }
+            data-testid={`session-history-status-${row.original.id}`}
           >
             {isCurrent ? "Current" : "Active"}
           </Badge>
@@ -291,6 +294,7 @@ export default function SessionHistory() {
           onClick={() => handleLogoutSession(row.original.id)}
           disabled={row.original.isCurrentSession}
           className="text-xs border-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--logout-button)] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          data-testid={`session-history-row-logout-btn-${row.original.id}`}
         >
           Log out
         </Button>
@@ -300,7 +304,7 @@ export default function SessionHistory() {
 
   if (isLoading) {
     return (
-      <div className="w-full space-y-4 p-4">
+      <div className="w-full space-y-4 p-4" data-testid="session-history-loading">
         <div className="flex items-center justify-center p-8">
           <div className="text-muted-foreground">Loading sessions...</div>
         </div>
@@ -312,7 +316,7 @@ export default function SessionHistory() {
     <div className="w-full space-y-2 ">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-[var(--primary)] tracking-tight">
+          <h2 className="text-[16px] font-semibold text-[var(--primary)] tracking-tight" data-testid="session-history-title">
             Session History
           </h2>
           <p className="text-[12px] text-[var(--muted-foreground)] leading-relaxed">
@@ -341,6 +345,7 @@ export default function SessionHistory() {
                 size="sm"
                 onClick={handleDeleteSelected}
                 className="h-8 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                data-testid="session-history-delete-selected-btn"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete ({selectedSessions.length})
@@ -355,6 +360,7 @@ export default function SessionHistory() {
                   if (current) handleLogoutSession(current.id);
                 }}
                 className="h-8 px-4 rounded-lg bg-[var(--muted)] text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:opacity-80 text-xs font-medium border-none shadow-none transition-all focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                data-testid="session-history-logout-btn"
               >
                 Logout
               </Button>
@@ -364,6 +370,7 @@ export default function SessionHistory() {
                   size="sm"
                   onClick={handleLogoutAll}
                   className="h-8 px-4 rounded-lg bg-[var(--primary)] text-white hover:bg-[var(--primary)] hover:opacity-90 text-xs font-medium shadow-none transition-all focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                  data-testid="session-history-logout-all-btn"
                 >
                   Logout from All
                 </Button>
@@ -375,7 +382,7 @@ export default function SessionHistory() {
 
       {/* Individual Logout Confirmation Modal */}
       <Dialog open={isLogoutConfirmOpen} onOpenChange={setIsLogoutConfirmOpen}>
-        <DialogContent className="sm:max-w-[400px] p-6 text-center" showCloseButton={true}>
+        <DialogContent className="sm:max-w-[400px] p-6 text-center" showCloseButton={true} data-testid="session-history-logout-confirm-dialog">
           <div className="flex flex-col items-center justify-center space-y-4 py-4">
             <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-[var(--logout-button)]/10 border-[12px] border-[var(--logout-button)]/5">
               <div className="flex items-center justify-center w-full h-full rounded-full bg-[var(--logout-button)] text-white">
@@ -394,12 +401,14 @@ export default function SessionHistory() {
               variant="outline"
               onClick={() => setIsLogoutConfirmOpen(false)}
               className="flex-1 max-w-[160px] h-12 border-[var(--border)] text-sm font-medium text-[var(--muted-foreground)] rounded-xl hover:bg-[var(--muted)] bg-[var(--background)]"
+              data-testid="session-history-logout-confirm-cancel-btn"
             >
               Cancel
             </Button>
             <Button
               onClick={executeLogoutSession}
               className="flex-1 max-w-[160px] h-12 bg-[var(--logout-button)] hover:bg-[var(--logout-button)] hover:opacity-90 text-white text-sm font-medium rounded-xl shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+              data-testid="session-history-logout-confirm-btn"
             >
               Log out
             </Button>
@@ -409,7 +418,7 @@ export default function SessionHistory() {
 
       {/* Logout All Confirmation Modal */}
       <Dialog open={isLogoutAllConfirmOpen} onOpenChange={setIsLogoutAllConfirmOpen}>
-        <DialogContent className="sm:max-w-[400px] p-6 text-center" showCloseButton={true}>
+        <DialogContent className="sm:max-w-[400px] p-6 text-center" showCloseButton={true} data-testid="session-history-logout-all-confirm-dialog">
           <div className="flex flex-col items-center justify-center space-y-4 py-4">
             <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-[var(--logout-button)]/10 border-[12px] border-[var(--logout-button)]/5">
               <div className="flex items-center justify-center w-full h-full rounded-full bg-[var(--logout-button)] text-white">
@@ -428,12 +437,14 @@ export default function SessionHistory() {
               variant="outline"
               onClick={() => setIsLogoutAllConfirmOpen(false)}
               className="flex-1 max-w-[160px] h-12 border-[var(--border)] text-sm font-medium text-[var(--muted-foreground)] rounded-xl hover:bg-[var(--muted)] bg-[var(--background)]"
+              data-testid="session-history-logout-all-confirm-cancel-btn"
             >
               Cancel
             </Button>
             <Button
               onClick={executeLogoutAll}
               className="flex-1 max-w-[160px] h-12 bg-[var(--logout-button)] hover:bg-[var(--logout-button)] hover:opacity-90 text-white text-sm font-medium rounded-xl whitespace-nowrap shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+              data-testid="session-history-logout-all-confirm-btn"
             >
               Log out from all
             </Button>

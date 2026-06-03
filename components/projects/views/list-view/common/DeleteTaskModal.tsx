@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   Dialog,
@@ -30,7 +30,10 @@ export default function DeleteTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[430px] rounded-2xl border-0 border-b-4 border-primary p-6">
+      <DialogContent
+        className="w-[430px] rounded-2xl border-0 border-b-4 border-primary p-6"
+        data-testid="delete-task-modal"
+      >
         
         {/* Title */}
         <DialogHeader className="text-center pt-4">
@@ -64,6 +67,7 @@ export default function DeleteTaskModal({
             onClick={onClose}
             disabled={loading}
             className="flex-1"
+            data-testid="delete-task-cancel-btn"
           >
             Cancel
           </Button>
@@ -72,6 +76,7 @@ export default function DeleteTaskModal({
             onClick={onConfirm}
             disabled={loading}
             className="flex-1"
+            data-testid="delete-task-confirm-btn"
           >
             {loading
               ? "Deleting..."

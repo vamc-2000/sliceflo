@@ -1,4 +1,4 @@
-﻿// components/projects/CreateTaskByEmailDialog.tsx
+// components/projects/CreateTaskByEmailDialog.tsx
 "use client";
 
 import { useState } from "react";
@@ -98,6 +98,7 @@ export function CreateTaskByEmailDialog({
                             onClick={handleRegenerate}
                             disabled={regenerating}
                             title="Regenerate email address"
+                            data-testid="task-by-email-regenerate-btn"
                         >
                             <RefreshCw
                                 className={cn("h-4 w-4", regenerating && "animate-spin")}
@@ -111,6 +112,7 @@ export function CreateTaskByEmailDialog({
                             className="h-9 w-9 flex-shrink-0"
                             onClick={handleCopy}
                             title="Copy email address"
+                            data-testid="task-by-email-copy-btn"
                         >
                             {copied ? (
                                 <Check className="h-4 w-4 text-green-500" />
@@ -127,6 +129,7 @@ export function CreateTaskByEmailDialog({
                             checked={skipModal}
                             onCheckedChange={(checked) => setSkipModal(!!checked)}
                             className="h-4 w-4"
+                            data-testid="task-by-email-skip-checkbox"
                         />
                         <label
                             htmlFor="skip-modal"

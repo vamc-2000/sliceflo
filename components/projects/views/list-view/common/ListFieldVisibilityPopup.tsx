@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -179,6 +179,7 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                     variant="outline"
                     size="sm"
                     className="h-8 w-8 p-0"
+                    data-testid="list-fields-visibility-trigger"
                 >
                     <Plus className="h-4 w-4" />
                 </Button>
@@ -187,6 +188,7 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                 className="w-[280px] p-0 flex flex-col h-[450px] border-b-[5px] border-b-primary"
                 align="end"
                 side="bottom"
+                data-testid="list-fields-visibility-content"
             >
                 {showCreateField ? (
                     <FieldTypeSelectContent
@@ -204,7 +206,7 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                     {shownFields.length} visible
                                 </span>
                             </div>
-
+ 
                             {/* Search */}
                             <div className="relative">
                                 <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -213,13 +215,14 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full h-8 pl-8 pr-2 text-xs border rounded-md outline-none focus:ring-1 focus:ring-primary"
+                                    data-testid="list-fields-visibility-search"
                                 />
                             </div>
                         </div>
-
+ 
                         {/* SCROLLABLE CONTENT */}
                         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3 min-h-0">
-
+ 
                             {/* SHOWN FIELDS */}
                             {shownFields.length > 0 && (
                                 <div className="space-y-1.5">
@@ -234,11 +237,12 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                                 e.stopPropagation();
                                                 handleHideAll();
                                             }}
+                                            data-testid="list-fields-visibility-hide-all"
                                         >
                                             Hide all
                                         </button>
                                     </div>
-
+ 
                                     <div className="space-y-0.5">
                                         {shownFields.map(field => (
                                             <div
@@ -273,13 +277,14 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                                     onCheckedChange={() => !field.required && handleToggle(field.id, field.isSystem, field.required || false)}
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="flex-shrink-0"
+                                                    data-testid={`list-fields-visibility-switch-${field.id}`}
                                                 />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
+ 
                             {/* HIDDEN FIELDS */}
                             {hiddenFields.length > 0 && (
                                 <div className="space-y-1.5">
@@ -294,11 +299,12 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                                 e.stopPropagation();
                                                 handleShowAll();
                                             }}
+                                            data-testid="list-fields-visibility-unhide-all"
                                         >
                                             Unhide all
                                         </button>
                                     </div>
-
+ 
                                     <div className="space-y-0.5">
                                         {hiddenFields.map(field => (
                                             <div
@@ -326,13 +332,14 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                                     onCheckedChange={() => handleToggle(field.id, field.isSystem, field.required || false)}
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="flex-shrink-0"
+                                                    data-testid={`list-fields-visibility-switch-${field.id}`}
                                                 />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
+ 
                             {/* NO RESULTS */}
                             {searchQuery && shownFields.length === 0 && hiddenFields.length === 0 && (
                                 <div className="py-6 text-center">
@@ -340,7 +347,7 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                 </div>
                             )}
                         </div>
-
+ 
                         {/* FIXED FOOTER */}
                         <div className="flex-shrink-0 border-t p-2.5 bg-background">
                             <Button
@@ -348,6 +355,7 @@ export function ListFieldVisibilityPopup({ projectId }: ListFieldVisibilityPopup
                                 size="sm"
                                 className="w-full bg-primary text-primary-foreground hover:text-primary font-medium px-3 h-8"
                                 onClick={handleCreateFieldClick}
+                                data-testid="list-fields-visibility-create-btn"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Create field

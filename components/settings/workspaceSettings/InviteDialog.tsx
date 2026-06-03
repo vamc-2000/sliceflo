@@ -327,11 +327,11 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[650px] border-b-[5px] border-b-[var(--primary)] p-0">
+      <DialogContent className="sm:max-w-[650px] border-b-[5px] border-b-[var(--primary)] p-0" data-testid="invite-dialog-content">
         {/* Header */}
         <DialogHeader className="px-10 pt-6 pb-0">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-[var(--primary)]">
+            <DialogTitle className="text-lg font-semibold text-[var(--primary)]" data-testid="invite-dialog-title">
               {heading}
             </DialogTitle>
             <Button
@@ -339,6 +339,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
               size="icon"
               onClick={onClose}
               className="h-8 w-8 p-0"
+              data-testid="invite-dialog-close-btn"
             >
               {/* <X className="h-5 w-5" /> */}
             </Button>
@@ -352,7 +353,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
               Invite with Shareable link
             </Label>
             <div className="flex items-center gap-2 bg-gray-100 border border-[#8E8E93] rounded-lg p-3">
-              <span className="flex-1 text-sm text-[#8E8E93] truncate">
+              <span className="flex-1 text-sm text-[#8E8E93] truncate" data-testid="invite-dialog-shareable-link">
                 {sharableLink}
               </span>
               <Button
@@ -360,6 +361,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                 size="icon"
                 onClick={copyReportUrlToClipboard}
                 className="h-8 w-8 p-0 shrink-0"
+                data-testid="invite-dialog-copy-link-btn"
               >
                 <Copy className="h-4 w-4 text-[#8E8E93]" />
               </Button>
@@ -385,6 +387,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                       <button
                         onClick={() => handleRemoveEmail(email)}
                         className="ml-2 hover:text-[var(--primary)]"
+                        data-testid={`invite-dialog-email-chip-delete-${email}`}
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -404,6 +407,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                 onChange={(e) => setInviteEmail(e.target.value)}
                 onKeyDown={allowMultipleEmails ? handleKeyDown : undefined}
                 className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-[#8E8E93]"
+                data-testid="invite-dialog-email-input"
               />
             </div>
           </div>
@@ -415,12 +419,14 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                 value={inviteRole}
                 onValueChange={setInviteRole}
                 className="flex gap-12"
+                data-testid="invite-dialog-role-group"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem
                     value="member"
                     id="member"
                     className="border-[#B0BAC3] text-[var(--primary)]"
+                    data-testid="invite-dialog-role-member"
                   />
                   <Label
                     htmlFor="member"
@@ -434,6 +440,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                     value="viewer"
                     id="viewer"
                     className="border-[#B0BAC3] text-[var(--primary)]"
+                    data-testid="invite-dialog-role-viewer"
                   />
                   <Label
                     htmlFor="viewer"
@@ -460,6 +467,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
             onClick={handleSendInvite}
             disabled={inviteLoading}
             className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 w-[150px] h-[50px]"
+            data-testid="invite-dialog-send-btn"
           >
             {inviteLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

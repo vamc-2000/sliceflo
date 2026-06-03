@@ -239,6 +239,7 @@ export function QuickTaskCreation({
               <button
                 onClick={onClose}
                 className="text-muted-foreground hover:text-muted-foreground transition-colors"
+                data-testid="quick-task-close-btn"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -260,6 +261,7 @@ export function QuickTaskCreation({
                 }}
                 autoFocus
                 className="border-0 border-b border-border rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-ring text-sm"
+                data-testid="quick-task-name-input"
               />
 
               {/* ProseMirror Editor - Reduced height */}
@@ -287,6 +289,7 @@ export function QuickTaskCreation({
                         "w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors",
                         lockTaskType && "opacity-80 cursor-default"
                       )}
+                      data-testid="quick-task-type-trigger"
                     >
                       {selectedTaskTypeConfig ? (
                         <span className="flex items-center gap-2">
@@ -314,6 +317,7 @@ export function QuickTaskCreation({
                             setIsTaskTypeOpen(false);
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-xs"
+                          data-testid={`quick-task-type-option-${type.value}`}
                         >
                           {getTaskTypeDisplayImage(type) ? (
                             <img src={getTaskTypeDisplayImage(type)!} alt="" className="h-4 w-4 object-contain" />
@@ -330,7 +334,7 @@ export function QuickTaskCreation({
               {(!projectId || teamId) && (
                 <Popover open={isProjectOpen} onOpenChange={setIsProjectOpen}>
                   <PopoverTrigger asChild>
-                    <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors">
+                    <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-project-trigger">
                       {project ? (
                         <span className="truncate">{project.name}</span>
                       ) : (
@@ -355,6 +359,7 @@ export function QuickTaskCreation({
                             "w-full text-left px-3 py-2 rounded hover:bg-muted text-xs",
                             selectedProjectId === p.id && "bg-blue-50 text-blue-600 font-medium"
                           )}
+                          data-testid={`quick-task-project-option-${p.id}`}
                         >
                           {p.name}
                         </button>
@@ -367,7 +372,7 @@ export function QuickTaskCreation({
               {/* Status */}
               <Popover open={isStatusOpen} onOpenChange={setIsStatusOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors">
+                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-status-trigger">
                     {selectedStatusOption ? (
                       <span className="flex items-center gap-2">
                         <span
@@ -393,6 +398,7 @@ export function QuickTaskCreation({
                           setIsStatusOpen(false);
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-xs"
+                        data-testid={`quick-task-status-option-${config.value}`}
                       >
                         <span
                           className="w-2 h-2 rounded-full flex-shrink-0"
@@ -408,7 +414,7 @@ export function QuickTaskCreation({
               {/* Priority */}
               <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors">
+                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-priority-trigger">
                     {selectedPriorityOption ? (
                       <span className="flex items-center gap-2">
                         <Flag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: selectedPriorityOption.color }} />
@@ -431,6 +437,7 @@ export function QuickTaskCreation({
                           setIsPriorityOpen(false);
                         }}
                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                        data-testid={`quick-task-priority-option-${priority.value}`}
                       >
                         <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: priority.color }} />
                         <span style={{ color: priority.color }}>{priority.label}</span>
@@ -443,7 +450,7 @@ export function QuickTaskCreation({
               {/* Assignee */}
               <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors">
+                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-assignee-trigger">
                     {assignedMember ? (
                       <span className="flex items-center gap-2">
                         <MemberAvatar
@@ -468,6 +475,7 @@ export function QuickTaskCreation({
                         setIsAssigneeOpen(false);
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-xs"
+                      data-testid={`quick-task-assignee-option-${member.userId}`}
                     >
                       <MemberAvatar
                         name={member.name}
@@ -482,7 +490,7 @@ export function QuickTaskCreation({
               {/* Start Date Picker */}
               <Popover open={isStartCalendarOpen} onOpenChange={setIsStartCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2" data-testid="quick-task-start-date-trigger">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{startDate ? format(startDate, "MMM d, yyyy") : "Start Date"}</span>
                   </button>
@@ -508,7 +516,7 @@ export function QuickTaskCreation({
               {/* Due Date Picker */}
               <Popover open={isEndCalendarOpen} onOpenChange={setIsEndCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2" data-testid="quick-task-due-date-trigger">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{endDate ? format(endDate, "MMM d, yyyy") : "Due Date"}</span>
                   </button>
@@ -535,6 +543,7 @@ export function QuickTaskCreation({
               onClick={handleCreate}
               disabled={!taskName.trim() || !selectedProjectId}
               className="bg-muted text-foreground hover:bg-muted-foreground/30 px-8 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="quick-task-submit-btn"
             >
               Done
             </Button>

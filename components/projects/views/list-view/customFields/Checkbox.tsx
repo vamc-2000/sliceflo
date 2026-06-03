@@ -1,4 +1,4 @@
-﻿// components/list-view/customFields/Checkbox.tsx
+// components/list-view/customFields/Checkbox.tsx
 
 "use client";
 
@@ -72,7 +72,7 @@ export function CheckboxField({
           <label htmlFor="field-name" className="text-xs font-medium block">
             Field name
           </label>
-          <Input
+          <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
             id="field-name"
             value={fieldName}
@@ -87,13 +87,13 @@ export function CheckboxField({
           <label htmlFor="description" className="text-xs font-medium block">
             Description
           </label>
-          <textarea
+          <textarea data-testid="custom-field-description-input"
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add a description...."
             rows={2}
-            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -103,18 +103,18 @@ export function CheckboxField({
             Default checkbox value
           </label>
           <Select value={defaultValue} onValueChange={(value: 'unchecked' | 'checked') => setDefaultValue(value)}>
-            <SelectTrigger className="h-9">
+            <SelectTrigger data-testid="custom-field-checkbox-default-trigger" className="h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="unchecked">Unchecked</SelectItem>
-              <SelectItem value="checked">Checked</SelectItem>
+              <SelectItem data-testid="custom-field-checkbox-default-option-unchecked" value="unchecked">Unchecked</SelectItem>
+              <SelectItem data-testid="custom-field-checkbox-default-option-checked" value="checked">Checked</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* More Settings Accordion */}
-        <button
+        <button data-testid="custom-field-more-settings-btn"
           type="button"
           onClick={() => setShowMoreSettings(!showMoreSettings)}
           className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -137,7 +137,7 @@ export function CheckboxField({
 
       {/* Fixed Footer */}
       <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-        <Button
+        <Button data-testid="custom-field-cancel-btn"
           type="button"
           variant="outline"
           onClick={onCancel}
@@ -145,7 +145,7 @@ export function CheckboxField({
         >
           Cancel
         </Button>
-        <Button
+        <Button data-testid="custom-field-submit-btn"
           type="button"
           onClick={handleSubmit}
           disabled={(!fieldName.trim()) || loading}

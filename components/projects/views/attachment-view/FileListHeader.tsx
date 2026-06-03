@@ -106,14 +106,15 @@ export function FileListHeader({
     };
 
     return (
-        <div className="flex-none border-b bg-background px-6 py-4">
+        <div className="flex-none border-b bg-background px-4 py-2.5">
             <div className="flex items-center justify-between gap-4">
                 {/* Left Side - Add Attachment, Search, and Filter */}
                 <div className="flex items-center gap-3 flex-1">
                     <Button
                         onClick={handleAddAttachment}
                         data-testid="btn-add-attachments-to-project"
-                        className="bg-[#001F3F] hover:bg-[#252b3d] text-white"
+                        variant="default"
+                        className="text-xs h-9 rounded-md"
                     >
                         <Plus className="h-4 w-4 mr-1" />
                         Add Attachment
@@ -129,7 +130,7 @@ export function FileListHeader({
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search"
-                            className="pl-10"
+                            className="pl-10 h-9 rounded-md text-xs"
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
@@ -148,30 +149,30 @@ export function FileListHeader({
                     <Button
                         onClick={onCreateFolder}
                         data-testid="btn-create-folder-icon"
-                        variant="outline"
+                        variant="secondary"
                         size="icon"
-                        className="h-9 w-9 bg-[#E5E5EA] text-[#8E8E93] rounded-sm"
+                        className="h-9 w-9 rounded-md"
                         title="Create Folder"
                     >
                         <FolderPlus className="h-4 w-4" />
                     </Button>
 
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={onSelectAll}
                         data-testid="btn-select-and-deselct-all-files"
-                        className="h-9 bg-[#E5E5EA] text-[#8E8E93] rounded-sm"
+                        className="h-9 rounded-md text-xs"
                     >
                         {selectedFiles > 0 && selectedFiles === totalFiles ? 'Deselect all' : 'Select all'}
                     </Button>
 
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={onDownloadAll}
                         data-testid="btn-download-all-files"
-                        className="h-9 bg-[#E5E5EA] text-[#8E8E93] rounded-sm"
+                        className="h-9 rounded-md text-xs"
                     >
                         Download all
                     </Button>
@@ -182,8 +183,7 @@ export function FileListHeader({
                             size="sm"
                             onClick={onDeleteSelected}
                             data-testid="btn-delete-selected-files"
-                            // className="h-9 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border-0 rounded-sm"
-                            className="h-9 bg-[#D04545] text-white hover:bg-red-100 hover:text-red-700 border-0 rounded-sm"
+                            className="h-9 rounded-md text-xs"
                         >
                             <Trash2 className="h-4 w-4 mr-1" />
                             Delete

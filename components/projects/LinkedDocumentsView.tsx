@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useDocStore } from "@/stores/useDoc-store";
@@ -135,6 +135,7 @@ export function LinkedDocumentsView({ projectId }: LinkedDocumentsViewProps) {
                 <Button
                   onClick={() => setIsCreateDialogOpen(true)}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 h-9 rounded-lg font-medium transition-colors text-xs"
+                  data-testid="linked-docs-create-btn"
                 >
                   Create or attach a new Doc
                 </Button>
@@ -145,6 +146,7 @@ export function LinkedDocumentsView({ projectId }: LinkedDocumentsViewProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 h-9 bg-muted border-border focus:ring-1 focus:ring-ring"
+                    data-testid="linked-docs-search-input"
                   />
                 </div>
               </div>
@@ -208,6 +210,7 @@ export function LinkedDocumentsView({ projectId }: LinkedDocumentsViewProps) {
                                     return next;
                                   });
                                 }}
+                                data-testid={`linked-docs-expand-btn-${doc.id}`}
                               >
                                 <ChevronDown className={cn("h-4 w-4 transition-transform", expandedLinkedDocs.has(doc.id) && "rotate-180")} />
                               </Button>
@@ -241,6 +244,7 @@ export function LinkedDocumentsView({ projectId }: LinkedDocumentsViewProps) {
                               size="sm"
                               onClick={() => handleUnlink(doc.id)}
                               className="h-8 px-6 rounded-full bg-muted text-muted-foreground border-none hover:bg-red-50 hover:text-red-600 transition-all font-medium text-xs"
+                              data-testid={`linked-docs-unlink-btn-${doc.id}`}
                             >
                               Unlink
                             </Button>

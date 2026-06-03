@@ -57,7 +57,7 @@ export default function ProjectCyclesPage({
     }
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-white">
+        <div className="flex flex-col h-screen overflow-hidden bg-background">
             <div className="flex-none">
                 <div className="w-full">
                     <Breadcrumbs />
@@ -69,7 +69,7 @@ export default function ProjectCyclesPage({
                 />
             </div>
 
-            <div className="flex-1 overflow-auto bg-white p-3">
+            <div className="flex-1 overflow-auto bg-background p-3">
                 {/* No config yet → landing page prompts to create config first */}
                 {!hasConfig ? (
                     <LandingPage

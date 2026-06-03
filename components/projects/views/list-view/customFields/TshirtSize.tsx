@@ -110,7 +110,7 @@ export function TshirtSizeField({ onSubmit, onCancel, initialData }: TshirtSizeF
                     <label htmlFor="field-name" className="text-xs font-medium block">
                         Field name
                     </label>
-                    <Input
+                    <Input data-testid="custom-field-name-input"
             disabled={!!initialData}
                         id="field-name"
                         value={fieldName}
@@ -162,7 +162,7 @@ export function TshirtSizeField({ onSubmit, onCancel, initialData }: TshirtSizeF
                         ))}
                     </div>
 
-                    <Button
+                    <Button data-testid="custom-field-add-option-btn"
                         size="sm"
                         variant="secondary"
                         type="button"
@@ -174,7 +174,7 @@ export function TshirtSizeField({ onSubmit, onCancel, initialData }: TshirtSizeF
                     </Button>
                 </div>
                 {/* More Settings Accordion - ALWAYS VISIBLE */}
-                <button
+                <button data-testid="custom-field-more-settings-btn"
                     type="button"
                     onClick={() => setShowMoreSettings(!showMoreSettings)}
                     className="w-full flex items-center justify-between px-3 py-2 bg-muted hover:bg-muted rounded-md transition-colors"
@@ -212,7 +212,7 @@ export function TshirtSizeField({ onSubmit, onCancel, initialData }: TshirtSizeF
 
             {/* Fixed Footer */}
             <div className="flex-shrink-0 border-t px-4 py-3 flex gap-2 bg-card">
-                <Button
+                <Button data-testid="custom-field-cancel-btn"
                     type="button"
                     variant="outline"
                     onClick={onCancel}
@@ -220,7 +220,7 @@ export function TshirtSizeField({ onSubmit, onCancel, initialData }: TshirtSizeF
                 >
                     Cancel
                 </Button>
-                <Button
+                <Button data-testid="custom-field-submit-btn"
                     type="button"
                     onClick={handleSubmit}
                     disabled={(!fieldName.trim() || options.length === 0) || loading}

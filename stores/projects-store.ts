@@ -64,6 +64,9 @@ import {
   Cycle,
   CycleConfig,
   ParallelCycleConfig,
+  StatusHistoryEntry,
+  getProjectStatusHistoryApi,
+  postProjectStatusHistoryApi,
 } from "@/lib/api/projects-api";
 
 export type { Cycle, CycleConfig, ParallelCycleConfig };
@@ -222,7 +225,6 @@ export interface ProjectStatusConfig {
   label: string;         // was: name (display form, e.g. "On Track")
   description?: string;
   color: string;
-  backgroundColor: string;
   order: number;
 }
 
@@ -473,6 +475,8 @@ export interface Project {
   parallelCycleConfigs?: ParallelCycleConfig[];
   cycles?: Cycle[];
   usesParallelCycleConfigs?: boolean;
+  statusHistory?: StatusHistoryEntry[];
+  currentProjectStatus?: string;
 }
 
 interface ProjectsState {
@@ -486,6 +490,8 @@ interface ProjectsState {
   // workItemTypes: WorkItemType[];
   features: Feature[];
   repeatingWorkSections: RepeatingWorkSection[];
+  fetchProjectStatusHistory: (projectId: string) => Promise<void>;
+  postProjectStatusHistory: (projectId: string, status: string, message: string) => Promise<void>;
 
   //document related actions
   addDocumentToProject: (projectId: string, docId: string) => void;
@@ -2552,16 +2558,12 @@ export const useProjectsStore = create<ProjectsState>()(
 
       getProjectStatusConfigs: (projectId: string) => {
         const project = get().projects.find(p => p.id === projectId);
-        return (project?.projectStatusConfig || []).map(s => ({
-          ...s,
-          backgroundColor: s.backgroundColor || s.color + '20', // fallback if not stored
-        }));
+        return project?.projectStatusConfig || [];
       },
 
       addProjectStatusConfig: async (projectId: string, data: {
         label: string;
         color: string;
-        backgroundColor?: string;
         value: string;
       }) => {
         const project = get().projects.find(p => p.id === projectId);
@@ -2589,7 +2591,6 @@ export const useProjectsStore = create<ProjectsState>()(
       updateProjectStatusConfig: async (projectId: string, statusId: string, data: {
         label?: string;
         color?: string;
-        backgroundColor?: string;
         value?: string;
       }) => {
         // ✅ API returns full updated array
@@ -2623,6 +2624,63 @@ export const useProjectsStore = create<ProjectsState>()(
               : p
           )
         }));
+      },
+
+      fetchProjectStatusHistory: async (projectId: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const data = await getProjectStatusHistoryApi(projectId);
+          set(state => ({
+            projects: state.projects.map(p =>
+              p.id === projectId
+                ? {
+                  ...p,
+                  statusHistory: data.history || [],
+                  currentProjectStatus: data.currentProjectStatus || ''
+                }
+                : p
+            ),
+            isLoading: false
+          }));
+        } catch (error: any) {
+          console.error("Fetch status history error:", error);
+          set({
+            error: error.response?.data?.message || 'Failed to fetch project status history',
+            isLoading: false
+          });
+        }
+      },
+
+      postProjectStatusHistory: async (projectId: string, status: string, message: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const data = await postProjectStatusHistoryApi(projectId, { status, message });
+          set(state => ({
+            projects: state.projects.map(p => {
+              if (p.id !== projectId) return p;
+              const currentHistory = p.statusHistory || [];
+              return {
+                ...p,
+                statusHistory: [data.entry, ...currentHistory],
+                currentProjectStatus: data.currentProjectStatus || ''
+              };
+            }),
+            isLoading: false
+          }));
+          toast("success", {
+            title: 'Project status update posted successfully!',
+          });
+        } catch (error: any) {
+          console.error("Post status history error:", error);
+          set({
+            error: error.response?.data?.message || 'Failed to post project status update',
+            isLoading: false
+          });
+          toast("error", {
+            title: 'Failed to post project status update',
+          });
+          throw error;
+        }
       },
 
       // Getter

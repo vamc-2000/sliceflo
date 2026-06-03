@@ -1189,6 +1189,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             onChange={(e) => setNewGroupName(e.target.value)}
             onKeyDown={handleKeyDown}
             className="w-full"
+            data-testid="kanban-add-group-input"
           />
         </div>
 
@@ -1197,6 +1198,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             size="sm"
             onClick={onSave}
             className="flex-1"
+            data-testid="kanban-add-group-create-btn"
           >
             <Check className="w-4 h-4 mr-2" />
             Create
@@ -1206,6 +1208,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             variant="outline"
             onClick={onCancel}
             className="flex-1"
+            data-testid="kanban-add-group-cancel-btn"
           >
             <X className="w-4 h-4 mr-2" />
             Cancel
@@ -1349,6 +1352,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             onChange={(e) => setNewTaskName(e.target.value)}
             onKeyDown={handleKeyDown}
             className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
+            data-testid="kanban-add-task-name-input"
           />
 
           {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}
@@ -1415,12 +1419,14 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             <div className="flex gap-1.5">
               <button
                 onClick={(e) => { e.stopPropagation(); onSave(); }}
+                data-testid="kanban-add-task-save-btn"
                 className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium"
               >
                 Save
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onCancel(); }}
+                data-testid="kanban-add-task-cancel-btn"
                 className="px-3 py-1 text-xs border border-border rounded hover:bg-muted transition-colors"
               >
                 Cancel
@@ -1561,6 +1567,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
           onChange={(e) => setNewSubtaskName(e.target.value)}
           onKeyDown={handleKeyDown}
           className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
+          data-testid="kanban-add-subtask-name-input"
         />
 
         {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}
@@ -1627,12 +1634,14 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
           <div className="flex gap-1.5">
             <button
               onClick={(e) => { e.stopPropagation(); onSave(); }}
+              data-testid="kanban-add-subtask-save-btn"
               className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium"
             >
               Save
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onCancel(); }}
+              data-testid="kanban-add-subtask-cancel-btn"
               className="px-3 py-1 text-xs border border-border rounded hover:bg-muted transition-colors"
             >
               Cancel
@@ -1682,6 +1691,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-2 pr-8 rounded text-xs"
+                data-testid="kanban-search-input"
               />
               <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
             </div>
@@ -1693,6 +1703,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                   variant="secondary"
                   size="sm"
                   className="rounded cursor-pointer gap-2 text-xs"
+                  data-testid="kanban-members-trigger"
                 >
                   <Users className="h-4 w-4" />
                   Members
@@ -1720,7 +1731,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
             {/* Group By Dropdown */}
             <DropdownMenu open={showGroupByDropdown} onOpenChange={setShowGroupByDropdown}>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs">
+                <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs" data-testid="kanban-groupby-trigger">
                   <Layers className="h-4 w-4" />
                   Group by: <span className="capitalize">{groupBy}</span>
                 </Button>
@@ -1743,6 +1754,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                       <button
                         key={option.value}
                         onClick={() => handleGroupByChange(option.value)}
+                        data-testid={`kanban-groupby-option-${option.value}`}
                         className={`w-full flex items-center gap-3 p-2 rounded text-xs hover:bg-muted 
         `}
                       >
@@ -1766,12 +1778,13 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                       <button
                         key={option.value}
                         onClick={() => handleGroupByChange(option.value)}
+                        data-testid={`kanban-groupby-option-${option.value}`}
                         className={`w-full flex items-center gap-3 p-2 rounded text-xs hover:bg-muted`}
                       >
                         {/* Radio */}
                         <span
                           className={`h-4 w-4 rounded-full border flex items-center justify-center
-                                                        ${groupBy === option.value ? "border-primary" : "border-input"}`}
+                                                         ${groupBy === option.value ? "border-primary" : "border-input"}`}
                         >
                           {groupBy === option.value && (
                             <span className="h-2 w-2 rounded-full bg-primary" />
@@ -1851,6 +1864,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                 size="sm"
                 className={cn("rounded cursor-pointer text-xs", showSortOptions && "bg-primary text-primary-foreground hover:bg-primary")}
                 onClick={() => setShowSortOptions(!showSortOptions)}
+                data-testid="kanban-sort-filter-toggle"
               >
                 <SlidersVertical className="h-4 w-4" />
               </Button>
@@ -1860,7 +1874,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                   {/* Sort Dropdown */}
                   <DropdownMenu open={activeDropdown === 'sort'} onOpenChange={(open) => setActiveDropdown(open ? 'sort' : null)}>
                     <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="kanban-sort-trigger">
                         <ArrowUpDown className="h-4 w-4" />
                         Sort
                       </Button>
@@ -1880,6 +1894,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                               <div
                                 key={field.id}
                                 onClick={() => handleFieldSelection(field.id)}
+                                data-testid={`kanban-sort-option-${field.id}`}
                                 className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
                               >
                                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${field.isSelected ? 'bg-primary border-primary' : 'border-input'}`}>
@@ -1898,6 +1913,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 <div
                                   key={field.id}
                                   onClick={() => handleFieldSelection(field.id)}
+                                  data-testid={`kanban-sort-option-${field.id}`}
                                   className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
                                 >
                                   <div className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${field.isSelected ? 'bg-primary border-primary' : 'border-input'}`}>
@@ -1931,6 +1947,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                             size="sm"
                             variant="ghost"
                             onClick={handleClearAllSort}
+                            data-testid="kanban-sort-clear-btn"
                             className="justify-start bg-muted text-foreground hover:bg-primary hover:text-primary-foreground text-xs"
                           >
                             Clear all sort
@@ -1949,7 +1966,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                     }}
                   >
                     <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="kanban-filter-trigger">
                         <Funnel className="h-4 w-4" />
                         Filter
                         {filterConfig.length > 0 && (
@@ -2107,6 +2124,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 variant="outline"
                                 className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 text-xs"
                                 onClick={() => setFilterConfig([])}
+                                data-testid="kanban-filter-clear-btn"
                               >
                                 Clear All Filters
                               </Button>
@@ -2142,7 +2160,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                     onOpenChange={(open) => setActiveDropdown(open ? 'display' : null)}
                   >
                     <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                      <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs" data-testid="kanban-display-trigger">
                         <Monitor className="h-4 w-4" />
                         Display
                       </Button>
@@ -2155,6 +2173,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                         </Label>
                         <Switch
                           id="collapsed-subtasks"
+                          data-testid="kanban-display-collapsed-subtasks-switch"
                           checked={displayOptions.collapsedSubtasks}
                           onCheckedChange={(checked) =>
                             setDisplayOptions(prev => ({ ...prev, collapsedSubtasks: !!checked }))
@@ -2169,6 +2188,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                         </Label>
                         <Switch
                           id="closed-tasks"
+                          data-testid="kanban-display-closed-tasks-switch"
                           checked={displayOptions.closedTasks}
                           onCheckedChange={(checked) =>
                             setDisplayOptions(prev => ({ ...prev, closedTasks: !!checked }))
@@ -2183,6 +2203,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                         </Label>
                         <Switch
                           id="wrap-text"
+                          data-testid="kanban-display-wrap-text-switch"
                           checked={displayOptions.wrapText}
                           onCheckedChange={(checked) =>
                             setDisplayOptions(prev => ({ ...prev, wrapText: !!checked }))
@@ -2197,6 +2218,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                         </Label>
                         <Switch
                           id="subtask-parent-id"
+                          data-testid="kanban-display-subtask-parent-id-switch"
                           checked={displayOptions.subtaskParentId}
                           onCheckedChange={(checked) =>
                             setDisplayOptions(prev => ({ ...prev, subtaskParentId: !!checked }))
@@ -2215,7 +2237,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
               {/* Hide groups dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm" className="gap-2 rounded text-xs">
+                  <Button variant="secondary" size="sm" className="gap-2 rounded text-xs" data-testid="kanban-unhide-column-trigger">
                     <EyeOff className="h-4 w-4" />
                     {(() => {
                       const hiddenSet = new Set(settings.hiddenColumns);
@@ -2290,6 +2312,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 showColumn(projectId, group.id);
                               }
                             }}
+                            data-testid={`kanban-unhide-column-option-${group.id}`}
                             className="w-full flex items-center justify-between p-2 rounded hover:bg-muted text-xs transition-colors group"
                           >
                             <div className="flex items-center gap-2">
@@ -2326,7 +2349,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                   onDataChange={handleDataChange}
                   onDragEnd={handleDragEnd}
                 >{(column) => (
-                  <KanbanBoard key={column.id} id={column.id} className="w-80 bg-muted border-none shadow-none divide-y-0 overflow-visible rounded-t-lg" style={{ borderTop: `4px solid ${column.color}` }}>
+                  <KanbanBoard key={column.id} id={column.id} data-testid={`kanban-column-${column.id}`} className="w-80 bg-muted border-none shadow-none divide-y-0 overflow-visible rounded-t-lg" style={{ borderTop: `4px solid ${column.color}` }}>
                     {/* Column Header */}
                     <KanbanHeader className="border-none py-2 px-3">
                       <div className="flex items-center justify-between">
@@ -2340,6 +2363,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 onChange={(e) => setEditedColumnName(e.target.value)}
                                 className="h-8 w-40 text-xs font-semibold uppercase"
                                 autoFocus
+                                data-testid={`kanban-column-name-input-${column.id}`}
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') {
                                     handleSaveColumnName(column.id);
@@ -2355,6 +2379,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 variant="ghost"
                                 onClick={() => handleSaveColumnName(column.id)}
                                 className="h-8 w-8 p-0"
+                                data-testid={`kanban-column-name-save-btn-${column.id}`}
                               >
                                 <Check className="h-4 w-4" />
                               </Button>
@@ -2363,13 +2388,14 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 variant="ghost"
                                 onClick={() => handleCancelEditColumnName()}
                                 className="h-8 w-8 p-0"
+                                data-testid={`kanban-column-name-cancel-btn-${column.id}`}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
                           ) : (
                             <>
-                              <h3 className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
+                              <h3 className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" data-testid={`kanban-column-name-text-${column.id}`} onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
                             </>
                           )}
                         </div>
@@ -2378,6 +2404,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 text-muted-foreground"
+                            data-testid={`kanban-column-hide-eye-btn-${column.id}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               hideColumn(projectId, column.id);
@@ -2392,6 +2419,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 variant="ghost"
                                 size="icon"
                                 title="More options"
+                                data-testid={`kanban-column-more-trigger-${column.id}`}
                               >
                                 <MoreHorizontalIcon className="w-4 h-4" />
                               </Button>
@@ -2401,6 +2429,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                               <DropdownMenuItem
                                 onClick={() => handleStartEditColumnName(column.id)}
                                 className="text-xs"
+                                data-testid={`kanban-column-rename-btn-${column.id}`}
                               >
                                 <Pencil className="w-3.5 h-3.5 mr-2" />
                                 Rename Status
@@ -2408,7 +2437,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
 
                               {/* Change Color - Submenu */}
                               <DropdownMenuSub>
-                                <DropdownMenuSubTrigger className="text-xs">
+                                <DropdownMenuSubTrigger className="text-xs" data-testid={`kanban-column-color-submenu-trigger-${column.id}`}>
                                   <Palette className="w-3.5 h-3.5 mr-2" />
                                   Assign color to Status
                                 </DropdownMenuSubTrigger>
@@ -2417,6 +2446,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                     <DropdownMenuItem
                                       key={color.value}
                                       onClick={() => handleChangeColumnColor(column.id, color.value)}
+                                      data-testid={`kanban-column-color-option-${column.id}-${color.name.toLowerCase()}`}
                                       className="flex items-center gap-2 text-xs"
                                     >
                                       <div
@@ -2434,15 +2464,15 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
 
                               {/* Duplicate Status - Submenu */}
                               <DropdownMenuSub>
-                                <DropdownMenuSubTrigger className="text-xs">
+                                <DropdownMenuSubTrigger className="text-xs" data-testid={`kanban-column-duplicate-submenu-trigger-${column.id}`}>
                                   <Copy className="w-3.5 h-3.5 mr-2" />
                                   Duplicate Status
                                 </DropdownMenuSubTrigger>
                                 <DropdownMenuSubContent>
-                                  <DropdownMenuItem onClick={() => handleDuplicateColumn(column.id)} className="text-xs">
+                                  <DropdownMenuItem onClick={() => handleDuplicateColumn(column.id)} className="text-xs" data-testid={`kanban-column-duplicate-btn-${column.id}`}>
                                     Duplicate tasks
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleDuplicateColumn(column.id)} className="text-xs">
+                                  <DropdownMenuItem onClick={() => handleDuplicateColumn(column.id)} className="text-xs" data-testid={`kanban-column-duplicate-without-tasks-btn-${column.id}`}>
                                     Duplicate without tasks
                                   </DropdownMenuItem>
                                 </DropdownMenuSubContent>
@@ -2454,6 +2484,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                               <DropdownMenuItem
                                 onClick={() => hideColumn(projectId, column.id)}
                                 className="text-xs"
+                                data-testid={`kanban-column-hide-btn-${column.id}`}
                               >
                                 <EyeOff className="w-3.5 h-3.5 mr-2" />
                                 Hide Status
@@ -2484,7 +2515,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                               <DropdownMenuSeparator />
 
                               {/* Complete All Tasks */}
-                              <DropdownMenuItem onClick={() => handleArchiveAllTasks(column.id)} className="text-xs">
+                              <DropdownMenuItem onClick={() => handleArchiveAllTasks(column.id)} className="text-xs" data-testid={`kanban-column-complete-all-btn-${column.id}`}>
                                 <CheckCheck className="w-3.5 h-3.5 mr-2" />
                                 Complete all tasks
                               </DropdownMenuItem>
@@ -2502,6 +2533,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                                 onClick={() => handleDeleteColumn(column.id)}
                                 disabled={!canDeleteColumn(column.id)}
                                 className="text-red-600 focus:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                                data-testid={`kanban-column-delete-btn-${column.id}`}
                               >
                                 <Trash2 className="w-3.5 h-3.5 mr-2" />
                                 Delete Status
@@ -2513,6 +2545,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                             variant="ghost"
                             size="icon"
                             title="Plus"
+                            data-testid={`kanban-column-add-task-trigger-${column.id}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleAddTask(column.id);
@@ -2525,7 +2558,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                     </KanbanHeader>
 
                     {/* Cards Container */}
-                    <KanbanCards id={column.id} className='gap-2'>
+                    <KanbanCards id={column.id} className='gap-2' data-testid={`kanban-column-cards-${column.id}`}>
                       {(task) => {
                         // Get the full task data
                         const fullTask = projectTasks.find(t => t.id === task.id);
@@ -2620,6 +2653,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                         style={{ borderLeftColor: `${column.color}80` }}
                         onClick={() => handleAddTask(column.id)}
                         disabled={addingTaskInColumn === column.id}
+                        data-testid={`kanban-column-add-task-bottom-btn-${column.id}`}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Task
@@ -2637,6 +2671,7 @@ const KanbanView = ({ projectId, initialGroupBy, initialFilters }: KanbanViewPro
                   ) : (
                     <button
                       onClick={handleStartCreateGroup}
+                      data-testid="kanban-add-group-btn"
                       className="w-80 bg-card rounded-lg hover:bg-muted p-2 transition-colors flex items-center justify-start gap-2 text-muted-foreground hover:text-foreground font-medium text-xs"
                     >
                       <Plus className="w-5 h-5" />

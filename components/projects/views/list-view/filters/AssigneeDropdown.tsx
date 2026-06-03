@@ -78,7 +78,7 @@ const AssigneeDropdown: React.FC<AssigneeDropdownProps> = ({
           {/* Member list */}
           <div className="max-h-64 overflow-y-auto">
             {availableMembers.map((member) => (
-              <DropdownMenuItem
+              <DropdownMenuItem data-testid={`assignee-dropdown-option-${member.userId}`}
                 key={member.userId}
                 onClick={() => {
                   onAssigneeChange(member.userId);
@@ -115,7 +115,7 @@ const AssigneeDropdown: React.FC<AssigneeDropdownProps> = ({
           </div>
 
           {availableMembers.length === 0 && (
-            <div className="p-4 text-center text-xs text-muted-foreground">
+            <div data-testid="assignee-dropdown-no-members" className="p-4 text-center text-xs text-muted-foreground">
               No members available
             </div>
           )}

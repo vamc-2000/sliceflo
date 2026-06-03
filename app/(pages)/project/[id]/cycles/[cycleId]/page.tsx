@@ -72,7 +72,7 @@ export default function CycleDetailPage({
     }
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-white">
+        <div className="flex flex-col h-screen overflow-hidden bg-background">
             {/* Consistent Header Section */}
             <div className="flex-none">
                 <div className="w-full border-b">
@@ -86,7 +86,7 @@ export default function CycleDetailPage({
             </div>
 
             {/* Main Content Area - Modularized */}
-            <div className="flex-1 overflow-hidden bg-white">
+            <div className="flex-1 overflow-hidden bg-background">
                 <CycleOverview
                     isEmpty={isEmpty}
                     tasks={cycleTasks}

@@ -73,24 +73,25 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
     if (isLoadingData) {
         return (
             <div className="flex items-center justify-center h-full min-h-[60vh]">
-                <div className="text-gray-500">Loading...</div>
+                <div className="text-muted-foreground">Loading...</div>
             </div>
         );
     }
 
     if (hasConfig && !isSubmitting) {
         return (
-            <div className="flex flex-col items-center justify-center h-full min-h-[60vh] p-8 text-center bg-white w-full">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 border border-gray-200 mb-4">
-                    <Settings2 className="h-8 w-8 text-gray-400" />
+            <div className="flex flex-col items-center justify-center h-full min-h-[60vh] p-8 text-center bg-background w-full">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted border border-border mb-4">
+                    <Settings2 className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Configuration Already Exists</h2>
-                <p className="text-sm text-gray-500 max-w-md mb-6">
+                <h2 className="text-xl font-semibold text-foreground mb-2">Configuration Already Exists</h2>
+                <p className="text-sm text-muted-foreground max-w-md mb-6">
                     A project can only have one cycle configuration. You can edit the existing configuration from the Cycles page.
                 </p>
                 <Button
                     onClick={() => router.push(`/project/${projectId}/cycles`)}
-                    className="bg-[#001F3F] text-white hover:bg-[#002B5C] px-6"
+                    variant="default"
+                    className="px-6"
                 >
                     Back to Cycles
                 </Button>
@@ -161,48 +162,60 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         {/* Cycle name */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle name</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle name</label>
                             <Input
                                 placeholder="e.g. West Bengal"
                                 value={name}
                                 onChange={handleNameChange}
-                                className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F]"
+                                className="h-10 bg-background border-border focus-visible:ring-primary"
+                                data-testid="cycle-config-name-input"
                             />
                         </div>
 
                         {/* Cycle identifier */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle identifier</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle identifier</label>
                             <Input
                                 placeholder="e.g. WES"
                                 value={slugPrefix}
                                 onChange={(e) => setSlugPrefix(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))}
-                                className="h-10 bg-background border-gray-300 focus-visible:ring-[#001F3F] uppercase"
+                                className="h-10 bg-background border-border focus-visible:ring-primary uppercase"
                                 maxLength={6}
+                                data-testid="cycle-config-identifier-input"
                             />
                         </div>
 
                         {/* Cycle start date */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle start date</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle start date</label>
                             <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
                                         className={cn(
-                                            "w-full h-10 justify-between text-left font-normal bg-background border-gray-300",
+                                            "w-full h-10 justify-between text-left font-normal bg-background border-border",
                                             !startDate && "text-muted-foreground"
                                         )}
+                                        data-testid="cycle-config-start-date-button"
                                     >
                                         <span>{startDate ? format(startDate, "PPP") : "Set cycle date"}</span>
-                                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
                                         selected={startDate}
-                                        onSelect={(d) => { if (d) { setStartDate(d); setStartDateOpen(false); } }}
+                                        onSelect={(d) => {
+                                            if (d) {
+                                                setStartDate(d);
+                                                setStartDateOpen(false);
+                                                if (endDate && d > endDate) {
+                                                    setEndDate(undefined);
+                                                }
+                                            }
+                                        }}
+                                        disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
                                         initialFocus
                                     />
                                 </PopoverContent>
@@ -211,16 +224,16 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
 
                         {/* Cycle duration */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Cycle duration</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Cycle duration</label>
                             <Select value={defaultDurationDays} onValueChange={setDefaultDurationDays}>
-                                <SelectTrigger className="w-full h-10 bg-background border-gray-300 text-sm">
+                                <SelectTrigger className="w-full h-10 bg-background border-border text-sm" data-testid="cycle-config-duration-trigger">
                                     <SelectValue placeholder="Select duration" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="7">1 week</SelectItem>
-                                    <SelectItem value="14">2 weeks</SelectItem>
-                                    <SelectItem value="21">3 weeks</SelectItem>
-                                    <SelectItem value="28">4 weeks</SelectItem>
+                                    <SelectItem value="7" data-testid="cycle-config-duration-option-7">1 week</SelectItem>
+                                    <SelectItem value="14" data-testid="cycle-config-duration-option-14">2 weeks</SelectItem>
+                                    <SelectItem value="21" data-testid="cycle-config-duration-option-21">3 weeks</SelectItem>
+                                    <SelectItem value="28" data-testid="cycle-config-duration-option-28">4 weeks</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -228,15 +241,15 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                 </div>
 
                 {/* ── Cycle description ──────────────────────── */}
-                <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-background shadow">
+                <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
                     <div className="space-y-3">
                         <div>
-                            <h1 className="font-semibold text-sm text-[#001F3F]">Cycle description</h1>
-                            <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">
+                            <h1 className="font-semibold text-sm text-primary">Cycle description</h1>
+                            <p className="font-medium text-xs text-muted-foreground leading-relaxed">
                                 Define the initial context and goals of this cycle configuration.
                             </p>
                         </div>
-                        <div className="min-h-[150px] border border-gray-200 rounded-md overflow-hidden bg-background relative">
+                        <div className="min-h-[150px] border border-border rounded-md overflow-hidden bg-background relative">
                             <ProseMirrorEditor
                                 initialContent={description}
                                 onBlur={(content) => setDescription(content)}
@@ -248,11 +261,11 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                 </div>
 
                 {/* ── Labels ──────────────────────────────── */}
-                <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-background shadow">
+                <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
                     <div className="flex justify-between items-start">
                         <div className="flex-1 pr-6">
-                            <h1 className="font-semibold text-sm text-[#001F3F]">Labels</h1>
-                            <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">
+                            <h1 className="font-semibold text-sm text-primary">Labels</h1>
+                            <p className="font-medium text-xs text-muted-foreground leading-relaxed">
                                 Create and manage labels to categorize and organize cycles, making it easier for your team to filter and track work.
                             </p>
                             <div className="flex gap-2 mt-4">
@@ -267,12 +280,12 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                         </div>
                         <div className="w-xs">
                             <Select>
-                                <SelectTrigger className="w-full h-10 bg-background border-gray-300 text-sm">
+                                <SelectTrigger className="w-full h-10 bg-background border-border text-sm" data-testid="cycle-config-labels-trigger">
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="l1">Label 1</SelectItem>
-                                    <SelectItem value="l2">Label 2</SelectItem>
+                                    <SelectItem value="l1" data-testid="cycle-config-label-option-l1">Label 1</SelectItem>
+                                    <SelectItem value="l2" data-testid="cycle-config-label-option-l2">Label 2</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -280,41 +293,41 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                 </div>
 
                 {/* ── Recur cycles ──────────────────────── */}
-                <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-background shadow">
+                <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
                     <div className="space-y-4">
                         <div className="flex-1">
-                            <h1 className="font-semibold text-sm text-[#001F3F]">Recur cycles</h1>
-                            <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">
+                            <h1 className="font-semibold text-sm text-primary">Recur cycles</h1>
+                            <p className="font-medium text-xs text-muted-foreground leading-relaxed">
                                 Automatically create cycles based on a defined schedule.
                             </p>
                         </div>
 
                         {/* Create next cycle block */}
-                        <div className="bg-secondary rounded-lg p-4 mb-4 border border-gray-200">
-                            <label className="block text-sm font-semibold text-[#8E8E93] mb-4">Create next cycle</label>
+                        <div className="bg-secondary/40 rounded-lg p-4 mb-4 border border-border">
+                            <label className="block text-sm font-semibold text-muted-foreground mb-4">Create next cycle</label>
                             <RadioGroup value={coolingPeriodMode} onValueChange={(v: any) => setCoolingPeriodMode(v)} className="space-y-0">
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="immediate" id="immediate" />
-                                    <label htmlFor="immediate" className="text-xs text-[#001F3F] font-normal cursor-pointer">Immediately after previous ends</label>
+                                    <RadioGroupItem value="immediate" id="immediate" data-testid="cycle-config-cooling-immediate" />
+                                    <label htmlFor="immediate" className="text-xs text-foreground font-normal cursor-pointer">Immediately after previous ends</label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="cooling" id="cooling" />
-                                    <label htmlFor="cooling" className="text-xs text-[#001F3F] font-normal cursor-pointer">Add cooling period between cycles</label>
+                                    <RadioGroupItem value="cooling" id="cooling" data-testid="cycle-config-cooling-period" />
+                                    <label htmlFor="cooling" className="text-xs text-foreground font-normal cursor-pointer">Add cooling period between cycles</label>
                                 </div>
                             </RadioGroup>
 
                             {coolingPeriodMode === "cooling" && (
-                                <div className="mt-4 flex items-center justify-between bg-background p-2 rounded-lg border border-gray-200">
-                                    <span className="text-xs text-gray-500">Set a cooling period of:</span>
+                                <div className="mt-4 flex items-center justify-between bg-background p-2 rounded-lg border border-border">
+                                    <span className="text-xs text-muted-foreground">Set a cooling period of:</span>
                                     <Select value={coolingPeriodDays} onValueChange={setCoolingPeriodDays}>
-                                        <SelectTrigger className="w-[300px] h-6 bg-background border-gray-300 text-xs">
+                                        <SelectTrigger className="w-[300px] h-6 bg-background border-border text-xs" data-testid="cycle-config-cooling-days-trigger">
                                             <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent >
-                                            <SelectItem className="text-xs" value="1">1 day</SelectItem>
-                                            <SelectItem className="text-xs" value="2">2 days</SelectItem>
-                                            <SelectItem className="text-xs" value="3">3 days</SelectItem>
-                                            <SelectItem className="text-xs" value="7">1 week</SelectItem>
+                                            <SelectItem className="text-xs" value="1" data-testid="cycle-config-cooling-days-option-1">1 day</SelectItem>
+                                            <SelectItem className="text-xs" value="2" data-testid="cycle-config-cooling-days-option-2">2 days</SelectItem>
+                                            <SelectItem className="text-xs" value="3" data-testid="cycle-config-cooling-days-option-3">3 days</SelectItem>
+                                            <SelectItem className="text-xs" value="7" data-testid="cycle-config-cooling-days-option-7">1 week</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -322,16 +335,16 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                         </div>
 
                         {/* End Condition block */}
-                        <div className="bg-secondary rounded-lg p-4 border border-gray-200">
-                            <label className="block text-sm font-semibold text-[#8E8E93] mb-4">End Condition</label>
+                        <div className="bg-secondary/40 rounded-lg p-4 border border-border">
+                            <label className="block text-sm font-semibold text-muted-foreground mb-4">End Condition</label>
                             <RadioGroup value={endCondition} onValueChange={(v: any) => setEndCondition(v)} className="space-y-0">
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="never" id="never" />
-                                    <label htmlFor="never" className="text-xs text-[#001F3F] font-normal cursor-pointer">Never ends</label>
+                                    <RadioGroupItem value="never" id="never" data-testid="cycle-config-end-never" />
+                                    <label htmlFor="never" className="text-xs text-foreground font-normal cursor-pointer">Never ends</label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="after_cycles" id="after_cycles" />
-                                    <label htmlFor="after_cycles" className="text-xs text-[#001F3F] font-normal cursor-pointer">Ends after</label>
+                                    <RadioGroupItem value="after_cycles" id="after_cycles" data-testid="cycle-config-end-after-cycles" />
+                                    <label htmlFor="after_cycles" className="text-xs text-foreground font-normal cursor-pointer">Ends after</label>
                                     <Input
                                         type="number"
                                         min={1}
@@ -339,22 +352,24 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                                         value={endCondition === "after_cycles" ? maxCycles || "" : ""}
                                         onChange={(e) => setMaxCycles(parseInt(e.target.value) || undefined)}
                                         disabled={endCondition !== "after_cycles"}
-                                        className="w-32 h-8 bg-background border-gray-300 text-xs rounded"
+                                        className="w-32 h-8 bg-background border-border text-xs rounded"
+                                        data-testid="cycle-config-max-cycles-input"
                                     />
-                                    <span className="text-xs text-[#001F3F]">cycles</span>
+                                    <span className="text-xs text-foreground">cycles</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="specific_date" id="specific_date" />
-                                    <label htmlFor="specific_date" className="text-xs text-[#001F3F] font-normal cursor-pointer">Ends on specific date</label>
+                                    <RadioGroupItem value="specific_date" id="specific_date" data-testid="cycle-config-end-specific-date" />
+                                    <label htmlFor="specific_date" className="text-xs text-foreground font-normal cursor-pointer">Ends on specific date</label>
                                     <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant="outline"
                                                 disabled={endCondition !== "specific_date"}
                                                 className={cn(
-                                                    "w-36 h-8 justify-between text-left font-normal bg-background border-gray-300 text-xs px-2 rounded",
+                                                    "w-36 h-8 justify-between text-left font-normal bg-background border-border text-xs px-2 rounded",
                                                     !endDate && "text-muted-foreground"
                                                 )}
+                                                data-testid="cycle-config-end-date-button"
                                             >
                                                 <span>{endDate ? format(endDate, "dd/MM/yyyy") : "dd/mm/yyyy"}</span>
                                             </Button>
@@ -364,6 +379,7 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                                                 mode="single"
                                                 selected={endDate}
                                                 onSelect={(d) => { if (d) { setEndDate(d); setEndDateOpen(false); } }}
+                                                disabled={(d) => startDate ? d < new Date(new Date(startDate).setHours(0, 0, 0, 0)) : d < new Date(new Date().setHours(0, 0, 0, 0))}
                                                 initialFocus
                                             />
                                         </PopoverContent>
@@ -380,14 +396,17 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                         variant="outline"
                         onClick={() => router.back()}
                         disabled={isSubmitting}
-                        className="min-w-40 text-[#8E8E93]"
+                        className="min-w-40 text-muted-foreground hover:text-foreground"
+                        data-testid="cycle-config-cancel-button"
                     >
                         Cancel
                     </Button>
                     <Button
+                        variant="default"
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="min-w-40 bg-[#001F3F] text-white hover:bg-[#002B5C] flex items-center justify-center"
+                        className="min-w-40 font-semibold flex items-center justify-center"
+                        data-testid="cycle-config-submit-button"
                     >
                         {isSubmitting ? (
                             <span className="flex items-center gap-2">

@@ -94,8 +94,28 @@ export default function GoalDetailPage() {
     const [isMembersPopoverOpen, setIsMembersPopoverOpen] = useState(false);
     const [editingTarget, setEditingTarget] = useState<GoalTarget | null>(null);
 
-    // const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-    // const [activeTarget, setActiveTarget] = useState<GoalTarget | null>(null);
+    const assignedMembers = useMemo(() => {
+        if (!goal) return [];
+        if (goal.visibility === 'team') {
+            const memberIds = new Set<string>();
+            const list: string[] = [];
+            const teamsList = goal.assignedTeams || goal.teams || [];
+            teamsList.forEach((team: any) => {
+                const members = team.members || team.teamMembers || [];
+                members.forEach((m: any) => {
+                    const uId = m.userId || m.id || m._id;
+                    if (uId && !memberIds.has(uId)) {
+                        memberIds.add(uId);
+                        list.push(uId);
+                    }
+                });
+            });
+            return list;
+        }
+        return (goal.assignedTo || []).map((item: any) => {
+            return typeof item === "string" ? item : (item._id || item.id || "");
+        }).filter(Boolean);
+    }, [goal]);
 
     // useEffect(() => {
     //     if (!goal) return;
@@ -168,10 +188,7 @@ export default function GoalDetailPage() {
                 ownerProfilesMap[userId] = profile;
             }
 
-            const isAssigned = goal.assignedTo?.some((item: any) => {
-                const assignedId = typeof item === "string" ? item : (item._id || item.id);
-                return assignedId === userId;
-            });
+            const isAssigned = assignedMembers.includes(userId);
 
             if (isAssigned) {
                 assignedProfilesMap[userId] = profile;
@@ -207,10 +224,10 @@ export default function GoalDetailPage() {
             });
         }
 
-        if (goal.assignedTo && goal.assignedTo.length > 0 && workspaceMembers.length > 0) {
-            goal.assignedTo.forEach((item: any) => {
-                const userId = typeof item === "string" ? item : (item._id || item.id);
+        if (assignedMembers.length > 0) {
+            assignedMembers.forEach((userId) => {
                 if (userId && !assignedProfilesMap[userId]) {
+                    // Try to resolve from workspace members lookup
                     const member = workspaceMembers.find((m) => m.userId === userId);
                     if (member) {
                         assignedProfilesMap[userId] = {
@@ -219,6 +236,22 @@ export default function GoalDetailPage() {
                             email: member.email || "",
                             profilePictureUrl: member.profilePicture || member.avatar || (member as any).profilePictureUrl || "",
                         } as Profile;
+                    } else if (goal.visibility === 'team') {
+                        // Fallback to resolving from team members list
+                        const teamsList = goal.assignedTeams || goal.teams || [];
+                        for (const team of teamsList) {
+                            const members = team.members || team.teamMembers || [];
+                            const tm = members.find((m: any) => (m.userId || m.id || m._id) === userId);
+                            if (tm) {
+                                assignedProfilesMap[userId] = {
+                                    _id: userId,
+                                    name: tm.name || "",
+                                    email: tm.email || "",
+                                    profilePictureUrl: tm.profilePictureUrl || tm.profilePicture || "",
+                                } as Profile;
+                                break;
+                            }
+                        }
                     }
                 }
             });
@@ -226,7 +259,7 @@ export default function GoalDetailPage() {
 
         setOwnerProfiles(ownerProfilesMap);
         setAssignedProfiles(assignedProfilesMap);
-    }, [goal, workspaceMembers]);
+    }, [goal, workspaceMembers, assignedMembers]);
 
     useEffect(() => {
         if (currentWorkspace?.id) {
@@ -719,8 +752,7 @@ export default function GoalDetailPage() {
                             <div className="space-y-4 pt-1">
                                 {/* Avatars */}
                                 <div className="flex items-center" data-testid="assigned-members-container">
-                                    {(goal.assignedTo || []).slice(0, 5).map((item, index) => {
-                                        const userId = getUserId(item);
+                                    {assignedMembers.slice(0, 5).map((userId, index) => {
                                         const profile = assignedProfiles[userId];
                                         return (
                                             <div key={index} className="relative group" style={{ marginLeft: index > 0 ? "-10px" : "0" }}>
@@ -741,7 +773,7 @@ export default function GoalDetailPage() {
                                         <PopoverTrigger asChild>
                                             <div
                                                 className="w-8 h-8 rounded-full bg-[#001F3F] hover:bg-[#001F3F]/90 text-white flex items-center justify-center border-[2px] border-card shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                                                style={{ marginLeft: (goal.assignedTo || []).length > 0 ? "-10px" : "0" }}
+                                                style={{ marginLeft: assignedMembers.length > 0 ? "-10px" : "0" }}
                                             >
                                                 <UserPlus className="w-3.5 h-3.5" />
                                             </div>
@@ -749,7 +781,7 @@ export default function GoalDetailPage() {
                                         <PopoverContent className="w-[400px] p-4 border border-b-[5px] border-b-[#001F3F]" align="start">
                                             <GoalMembersSection
                                                 goalId={goal.id}
-                                                members={goal.assignedTo || []}
+                                                members={assignedMembers}
                                                 onAddMember={handleAddAssignee}
                                                 onRemoveMember={handleRemoveAssignee}
                                                 onInviteClick={() => {
@@ -965,13 +997,11 @@ export default function GoalDetailPage() {
                         goalId={goalId}
                         goalName={goal?.title || "Goal"}
                         targetToEdit={editingTarget}
-                        goalAssignedTo={goal.assignedTo || []}
+                        goalAssignedTo={assignedMembers}
                         data-testid="create-target-modal"
                     />
 
-
-                </div>
-
+              </div>
             </div>
 
         </div>

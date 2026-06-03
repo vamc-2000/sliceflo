@@ -53,29 +53,16 @@ export const DashboardItemCard = ({
 }: DashboardItemCardProps) => {
   const router = useRouter();
 
-  // Use custom icons or defaults
   const StarIcon = actionIcons?.star || Star;
 
 
-  // const renderIcon = () => {
-  //   if (typeof icon === "string") {
 
-  //     if (icon === "📁") {
-  //       return <CgFileDocument className="w-3.5 h-3.5 text-gray-700" />;
-  //     }
-  //     return <CgFileDocument className="w-3.5 h-3.5 text-gray-700" />;
-  //   }
-  //   // Custom React component
-  //   return icon;
-  // };
   const getHeaderStyle = () => {
-    // If color prop is provided, use it
     if (color) {
       return {
         backgroundColor: color,
       };
     }
-    // Fallback to isPurple for backward compatibility
     if (isPurple) {
       return {};
     }
@@ -103,12 +90,9 @@ export const DashboardItemCard = ({
           boxShadow: `inset 0 -1px 0 0 ${color}44`,
         } : undefined}
       >
-        {/* Removed Icon Section */}
 
 
-        {/* Buttons with circular white backgrounds */}
         <div className="flex items-center gap-2 ml-auto">
-          {/* Star Icon */}
           <Button
             variant="ghost"
             size="icon"
@@ -132,7 +116,6 @@ export const DashboardItemCard = ({
             />
           </Button>
 
-          {/* Share Icon */}
           <Button
             variant="ghost"
             size="icon"
@@ -151,7 +134,6 @@ export const DashboardItemCard = ({
             <BiExpandAlt className="h-2 w-2 text-foreground" />
           </Button>
 
-          {/* More Icon */}
           <Button
             variant="ghost"
             size="icon"
@@ -176,15 +158,11 @@ export const DashboardItemCard = ({
 
 
 
-
-      {/* Content Section */}
       <div className="px-3 mb-1 py-2 space-y-2 rounded-b-[6px] -mt-4">
-        {/* Title */}
         <h3 className="font-semibold text-[13px] leading-tight text-foreground line-clamp-2">
           {title}
         </h3>
 
-        {/* Metadata */}
         {(createdBy || fileSize) && (
           <div className="flex items-center gap-1">
             {createdBy && (

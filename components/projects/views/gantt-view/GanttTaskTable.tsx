@@ -45,6 +45,8 @@ import {
     SkipForward,
     GitMerge,
     LayoutTemplate,
+    Calendar as CalendarIcon,
+    RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -102,7 +104,7 @@ function TableAvatar({ name, size = 'sm' }: { name?: string; size?: 'sm' | 'md' 
     const dim = size === 'sm' ? 'w-6 h-6 ' : 'w-7 h-7 text-xs';
     if (!name) {
         return (
-            <div className={`${dim} rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 mx-auto`}>
+            <div className={`${dim} rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground mx-auto`}>
                 <User className="h-3 w-3" />
             </div>
         );
@@ -123,8 +125,8 @@ function TableAvatar({ name, size = 'sm' }: { name?: string; size?: 'sm' | 'md' 
 function TablePriorityFlag({ priority, color }: { priority?: string; color?: string }) {
     if (!priority) {
         return (
-            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-600/10 mx-auto">
-                <Flag className="h-3.5 w-3.5 text-gray-400" />
+            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted mx-auto">
+                <Flag className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
         );
     }
@@ -683,9 +685,13 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                 <Popover>
                     <PopoverTrigger asChild>
                         <div className={cellCls}>
-                            <span className={cn("text-xs", !dateValue && "text-muted-foreground")}>
-                                {dateValue ? formatDate(item[h.key]) : 'Set date'}
-                            </span>
+                            {dateValue ? (
+                                <span className="text-xs">
+                                    {formatDate(item[h.key])}
+                                </span>
+                            ) : (
+                                <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
+                            )}
                         </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 border-b-4 border-b-primary" align="start">
@@ -714,9 +720,9 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <div className={cellCls}>
-                            <Flag className="h-3 w-3 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
+                            <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
                             <span className={cn("text-xs truncate", !priorityCfg && "text-muted-foreground")}>
-                                {priorityCfg?.label || 'Priority'}
+                                {priorityCfg?.label || '—'}
                             </span>
                         </div>
                     </DropdownMenuTrigger>
@@ -770,25 +776,25 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="w-full h-full flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:bg-gray-100 overflow-hidden px-3">
-                            <span className={cn("truncate w-full text-center", !cycle && "text-muted-foreground font-normal")}>
-                                {cycle?.name || '—'}
+                        <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
+                            <span className={cn("truncate w-full text-center flex items-center justify-center", !cycle && "text-muted-foreground font-normal")}>
+                                {cycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                             </span>
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto">
                         {cycles.map(c => (
                             <DropdownMenuItem key={c.id} onClick={() => updateFn(item.id, { cycleId: c.id })} className="p-0 focus:bg-transparent">
-                                <div className="w-full h-9 flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-gray-100 hover:bg-gray-200">
+                                <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                     <span className="truncate w-full text-center">{c.name}</span>
                                 </div>
                             </DropdownMenuItem>
                         ))}
                         {cycles.length === 0 && (
-                            <div className="p-2 text-xs text-gray-500 text-center">No cycles available</div>
+                            <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                         )}
                         {cycles.length > 0 && <DropdownMenuSeparator />}
-                        <DropdownMenuItem onClick={() => updateFn(item.id, { cycleId: null })} className="p-0 h-9 text-xs justify-center bg-gray-300 focus:bg-gray-200 rounded-xs">
+                        <DropdownMenuItem onClick={() => updateFn(item.id, { cycleId: null })} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
                             — Clear Cycle —
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -844,6 +850,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 className={cn("p-0 h-6 w-6 shrink-0", taskSubtasks.length === 0 && "invisible")}
                                                 variant="ghost"
                                                 size="sm"
+                                                data-testid={`gantt-task-row-expand-btn-${task.id}`}
                                             >
                                                 {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                             </Button>
@@ -852,6 +859,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                             <Checkbox
                                                 checked={task.completed}
                                                 onCheckedChange={(checked) => updateTask(task.id, { completed: checked as boolean })}
+                                                data-testid={`gantt-task-row-checkbox-${task.id}`}
                                             />
                                         </td>
                                         {shouldShowField('id', 'ID') && (
@@ -882,6 +890,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                 handleStartAddSubtask(task.id);
                                                             }}
                                                             title="Add Subtask"
+                                                            data-testid={`gantt-task-row-add-subtask-btn-${task.id}`}
                                                         >
                                                             <Plus className="h-2.5 w-2.5" />
                                                             <span className="text-xs font-medium">Sub Task</span>
@@ -894,6 +903,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                 setShowTaskDetail(true);
                                                             }}
                                                             title="Open Task"
+                                                            data-testid={`gantt-task-row-open-detail-btn-${task.id}`}
                                                         >
                                                             <ChevronsLeftRight className="h-4 w-4 rotate-135" />
                                                         </button>
@@ -944,6 +954,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 <Checkbox
                                                     checked={subtask.completed}
                                                     onCheckedChange={(checked) => updateSubtask(subtask.id, { completed: checked as boolean })}
+                                                    data-testid={`gantt-subtask-row-checkbox-${subtask.id}`}
                                                 />
                                             </td>
                                             {shouldShowField('id', 'ID') && (
@@ -980,6 +991,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                     setShowTaskDetail(true);
                                                                 }}
                                                                 title="Open Subtask"
+                                                                data-testid={`gantt-subtask-row-open-detail-btn-${subtask.id}`}
                                                             >
                                                                 <ChevronsLeftRight className="h-4 w-4 rotate-135" />
                                                             </button>
@@ -1041,6 +1053,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                             if (e.key === 'Escape') handleCancelAddSubtask();
                                                         }}
                                                         className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
+                                                        data-testid="gantt-new-subtask-name-input"
                                                     />
                                                 </div>
                                             </td>
@@ -1079,30 +1092,30 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                     );
                                                 }
                                                 if (h.key === 'cycle') {
-                                                    const cycle = cycles.find(c => c.id === newSubtaskData.cycleId);
+                                                    const selCycle = cycles.find(c => c.id === newSubtaskData.cycleId);
                                                     return (
                                                         <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger asChild>
-                                                                    <button className="w-full h-full flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:bg-gray-100 overflow-hidden px-3">
-                                                                        <span className={cn("truncate w-full text-center", !cycle && "text-muted-foreground font-normal")}>
-                                                                            {cycle?.name || '—'}
+                                                                    <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
+                                                                        <span className={cn("truncate w-full text-center flex items-center justify-center", !selCycle && "text-muted-foreground font-normal")}>
+                                                                            {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                                                         </span>
                                                                     </button>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="start" className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto z-[50]">
                                                                     {cycles.map(c => (
                                                                         <DropdownMenuItem key={c.id} onClick={() => setNewSubtaskData(prev => ({ ...prev, cycleId: c.id }))} className="p-0 focus:bg-transparent">
-                                                                            <div className="w-full h-9 flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-gray-100 hover:bg-gray-200">
+                                                                            <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                                                                 <span className="truncate w-full text-center">{c.name}</span>
                                                                             </div>
                                                                         </DropdownMenuItem>
                                                                     ))}
                                                                     {cycles.length === 0 && (
-                                                                        <div className="p-2 text-xs text-gray-500 text-center">No cycles available</div>
+                                                                        <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                                                                     )}
                                                                     {cycles.length > 0 && <DropdownMenuSeparator />}
-                                                                    <DropdownMenuItem onClick={() => setNewSubtaskData(prev => ({ ...prev, cycleId: null }))} className="p-0 h-9 text-xs justify-center bg-gray-300 focus:bg-gray-200 rounded-xs">
+                                                                    <DropdownMenuItem onClick={() => setNewSubtaskData(prev => ({ ...prev, cycleId: null }))} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
                                                                         — Clear Cycle —
                                                                     </DropdownMenuItem>
                                                                 </DropdownMenuContent>
@@ -1185,9 +1198,13 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                             <Popover>
                                                                 <PopoverTrigger asChild>
                                                                     <div className={cellCls}>
-                                                                        <span className={cn("text-xs", !dateValue && "text-muted-foreground")}>
-                                                                            {dateValue ? format(dateValue, 'd MMM') : (h.key === 'startDate' ? 'Start Date' : 'Due Date')}
-                                                                        </span>
+                                                                        {dateValue ? (
+                                                                            <span className="text-xs">
+                                                                                {format(dateValue, 'd MMM')}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
+                                                                        )}
                                                                     </div>
                                                                 </PopoverTrigger>
                                                                 <PopoverContent className="w-auto p-0" align="start">
@@ -1218,9 +1235,9 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger asChild>
                                                                     <div className={cellCls}>
-                                                                        <Flag className="h-3 w-3 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
+                                                                        <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
                                                                         <span className={cn("text-xs truncate", !priorityCfg && "text-muted-foreground")}>
-                                                                            {priorityCfg?.label || 'Priority'}
+                                                                            {priorityCfg?.label || '—'}
                                                                         </span>
                                                                     </div>
                                                                 </DropdownMenuTrigger>
@@ -1236,6 +1253,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                         </td>
                                                     );
                                                 }
+
                                                 return <td key={h.key} className={bodyCellCls} />;
                                             })}
                                             <td className="w-10 px-2 border-l sticky right-0 z-20 bg-card" style={{ boxShadow: '-4px 0 8px rgba(0,0,0,0.05)' }}>
@@ -1243,12 +1261,14 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                     <button
                                                         onClick={() => handleSaveSubtask(task.id)}
                                                         className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors shadow-sm font-medium"
+                                                        data-testid="gantt-new-subtask-save-btn"
                                                     >
                                                         Save
                                                     </button>
                                                     <button
                                                         onClick={handleCancelAddSubtask}
                                                         className="px-2 py-1 border border-border text-muted-foreground rounded hover:bg-muted transition-colors font-medium"
+                                                        data-testid="gantt-new-subtask-cancel-btn"
                                                     >
                                                         Cancel
                                                     </button>
@@ -1288,6 +1308,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                             setShowAddTask(true);
                                                             setShowTaskTypeMenu(false);
                                                         }}
+                                                        data-testid="gantt-new-task-trigger"
                                                     >
                                                         <Plus className={cn("h-3 w-3", (isAddTaskRowHovered || showTaskTypeMenu) ? "text-primary/60" : "text-muted-foreground")} />
                                                         Add Task
@@ -1367,6 +1388,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 if (e.key === 'Escape') handleCancelAddTask();
                                             }}
                                             className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
+                                            data-testid="gantt-new-task-name-input"
                                         />
                                     </div>
                                 </td>
@@ -1407,30 +1429,30 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                         );
                                     }
                                     if (h.key === 'cycle') {
-                                        const cycle = cycles.find(c => c.id === newTaskData.cycleId);
+                                        const selCycle = cycles.find(c => c.id === newTaskData.cycleId);
                                         return (
                                             <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <button className="w-full h-full flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:bg-gray-100 overflow-hidden px-3">
-                                                            <span className={cn("truncate w-full text-center", !cycle && "text-muted-foreground font-normal")}>
-                                                                {cycle?.name || '—'}
+                                                        <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
+                                                            <span className={cn("truncate w-full text-center flex items-center justify-center", !selCycle && "text-muted-foreground font-normal")}>
+                                                                {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                                             </span>
                                                         </button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="start" className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto z-[50]">
                                                         {cycles.map(c => (
                                                             <DropdownMenuItem key={c.id} onClick={() => setNewTaskData(prev => ({ ...prev, cycleId: c.id }))} className="p-0 focus:bg-transparent">
-                                                                <div className="w-full h-9 flex items-center justify-center rounded-xs text-gray-700 text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-gray-100 hover:bg-gray-200">
+                                                                <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                                                     <span className="truncate w-full text-center">{c.name}</span>
                                                                 </div>
                                                             </DropdownMenuItem>
                                                         ))}
                                                         {cycles.length === 0 && (
-                                                            <div className="p-2 text-xs text-gray-500 text-center">No cycles available</div>
+                                                            <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                                                         )}
                                                         {cycles.length > 0 && <DropdownMenuSeparator />}
-                                                        <DropdownMenuItem onClick={() => setNewTaskData(prev => ({ ...prev, cycleId: null }))} className="p-0 h-9 text-xs justify-center bg-gray-300 focus:bg-gray-200 rounded-xs">
+                                                        <DropdownMenuItem onClick={() => setNewTaskData(prev => ({ ...prev, cycleId: null }))} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
                                                             — Clear Cycle —
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -1513,9 +1535,13 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <div className={cellCls}>
-                                                            <span className={cn("text-xs", !dateValue && "text-muted-foreground")}>
-                                                                {dateValue ? format(dateValue, 'd MMM') : (h.key === 'startDate' ? 'Start Date' : 'Due Date')}
-                                                            </span>
+                                                            {dateValue ? (
+                                                                <span className="text-xs">
+                                                                    {format(dateValue, 'd MMM')}
+                                                                </span>
+                                                            ) : (
+                                                                <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
+                                                            )}
                                                         </div>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="start">
@@ -1546,9 +1572,9 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <div className={cellCls}>
-                                                            <Flag className="h-3 w-3 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
+                                                            <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: priorityCfg?.color || '#9ca3af' }} />
                                                             <span className={cn("text-xs truncate", !priorityCfg && "text-muted-foreground")}>
-                                                                {priorityCfg?.label || 'Priority'}
+                                                                {priorityCfg?.label || '—'}
                                                             </span>
                                                         </div>
                                                     </DropdownMenuTrigger>
@@ -1564,18 +1590,21 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                             </td>
                                         );
                                     }
+
                                     return <td key={h.key} className={bodyCellCls} />;
                                 })}
                                 <td className="w-10 px-2 border-l sticky right-0 z-20 bg-card" style={{ boxShadow: '-4px 0 8px rgba(0,0,0,0.05)' }}>
                                     <div className="flex items-center gap-1 justify-center">
                                         <button
                                             onClick={handleSaveTask}
+                                            data-testid="gantt-new-task-save-btn"
                                             className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors shadow-sm font-medium"
                                         >
                                             Save
                                         </button>
                                         <button
                                             onClick={handleCancelAddTask}
+                                            data-testid="gantt-new-task-cancel-btn"
                                             className="px-2 py-1 border border-border text-muted-foreground rounded hover:bg-muted transition-colors font-medium"
                                         >
                                             Cancel

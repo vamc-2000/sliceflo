@@ -280,7 +280,7 @@ export function CreateView({ projectId }: CreateViewProps) {
         return [];
     };
 
-    const renderValueInput = (filter: FilterCriteria) => {
+    const renderValueInput = (filter: FilterCriteria, index: number) => {
         const field = getFieldById(filter.field);
         if (!field) return null;
 
@@ -324,12 +324,12 @@ export function CreateView({ projectId }: CreateViewProps) {
                     value={filter.value}
                     onValueChange={(val) => updateFilter(filter.id, { value: val })}
                 >
-                    <SelectTrigger className="h-10 bg-gray-50 border-gray-200 focus:ring-0">
+                    <SelectTrigger className="h-10 bg-gray-50 border-gray-200 focus:ring-0" data-testid={`view-filter-value-${index}`}>
                         <SelectValue placeholder="Select option" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border-0 border-b-[5px] border-primary">
                         {options.map(opt => (
-                            <SelectItem key={opt.value} value={opt.value}>
+                            <SelectItem key={opt.value} value={opt.value} data-testid={`view-filter-value-${index}-option-${opt.value}`}>
                                 <div className="flex items-center gap-2">
                                     {opt.type === 'status' && (
                                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: opt.color }} />
@@ -380,6 +380,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                                 "w-full justify-start text-left font-normal h-10 bg-gray-50 border-gray-200",
                                 !filter.value && "text-muted-foreground"
                             )}
+                            data-testid={`view-filter-value-date-btn-${index}`}
                         >
                             <Clock className="mr-2 h-4 w-4" />
                             {filter.value ? format(new Date(filter.value), "PPP") : <span>Pick a date</span>}
@@ -405,6 +406,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                     onChange={(e) => updateFilter(filter.id, { value: e.target.value })}
                     placeholder="Enter number"
                     className="h-10 bg-gray-50 border-gray-200 focus-visible:ring-0"
+                    data-testid={`view-filter-value-number-input-${index}`}
                 />
             );
         }
@@ -415,6 +417,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                 value={filter.value}
                 onChange={(e) => updateFilter(filter.id, { value: e.target.value })}
                 className="h-10 bg-gray-50 border-gray-200 focus-visible:ring-0"
+                data-testid={`view-filter-value-text-input-${index}`}
             />
         );
     };
@@ -489,20 +492,21 @@ export function CreateView({ projectId }: CreateViewProps) {
     };
 
     return (
-        <div className="bg-white flex flex-col w-full">
+        <div className="bg-background flex flex-col w-full">
             <div className="flex-1 flex flex-col">
-                <div className="w-full p-6 bg-white">
-                    <div className="space-y-6">
+                <div className="w-full p-6 bg-background">
+                    <div className="space-y-4">
                         {/* View Info Section */}
-                        <div style={{ backgroundColor: '#F2F2F7' }} className="rounded-lg p-4">
+                        <div className="rounded-lg p-4 bg-muted/50">
                             <div className="flex items-start gap-4">
                                 {/* Icon Section */}
                                 <div className="flex flex-col">
-                                    <label className="text-xs font-medium text-gray-500 mb-2 h-4">Icon</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-2 h-4">Icon</label>
                                     <button
                                         type="button"
                                         onClick={() => setIsIconPickerOpen(true)}
-                                        className="w-10 h-10 bg-white border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors overflow-hidden group relative"
+                                        className="w-10 h-10 bg-background border border-border rounded-md flex items-center justify-center hover:bg-muted transition-colors overflow-hidden group relative"
+                                        data-testid="view-icon-button"
                                     >
                                         {renderIcon()}
                                     </button>
@@ -510,40 +514,42 @@ export function CreateView({ projectId }: CreateViewProps) {
 
                                 {/* View Name */}
                                 <div className="w-80">
-                                    <label className="block text-xs font-medium text-gray-500 mb-2 h-4">View name</label>
+                                    <label className="block text-xs font-medium text-muted-foreground mb-2 h-4">View name</label>
                                     <Input
                                         type="text"
                                         value={name}
                                         onChange={handleNameChange}
                                         placeholder="e.g. Marketing"
-                                        className="h-10 bg-white border-gray-300 focus-visible:ring-[#001F3F]"
+                                        className="h-10 bg-background border-border focus-visible:ring-primary"
+                                        data-testid="view-name-input"
                                     />
                                 </div>
 
                                 {/* View Identifier */}
                                 <div className="w-80">
-                                    <label className="block text-xs font-medium text-gray-500 mb-2 h-4">View identifier</label>
+                                    <label className="block text-xs font-medium text-muted-foreground mb-2 h-4">View identifier</label>
                                     <Input
                                         type="text"
                                         value={identifier}
                                         onChange={(e) => setIdentifier(e.target.value)}
                                         placeholder="e.g. MAR"
-                                        className="h-10 bg-white border-gray-300 uppercase focus-visible:ring-[#001F3F]"
+                                        className="h-10 bg-background border-border uppercase focus-visible:ring-primary"
                                         readOnly
+                                        data-testid="view-identifier-input"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* View Description */}
-                        <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-white mb-6 shadow">
+                        <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card mb-6 shadow">
                             <div className="flex justify-between items-start">
                                 <div className="flex-1 pr-6">
-                                    <h1 className="font-semibold text-sm text-black">View description</h1>
-                                    <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                                    <h1 className="font-semibold text-sm text-foreground">View description</h1>
+                                    <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                                         Add a detailed description for this tailored view to help your team understand its purpose.
                                     </p>
-                                    <div className="min-h-[150px] border border-gray-200 rounded-md overflow-hidden bg-[#F9FAFB]">
+                                    <div className="min-h-[150px] border border-border rounded-md overflow-hidden bg-muted/30">
                                         <ProseMirrorEditor
                                             initialContent={description}
                                             onBlur={(content) => setDescription(content)}
@@ -556,11 +562,11 @@ export function CreateView({ projectId }: CreateViewProps) {
                         </div>
 
                         {/* View Type Selection */}
-                        <div className="border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white mb-6 shadow">
+                        <div className="border border-border border-l-4 border-l-primary rounded-lg p-4 bg-card mb-6 shadow">
                             <div className="flex justify-between items-center">
                                 <div className="flex-1 pr-6">
-                                    <h1 className="font-semibold text-sm text-black">Select view type</h1>
-                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                    <h1 className="font-semibold text-sm text-foreground">Select view type</h1>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
                                         Select the layout type (List, Board, etc.) in which you want to apply the filters.
                                     </p>
                                 </div>
@@ -570,14 +576,15 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             <Button
                                                 variant="outline"
                                                 size="lg"
-                                                className="w-xs justify-between bg-white border-gray-300 text-gray-700 hover:bg-gray-50 h-10 px-3 font-normal"
+                                                className="w-xs justify-between bg-background border-border text-foreground hover:bg-muted h-10 px-3 font-normal"
+                                                data-testid="view-type-dropdown-trigger"
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    {viewType === 'list' && <List className="h-4 w-4 text-gray-500" />}
-                                                    {viewType === 'kanban' && <SquareKanban className="h-4 w-4 text-gray-500" />}
-                                                    {viewType === 'gantt' && <ChartGantt className="h-4 w-4 text-gray-500" />}
-                                                    {viewType === 'attachments' && <Paperclip className="h-4 w-4 text-gray-500" />}
-                                                    <span className={!viewType ? "text-gray-400" : ""}>
+                                                    {viewType === 'list' && <List className="h-4 w-4 text-muted-foreground" />}
+                                                    {viewType === 'kanban' && <SquareKanban className="h-4 w-4 text-muted-foreground" />}
+                                                    {viewType === 'gantt' && <ChartGantt className="h-4 w-4 text-muted-foreground" />}
+                                                    {viewType === 'attachments' && <Paperclip className="h-4 w-4 text-muted-foreground" />}
+                                                    <span className={!viewType ? "text-muted-foreground" : ""}>
                                                         {viewType ? (
                                                             viewType === 'list' ? 'List' :
                                                                 viewType === 'kanban' ? 'Kanban' :
@@ -586,20 +593,20 @@ export function CreateView({ projectId }: CreateViewProps) {
                                                         ) : "Select"}
                                                     </span>
                                                 </div>
-                                                <ChevronDown className="h-4 w-4 text-gray-400" />
+                                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-[320px]">
-                                            <DropdownMenuItem onClick={() => setViewType("list")} className="gap-2 cursor-pointer">
-                                                <List className="h-4 w-4 text-gray-500" />
+                                        <DropdownMenuContent align="end" className="w-[320px] border-0 border-b-[5px] border-primary">
+                                            <DropdownMenuItem onClick={() => setViewType("list")} className="gap-2 cursor-pointer" data-testid="view-type-option-list">
+                                                <List className="h-4 w-4 text-muted-foreground" />
                                                 <span>List</span>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setViewType("kanban"); setGroupBy("status"); }} className="gap-2 cursor-pointer">
-                                                <SquareKanban className="h-4 w-4 text-gray-500" />
+                                            <DropdownMenuItem onClick={() => { setViewType("kanban"); setGroupBy("status"); }} className="gap-2 cursor-pointer" data-testid="view-type-option-kanban">
+                                                <SquareKanban className="h-4 w-4 text-muted-foreground" />
                                                 <span>Kanban</span>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setViewType("gantt"); setGroupBy("none"); }} className="gap-2 cursor-pointer">
-                                                <ChartGantt className="h-4 w-4 text-gray-500" />
+                                            <DropdownMenuItem onClick={() => { setViewType("gantt"); setGroupBy("none"); }} className="gap-2 cursor-pointer" data-testid="view-type-option-gantt">
+                                                <ChartGantt className="h-4 w-4 text-muted-foreground" />
                                                 <span>Gantt</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
@@ -609,20 +616,20 @@ export function CreateView({ projectId }: CreateViewProps) {
                         </div>
                         {/* Group By Selection */}
                         <div className={cn(
-                            "border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white mb-6 shadow transition-opacity",
+                            "border border-border border-l-4 border-l-primary rounded-lg p-4 bg-card mb-6 shadow transition-opacity",
                             viewType === 'gantt' && "opacity-50 grayscale-[0.5]"
                         )}>
                             <div className="flex justify-between items-center">
                                 <div className="flex-1 pr-6">
-                                    <h1 className="font-semibold text-sm text-black flex items-center gap-2">
+                                    <h1 className="font-semibold text-sm text-foreground flex items-center gap-2">
                                         Group by
                                         {viewType === 'gantt' && (
-                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                                                 Not Supported
                                             </span>
                                         )}
                                     </h1>
-                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
                                         {viewType === 'gantt'
                                             ? `Grouping is not yet supported for ${viewType} view. It will default to "None".`
                                             : "Select the field you want to group your tasks by in this view."
@@ -635,25 +642,27 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             <Button
                                                 variant="outline"
                                                 size="lg"
-                                                className="w-xs justify-between bg-white border-gray-300 text-gray-700 hover:bg-gray-50 h-10 px-3 font-normal"
+                                                className="w-xs justify-between bg-background border-border text-foreground hover:bg-muted h-10 px-3 font-normal"
                                                 disabled={viewType === 'gantt'}
+                                                data-testid="view-groupby-dropdown-trigger"
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <span className={!groupBy ? "text-gray-400" : ""}>
+                                                    <span className={!groupBy ? "text-muted-foreground" : ""}>
                                                         {groupBy ? (
                                                             groupByOptions.find(o => o.option === groupBy)?.label || groupBy
                                                         ) : "Select field"}
                                                     </span>
                                                 </div>
-                                                <ChevronDown className="h-4 w-4 text-gray-400" />
+                                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-[320px]">
+                                        <DropdownMenuContent align="end" className="w-[320px] border-0 border-b-[5px] border-primary">
                                             {groupByOptions.map(option => (
                                                 <DropdownMenuItem
                                                     key={option.option}
                                                     onClick={() => setGroupBy(option.option)}
                                                     className="gap-2 cursor-pointer"
+                                                    data-testid={`view-groupby-option-${option.option}`}
                                                 >
                                                     <span>{option.label}</span>
                                                 </DropdownMenuItem>
@@ -665,11 +674,11 @@ export function CreateView({ projectId }: CreateViewProps) {
                         </div>
 
                         {/* Filters Section */}
-                        <div className="border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white shadow">
+                        <div className="border border-border border-l-4 border-l-primary rounded-lg p-4 bg-card shadow">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex-1 pr-6">
-                                    <h1 className="font-semibold text-sm text-black">Filters</h1>
-                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                    <h1 className="font-semibold text-sm text-foreground">Filters</h1>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
                                         Customize your view by applying specific task filters that will be saved for this view.
                                     </p>
                                 </div>
@@ -679,7 +688,8 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             variant="outline"
                                             size="sm"
                                             onClick={addFilter}
-                                            className="gap-2 text-gray-600 bg-white border-gray-300 hover:bg-gray-50"
+                                            className="gap-2 text-muted-foreground bg-background border-border hover:bg-muted"
+                                            data-testid="view-add-filter-button"
                                         >
                                             <Plus className="h-4 w-4" />
                                             <span>Add filter</span>
@@ -689,7 +699,8 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => setFilters([])}
-                                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 font-semibold"
+                                            className="text-muted-foreground hover:text-foreground hover:bg-muted font-semibold"
+                                            data-testid="view-clear-filters-button"
                                         >
                                             Clear all
                                         </Button>
@@ -702,7 +713,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                                     <div key={filter.id} className="flex items-center gap-3">
                                         <div className="w-20">
                                             {index === 0 ? (
-                                                <div className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded text-gray-500 font-medium h-10 flex items-center justify-center">
+                                                <div className="px-3 py-1.5 text-xs bg-muted/50 border border-border rounded text-muted-foreground font-medium h-10 flex items-center justify-center">
                                                     Where
                                                 </div>
                                             ) : (
@@ -710,12 +721,12 @@ export function CreateView({ projectId }: CreateViewProps) {
                                                     value={filter.operator || "AND"}
                                                     onValueChange={(val) => updateFilter(filter.id, { operator: val as any })}
                                                 >
-                                                    <SelectTrigger className="h-10 bg-gray-50 border-gray-200 focus:ring-0">
+                                                    <SelectTrigger className="h-10 bg-muted/50 border-border focus:ring-0" data-testid={`view-filter-operator-${index}`}>
                                                         <SelectValue />
                                                     </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="AND">AND</SelectItem>
-                                                        <SelectItem value="OR">OR</SelectItem>
+                                                    <SelectContent className="border-0 border-b-[5px] border-primary">
+                                                        <SelectItem value="AND" data-testid={`view-filter-operator-${index}-option-AND`}>AND</SelectItem>
+                                                        <SelectItem value="OR" data-testid={`view-filter-operator-${index}-option-OR`}>OR</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             )}
@@ -725,10 +736,10 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             value={filter.field}
                                             onValueChange={(val) => updateFilter(filter.id, { field: val })}
                                         >
-                                            <SelectTrigger className="w-48 h-10 bg-gray-50 border-gray-200">
+                                            <SelectTrigger className="w-48 h-10 bg-muted/50 border-border" data-testid={`view-filter-field-${index}`}>
                                                 <SelectValue placeholder="Filter field" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="border-0 border-b-[5px] border-primary">
                                                 {availableFields.map(f => {
                                                     const isGrouped = f.id === groupBy ||
                                                         (f.id === 'endDate' && groupBy === 'dueDate') ||
@@ -740,6 +751,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                                                             value={f.id}
                                                             disabled={isGrouped}
                                                             className={cn(isGrouped && "opacity-50 cursor-not-allowed")}
+                                                            data-testid={`view-filter-field-${index}-option-${f.id}`}
                                                         >
                                                             {f.name}
                                                         </SelectItem>
@@ -752,12 +764,12 @@ export function CreateView({ projectId }: CreateViewProps) {
                                             value={filter.condition}
                                             onValueChange={(val) => updateFilter(filter.id, { condition: val as any, value: "" })}
                                         >
-                                            <SelectTrigger className="w-40 h-10 bg-gray-50 border-gray-200">
+                                            <SelectTrigger className="w-40 h-10 bg-muted/50 border-border" data-testid={`view-filter-condition-${index}`}>
                                                 <SelectValue placeholder="Condition" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="border-0 border-b-[5px] border-primary">
                                                 {getConditionsForField(filter.field).map(cond => (
-                                                    <SelectItem key={cond} value={cond}>
+                                                    <SelectItem key={cond} value={cond} data-testid={`view-filter-condition-${index}-option-${cond}`}>
                                                         {filterConditions[cond]?.title || cond}
                                                     </SelectItem>
                                                 ))}
@@ -765,14 +777,15 @@ export function CreateView({ projectId }: CreateViewProps) {
                                         </Select>
 
                                         <div className="flex-1">
-                                            {renderValueInput(filter)}
+                                            {renderValueInput(filter, index)}
                                         </div>
 
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => removeFilter(filter.id)}
-                                            className="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                            data-testid={`view-filter-remove-btn-${index}`}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -784,7 +797,8 @@ export function CreateView({ projectId }: CreateViewProps) {
                                         variant="outline"
                                         size="sm"
                                         onClick={addFilter}
-                                        className="gap-2 text-gray-600 bg-white border-gray-300 hover:bg-gray-50"
+                                        className="gap-2 text-muted-foreground bg-background border-border hover:bg-muted"
+                                        data-testid="view-add-filter-button"
                                     >
                                         <Plus className="h-4 w-4" />
                                         <span>Add filter</span>
@@ -798,15 +812,17 @@ export function CreateView({ projectId }: CreateViewProps) {
                             <Button
                                 variant="outline"
                                 size="lg"
-                                className="w-32 border-gray-300 text-gray-600 font-semibold h-11"
+                                className="w-32 border-border text-muted-foreground font-semibold h-11"
                                 onClick={() => router.back()}
                                 disabled={loading}
+                                data-testid="view-cancel-button"
                             >
                                 Cancel
                             </Button>
                             <Button
+                                variant="default"
                                 size="lg"
-                                className="w-40 bg-[#001F3F] text-white hover:bg-[#002B5C] font-semibold h-11"
+                                className="w-40 font-semibold h-11"
                                 onClick={handleCreate}
                                 disabled={
                                     loading ||
@@ -817,6 +833,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                                     filters.length === 0 ||
                                     filters.some(f => !f.field || !f.condition || (f.condition !== 'is-empty' && f.condition !== 'is-not-empty' && !f.value))
                                 }
+                                data-testid="view-submit-button"
                             >
                                 {loading ? (
                                     <div className="flex items-center gap-2">
@@ -836,7 +853,7 @@ export function CreateView({ projectId }: CreateViewProps) {
                 onClose={() => setIsIconPickerOpen(false)}
                 onSelect={handleIconSelect}
                 currentIcon={viewIcon}
-                currentColor={selectedIconData?.color || '#001F3F'}
+                currentColor={selectedIconData?.color || '#3B82F6'}
                 currentType={viewIconType}
                 onUpload={handleIconUpload}
                 onDelete={handleIconDelete}

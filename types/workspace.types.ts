@@ -106,7 +106,42 @@ export interface WorkspaceMembersResponse {
   members: WorkspaceMember[];
 }
 
+export interface ProjectExport {
+  id: string;
+  tenantId: string;
+  userId: string;
+  workspaceId: string;
+  projectId: string;
+  projectName: string;
+  type: 'project' | string;
+  format: 'xlsx' | string;
+  status: 'pending' | 'completed' | 'failed' | string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  errorMessage?: string | null;
+  requestedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
+export interface ListExportsResponse {
+  exports: ProjectExport[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
 
-
-
+export interface ExportDownloadResponse {
+  exportId: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  downloadUrl: string;
+  expiresIn: number;
+}

@@ -1,4 +1,4 @@
-﻿// components/projects/views/list-view/filters/AdvancedFilters.tsx
+// components/projects/views/list-view/filters/AdvancedFilters.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -244,6 +244,7 @@ export default function AdvancedFilters({
           value={criteria.value}
           onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
           className="w-full px-3 py-2 text-xs border-b border-input bg-transparent focus:outline-none"
+          data-testid={`advanced-filters-value-input-${criteria.id}`}
         >
           <option value="">Select value</option>
           {options.map(opt => (
@@ -261,6 +262,7 @@ export default function AdvancedFilters({
           value={criteria.value}
           onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
           className="border-0 border-b border-input rounded-none focus-visible:ring-0"
+          data-testid={`advanced-filters-value-input-${criteria.id}`}
         />
       );
     }
@@ -274,6 +276,7 @@ export default function AdvancedFilters({
           onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
           placeholder="Enter number"
           className="border-0 border-b border-input rounded-none focus-visible:ring-0"
+          data-testid={`advanced-filters-value-input-${criteria.id}`}
         />
       );
     }
@@ -286,13 +289,17 @@ export default function AdvancedFilters({
         onChange={(e) => updateCriteria(criteria.id, { value: e.target.value })}
         placeholder="Enter value"
         className="border-0 border-b border-input rounded-none focus-visible:ring-0"
+        data-testid={`advanced-filters-value-input-${criteria.id}`}
       />
     );
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent
+        className="max-w-3xl max-h-[80vh] overflow-y-auto"
+        data-testid="advanced-filters-modal"
+      >
         <DialogHeader>
           <DialogTitle>Filters</DialogTitle>
         </DialogHeader>
@@ -319,7 +326,11 @@ export default function AdvancedFilters({
 
           {/* Criteria List */}
           {filterBlock.children.map((criteria, index) => (
-            <div key={criteria.id} className="flex items-center gap-2 p-3 border rounded-lg">
+            <div
+              key={criteria.id}
+              className="flex items-center gap-2 p-3 border rounded-lg"
+              data-testid={`advanced-filters-criteria-${criteria.id}`}
+            >
               {/* Operator label */}
               <div className="w-16 text-xs font-medium text-muted-foreground">
                 {index === 0 ? "Where" : filterBlock.operator}
@@ -334,10 +345,17 @@ export default function AdvancedFilters({
                   updateCriteria(criteria.id, { field: newField, condition: newCondition, value: "" });
                 }}
                 className="flex-1 px-3 py-2 text-xs border-b border-input bg-transparent focus:outline-none"
+                data-testid={`advanced-filters-field-trigger-${criteria.id}`}
               >
                 <option value="">Select field</option>
                 {availableFields.map(field => (
-                  <option key={field.id} value={field.id}>{field.name}</option>
+                  <option
+                    key={field.id}
+                    value={field.id}
+                    data-testid={`advanced-filters-field-option-${criteria.id}-${field.id}`}
+                  >
+                    {field.name}
+                  </option>
                 ))}
               </select>
 
@@ -347,9 +365,14 @@ export default function AdvancedFilters({
                 onChange={(e) => updateCriteria(criteria.id, { condition: e.target.value as FilterConditionId, value: "" })}
                 disabled={!criteria.field}
                 className="flex-1 px-3 py-2 text-xs border-b border-input bg-transparent focus:outline-none disabled:opacity-50"
+                data-testid={`advanced-filters-condition-trigger-${criteria.id}`}
               >
                 {getConditionsForField(criteria.field).map(cond => (
-                  <option key={cond} value={cond}>
+                  <option
+                    key={cond}
+                    value={cond}
+                    data-testid={`advanced-filters-condition-option-${criteria.id}-${cond}`}
+                  >
                     {filterConditions[cond]?.title || cond}
                   </option>
                 ))}
@@ -367,6 +390,7 @@ export default function AdvancedFilters({
                 onClick={() => removeCriteria(criteria.id)}
                 disabled={filterBlock.children.length === 1}
                 className="text-muted-foreground hover:text-red-600"
+                data-testid={`advanced-filters-remove-btn-${criteria.id}`}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -379,6 +403,7 @@ export default function AdvancedFilters({
             variant="outline"
             onClick={addCriteria}
             className="w-full gap-2"
+            data-testid="advanced-filters-add-btn"
           >
             <Plus className="h-4 w-4" />
             Add Filter Criteria
@@ -389,7 +414,11 @@ export default function AdvancedFilters({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleApply} disabled={!isValid()}>
+          <Button
+            onClick={handleApply}
+            disabled={!isValid()}
+            data-testid="advanced-filters-apply-btn"
+          >
             Apply Filter
           </Button>
         </DialogFooter>

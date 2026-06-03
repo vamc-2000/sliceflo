@@ -2,11 +2,11 @@
 
 
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import NextImage from "next/image";
-import { Eye, Trash2, FileText, Table as TableIcon } from "lucide-react";
+import { Eye, Trash2, FileText, Table as TableIcon, Download, RefreshCw } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { useImpler } from "@impler/react";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -48,9 +48,83 @@ const staticRecords = [
 // ─── Component ────────────────────────────────────────────────────────────────
 const ImportAuthorizationPage = () => {
   const { projects, addProject } = useProjectsStore();
-  const currentWorkspace = useWorkspaceStore((s) => s.currentWorkspace);
+  const {
+    exports = [],
+    exportProject,
+    fetchExports,
+    downloadExport,
+    isLoadingExports
+  } = useWorkspaceStore();
   const { importRecords, addImportRecord, deleteImportRecord } = useImportStore();
   const [activeSection, setActiveSection] = useState<"imports" | "exports" | null>(null);
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [selectedFormat, setSelectedFormat] = useState<string>("excel");
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  // Fetch exports when activeSection becomes "exports"
+  useEffect(() => {
+    if (activeSection === "exports") {
+      fetchExports({ limit: 50, offset: 0 }).catch((err) => {
+        console.error("Error fetching exports:", err);
+      });
+    }
+  }, [activeSection, fetchExports]);
+
+  // Poller for pending exports
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    const hasPending = exports.some((exp) => exp.status === "pending");
+
+    if (hasPending && activeSection === "exports") {
+      intervalId = setInterval(() => {
+        fetchExports({ limit: 50, offset: 0 }).catch(console.error);
+      }, 5000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [exports, activeSection, fetchExports]);
+
+  const handleExportData = async () => {
+    if (!selectedProjectId) {
+      toast("error", { title: "Error", description: "Please select a project to export." });
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      await exportProject(selectedProjectId);
+      toast("success", { title: "Success", description: "Project export initiated successfully!" });
+      // Refresh exports list
+      fetchExports({ limit: 50, offset: 0 });
+    } catch (err: any) {
+      toast("error", {
+        title: "Export Failed",
+        description: err.response?.data?.message || "Failed to start export.",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDownloadExport = async (exportId: string) => {
+    try {
+      const response = await downloadExport(exportId);
+      if (response?.downloadUrl) {
+        window.open(response.downloadUrl, "_blank");
+        toast("success", { title: "Success", description: "Download link opened." });
+      } else {
+        toast("error", { title: "Error", description: "Download link not found." });
+      }
+    } catch (err: any) {
+      toast("error", {
+        title: "Download Failed",
+        description: err.response?.data?.message || "Failed to retrieve download link.",
+      });
+    }
+  };
 
   // ── Impler callback ─────────────────────────────────────────────────────────
 const onDataImported = useCallback(async (uploadData: any) => {
@@ -207,7 +281,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
     <div className="w-full space-y-2">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight">Import &amp; Authorization</h2>
+        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight" data-testid="import-auth-title">Import &amp; Authorization</h2>
         <p className="text-xs text-[#8E8E93]">Manage your imports and app authorization</p>
       </div>
 
@@ -225,14 +299,16 @@ const onDataImported = useCallback(async (uploadData: any) => {
               className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white"
               onClick={() => showWidget({})}
               disabled={!isImplerInitiated}
+              data-testid="import-auth-import-btn"
             >
               {isImplerInitiated ? "Import file" : "Loading..."}
             </Button>
           </div>
         }
+        data-testid="import-auth-imports-card"
       >
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-border rounded-lg">
+          <table className="w-full border-collapse border border-border rounded-lg" data-testid="import-auth-imports-table">
             <thead>
               <tr className="bg-[#F6FAFF]">
                 <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Type of import</th>
@@ -244,7 +320,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
             </thead>
             <tbody>
               {allRecords.map((item) => (
-                <tr key={item.id} className="hover:bg-muted bg-card">
+                <tr key={item.id} className="hover:bg-muted bg-card" data-testid={`import-auth-import-row-${item.id}`}>
                   <td className="border border-border px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 flex items-center justify-center">{getTypeIcon(item.type)}</div>
@@ -261,6 +337,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                       <button
                         className="p-2 hover:bg-gray-100 rounded transition-colors"
                         onClick={() => toast("info", { title: "Info", description: item.importedNumber })}
+                        data-testid={`import-auth-import-view-btn-${item.id}`}
                       >
                         <Eye className="w-4 h-4 text-[var(--primary)]" />
                       </button>
@@ -274,6 +351,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                             toast("success", { title: "Success", description: "Import record deleted" });
                           }
                         }}
+                        data-testid={`import-auth-import-delete-btn-${item.id}`}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
@@ -294,22 +372,23 @@ const onDataImported = useCallback(async (uploadData: any) => {
         icon={<NextImage src="/images/Myexports.svg" alt="exports" width={40} height={40} className="w-10 h-10" />}
         isActive={activeSection === "exports"}
         onToggle={() => setActiveSection((prev) => (prev === "exports" ? null : "exports"))}
+        data-testid="import-auth-exports-card"
       >
-        <div className="px-6 py-1 space-y-2">
+        <div className="px-6 py-1 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Project Selection */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-foreground">
                 Choose the project you want to export
               </Label>
-              <Select>
-                <SelectTrigger className="w-full h-11 bg-card border-border">
+              <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                <SelectTrigger className="w-full h-11 bg-card border-border" data-testid="import-auth-project-select-trigger">
                   <SelectValue placeholder="Select Project..." />
                 </SelectTrigger>
                 <SelectContent>
                   {projects.length > 0 ? (
                     projects.map((p) => (
-                      <SelectItem key={p.id} value={p.id!}>
+                      <SelectItem key={p.id} value={p.id!} data-testid={`import-auth-project-select-item-${p.id}`}>
                         {p.name}
                       </SelectItem>
                     ))
@@ -325,24 +404,118 @@ const onDataImported = useCallback(async (uploadData: any) => {
               <Label className="text-sm font-medium text-foreground">
                 Choose the format in which you want to export
               </Label>
-              <Select>
-                <SelectTrigger className="w-full h-11 bg-card border-border">
+              <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                <SelectTrigger className="w-full h-11 bg-card border-border" data-testid="import-auth-format-select-trigger">
                   <SelectValue placeholder="Select format..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="csv">CSV</SelectItem>
-                  <SelectItem value="json">JSON</SelectItem>
-                  <SelectItem value="excel">Excel</SelectItem>
+                  <SelectItem value="csv" data-testid="import-auth-format-select-item-csv">CSV</SelectItem>
+                  <SelectItem value="json" data-testid="import-auth-format-select-item-json">JSON</SelectItem>
+                  <SelectItem value="excel" data-testid="import-auth-format-select-item-excel">Excel</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           
           <div className="flex justify-end pt-2">
-             <Button className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-8 h-10 rounded-md font-medium">
-               Export Data
+             <Button 
+               className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-8 h-10 rounded-md font-medium"
+               onClick={handleExportData}
+               disabled={isExporting}
+               data-testid="import-auth-export-submit-btn"
+             >
+               {isExporting ? "Exporting..." : "Export Data"}
              </Button>
           </div>
+
+          {/* Recent Exports list */}
+          {activeSection === "exports" && (
+            <div className="mt-6 space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-[var(--primary)]">Recent Exports</h4>
+                <button
+                  onClick={() => fetchExports({ limit: 50, offset: 0 })}
+                  className="p-1.5 hover:bg-gray-150 rounded transition-colors text-slate-500"
+                  disabled={isLoadingExports}
+                  title="Refresh Exports"
+                  data-testid="import-auth-exports-refresh-btn"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isLoadingExports ? "animate-spin" : ""}`} />
+                </button>
+              </div>
+              
+              {exports.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-border rounded-lg" data-testid="import-auth-exports-table">
+                    <thead>
+                      <tr className="bg-[#F6FAFF]">
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-left">Project Name</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Format</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Status</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Requested At</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {exports.map((item) => (
+                        <tr key={item.id} className="hover:bg-slate-50 transition-colors" data-testid={`import-auth-export-row-${item.id}`}>
+                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] font-medium">
+                            {item.projectName}
+                          </td>
+                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] text-center font-medium">
+                            {item.format.toUpperCase()}
+                          </td>
+                          <td className="border border-border px-4 py-3 text-center">
+                            {item.status === "completed" && (
+                              <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>
+                            )}
+                            {item.status === "pending" && (
+                              <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 animate-pulse">Pending</Badge>
+                            )}
+                            {item.status === "failed" && (
+                              <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Failed</Badge>
+                            )}
+                          </td>
+                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] text-center">
+                            {formatDate(new Date(item.requestedAt))}
+                          </td>
+                          <td className="border border-border px-4 py-3">
+                            <div className="flex items-center justify-center gap-2">
+                              {item.status === "completed" ? (
+                                <button
+                                  className="p-2 hover:bg-green-50 rounded transition-colors text-green-600 cursor-pointer"
+                                  onClick={() => handleDownloadExport(item.id)}
+                                  title="Download Export File"
+                                  data-testid={`import-auth-export-download-btn-${item.id}`}
+                                >
+                                  <Download className="w-4 h-4" />
+                                </button>
+                              ) : item.status === "failed" ? (
+                                <button
+                                  className="p-2 hover:bg-red-50 rounded transition-colors text-red-500 font-semibold cursor-pointer"
+                                  onClick={() => toast("error", { title: "Export Error", description: item.errorMessage || "Unknown error occurred" })}
+                                  title="View Error Details"
+                                  data-testid={`import-auth-export-error-btn-${item.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <span className="text-xs text-gray-400">Processing...</span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-6 text-sm text-gray-500 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                  No export runs found yet.
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </SettingsCard>
     </div>

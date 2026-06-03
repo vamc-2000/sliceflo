@@ -46,7 +46,10 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
   const relLabel = rel?.label || relType;
 
   return (
-    <div className="w-[380px] p-4 space-y-2 bg-card rounded-lg border-b-[5px] border-b-primary shadow-xl">
+    <div
+      className="w-[380px] p-4 space-y-2 bg-card rounded-lg border-b-[5px] border-b-primary shadow-xl"
+      data-testid="relationship-detail-dialog"
+    >
       <div className="space-y-1">
         <h3 className="text-sm font-semibold leading-none tracking-tight text-primary">Relationship</h3>
         <p className="text-xs text-muted-foreground">

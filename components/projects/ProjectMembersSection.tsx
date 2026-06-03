@@ -292,6 +292,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                             <button
                                 onClick={() => { setShowAddInterface(false); setSearchQuery(""); }}
                                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-1"
+                                data-testid="project-members-back-btn"
                             >
                                 <ChevronRight className="h-4 w-4 rotate-180" />
                             </button>
@@ -300,12 +301,14 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                             <TabsTrigger
                                 value="teams"
                                 className="text-xs rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                                data-testid="project-members-tab-teams"
                             >
                                 Teams
                             </TabsTrigger>
                             <TabsTrigger
                                 value="members"
                                 className="text-xs rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                                data-testid="project-members-tab-members"
                             >
                                 Members
                             </TabsTrigger>
@@ -322,6 +325,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="pl-9 h-8 rounded-md text-xs"
+                                    data-testid="project-members-search-available"
                                 />
                             </div>
                         )}
@@ -369,6 +373,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                             onClick={() => handleAddMember(member.userId)}
                                             disabled={isLoading}
                                             className="shrink-0  h-8 w-8 group-hover:opacity-100 transition-opacity"
+                                            data-testid={`project-members-add-member-btn-${member.userId}`}
                                         >
                                             <Plus className="h-5 w-5 border-2 border-current rounded-full p-0.5" />
                                         </Button>
@@ -387,6 +392,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-9 h-8 rounded-md text-xs"
+                                data-testid="project-members-search-teams"
                             />
                         </div>
 
@@ -437,6 +443,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                                         }}
                                                         onClick={(e) => e.stopPropagation()}
                                                         className="border-input"
+                                                        data-testid={`project-members-team-checkbox-${team.id}`}
                                                     />
 
                                                     {/* Avatar */}
@@ -486,6 +493,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                                             toggleTeamExpand(team.id);
                                                         }
                                                     }}
+                                                    data-testid={`project-members-team-expand-btn-${team.id}`}
                                                 >
                                                     <ChevronRight
                                                         className={`h-4 w-4 transition={{
@@ -533,6 +541,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                                                                             toggleTeamMemberSelect(team.id, member.id, Boolean(checked))
                                                                                         }
                                                                                         className="border-input"
+                                                                                        data-testid={`project-members-team-member-checkbox-${team.id}-${member.id}`}
                                                                                     />
 
                                                                                     <Avatar className="h-7 w-7">
@@ -596,6 +605,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                                                                 setIsLoading(false);
                                                                             }
                                                                         }}
+                                                                        data-testid={`project-members-team-add-selected-btn-${team.id}`}
                                                                     >
                                                                         {isLoading ? (
                                                                             <span className="flex items-center justify-center gap-2">
@@ -668,6 +678,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-8 text-xs"
+                    data-testid="project-members-search"
                 />
             </div>
 
@@ -718,6 +729,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                                     disabled={isLoading || member?.role === 'owner'}
                                     className="ml-0 text-muted-foreground hover:text-destructive shrink-0 h-8 w-8 rounded-none"
                                     title={member?.role === 'owner' ? 'Cannot remove project owner' : 'Remove member'}
+                                    data-testid={`project-members-remove-btn-${member?.userId}`}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -736,6 +748,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                     size="sm"
                     onClick={onInviteClick}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs"
+                    data-testid="project-members-invite-btn"
                 >
                     <Plus className="h-4 w-4 mr-1" />
                     Invite
@@ -745,6 +758,7 @@ const ProjectMembersSection: React.FC<ProjectMembersSectionProps> = ({
                     size="sm"
                     onClick={() => setShowAddInterface(true)}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs"
+                    data-testid="project-members-add-btn"
                 >
                     <Plus className="h-4 w-4 mr-1" />
                     Add

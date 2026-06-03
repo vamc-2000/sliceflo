@@ -1,4 +1,4 @@
-﻿// components/projects/views/gantt-view/CustomGanttCalendarPicker.tsx
+// components/projects/views/gantt-view/CustomGanttCalendarPicker.tsx
 "use client";
 
 import * as React from "react";
@@ -193,6 +193,7 @@ export function CustomGanttCalendarPicker({
         <button
           onClick={handleLeftArrowClick}
           className="p-1 rounded hover:bg-gray-100 transition-colors"
+          data-testid="gantt-picker-prev-btn"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -201,6 +202,7 @@ export function CustomGanttCalendarPicker({
         <button
           className="font-medium text-xs hover:bg-gray-100 px-2 py-1 rounded transition-colors"
           onClick={handleHeaderClick}
+          data-testid="gantt-picker-mode-btn"
         >
           {getHeaderLabel()}
         </button>
@@ -209,6 +211,7 @@ export function CustomGanttCalendarPicker({
         <button
           onClick={handleRightArrowClick}
           className="p-1 rounded hover:bg-gray-100 transition-colors"
+          data-testid="gantt-picker-next-btn"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -275,6 +278,7 @@ export function CustomGanttCalendarPicker({
                   
                   setPickerMode("date-grid");
                 }}
+                data-testid={`gantt-picker-month-option-${i}`}
               >
                 {format(new Date(0, i), "MMM")}
               </button>
@@ -302,6 +306,7 @@ export function CustomGanttCalendarPicker({
                     setMonth(new Date(year, month.getMonth(), 1));
                     setPickerMode("month-grid");
                   }}
+                  data-testid={`gantt-picker-year-option-${year}`}
                 >
                   {year}
                 </button>
