@@ -148,6 +148,7 @@ import { MemberAvatar } from "./MemberAvatar";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useProjectsStore, TaskTypeConfig, } from "@/stores/projects-store";
 import { Task, TaskRelationship } from "@/types/task.types";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 import { RelationshipDropdown } from "./views/list-view/common/RelationshipDropdown";
 import { TaskSelector } from "./views/list-view/common/TaskSelector";
@@ -802,9 +803,10 @@ export function TaskDetailView({
                         </div>
 
                         {/* CONTENT AREA - Two columns */}
-                        <div className="flex flex-1 overflow-hidden">
+                        <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
+
                             {/* Left Panel - Main Content */}
-                            <div className="flex-1 flex flex-col overflow-hidden bg-card">
+                            <ResizablePanel defaultSize={70} className="flex flex-col overflow-hidden bg-card">
 
 
                                 {/* Main Content Area - Scrollable */}
@@ -1786,10 +1788,12 @@ export function TaskDetailView({
 
 
                                 </div>
-                            </div>
+                            </ResizablePanel>
+
+                            <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
 
                             {/* Right Sidebar - Properties */}
-                            <div className="w-[320px] flex flex-col shrink-0">
+                            <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="flex flex-col shrink-0">
                                 {/* Full-width pill tab switcher */}
                                 <div className="bg-muted p-2 flex items-center gap-1">
                                     {[
@@ -2192,8 +2196,8 @@ export function TaskDetailView({
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                        </div>
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     </div>
                 </DialogPrimitive.Content>
             </DialogPrimitive.Portal>

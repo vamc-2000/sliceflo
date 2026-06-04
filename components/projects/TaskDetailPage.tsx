@@ -67,10 +67,10 @@ import { MemberAvatar } from "./MemberAvatar";
 import { useTasksStore } from "@/stores/tasks-store";
 import {
     useProjectsStore,
-    getTaskTypeIcon,
-    getTaskTypeIconColor,
-    getDefaultTaskTypeIcon,
+    TaskTypeConfig,
 } from "@/stores/projects-store";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { iconComponentMap } from "@/components/ColorIconPicker";
 import { Task, TaskRelationship } from "@/types/task.types";
 import { cn } from "@/lib/utils";
 import { RelationshipDropdown } from "./views/list-view/common/RelationshipDropdown";
@@ -355,6 +355,67 @@ export function TaskDetailPage({
         </PopoverContent>
     );
 
+    const renderTaskTypeVisual = (
+        type?: TaskTypeConfig | null,
+        className = "w-4 h-4"
+    ) => {
+        if (!type) return null;
+
+        const wrapperClass = `${className} shrink-0 flex items-center justify-center`;
+
+        if (type.icon?.type === "file" && type.icon?.presignedUrl) {
+            return (
+                <div className={wrapperClass}>
+                    <img
+                        src={type.icon.presignedUrl}
+                        alt={type.label}
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+            );
+        }
+
+        if (type.displayImage) {
+            return (
+                <div className={wrapperClass}>
+                    <img
+                        src={type.displayImage}
+                        alt={type.label}
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+            );
+        }
+
+        if (type.iconId && type.icon?.type === "icon" && type.icon?.name) {
+            const Icon = iconComponentMap[type.icon.name];
+            if (Icon) {
+                return (
+                    <div className={wrapperClass}>
+                        <Icon
+                            className="w-full h-full"
+                            color={type.icon.color || type.color || "#3B82F6"}
+                        />
+                    </div>
+                );
+            }
+        }
+
+        return (
+            <div
+                className={`${wrapperClass} rounded-sm`}
+                style={{ backgroundColor: `${type.color || "#6B7280"}20` }}
+            >
+                <span
+                    className="text-[10px] leading-none font-semibold"
+                    style={{ color: type.color || "#6B7280" }}
+                >
+                    {type.label?.charAt(0)?.toUpperCase() || "T"}
+                </span>
+            </div>
+        );
+    };
+
     // ─────────────────────────────────────────────────────────────────────
     return (
         <div className="flex flex-col h-screen overflow-hidden bg-card">
@@ -397,10 +458,10 @@ export function TaskDetailPage({
             </div>
 
             {/* Two-column area */}
-            <div className="flex flex-1 overflow-hidden">
+            <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
 
                 {/* LEFT PANEL */}
-                <div className="flex-1 flex flex-col overflow-hidden bg-card">
+                <ResizablePanel defaultSize={70} className="flex flex-col overflow-hidden bg-card">
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-card">
                         {/* Task Title and Type */}
                         <div className="flex flex-col gap-1.5 shrink-0">
@@ -410,27 +471,37 @@ export function TaskDetailPage({
                                     <SelectTrigger data-testid="task-detail-type-select-trigger" className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2">
                                         <SelectValue>
                                             {(() => {
-                                                const t = taskTypes.find((t) => t.value === (currentTask.taskType || "task"));
-                                                if (!t) return <span className="text-xs">Task</span>;
-                                                const Icon = getTaskTypeIcon(t);
-                                                const Default = getDefaultTaskTypeIcon();
-                                                return <div className="flex items-center gap-1.5">{Icon ? <Icon className="w-3 h-3 text-primary-foreground" /> : <Default className="w-3 h-3 text-primary-foreground" />}<span className="text-xs text-primary-foreground">{t.label}</span></div>;
+                                                const selectedType =
+                                                    taskTypes.find((t) => t.value === (currentTask.taskType || "task")) || null;
+
+                                                if (!selectedType) {
+                                                    return <span className="text-xs text-primary-foreground">Task</span>;
+                                                }
+
+                                                return (
+                                                    <div className="flex items-center gap-1.5">
+                                                        {renderTaskTypeVisual(selectedType, "w-3 h-3")}
+                                                        <span className="text-xs text-primary-foreground">
+                                                            {selectedType.label}
+                                                        </span>
+                                                    </div>
+                                                );
                                             })()}
                                         </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {taskTypes.map((type) => {
-                                            const Icon = getTaskTypeIcon(type);
-                                            const Default = getDefaultTaskTypeIcon();
-                                            return (
-                                                <SelectItem key={type._id} value={type.value} data-testid={`task-detail-type-option-${type.value}`}>
-                                                    <div className="flex items-center gap-2">
-                                                        {Icon ? <Icon className="w-3.5 h-3.5" style={{ color: getTaskTypeIconColor(type) }} /> : <Default className="w-3.5 h-3.5 text-muted-foreground" />}
-                                                        <span className="text-xs">{type.label}</span>
-                                                    </div>
-                                                </SelectItem>
-                                            );
-                                        })}
+                                        {taskTypes.map((type) => (
+                                            <SelectItem
+                                                key={type._id || type.value}
+                                                value={type.value}
+                                                data-testid={`task-detail-type-option-${type.value}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    {renderTaskTypeVisual(type, "w-3.5 h-3.5")}
+                                                    <span className="text-xs">{type.label}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{formatTaskId(projectSlug, currentTask.taskNumber)}</span>
@@ -671,10 +742,12 @@ export function TaskDetailPage({
                         )}
 
                     </div>
-                </div>
+                </ResizablePanel>
+
+                <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
 
                 {/* RIGHT SIDEBAR */}
-                <div className="w-[320px] flex flex-col shrink-0">
+                <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="flex flex-col shrink-0">
                     {/* Full-width pill tab switcher */}
                     <div className="bg-muted p-2 flex items-center gap-1">
                         {(['properties', 'activity'] as const).map(tab => (
@@ -888,8 +961,8 @@ export function TaskDetailPage({
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </div>
     );
 }
