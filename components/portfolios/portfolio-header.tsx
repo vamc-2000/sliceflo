@@ -523,12 +523,12 @@ export function PortfolioHeader({
 
                 <DropdownMenuSeparator className="mx-2 my-0" />
 
-                <DropdownMenuItem onClick={() => setShowArchiveModal(true)}>
+                <DropdownMenuItem onClick={() => setShowArchiveModal(true)} className="text-xs">
                   <Archive className="mr-2 h-4 w-4" /> Archive Portfolio
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600"
+                  className="text-red-600 focus:text-red-600 text-xs"
                   onClick={() => setDeleteDialogOpen(true)}
                   disabled={isLoading}
                 >

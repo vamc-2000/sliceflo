@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import { useOpenProfileModal, useHasMore, useLoadMoreEmails, useEmailLoading } from "@/stores/mailbox-store";
+import { useOpenProfileModal, useHasMore, useLoadMoreEmails, useEmailLoading, useSelectedEmail } from "@/stores/mailbox-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Email } from "@/types/mailbox.types";
 import ProfileModal from "./ProfileModal";
@@ -27,6 +27,7 @@ const MailList: React.FC<MailListProps> = ({
   const hasMore = useHasMore();
   const loadMore = useLoadMoreEmails();
   const loading = useEmailLoading();
+  const selectedEmail = useSelectedEmail();
 
   const emailInfo = emails;
   // console.log("Email Information", emails.updatedBy.profilePicture)
@@ -98,10 +99,13 @@ const MailList: React.FC<MailListProps> = ({
             key={email._id}
             data-testid={`mail-list-item-${email._id}`}
             onClick={() => onEmailSelect(email)}
-            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors ${email.read
-              ? "bg-background text-muted-foreground font-normal hover:bg-muted"     // read → muted
-              : "text-foreground font-semibold hover:bg-primary/10"                  // unread → highlighted
-              }`}
+            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors border-r-2 ${
+              selectedEmail?._id === email._id
+                ? "bg-muted border-brand-orange text-foreground font-semibold"
+                : email.read
+                ? "bg-background border-transparent text-muted-foreground font-normal hover:bg-muted"
+                : "bg-background border-transparent text-foreground font-semibold hover:bg-primary/10"
+            }`}
           >
             {/* Email content */}
             <div data-testid={`mail-list-item-content-${email._id}`} className="flex-1 min-w-0">

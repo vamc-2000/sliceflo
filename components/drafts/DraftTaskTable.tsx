@@ -74,6 +74,7 @@ import {
   ArrowUp,
   ArrowDown,
   ChevronsUpDown,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -88,7 +89,10 @@ import {
   getDefaultTaskTypeIcon,
   useProjectsStore,
   getProfilePictureUrl,
+  DEFAULT_BACKEND_TYPE_IMAGES,
+  TaskTypeConfig,
 } from "@/stores/projects-store";
+import { iconComponentMap } from "@/components/ColorIconPicker";
 import { formatTaskId } from '@/utils/task-utils';
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -97,6 +101,120 @@ import DuplicateDraftTaskDialog from "./DuplicateDraftTaskDialog";
 import { useGoalsStore } from "@/stores/goals-store";
 import { ConvertToSubtaskDialog } from "@/components/projects/ConvertToSubtaskDialog";
 import { DraftFieldVisibilityPopup } from "@/components/drafts/common/DraftFieldVisibilityPopup";
+
+const renderDraftTaskTypeVisual = (
+  type?: TaskTypeConfig | null,
+  className = "w-4 h-4"
+) => {
+  if (!type) return null;
+
+  const wrapperClass = `${className} shrink-0 flex items-center justify-center`;
+
+  if (type.value === 'subtask') {
+    return (
+      <div className={wrapperClass}>
+        <ListChecks
+          className={`${className} shrink-0`}
+          color={type.color || "#6B7280"}
+        />
+      </div>
+    );
+  }
+
+  if (type.value === 'archive') {
+    return (
+      <div className={wrapperClass}>
+        <Archive
+          className={`${className} shrink-0`}
+          color={type.color || "#6B7280"}
+        />
+      </div>
+    );
+  }
+
+  if (type.icon?.type === "file" && type.icon?.presignedUrl) {
+    return (
+      <div className={wrapperClass}>
+        <img
+          src={type.icon.presignedUrl}
+          alt={type.label}
+          className={`${className} object-contain shrink-0`}
+        />
+      </div>
+    );
+  }
+
+  if (type.displayImage) {
+    return (
+      <div className={wrapperClass}>
+        <img
+          src={type.displayImage}
+          alt={type.label}
+          className={`${className} object-contain shrink-0`}
+        />
+      </div>
+    );
+  }
+
+  if (type.iconId && type.icon?.type === "icon" && type.icon?.name) {
+    const Icon = iconComponentMap[type.icon.name];
+    if (Icon) {
+      return (
+        <div className={wrapperClass}>
+          <Icon
+            className={`${className} shrink-0`}
+            color={type.icon.color || type.color || "#3B82F6"}
+          />
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className={wrapperClass}>
+      <LayoutTemplate
+        className={`${className} shrink-0`}
+        color={type.color || "#6B7280"}
+      />
+    </div>
+  );
+};
+
+const getResolvedTaskType = (typeValue: string, taskTypesList: TaskTypeConfig[]): TaskTypeConfig => {
+  const existing = taskTypesList.find(t => t.value === typeValue);
+  if (existing) return existing;
+
+  return {
+    _id: typeValue,
+    value: typeValue,
+    label: typeValue === 'subtask' ? 'Sub Task' : (typeValue.charAt(0).toUpperCase() + typeValue.slice(1)),
+    description: '',
+    color: typeValue === 'milestone' ? '#ef4444' : '#6B7280',
+    order: 0,
+    displayImage: DEFAULT_BACKEND_TYPE_IMAGES[typeValue] || null,
+  };
+};
+
+const getDraftTaskTypes = (taskTypesList: TaskTypeConfig[]): TaskTypeConfig[] => {
+  const defaults = ['task', 'milestone', 'approval', 'meeting', 'archive', 'subtask'];
+  const list = [...taskTypesList];
+  
+  defaults.forEach(defValue => {
+    if (!list.some(t => t.value === defValue)) {
+      list.push({
+        _id: defValue,
+        value: defValue,
+        label: defValue === 'subtask' ? 'Sub Task' : (defValue.charAt(0).toUpperCase() + defValue.slice(1)),
+        description: '',
+        color: '#6B7280',
+        order: 0,
+        displayImage: DEFAULT_BACKEND_TYPE_IMAGES[defValue] || null,
+      });
+    }
+  });
+  
+  return list;
+};
 
 interface DraftTaskTableProps {
   tasks?: Task[];
@@ -337,6 +455,7 @@ export function DraftTaskTable({
       status: updates.status,
       startDate: updates.startDate,
       dueDate: updates.endDate,
+      taskType: updates.taskType,
     });
   }, [currentWorkspace?.id, saveDraft]);
 
@@ -1234,26 +1353,11 @@ export function DraftTaskTable({
                             <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
                               <SelectValue>
                                 {(() => {
-                                  const selectedType = taskTypes.find(t => t.value === (task.taskType || 'task'));
-                                  if (!selectedType) return null;
-
-                                  const IconComponent = getTaskTypeIcon(selectedType);
-                                  const DefaultIcon = getDefaultTaskTypeIcon();
-                                  const iconColor = getTaskTypeIconColor(selectedType);
-
+                                  const typeValue = task.taskType || 'task';
+                                  const selectedType = getResolvedTaskType(typeValue, taskTypes);
                                   return (
                                     <div className="flex items-center gap-2">
-                                      {IconComponent ? (
-                                        <IconComponent
-                                          className="w-3 h-3 flex-shrink-0"
-                                          style={{ color: iconColor }}
-                                        />
-                                      ) : (
-                                        <DefaultIcon
-                                          className="w-3 h-3 flex-shrink-0"
-                                          style={{ color: selectedType.color }}
-                                        />
-                                      )}
+                                      {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
                                       <span>{selectedType.label}</span>
                                     </div>
                                   );
@@ -1261,30 +1365,14 @@ export function DraftTaskTable({
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                              {taskTypes.map((type) => {
-                                const IconComponent = getTaskTypeIcon(type);
-                                const DefaultIcon = getDefaultTaskTypeIcon();
-                                const iconColor = getTaskTypeIconColor(type);
-
-                                return (
-                                  <SelectItem key={type._id} value={type.value}>
-                                    <div className="flex items-center gap-2">
-                                      {IconComponent ? (
-                                        <IconComponent
-                                          className="w-3 h-3 flex-shrink-0"
-                                          style={{ color: iconColor }}
-                                        />
-                                      ) : (
-                                        <DefaultIcon
-                                          className="w-3 h-3 flex-shrink-0"
-                                          style={{ color: type.color }}
-                                        />
-                                      )}
-                                      <span>{type.label}</span>
-                                    </div>
-                                  </SelectItem>
-                                );
-                              })}
+                              {getDraftTaskTypes(taskTypes).map((type) => (
+                                <SelectItem key={type._id} value={type.value}>
+                                  <div className="flex items-center gap-2">
+                                    {renderDraftTaskTypeVisual(type, "w-3 h-3")}
+                                    <span>{type.label}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -1589,7 +1677,7 @@ export function DraftTaskTable({
                                 value={subtask.taskType || 'task'}
                                 onValueChange={async (value) => {
                                   try {
-                                    await updateTask(task.id, { taskType: value });
+                                    await updateSubtask(subtask.id, { taskType: value });
                                   } catch {
                                     // handle error if needed
                                   }
@@ -1598,26 +1686,11 @@ export function DraftTaskTable({
                                 <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
                                   <SelectValue>
                                     {(() => {
-                                      const selectedType = taskTypes.find(t => t.value === (subtask.taskType || 'task'));
-                                      if (!selectedType) return null;
-
-                                      const IconComponent = getTaskTypeIcon(selectedType);
-                                      const DefaultIcon = getDefaultTaskTypeIcon();
-                                      const iconColor = getTaskTypeIconColor(selectedType);
-
+                                      const typeValue = subtask.taskType || 'task';
+                                      const selectedType = getResolvedTaskType(typeValue, taskTypes);
                                       return (
                                         <div className="flex items-center gap-2">
-                                          {IconComponent ? (
-                                            <IconComponent
-                                              className="w-3 h-3 flex-shrink-0"
-                                              style={{ color: iconColor }}
-                                            />
-                                          ) : (
-                                            <DefaultIcon
-                                              className="w-3 h-3 flex-shrink-0"
-                                              style={{ color: selectedType.color }}
-                                            />
-                                          )}
+                                          {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
                                           <span>{selectedType.label}</span>
                                         </div>
                                       );
@@ -1625,30 +1698,14 @@ export function DraftTaskTable({
                                   </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {taskTypes.map((type) => {
-                                    const IconComponent = getTaskTypeIcon(type);
-                                    const DefaultIcon = getDefaultTaskTypeIcon();
-                                    const iconColor = getTaskTypeIconColor(type);
-
-                                    return (
-                                      <SelectItem key={type._id} value={type.value}>
-                                        <div className="flex items-center gap-2">
-                                          {IconComponent ? (
-                                            <IconComponent
-                                              className="w-3 h-3 flex-shrink-0"
-                                              style={{ color: iconColor }}
-                                            />
-                                          ) : (
-                                            <DefaultIcon
-                                              className="w-3 h-3 flex-shrink-0"
-                                              style={{ color: type.color }}
-                                            />
-                                          )}
-                                          <span>{type.label}</span>
-                                        </div>
-                                      </SelectItem>
-                                    );
-                                  })}
+                                  {getDraftTaskTypes(taskTypes).map((type) => (
+                                    <SelectItem key={type._id} value={type.value}>
+                                      <div className="flex items-center gap-2">
+                                        {renderDraftTaskTypeVisual(type, "w-3 h-3")}
+                                        <span>{type.label}</span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </TableCell>
@@ -1913,39 +1970,26 @@ export function DraftTaskTable({
                                     <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
                                       <SelectValue>
                                         {(() => {
-                                          if (!selType) return null;
-                                          const IconComponent = getTaskTypeIcon(selType);
-                                          const DefaultIcon = getDefaultTaskTypeIcon();
-                                          const iconColor = getTaskTypeIconColor(selType);
+                                          const typeValue = newSubtaskData.taskType || 'task';
+                                          const selectedType = getResolvedTaskType(typeValue, taskTypes);
                                           return (
                                             <div className="flex items-center gap-2">
-                                              {IconComponent
-                                                ? <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: iconColor }} />
-                                                : <DefaultIcon className="w-3 h-3 flex-shrink-0" style={{ color: selType.color }} />
-                                              }
-                                              <span>{selType.label}</span>
+                                              {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
+                                              <span>{selectedType.label}</span>
                                             </div>
                                           );
                                         })()}
                                       </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
-                                      {taskTypes.map(type => {
-                                        const IconComponent = getTaskTypeIcon(type);
-                                        const DefaultIcon = getDefaultTaskTypeIcon();
-                                        const iconColor = getTaskTypeIconColor(type);
-                                        return (
-                                          <SelectItem key={type._id} value={type.value}>
-                                            <div className="flex items-center gap-2">
-                                              {IconComponent
-                                                ? <IconComponent className="w-3 h-3 flex-shrink-0" style={{ color: iconColor }} />
-                                                : <DefaultIcon className="w-3 h-3 flex-shrink-0" style={{ color: type.color }} />
-                                              }
-                                              <span>{type.label}</span>
-                                            </div>
-                                          </SelectItem>
-                                        );
-                                      })}
+                                      {getDraftTaskTypes(taskTypes).map((type) => (
+                                        <SelectItem key={type._id} value={type.value}>
+                                          <div className="flex items-center gap-2">
+                                            {renderDraftTaskTypeVisual(type, "w-3 h-3")}
+                                            <span>{type.label}</span>
+                                          </div>
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </TableCell>

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { Project } from "@/stores/projects-store";
 import { ProjectTable } from "./ProjectTable";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ProjectGroupProps {
   id: string;
@@ -28,21 +29,22 @@ export function ProjectGroup({
   viewType = "list",
   onAddProject
 }: ProjectGroupProps) {
-  
+
   return (
     <div className="flex flex-col gap-2 overflow-hidden">
       {/* ── Group Header ─────────────────────────────────────────── */}
       <div
-        className="flex items-center justify-between px-4 py-2 bg-muted rounded-l-md"
+        onClick={() => onToggle(id)}
+        className="flex items-center justify-between px-4 py-2 bg-muted rounded-md cursor-pointer"
       >
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
           <button
-            onClick={() => onToggle(id)}
+            // onClick={() => onToggle(id)}
             className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted/50 transition-colors text-muted-foreground"
           >
             <ChevronDown
-              className="h-4 w-4 transition-transform duration-200"
+              className="h-4 w-4 transition-transform duration-200 cursor-pointer"
               style={{ transform: !isOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
             />
           </button>
@@ -65,9 +67,25 @@ export function ProjectGroup({
       </div>
 
       {/* ── Task Table ───────────────────────────────────────────── */}
-      {isOpen && (
-        <ProjectTable portfolioId={portfolioId} projects={projects} groupColor={color} viewType={viewType} onAddProject={onAddProject} />
-      )}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <ProjectTable
+              portfolioId={portfolioId}
+              projects={projects}
+              groupColor={color}
+              viewType={viewType}
+              onAddProject={onAddProject}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

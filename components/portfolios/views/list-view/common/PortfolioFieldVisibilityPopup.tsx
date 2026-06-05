@@ -80,19 +80,19 @@ export function PortfolioFieldVisibilityPopup({ portfolioId, viewType = "list", 
                         size="sm"
                         className="h-8 w-8 p-0"
                     >
-                        <Plus className="h-4 w-4 text-muted-foreground" />
+                        <Plus className="h-4 w-4 " />
                     </Button>
                 )}
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-[320px] p-0 flex flex-col h-[450px] border-b-5 border-b-[#001F3F]"
+                className="w-[320px] p-0 flex flex-col h-[450px] border-b-5 border-b-primary"
                 align="end"
                 side="bottom"
             >
                 {/* FIXED HEADER */}
                 <div className="flex-shrink-0 px-3 py-2.5 border-b space-y-2 bg-background">
                     <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-semibold">Fields</h4>
+                        <h4 className="text-xs font-semibold">Fields</h4>
                         <span className="text-xs text-muted-foreground">
                             {visibleFieldIds.length} visible
                         </span>
@@ -105,7 +105,7 @@ export function PortfolioFieldVisibilityPopup({ portfolioId, viewType = "list", 
                             placeholder="Search fields..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-8 pl-8 pr-2 text-sm border rounded-md outline-none focus:ring-1 focus:ring-primary"
+                            className="w-full h-8 pl-8 pr-2 text-xs border rounded-md outline-none focus:ring-1 focus:ring-primary"
                         />
                     </div>
                 </div>
@@ -138,13 +138,13 @@ export function PortfolioFieldVisibilityPopup({ portfolioId, viewType = "list", 
                                         key={field.id}
                                         className={cn(
                                             "flex items-center justify-between py-1.5 px-2 rounded-md transition-colors",
-                                            field.required ? "bg-gray-50 cursor-not-allowed opacity-75" : "hover:bg-muted/50 cursor-pointer"
+                                            field.required ? "bg-muted cursor-not-allowed opacity-75" : "hover:bg-muted/50 cursor-pointer"
                                         )}
                                         onClick={() => !field.required && toggleFieldVisibility(portfolioId, field.id, viewType)}
                                     >
                                         <div className="flex flex-col flex-1 min-w-0">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm truncate">{field.label}</span>
+                                                <span className="text-xs truncate">{field.label}</span>
                                                 {field.required && (
                                                     <span className="text-xs text-red-500" title="Required field">*</span>
                                                 )}
@@ -195,7 +195,7 @@ export function PortfolioFieldVisibilityPopup({ portfolioId, viewType = "list", 
                                         onClick={() => toggleFieldVisibility(portfolioId, field.id, viewType)}
                                     >
                                         <div className="flex flex-col flex-1 min-w-0">
-                                            <span className="text-sm truncate">{field.label}</span>
+                                            <span className="text-xs truncate">{field.label}</span>
                                             {field.type && (
                                                 <span className="text-xs text-muted-foreground capitalize">
                                                     {field.type.replace(/-/g, ' ')}
@@ -217,7 +217,7 @@ export function PortfolioFieldVisibilityPopup({ portfolioId, viewType = "list", 
                     {/* NO RESULTS */}
                     {searchQuery && shownFields.length === 0 && hiddenFields.length === 0 && (
                         <div className="py-6 text-center">
-                            <p className="text-sm text-muted-foreground">No fields found</p>
+                            <p className="text-xs text-muted-foreground">No fields found</p>
                         </div>
                     )}
                 </div>

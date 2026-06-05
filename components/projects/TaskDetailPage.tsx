@@ -201,6 +201,11 @@ export function TaskDetailPage({
     const [docTreeExpanded, setDocTreeExpanded] = useState<Set<string>>(new Set());
     const [expandedLinkedDocs, setExpandedLinkedDocs] = useState<Set<string>>(new Set());
 
+    // Collapsible sections state
+    const [isLabelsExpanded, setIsLabelsExpanded] = useState(false);
+    const [isCustomFieldsExpanded, setIsCustomFieldsExpanded] = useState(false);
+    const [isTaskDetailsExpanded, setIsTaskDetailsExpanded] = useState(true);
+
 
     const handleCopyTaskLink = async () => {
         try {
@@ -764,15 +769,33 @@ export function TaskDetailPage({
                                     }
                                 `}
                             >
-                                {tab === "activity" ? "Activity Log" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                {tab === "activity" ? "Activity Log" : "Properties"}
                             </button>
                         ))}
                     </div>
                     <div className="flex-1 overflow-y-auto p-4">
                         {activeTab === "properties" && (
-                            <div className="space-y-1">
-                                {/* STATUS */}
-                                <div className="flex items-center justify-between py-1">
+                            <div className="space-y-4">
+                                {/* Task Details collapsible section */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-semibold">Task Details</h3>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6"
+                                            onClick={() => setIsTaskDetailsExpanded(!isTaskDetailsExpanded)}
+                                        >
+                                            <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isTaskDetailsExpanded ? "rotate-180" : "rotate-0")} />
+                                        </Button>
+                                    </div>
+
+                                    <div className={cn(
+                                        "transition-all duration-300 ease-in-out overflow-hidden space-y-1",
+                                        isTaskDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+                                    )}>
+                                        {/* STATUS */}
+                                        <div className="flex items-center justify-between py-1">
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><LayoutTemplate className="h-4 w-4" />Status</Label>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -882,80 +905,111 @@ export function TaskDetailPage({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
+                            </div>
+                        </div>
                                 {/* Labels */}
                                 <div className="space-y-2 pt-2">
                                     <div className="flex items-center justify-between">
                                         <Label className="font-semibold">Labels</Label>
-                                        <LabelPicker
-                                            selectedLabelIds={currentTask.labelIds || []}
-                                            onSelect={handleSelectLabel}
-                                            onRemove={handleRemoveLabel}
-                                        >
-                                            <Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-label-picker-trigger">
-                                                <Plus className="h-3 w-3" />
+                                        <div className="flex items-center gap-1">
+                                            <LabelPicker
+                                                selectedLabelIds={currentTask.labelIds || []}
+                                                onSelect={handleSelectLabel}
+                                                onRemove={handleRemoveLabel}
+                                            >
+                                                <Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-label-picker-trigger">
+                                                    <Plus className="h-3 w-3" />
+                                                </Button>
+                                            </LabelPicker>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6"
+                                                onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+                                            >
+                                                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLabelsExpanded ? "rotate-180" : "rotate-0")} />
                                             </Button>
-                                        </LabelPicker>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {currentTask.labelIds && currentTask.labelIds.length > 0 ? (
-                                            currentTask.labelIds.map(labelId => {
-                                                const label = currentWorkspace?.labels?.find(l => l.id === labelId);
-                                                if (!label) return null;
-                                                return (
-                                                    <LabelBadge
-                                                        key={labelId}
-                                                        label={label}
-                                                        onRemove={() => handleRemoveLabel(labelId)}
-                                                        removeButtonTestId={`task-detail-label-remove-${labelId}`}
-                                                    />
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="text-xs text-muted-foreground italic">No labels assigned yet.</div>
-                                        )}
+                                    <div className={cn(
+                                        "transition-all duration-300 ease-in-out overflow-hidden",
+                                        isLabelsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+                                    )}>
+                                        <div className="flex flex-wrap gap-2">
+                                            {currentTask.labelIds && currentTask.labelIds.length > 0 ? (
+                                                currentTask.labelIds.map(labelId => {
+                                                    const label = currentWorkspace?.labels?.find(l => l.id === labelId);
+                                                    if (!label) return null;
+                                                    return (
+                                                        <LabelBadge
+                                                            key={labelId}
+                                                            label={label}
+                                                            onRemove={() => handleRemoveLabel(labelId)}
+                                                            removeButtonTestId={`task-detail-label-remove-${labelId}`}
+                                                        />
+                                                    );
+                                                })
+                                            ) : (
+                                                <div className="text-xs text-muted-foreground italic">No labels assigned yet.</div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 {/* CUSTOM FIELDS */}
                                 <>
                                     <div className="flex items-center justify-between py-1">
                                         <p className="text-xs font-semibold uppercase tracking-wide">Custom Fields</p>
-                                        <Popover open={showAddFieldPopover} onOpenChange={setShowAddFieldPopover}>
-                                            <PopoverTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-add-custom-field-trigger"><Plus className="h-3 w-3" /></Button></PopoverTrigger>
-                                            <PopoverContent className="w-[300px] p-0 flex flex-col" align="end" style={{ height: "480px" }}>
-                                                <FieldTypeSelectContent projectId={projectId} onFieldCreated={() => setShowAddFieldPopover(false)} onBack={() => setShowAddFieldPopover(false)} />
-                                            </PopoverContent>
-                                        </Popover>
+                                        <div className="flex items-center gap-1">
+                                            <Popover open={showAddFieldPopover} onOpenChange={setShowAddFieldPopover}>
+                                                <PopoverTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6" data-testid="task-detail-add-custom-field-trigger"><Plus className="h-3 w-3" /></Button></PopoverTrigger>
+                                                <PopoverContent className="w-[300px] p-0 flex flex-col" align="end" style={{ height: "480px" }}>
+                                                    <FieldTypeSelectContent projectId={projectId} onFieldCreated={() => setShowAddFieldPopover(false)} onBack={() => setShowAddFieldPopover(false)} />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6"
+                                                onClick={() => setIsCustomFieldsExpanded(!isCustomFieldsExpanded)}
+                                            >
+                                                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isCustomFieldsExpanded ? "rotate-180" : "rotate-0")} />
+                                            </Button>
+                                        </div>
                                     </div>
-                                    {customFields.length === 0 ? <p className="text-xs text-muted-foreground py-2">No custom fields yet</p> : (
-                                        <>
-                                            {(showAllCustomFields ? customFields : customFields.slice(0, CUSTOM_FIELDS_PREVIEW_COUNT)).map((field) => {
-                                                const fd = getTaskCustomFieldById(projectId, field.id);
-                                                if (!fd) return null;
-                                                const IconComponent = getCustomFieldIcon(field.type);
-                                                return (
-                                                    <div key={field.id} className="flex items-center justify-between py-1">
-                                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0 max-w-[45%]"><IconComponent className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{field.name}</span></Label>
-                                                        <div className="w-[160px]" data-testid={`task-detail-custom-field-dropdown-${field.id}`}>
-                                                            <CustomFieldDropdown field={fd} value={currentTask.customFieldValues?.[field.id] || (field.type === "select-many" || field.type === "label" ? [] : "")}
-                                                                onUpdate={(v) => handleUpdateTask({ customFieldValues: { ...currentTask.customFieldValues, [field.id]: v } })} task={currentTask} />
+                                    <div className={cn(
+                                        "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+                                        isCustomFieldsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+                                    )}>
+                                        {customFields.length === 0 ? <p className="text-xs text-muted-foreground py-2">No custom fields yet</p> : (
+                                            <>
+                                                {(showAllCustomFields ? customFields : customFields.slice(0, CUSTOM_FIELDS_PREVIEW_COUNT)).map((field) => {
+                                                    const fd = getTaskCustomFieldById(projectId, field.id);
+                                                    if (!fd) return null;
+                                                    const IconComponent = getCustomFieldIcon(field.type);
+                                                    return (
+                                                        <div key={field.id} className="flex items-center justify-between py-1">
+                                                            <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0 max-w-[45%]"><IconComponent className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{field.name}</span></Label>
+                                                            <div className="w-[160px]" data-testid={`task-detail-custom-field-dropdown-${field.id}`}>
+                                                                <CustomFieldDropdown field={fd} value={currentTask.customFieldValues?.[field.id] || (field.type === "select-many" || field.type === "label" ? [] : "")}
+                                                                    onUpdate={(v) => handleUpdateTask({ customFieldValues: { ...currentTask.customFieldValues, [field.id]: v } })} task={currentTask} />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            {customFields.length > CUSTOM_FIELDS_PREVIEW_COUNT && (
-                                                <button onClick={() => setShowAllCustomFields((p) => !p)} className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors" data-testid="task-detail-custom-field-toggle-show-all">
-                                                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", showAllCustomFields && "rotate-180")} />
-                                                    {showAllCustomFields ? "Show less" : `Show ${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT} more field${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT > 1 ? "s" : ""}`}
-                                                </button>
-                                            )}
-                                        </>
-                                    )}
+                                                    );
+                                                })}
+                                                {customFields.length > CUSTOM_FIELDS_PREVIEW_COUNT && (
+                                                    <button onClick={() => setShowAllCustomFields((p) => !p)} className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors" data-testid="task-detail-custom-field-toggle-show-all">
+                                                        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", showAllCustomFields && "rotate-180")} />
+                                                        {showAllCustomFields ? "Show less" : `Show ${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT} more field${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT > 1 ? "s" : ""}`}
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 </>
                                 <Separator className="my-2" />
                                 <TaskAttachments taskId={currentTask.id} attachments={currentTask.attachments ?? []} />
                             </div>
                         )}
-                        {/* {activeTab === "progress" && <div className="text-center text-muted-foreground text-xs py-8">Progress content here</div>} */}
                         {activeTab === "activity" && (
                             <div className="space-y-4">
                                 <SharedActivityLog entityType="task" entityId={currentTask.id} />

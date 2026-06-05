@@ -57,7 +57,7 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 h-9 rounded text-muted-foreground bg-background hover:bg-muted hover:text-foreground">
+                <Button variant="ghost" size="sm" className="gap-1 h-8 rounded text-xs text-muted-foreground bg-background hover:bg-muted hover:text-foreground">
                     More
                     <ChevronDown className="h-4 w-4" />
                 </Button>

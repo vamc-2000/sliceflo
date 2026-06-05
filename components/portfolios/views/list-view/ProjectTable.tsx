@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -105,8 +106,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
   const [isAddProjectRowHovered, setIsAddProjectRowHovered] = useState(false);
   const [showAddProjectMenu, setShowAddProjectMenu] = useState(false);
-  const [addProjectMenuCoords, setAddProjectMenuCoords] = useState<{ top: number, left: number } | null>(null);
-  const chevronButtonRef = React.useRef<HTMLButtonElement>(null);
 
   const key = `${portfolioId}-${viewType}`;
   const defaultVisible = viewType === "gantt"
@@ -154,7 +153,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
   const PriorityFlag = ({ priority, color }: { priority?: string; color?: string }) => {
     if (!priority) {
       return (
-        <div className="w-7 h-7 rounded-full border border-dashed border-gray-300 flex items-center justify-center mx-auto">
+        <div className="w-6 h-6 rounded-full border border-dashed border-gray-300 flex items-center justify-center mx-auto">
           <Flag className="h-3 w-3 text-gray-300" />
         </div>
       );
@@ -285,7 +284,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     backgroundColor: 'var(--card)',
                     borderLeft: '1px solid var(--border)',
                     boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                    padding: 4,
+                    padding: 0,
                     margin: 0,
                   }}
                 >
@@ -309,7 +308,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                 return (
                   <TableRow
                     key={project.id || index}
-                    className="group hover:bg-muted/50 transition-colors !h-11 border-b border-border last:border-0"
+                    className="group hover:bg-muted/50 transition-colors border-b border-border last:border-0"
                   >
                     <TableCell className="p-0" style={getDragColumnStyle(false)}>
                       <GripVertical className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 cursor-grab mx-auto" />
@@ -436,36 +435,36 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             <MoreHorizontal className="h-4 w-4" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[180px] p-1 border-b-5 border-b-primary">
+                        <DropdownMenuContent align="end" className="w-[190px] p-1 border-b-5 border-b-primary">
                           <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); project.id && router.push(`/project/${project.id}`); }}
-                            className="py-2"
+                            className="py-2 text-xs"
                           >
-                            <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                            <ExternalLink className="h-3.5 w-3.5 mr-1" />
                             Open project
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {portfolioId && (
                             <DropdownMenuItem
                               onClick={(e) => { e.stopPropagation(); project.id && setProjectToRemove(project.id); }}
-                              className="py-2"
+                              className="py-2 text-xs"
                             >
-                              <Trash2 className="h-3.5 w-3.5 mr-2" />
+                              <Trash2 className="h-3.5 w-3.5 mr-1" />
                               Remove from portfolio
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); project.id && setProjectToArchive(project.id); }}
-                            className="py-2"
+                            className="py-2 text-xs"
                           >
-                            <Archive className="h-3.5 w-3.5 mr-2" />
+                            <Archive className="h-3.5 w-3.5 mr-1" />
                             Archive project
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); project.id && setProjectToDelete(project.id); }}
-                            className="text-red-500 focus:text-red-500 py-2"
+                            className="text-red-500 focus:text-red-500 py-2 text-xs"
                           >
-                            <Trash2 className="h-3.5 w-3.5 mr-2" />
+                            <Trash2 className="h-3.5 w-3.5 mr-1" />
                             Delete project
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -479,10 +478,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
               <TableRow
                 className="group border-b border-border"
                 onMouseEnter={() => setIsAddProjectRowHovered(true)}
-                onMouseLeave={() => {
-                  setIsAddProjectRowHovered(false);
-                  setShowAddProjectMenu(false);
-                }}
+                onMouseLeave={() => setIsAddProjectRowHovered(false)}
               >
                 <TableCell className="p-0" style={getDragColumnStyle(false, `${groupColor}44`)} />
                 <TableCell className={`${bodyCellCls} text-transparent`} />
@@ -505,61 +501,47 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         Add New Project
                       </button>
 
-                      {(isAddProjectRowHovered || showAddProjectMenu) && (
-                        <div className="relative">
+                      <DropdownMenu open={showAddProjectMenu} onOpenChange={setShowAddProjectMenu}>
+                        <DropdownMenuTrigger asChild>
                           <button
-                            ref={chevronButtonRef}
-                            className="px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!showAddProjectMenu && chevronButtonRef.current) {
-                                const rect = chevronButtonRef.current.getBoundingClientRect();
-                                const dropdownHeight = 84; // Approx height for 2 items
-                                setAddProjectMenuCoords({
-                                  top: rect.top - dropdownHeight - 4,
-                                  left: rect.left,
-                                });
-                              }
-                              setShowAddProjectMenu(prev => !prev);
-                            }}
+                            className={cn(
+                              "px-1 py-0.5 border-l border-primary/30 text-muted-foreground group-hover:text-primary/60 transition-colors outline-none",
+                              !(isAddProjectRowHovered || showAddProjectMenu) && "invisible"
+                            )}
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <ChevronUp className="h-3 w-3 text-primary/60" />
+                            <ChevronUp className="h-3 w-3" />
                           </button>
-
-                          {showAddProjectMenu && addProjectMenuCoords && (
-                            <div
-                              style={{
-                                position: 'fixed',
-                                top: addProjectMenuCoords.top,
-                                left: addProjectMenuCoords.left,
-                                zIndex: 9999,
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuContent
+                            align="start"
+                            side="top"
+                            className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] z-[9999] p-0"
+                          >
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setShowAddProjectMenu(false);
+                                router.push(`/portfolio/${portfolioId}/create-project`);
                               }}
-                              className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] overflow-hidden"
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none focus:bg-muted"
                             >
-                              <button
-                                onClick={() => {
-                                  setShowAddProjectMenu(false);
-                                  router.push(`/portfolio/${portfolioId}/create-project`);
-                                }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left"
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                                <span>Add new project</span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setShowAddProjectMenu(false);
-                                  onAddProject?.();
-                                }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left border-t border-border"
-                              >
-                                <LinkIcon className="h-3.5 w-3.5" />
-                                <span>Add existing project</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                              <Plus className="h-3.5 w-3.5" />
+                              <span>Add new project</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setShowAddProjectMenu(false);
+                                onAddProject?.();
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none border-t border-border focus:bg-muted"
+                            >
+                              <LinkIcon className="h-3.5 w-3.5" />
+                              <span>Add existing project</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </TableCell>

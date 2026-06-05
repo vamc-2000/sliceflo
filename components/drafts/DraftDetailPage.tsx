@@ -40,6 +40,7 @@ import {
     Activity,
 } from "lucide-react";
 import { format } from "date-fns";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useDraftsStore } from "@/stores/drafts-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useProjectsStore, getDefaultTaskTypeIcon, getProfilePictureUrl } from "@/stores/projects-store";
@@ -134,6 +135,8 @@ export function DraftDetailPage({
     const [isAddingSubDraft, setIsAddingSubDraft] = useState(false);
     const [newSubDraftTitle, setNewSubDraftTitle] = useState("");
     const [isReadOnly] = useState(false);
+    const [isDraftDetailsExpanded, setIsDraftDetailsExpanded] = useState(true);
+    const [isAttachmentsExpanded, setIsAttachmentsExpanded] = useState(false);
 
     const handleUpdateDraft = (updates: Partial<PatchDraftRequest>) => {
         saveDraft({ id: currentDraft.id, workspaceId: currentDraft.workspaceId, ...updates });
@@ -176,11 +179,11 @@ export function DraftDetailPage({
     return (
         <div className="flex flex-col h-screen overflow-hidden bg-background">
             {/* Header section (fixed at top) */}
-            <div className="flex-none bg-background flex items-center justify-between shrink-0 text-sm">
+            <div className="flex-none bg-background flex items-center justify-between shrink-0 text-xs">
                 <div className="flex items-center gap-2">
                     <Breadcrumbs />
                     {isSubDraft && (
-                        <span className="text-sm bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
                             Sub-Draft
                         </span>
                     )}
@@ -215,13 +218,13 @@ export function DraftDetailPage({
             </div>
 
             {/* Two-column area */}
-            <div className="flex flex-1 overflow-hidden">
+            <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
                 {/* LEFT PANEL */}
-                <div className="flex-1 flex flex-col overflow-hidden bg-background">
+                <ResizablePanel defaultSize={70} className="flex flex-col overflow-hidden bg-background">
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
                         {/* Draft Title */}
                         <div className="flex items-center shrink-0 flex-wrap gap-3">
-                            <h1 className="text-4xl font-semibold">{currentDraft.title}</h1>
+                            <h1 className="text-sm leading-tight">{currentDraft.title}</h1>
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1.5 h-8 w-auto min-w-[60px] bg-[#001F3F] text-white rounded-md justify-center px-2">
                                     {(() => {
@@ -249,7 +252,7 @@ export function DraftDetailPage({
                         {/* Description */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <Label className="text-sm font-semibold">Description</Label>
+                                <Label className="text-xs font-semibold">Description</Label>
                                 <Button variant="ghost" size="icon" className="h-6 w-6">
                                     <History className="h-3 w-3 text-muted-foreground" />
                                 </Button>
@@ -283,7 +286,7 @@ export function DraftDetailPage({
                         {!isSubDraft && (isAddingSubDraft || subDrafts.length > 0) && (
                             <div className="space-y-4 border-t pt-4 mt-4">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold">Sub-Drafts</h3>
+                                    <h3 className="text-xs font-semibold">Sub-Drafts</h3>
                                     <div className="flex items-center gap-2">
                                         <Button variant="secondary" size="sm" className="h-8" onClick={() => setIsAddingSubDraft(true)} disabled={isAddingSubDraft}>
                                             <Plus className="h-3 w-3 mr-1" />Add Sub-Draft
@@ -341,8 +344,8 @@ export function DraftDetailPage({
                                             {subDrafts.map((sub) => (
                                                 <tr key={sub.id} className="border-b hover:bg-muted/20">
                                                     <td className="p-3"><input type="checkbox" className="rounded border-border" /></td>
-                                                    <td className="p-3 text-sm">{sub.title}</td>
-                                                    <td className="p-3 text-sm">
+                                                    <td className="p-3 text-xs">{sub.title}</td>
+                                                    <td className="p-3 text-xs">
                                                         {sub.assigneeId ? (() => {
                                                             const member = projectMembers.find(m => m.userId === sub.assigneeId);
                                                             return (
@@ -352,7 +355,7 @@ export function DraftDetailPage({
                                                             );
                                                         })() : <span className="text-xs text-muted-foreground">—</span>}
                                                     </td>
-                                                    <td className="p-3 text-sm">
+                                                    <td className="p-3 text-xs">
                                                         {sub.status
                                                             ? <span className="px-2 py-1 rounded text-xs bg-muted">{sub.status}</span>
                                                             : <span className="text-xs text-muted-foreground">—</span>}
@@ -385,7 +388,7 @@ export function DraftDetailPage({
                                             {subDrafts.length === 0 && !isAddingSubDraft && (
                                                 <tr>
                                                     <td colSpan={7} className="p-8 text-center">
-                                                        <p className="text-sm text-muted-foreground">No sub-drafts added yet</p>
+                                                        <p className="text-xs text-muted-foreground">No sub-drafts added yet</p>
                                                         <Button variant="link" size="sm" className="text-xs" onClick={() => setIsAddingSubDraft(true)}>
                                                             Add your first sub-draft
                                                         </Button>
@@ -404,192 +407,232 @@ export function DraftDetailPage({
                             </div>
                         )}
                     </div>
-                </div>
+                </ResizablePanel>
+
+                <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
 
                 {/* RIGHT SIDEBAR */}
-                <div className="w-[320px] flex flex-col shrink-0 border-l">
-                    <div className="flex justify-around border-b bg-background shrink-0 p-2">
-                        <Button
-                            variant="ghost" size="sm"
-                            className="px-4 py-3 font-medium transition-colors underline underline-offset-8 decoration-[#001F3F] text-[#001F3F]"
+                <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="flex flex-col shrink-0 border-l">
+                    <div className="bg-muted p-2 flex items-center gap-1">
+                        <button
+                            className="flex-1 py-2 rounded-lg text-xs font-semibold bg-[#001F3F] text-white shadow-sm"
+                            data-testid="draft-detail-tab-properties"
                         >
                             Properties
-                        </Button>
+                        </button>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4">
-                        <div className="space-y-1">
-                            {/* STATUS */}
-                            <div className="flex items-center justify-between py-1">
-                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                    <Activity className="h-4 w-4" /> Status
-                                </Label>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.status && "text-muted-foreground")}>
-                                            {currentDraft.status ? (() => {
-                                                const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
-                                                return (
-                                                    <span className="flex items-center gap-1.5">
-                                                        {s && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />}
-                                                        {s?.label || currentDraft.status}
-                                                    </span>
-                                                );
-                                            })() : "—"}
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => handleUpdateDraft({ status: undefined })}>Clear</DropdownMenuItem>
-                                        <Separator className="my-1" />
-                                        {taskStatusConfigs.map((s) => (
-                                            <DropdownMenuItem key={s._id} onSelect={() => handleUpdateDraft({ status: s.value })}>
-                                                <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: s.color }} />
-                                                {s.label}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                        <div className="space-y-4">
+                            {/* Draft Details collapsible section */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-semibold">Draft Details</h3>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        onClick={() => setIsDraftDetailsExpanded(!isDraftDetailsExpanded)}
+                                    >
+                                        <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isDraftDetailsExpanded ? "rotate-180" : "rotate-0")} />
+                                    </Button>
+                                </div>
 
-                            {/* PRIORITY */}
-                            <div className="flex items-center justify-between py-1">
-                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                    <Flag className="h-4 w-4" /> Priority
-                                </Label>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.priority && "text-muted-foreground")}>
-                                            {currentDraft.priority ? (
-                                                <span className="flex items-center gap-1.5">
-                                                    {getPriorityColor(currentDraft.priority) && (
-                                                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getPriorityColor(currentDraft.priority) }} />
-                                                    )}
-                                                    {taskPriorityConfigs.find((p) => p.value === currentDraft.priority)?.label || currentDraft.priority}
-                                                </span>
-                                            ) : "—"}
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => handleUpdateDraft({ priority: undefined })}>Clear</DropdownMenuItem>
-                                        <Separator className="my-1" />
-                                        {taskPriorityConfigs.map((p) => (
-                                            <DropdownMenuItem key={p._id} onSelect={() => handleUpdateDraft({ priority: p.value })}>
-                                                <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: p.color }} />
-                                                {p.label}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-
-                            {/* START DATE */}
-                            <div className="flex items-center justify-between py-1">
-                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                    <CalendarIcon className="h-4 w-4" /> Start
-                                </Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.startDate && "text-muted-foreground")}>
-                                            {currentDraft.startDate ? format(new Date(currentDraft.startDate), "PP") : "—"}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="end">
-                                        <Calendar
-                                            mode="single"
-                                            selected={currentDraft.startDate ? new Date(currentDraft.startDate) : undefined}
-                                            onSelect={(d) => {
-                                                if (d) {
-                                                    const updates: Partial<PatchDraftRequest> = { startDate: format(d, "yyyy-MM-dd") };
-                                                    if (currentDraft.dueDate && new Date(currentDraft.dueDate) < d) updates.dueDate = undefined;
-                                                    handleUpdateDraft(updates);
-                                                }
-                                            }}
-                                            initialFocus
-                                        />
-                                        {currentDraft.startDate && (
-                                            <div className="p-2 border-t">
-                                                <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ startDate: undefined })}>
-                                                    Clear date
+                                <div className={cn(
+                                    "transition-all duration-300 ease-in-out overflow-hidden space-y-1",
+                                    isDraftDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+                                )}>
+                                    {/* STATUS */}
+                                    <div className="flex items-center justify-between py-1">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <Activity className="h-4 w-4" /> Status
+                                        </Label>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.status && "text-blue-400 dark:text-blue-500/70")}>
+                                                    {currentDraft.status ? (() => {
+                                                        const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
+                                                        return (
+                                                            <span className="flex items-center gap-1.5">
+                                                                {s && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />}
+                                                                {s?.label || currentDraft.status}
+                                                            </span>
+                                                        );
+                                                    })() : "—"}
                                                 </Button>
-                                            </div>
-                                        )}
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ status: undefined })}>Clear</DropdownMenuItem>
+                                                <Separator className="my-1" />
+                                                {taskStatusConfigs.map((s) => (
+                                                    <DropdownMenuItem key={s._id} onSelect={() => handleUpdateDraft({ status: s.value })}>
+                                                        <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: s.color }} />
+                                                        {s.label}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
 
-                            {/* DUE DATE */}
-                            <div className="flex items-center justify-between py-1">
-                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                    <CalendarIcon className="h-4 w-4" /> Due
-                                </Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.dueDate && "text-muted-foreground")}>
-                                            {currentDraft.dueDate ? format(new Date(currentDraft.dueDate), "PP") : "—"}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="end">
-                                        <Calendar
-                                            mode="single"
-                                            selected={currentDraft.dueDate ? new Date(currentDraft.dueDate) : undefined}
-                                            onSelect={(d) => { if (d) handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") }); }}
-                                            disabled={(date) => (currentDraft.startDate ? date < new Date(new Date(currentDraft.startDate).setHours(0, 0, 0, 0)) : false)}
-                                            initialFocus
-                                        />
-                                        {currentDraft.dueDate && (
-                                            <div className="p-2 border-t">
-                                                <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ dueDate: undefined })}>
-                                                    Clear date
+                                    {/* PRIORITY */}
+                                    <div className="flex items-center justify-between py-1">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <Flag className="h-4 w-4" /> Priority
+                                        </Label>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.priority && "text-blue-400 dark:text-blue-500/70")}>
+                                                    {currentDraft.priority ? (
+                                                        <span className="flex items-center gap-1.5">
+                                                            {getPriorityColor(currentDraft.priority) && (
+                                                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getPriorityColor(currentDraft.priority) }} />
+                                                            )}
+                                                            {taskPriorityConfigs.find((p) => p.value === currentDraft.priority)?.label || currentDraft.priority}
+                                                        </span>
+                                                    ) : "—"}
                                                 </Button>
-                                            </div>
-                                        )}
-                                    </PopoverContent>
-                                </Popover>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ priority: undefined })}>Clear</DropdownMenuItem>
+                                                <Separator className="my-1" />
+                                                {taskPriorityConfigs.map((p) => (
+                                                    <DropdownMenuItem key={p._id} onSelect={() => handleUpdateDraft({ priority: p.value })}>
+                                                        <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: p.color }} />
+                                                        {p.label}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+
+                                    {/* START DATE */}
+                                    <div className="flex items-center justify-between py-1">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <CalendarIcon className="h-4 w-4" /> Start
+                                        </Label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.startDate && "text-blue-400 dark:text-blue-500/70")}>
+                                                    {currentDraft.startDate ? format(new Date(currentDraft.startDate), "PP") : "—"}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="end">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={currentDraft.startDate ? new Date(currentDraft.startDate) : undefined}
+                                                    onSelect={(d) => {
+                                                        if (d) {
+                                                            const updates: Partial<PatchDraftRequest> = { startDate: format(d, "yyyy-MM-dd") };
+                                                            if (currentDraft.dueDate && new Date(currentDraft.dueDate) < d) updates.dueDate = undefined;
+                                                            handleUpdateDraft(updates);
+                                                        }
+                                                    }}
+                                                    initialFocus
+                                                />
+                                                {currentDraft.startDate && (
+                                                    <div className="p-2 border-t">
+                                                        <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ startDate: undefined })}>
+                                                            Clear date
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+
+                                    {/* DUE DATE */}
+                                    <div className="flex items-center justify-between py-1">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <CalendarIcon className="h-4 w-4" /> Due
+                                        </Label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.dueDate && "text-blue-400 dark:text-blue-500/70")}>
+                                                    {currentDraft.dueDate ? format(new Date(currentDraft.dueDate), "PP") : "—"}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="end">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={currentDraft.dueDate ? new Date(currentDraft.dueDate) : undefined}
+                                                    onSelect={(d) => { if (d) handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") }); }}
+                                                    disabled={(date) => (currentDraft.startDate ? date < new Date(new Date(currentDraft.startDate).setHours(0, 0, 0, 0)) : false)}
+                                                    initialFocus
+                                                />
+                                                {currentDraft.dueDate && (
+                                                    <div className="p-2 border-t">
+                                                        <Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateDraft({ dueDate: undefined })}>
+                                                            Clear date
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+
+                                    {/* ASSIGNEE */}
+                                    <div className="flex items-center justify-between py-1">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <User className="h-4 w-4" /> Assignee
+                                        </Label>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.assigneeId && "text-blue-400 dark:text-blue-500/70")}>
+                                                    {currentDraft.assigneeId ? (() => {
+                                                        const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
+                                                        return (
+                                                            <span className="flex items-center gap-1.5">
+                                                                <Avatar name={member?.name} src={getProfilePictureUrl(member?.avatar)} size="xs" />
+                                                            </span>
+                                                        );
+                                                    })() : "—"}
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ assigneeId: undefined })}>Clear</DropdownMenuItem>
+                                                <Separator className="my-1" />
+                                                {projectMembers.map((m) => (
+                                                    <DropdownMenuItem key={m.userId} onSelect={() => handleUpdateDraft({ assigneeId: m.userId })}>
+                                                        <div className="flex items-center gap-2">
+                                                            <Avatar name={m.name} src={getProfilePictureUrl(m.avatar)} size="xs" />
+                                                            {m.name}
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* ASSIGNEE */}
-                            <div className="flex items-center justify-between py-1">
-                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                    <User className="h-4 w-4" /> Assignee
-                                </Label>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.assigneeId && "text-muted-foreground")}>
-                                            {currentDraft.assigneeId ? (() => {
-                                                const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
-                                                return (
-                                                    <span className="flex items-center gap-1.5">
-                                                        <Avatar name={member?.name} src={getProfilePictureUrl(member?.avatar)} size="xs" />
-                                                    </span>
-                                                );
-                                            })() : "—"}
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => handleUpdateDraft({ assigneeId: undefined })}>Clear</DropdownMenuItem>
-                                        <Separator className="my-1" />
-                                        {projectMembers.map((m) => (
-                                            <DropdownMenuItem key={m.userId} onSelect={() => handleUpdateDraft({ assigneeId: m.userId })}>
-                                                <div className="flex items-center gap-2">
-                                                    <Avatar name={m.name} src={getProfilePictureUrl(m.avatar)} size="xs" />
-                                                    {m.name}
-                                                </div>
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            {/* Attachments collapsible section */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-semibold">Attachments</h3>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+                                    >
+                                        <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
+                                    </Button>
+                                </div>
+
+                                <div className={cn(
+                                    "transition-all duration-300 ease-in-out overflow-hidden",
+                                    isAttachmentsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+                                )}>
+                                    <DraftAttachments
+                                        draftId={currentDraft.id}
+                                        attachments={currentDraft.attachments ?? []}
+                                        workspaceId={currentDraft.workspaceId}
+                                    />
+                                </div>
                             </div>
-
-
-                            <Separator className="my-2" />
-                            <DraftAttachments
-                                draftId={currentDraft.id}
-                                attachments={currentDraft.attachments ?? []}
-                                workspaceId={currentDraft.workspaceId}
-                            />
                         </div>
                     </div>
-                </div>
-            </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </div>
     );
 }

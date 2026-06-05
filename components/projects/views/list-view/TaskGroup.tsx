@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { TaskTable } from "./TaskTable";
 import { useTasksStore } from "@/stores/tasks-store";
+import { AnimatePresence, motion } from "framer-motion";
 import { Task, ColumnConfig } from '@/types/task.types';
 import { FilterBlock } from "@/components/projects/views/list-view/filters/AdvancedFiltersNew";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -641,13 +642,13 @@ export function TaskGroup({
     <div className="flex flex-col gap-2 overflow-hidden w-full">
       {/* ── Group Header ─────────────────────────────────────────── */}
       <div
-        className="flex items-center justify-between px-4 py-2 bg-muted rounded-md w-full"
+        onClick={onToggleCollapse}
+        className="flex items-center justify-between px-4 py-2 bg-muted rounded-md w-full cursor-pointer select-none"
       >
         {/* Left: chevron + dot + name + menu + count badge */}
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
           <button data-testid={`task-group-collapse-button-${group.id}`}
-            onClick={onToggleCollapse}
             className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted transition-colors text-muted-foreground"
           >
             <ChevronDown
@@ -664,7 +665,7 @@ export function TaskGroup({
 
           {/* Editable name */}
           {isEditingName ? (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
@@ -695,7 +696,11 @@ export function TaskGroup({
           {/* ··· menu */}
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button data-testid={`task-group-menu-trigger-${group.id}`} className="ml-1 flex items-center justify-center w-5 h-5 rounded text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors">
+              <button
+                data-testid={`task-group-menu-trigger-${group.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="ml-1 flex items-center justify-center w-5 h-5 rounded text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors"
+              >
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
@@ -816,25 +821,35 @@ export function TaskGroup({
       </div>
 
       {/* ── Task Table ───────────────────────────────────────────── */}
-      {!isCollapsed && (
-        <TaskTable
-          groupId={group.id}
-          projectId={projectId}
-          hideFields={hideFields}
-          groupBy={groupBy}
-          filteredTasks={sortedAndFilteredTasks}
-          groupName={group.name}
-          groupMemberId={group.memberId}
-          groupFieldId={group.fieldId}
-          columnConfigs={columnConfigs}
-          displayOptions={displayOptions}
-          groupColor={accentColor}
-          activeSortConfig={activeSortConfig}
-          onSortChange={onSortChange}
-          onSelectionChange={onSelectionChange}
-          clearSelection={clearSelection}
-        />
-      )}
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden w-full"
+          >
+            <TaskTable
+              groupId={group.id}
+              projectId={projectId}
+              hideFields={hideFields}
+              groupBy={groupBy}
+              filteredTasks={sortedAndFilteredTasks}
+              groupName={group.name}
+              groupMemberId={group.memberId}
+              groupFieldId={group.fieldId}
+              columnConfigs={columnConfigs}
+              displayOptions={displayOptions}
+              groupColor={accentColor}
+              activeSortConfig={activeSortConfig}
+              onSortChange={onSortChange}
+              onSelectionChange={onSelectionChange}
+              clearSelection={clearSelection}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Delete Group Confirmation */}
       <ConfirmationModal

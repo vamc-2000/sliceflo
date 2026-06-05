@@ -28,7 +28,7 @@ import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/stores/profile-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useDocStore } from "@/stores/useDoc-store";
 import { updateDocument as updateDocumentApi } from "@/lib/api/documents-api";
 import Link from "next/link";
@@ -102,6 +102,13 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const [portfolioAttachments, setPortfolioAttachments] = useState<FileAttachment[]>([]);
   const [showAll, setShowAll] = useState(false);
+
+  // Collapsible sections state
+  const [isPortfolioDetailsExpanded, setIsPortfolioDetailsExpanded] = useState(true);
+  const [isLinkedItemsExpanded, setIsLinkedItemsExpanded] = useState(false);
+  const [isLabelsExpanded, setIsLabelsExpanded] = useState(false);
+  const [isAboutPortfolioExpanded, setIsAboutPortfolioExpanded] = useState(false);
+  const [isAttachmentsExpanded, setIsAttachmentsExpanded] = useState(false);
 
   const visibleAttachments = showAll
     ? portfolioAttachments
@@ -325,230 +332,245 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
     <div className="space-y-4">
       {/* Portfolio Details */}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold">Portfolio Details</h3>
-
-        {/* ✅ Status - Left-Right Alignment */}
         <div className="flex items-center justify-between">
-          <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-            <Hexagon
-              className="h-4 w-4"
-            />
-            Status
-          </Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="h-8 px-3 hover:bg-muted text-xs"
-              >
-                <Badge
-                  className={cn("h-6", statusColors[portfolio.status as string] || statusColors.open)}
+          <h3 className="text-sm font-semibold">Portfolio Details</h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={() => setIsPortfolioDetailsExpanded(!isPortfolioDetailsExpanded)}
+          >
+            <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isPortfolioDetailsExpanded ? "rotate-180" : "rotate-0")} />
+          </Button>
+        </div>
+
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+          isPortfolioDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+        )}>
+          {/* ✅ Status - Left-Right Alignment */}
+          <div className="flex items-center justify-between">
+            <Label className="text-muted-foreground flex items-center gap-2 text-xs">
+              <Hexagon
+                className="h-4 w-4"
+              />
+              Status
+            </Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 px-3 hover:bg-muted text-xs"
                 >
-                  {currentStatus.label}
-                </Badge>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {STATUS_OPTIONS.map((s) => (
-                <DropdownMenuItem
-                  key={s.value}
-                  onClick={() => handleUpdateStatus(s.value)}
-                  className="text-xs"
-                >
-                  <Badge variant="secondary" className={cn("mr-2 text-xs capitalize", s.cls)}>
-                    {s.label}
+                  <Badge
+                    className={cn("h-6", statusColors[portfolio.status as string] || statusColors.open)}
+                  >
+                    {currentStatus.label}
                   </Badge>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* ✅ Priority - Left-Right Alignment */}
-        <div className="flex items-center justify-between">
-          <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-            <Flag className="h-4 w-4" />
-            Priority
-          </Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-8 transition-all duration-200",
-                  portfolio.priority ? "w-8 p-0 rounded-full" : "px-3 bg-secondary hover:bg-muted text-xs",
-                  !portfolio.priority && "text-muted-foreground"
-                )}
-                style={portfolio.priority ? {
-                  backgroundColor: (currentPriority?.color || "#6b7280") + "15",
-                } : {}}
-              >
-                {portfolio.priority ? (
-                  <Flag
-                    className="h-4 w-4"
-                    style={{ color: currentPriority?.color || "#6b7280" }}
-                  />
-                ) : (
-                  "—"
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {PRIORITY_LEVELS.map((level) => (
-                <DropdownMenuItem
-                  key={level.value}
-                  onSelect={() => handleUpdatePriority(level.value)}
-                  className="text-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <Flag
-                      className="h-3.5 w-3.5"
-                      style={{ color: level.color }}
-                    />
-                    <span>{level.label}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* ✅ Start Date - Left-Right Alignment */}
-        <div className="flex items-center justify-between">
-          <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-            <CalendarIcon className="h-4 w-4" />
-            Start Date
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="secondary"
-                size="sm"
-                className={cn(
-                  "h-8 px-3 font-normal hover:bg-muted text-xs",
-                  !portfolio.startDate && "text-muted-foreground"
-                )}
-              >
-                {portfolio.startDate ? format(new Date(portfolio.startDate), "PP") : "—"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={portfolio.startDate ? new Date(portfolio.startDate) : undefined}
-                onSelect={handleUpdateStartDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* ✅ End Date - Left-Right Alignment */}
-        <div className="flex items-center justify-between">
-          <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-            <CalendarIcon className="h-4 w-4" />
-            End Date
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="secondary"
-                size="sm"
-                className={cn(
-                  "h-8 px-3 font-normal hover:bg-muted text-xs",
-                  !portfolio.endDate && "text-muted-foreground"
-                )}
-              >
-                {portfolio.endDate ? format(new Date(portfolio.endDate), "PP") : "—"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={portfolio.endDate ? new Date(portfolio.endDate) : undefined}
-                onSelect={handleUpdateEndDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* ✅ Leaders - Multi-Avatar Display */}
-        <div className="flex items-center justify-between">
-          <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-            <User className="h-4 w-4" />
-            Leaders
-          </Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-8 px-2 hover:bg-muted flex items-center gap-1 text-xs",
-                  (!portfolio.leaders || portfolio.leaders.length === 0) && "text-muted-foreground"
-                )}
-              >
-                {(() => {
-                  const leaderIds = portfolio.leaders || [];
-                  if (leaderIds.length === 0) return "—";
-
-                  return (
-                    <div className="flex -space-x-2 overflow-hidden">
-                      {leaderIds.map((id, i) => {
-                        const m = workspaceMembers.find((member) => member.userId === id);
-                        return (
-                          <Avatar
-                            key={id}
-                            className="h-6 w-6 border-2 border-white"
-                            style={{ zIndex: 10 - i }}
-                            title={m?.name}
-                          >
-                            {m?.profilePicture && <AvatarImage src={m.profilePicture} />}
-                            <AvatarFallback
-                              className="text-white text-xs font-semibold"
-                              style={{ backgroundColor: getAvatarColor(m?.name || "U") }}
-                            >
-                              {m?.name?.charAt(0).toUpperCase() || "?"}
-                            </AvatarFallback>
-                          </Avatar>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuSeparator />
-              {workspaceMembers.map((member) => {
-                const isLeader = (portfolio.leaders || []).includes(member.userId);
-                return (
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {STATUS_OPTIONS.map((s) => (
                   <DropdownMenuItem
-                    key={member.userId}
-                    onSelect={() => handleUpdateLeader(member.userId)}
-                    className="flex items-center justify-between pointer-events-auto text-xs"
+                    key={s.value}
+                    onClick={() => handleUpdateStatus(s.value)}
+                    className="text-xs"
+                  >
+                    <Badge variant="secondary" className={cn("mr-2 text-xs capitalize", s.cls)}>
+                      {s.label}
+                    </Badge>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* ✅ Priority - Left-Right Alignment */}
+          <div className="flex items-center justify-between">
+            <Label className="text-muted-foreground flex items-center gap-2 text-xs">
+              <Flag className="h-4 w-4" />
+              Priority
+            </Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 transition-all duration-200",
+                    portfolio.priority ? "w-8 p-0 rounded-full" : "px-3 bg-secondary hover:bg-muted text-xs",
+                    !portfolio.priority && "text-muted-foreground"
+                  )}
+                  style={portfolio.priority ? {
+                    backgroundColor: (currentPriority?.color || "#6b7280") + "15",
+                  } : {}}
+                >
+                  {portfolio.priority ? (
+                    <Flag
+                      className="h-4 w-4"
+                      style={{ color: currentPriority?.color || "#6b7280" }}
+                    />
+                  ) : (
+                    "—"
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {PRIORITY_LEVELS.map((level) => (
+                  <DropdownMenuItem
+                    key={level.value}
+                    onSelect={() => handleUpdatePriority(level.value)}
+                    className="text-xs"
                   >
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6 border">
-                        {member.profilePicture && <AvatarImage src={member.profilePicture} />}
-                        <AvatarFallback
-                          className="text-white text-[10px] font-semibold"
-                          style={{ backgroundColor: getAvatarColor(member.name) }}
-                        >
-                          {member.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span >{member.name}</span>
+                      <Flag
+                        className="h-3.5 w-3.5"
+                        style={{ color: level.color }}
+                      />
+                      <span>{level.label}</span>
                     </div>
-                    {isLeader && <Check className="h-3.5 w-3.5 text-blue-600" />}
                   </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* ✅ Start Date - Left-Right Alignment */}
+          <div className="flex items-center justify-between">
+            <Label className="text-muted-foreground flex items-center gap-2 text-xs">
+              <CalendarIcon className="h-4 w-4" />
+              Start Date
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    !portfolio.startDate && "text-muted-foreground"
+                  )}
+                >
+                  {portfolio.startDate ? format(new Date(portfolio.startDate), "PP") : "—"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={portfolio.startDate ? new Date(portfolio.startDate) : undefined}
+                  onSelect={handleUpdateStartDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* ✅ End Date - Left-Right Alignment */}
+          <div className="flex items-center justify-between">
+            <Label className="text-muted-foreground flex items-center gap-2 text-xs">
+              <CalendarIcon className="h-4 w-4" />
+              End Date
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    !portfolio.endDate && "text-muted-foreground"
+                  )}
+                >
+                  {portfolio.endDate ? format(new Date(portfolio.endDate), "PP") : "—"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={portfolio.endDate ? new Date(portfolio.endDate) : undefined}
+                  onSelect={handleUpdateEndDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* ✅ Leaders - Multi-Avatar Display */}
+          <div className="flex items-center justify-between">
+            <Label className="text-muted-foreground flex items-center gap-2 text-xs">
+              <User className="h-4 w-4" />
+              Leaders
+            </Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-2 hover:bg-muted flex items-center gap-1 text-xs",
+                    (!portfolio.leaders || portfolio.leaders.length === 0) && "text-muted-foreground"
+                  )}
+                >
+                  {(() => {
+                    const leaderIds = portfolio.leaders || [];
+                    if (leaderIds.length === 0) return "—";
+
+                    return (
+                      <div className="flex -space-x-2 overflow-hidden">
+                        {leaderIds.map((id, i) => {
+                          const m = workspaceMembers.find((member) => member.userId === id);
+                          return (
+                            <Avatar
+                              key={id}
+                              className="h-6 w-6 border-2 border-white"
+                              style={{ zIndex: 10 - i }}
+                              title={m?.name}
+                            >
+                              {m?.profilePicture && <AvatarImage src={m.profilePicture} />}
+                              <AvatarFallback
+                                className="text-white text-xs font-semibold"
+                                style={{ backgroundColor: getAvatarColor(m?.name || "U") }}
+                              >
+                                {m?.name?.charAt(0).toUpperCase() || "?"}
+                              </AvatarFallback>
+                            </Avatar>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuSeparator />
+                {workspaceMembers.map((member) => {
+                  const isLeader = (portfolio.leaders || []).includes(member.userId);
+                  return (
+                    <DropdownMenuItem
+                      key={member.userId}
+                      onSelect={() => handleUpdateLeader(member.userId)}
+                      className="flex items-center justify-between pointer-events-auto text-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6 border">
+                          {member.profilePicture && <AvatarImage src={member.profilePicture} />}
+                          <AvatarFallback
+                            className="text-white text-[10px] font-semibold"
+                            style={{ backgroundColor: getAvatarColor(member.name) }}
+                          >
+                            {member.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span >{member.name}</span>
+                      </div>
+                      {isLeader && <Check className="h-3.5 w-3.5 text-blue-600" />}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -558,9 +580,25 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="font-semibold">Labels</Label>
-          <Button variant="ghost" size="icon" className="h-6 w-6">
-            <Plus className="h-3 w-3" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Plus className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+            >
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLabelsExpanded ? "rotate-180" : "rotate-0")} />
+            </Button>
+          </div>
+        </div>
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isLabelsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+        )}>
+          {/* Collapsible content area */}
         </div>
       </div>
 
@@ -570,21 +608,36 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="font-semibold">About this Portfolio</Label>
-          {charCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {charCount} chars
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {charCount > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {charCount} chars
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsAboutPortfolioExpanded(!isAboutPortfolioExpanded)}
+            >
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAboutPortfolioExpanded ? "rotate-180" : "rotate-0")} />
+            </Button>
+          </div>
         </div>
-        <TooltipProvider>
-          <ProseMirrorEditor
-            initialContent={content}
-            mentionableMembers={mentionableMembers}
-            onBlur={handleContentChange}
-            placeholder="Add portfolio description..."
-            className="w-full h-full"
-          />
-        </TooltipProvider>
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isAboutPortfolioExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+        )}>
+          <TooltipProvider>
+            <ProseMirrorEditor
+              initialContent={content}
+              mentionableMembers={mentionableMembers}
+              onBlur={handleContentChange}
+              placeholder="Add portfolio description..."
+              className="w-full h-full"
+            />
+          </TooltipProvider>
+        </div>
       </div>
 
       <Separator className="my-4" />
@@ -593,126 +646,141 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="font-semibold">Linked Items</Label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <Plus className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 max-h-72 overflow-y-auto p-2">
-              {linkedDocs.length > 0 && (
-                <>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-popover z-10">
-                    Linked Documents
-                  </div>
-                  {linkedDocs.map((doc) => (
-                    <DropdownMenuItem
-                      key={doc.id}
-                      className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <span className="truncate text-xs">{doc.title}</span>
+          <div className="flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 max-h-72 overflow-y-auto p-2">
+                {linkedDocs.length > 0 && (
+                  <>
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-popover z-10">
+                      Linked Documents
+                    </div>
+                    {linkedDocs.map((doc) => (
+                      <DropdownMenuItem
+                        key={doc.id}
+                        className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span className="truncate text-xs">{doc.title}</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveDocument(doc.id);
+                          }}
+                        >
+                          <X className="w-3 h-3 text-red-500" />
+                        </Button>
+                      </DropdownMenuItem>
+                    ))}
+                    <div className="h-px bg-border my-2" />
+                  </>
+                )}
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
+                      <Plus className="w-4 h-4 text-muted-foreground" />
+                      <span>Link Docs</span>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="right" className="w-56 p-0">
+                    {availableDocs.length > 0 ? (
+                      <>
+                        <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
+                          Available Documents
+                        </div>
+                        {/* Only ONE scroll container */}
+                        <div className="max-h-52 overflow-y-auto">
+                          {availableDocs.map((doc) => (
+                            <DropdownMenuItem
+                              key={doc.id}
+                              onClick={() => handleAddDocument(doc.id)}
+                              className="cursor-pointer px-2 py-2 text-xs"
+                            >
+                              <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
+                              <span className="truncate">{doc.title}</span>
+                            </DropdownMenuItem>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-4 text-xs text-muted-foreground text-center">
+                        No documents available to link
                       </div>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {linkedDocs.length === 0 && (
+                  <div className="px-2 py-1 text-xs text-muted-foreground italic">
+                    No documents linked yet
+                  </div>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
+            >
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLinkedItemsExpanded ? "rotate-180" : "rotate-0")} />
+            </Button>
+          </div>
+        </div>
+
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isLinkedItemsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+        )}>
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {linkedDocs.length > 0 ? (
+              linkedDocs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="group flex items-center justify-between p-2 bg-card border rounded-lg shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="flex items-center gap-2 overflow-hidden flex-1">
+                    <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <FileText className="w-3 h-3 text-muted-foreground" />
+                    </div>
+                    <span className="text-xs font-medium truncate">{doc.title}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Link href={`/docs/${doc.id}`} target="_blank">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveDocument(doc.id);
-                        }}
+                        className="h-6 w-6"
                       >
-                        <X className="w-3 h-3 text-red-500" />
+                        <SquareArrowOutUpRight className="w-3 h-3" />
                       </Button>
-                    </DropdownMenuItem>
-                  ))}
-                  <div className="h-px bg-border my-2" />
-                </>
-              )}
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
-                    <Plus className="w-4 h-4 text-muted-foreground" />
-                    <span>Link Docs</span>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="right" className="w-56 p-0">
-                  {availableDocs.length > 0 ? (
-                    <>
-                      <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
-                        Available Documents
-                      </div>
-                      {/* Only ONE scroll container */}
-                      <div className="max-h-52 overflow-y-auto">
-                        {availableDocs.map((doc) => (
-                          <DropdownMenuItem
-                            key={doc.id}
-                            onClick={() => handleAddDocument(doc.id)}
-                            className="cursor-pointer px-2 py-2 text-xs"
-                          >
-                            <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
-                            <span className="truncate">{doc.title}</span>
-                          </DropdownMenuItem>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="p-4 text-xs text-muted-foreground text-center">
-                      No documents available to link
-                    </div>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {linkedDocs.length === 0 && (
-                <div className="px-2 py-1 text-xs text-muted-foreground italic">
-                  No documents linked yet
-                </div>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="space-y-2 max-h-60 overflow-y-auto">
-          {linkedDocs.length > 0 ? (
-            linkedDocs.map((doc) => (
-              <div
-                key={doc.id}
-                className="group flex items-center justify-between p-2 bg-card border rounded-lg shadow-sm hover:shadow-md transition-all"
-              >
-                <div className="flex items-center gap-2 overflow-hidden flex-1">
-                  <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <FileText className="w-3 h-3 text-muted-foreground" />
-                  </div>
-                  <span className="text-xs font-medium truncate">{doc.title}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Link href={`/docs/${doc.id}`} target="_blank">
+                    </Link>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6"
+                      onClick={() => handleRemoveDocument(doc.id)}
+                      className="h-6 w-6 text-red-500"
                     >
-                      <SquareArrowOutUpRight className="w-3 h-3" />
+                      <X className="w-3 h-3" />
                     </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveDocument(doc.id)}
-                    className="h-6 w-6 text-red-500"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-xs text-muted-foreground italic">No items linked yet.</div>
-          )}
+              ))
+            ) : (
+              <div className="text-xs text-muted-foreground italic">No items linked yet.</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -729,65 +797,80 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
               </span>
             )}
           </div>
-          {portfolioAttachments.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setIsAttachOpen(true)}
-              className="p-2 rounded-md bg-muted hover:bg-muted transition"
+          <div className="flex items-center gap-1">
+            {portfolioAttachments.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsAttachOpen(true)}
+                className="p-2 rounded-md bg-muted hover:bg-muted transition"
+              >
+                <Paperclip className="h-5 w-5 text-muted-foreground" />
+              </button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
             >
-              <Paperclip className="h-5 w-5 text-muted-foreground" />
-            </button>
-          )}
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
+            </Button>
+          </div>
         </div>
 
-        {portfolioAttachments.length === 0 ? (
-          <div
-            className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
-            onClick={() => setIsAttachOpen(true)}
-            role="button"
-          >
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Upload className="h-6 w-6 text-brand-orange" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-medium">Upload sources</p>
-                <p className="text-xs text-muted-foreground">
-                  Drag & drop or{" "}
-                  <span className="text-brand-orange cursor-pointer">
-                    choose file
-                  </span>{" "}
-                  to upload
-                </p>
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isAttachmentsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+        )}>
+          {portfolioAttachments.length === 0 ? (
+            <div
+              className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
+              onClick={() => setIsAttachOpen(true)}
+              role="button"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-brand-orange" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Upload sources</p>
+                  <p className="text-xs text-muted-foreground">
+                    Drag & drop or{" "}
+                    <span className="text-brand-orange cursor-pointer">
+                      choose file
+                    </span>{" "}
+                    to upload
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"}`}>
-            {visibleAttachments.map((file) => (
-              <PortfolioAttachments
-                key={file.id}
-                file={file}
-                onDownload={handleDownload}
-                onDelete={handleDelete}
-                onView={handleView}
-              />
-            ))}
+          ) : (
+            <div className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"}`}>
+              {visibleAttachments.map((file) => (
+                <PortfolioAttachments
+                  key={file.id}
+                  file={file}
+                  onDownload={handleDownload}
+                  onDelete={handleDelete}
+                  onView={handleView}
+                />
+              ))}
 
-            {portfolioAttachments.length > 2 && (
-              <div className="text-center">
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="text-xs text-muted-foreground text-center font-medium hover:underline"
-                >
-                  {showAll
-                    ? "Show less"
-                    : `Show more (${portfolioAttachments.length - 2})`}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              {portfolioAttachments.length > 2 && (
+                <div className="text-center">
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="text-xs text-muted-foreground text-center font-medium hover:underline"
+                  >
+                    {showAll
+                      ? "Show less"
+                      : `Show more (${portfolioAttachments.length - 2})`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <AttachFileModal
           open={isAttachOpen}
