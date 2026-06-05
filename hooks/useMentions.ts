@@ -9,7 +9,7 @@ interface MentionableMember {
 interface UseMentionsProps {
     value: string;
     setValue: (v: string) => void;
-    inputRef: React.RefObject<HTMLInputElement | null>;
+    inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
     mirrorRef: React.RefObject<HTMLDivElement | null>;
     members: MentionableMember[];
 }
@@ -21,6 +21,7 @@ export function useMentions({
     mirrorRef,
     members,
 }: UseMentionsProps) {
+
     const [query, setQuery] = useState("");
     const [showMentionList, setShowMentionList] = useState(false);
     const [mentionIndex, setMentionIndex] = useState(0);
@@ -37,9 +38,10 @@ export function useMentions({
         : members;
 
     const insertMention = (member: MentionableMember) => {
-        if (!inputRef.current) return;
+        const el = inputRef.current as HTMLInputElement | HTMLTextAreaElement | null;
+        if (!el) return;
 
-        const cursorPos = inputRef.current.selectionStart ?? value.length;
+        const cursorPos = el.selectionStart ?? value.length;
         const beforeCursor = value.slice(0, cursorPos);
         const afterCursor = value.slice(cursorPos);
         const atIndex = beforeCursor.lastIndexOf("@");
@@ -52,11 +54,18 @@ export function useMentions({
         setValue(newText);
 
         requestAnimationFrame(() => {
-            if (inputRef.current) {
+            const el2 = inputRef.current as HTMLInputElement | HTMLTextAreaElement | null;
+            if (el2) {
                 const pos = beforeAt.length + mentionText.length;
-                inputRef.current.selectionStart = pos;
-                inputRef.current.selectionEnd = pos;
-                inputRef.current.focus();
+                el2.selectionStart = pos;
+                el2.selectionEnd = pos;
+                el2.focus();
+
+                // auto-resize if it's a textarea
+                if (el2.tagName === 'TEXTAREA') {
+                    el2.style.height = 'auto';
+                    el2.style.height = el2.scrollHeight + 'px';
+                }
             }
         });
 

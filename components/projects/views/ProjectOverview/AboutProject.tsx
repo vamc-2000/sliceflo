@@ -92,6 +92,7 @@ export default function AboutProject({
   const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] = useState(true);
   const [isCustomFieldsExpanded, setIsCustomFieldsExpanded] = useState(false);
 
+
   const { user: profile } = useProfileStore()
   const {
     projects,
@@ -1071,6 +1072,7 @@ export default function AboutProject({
             </Button>
           </div>
         </div>
+
         <div className={cn(
           "transition-all duration-300 ease-in-out overflow-hidden",
           isAboutProjectExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
@@ -1090,103 +1092,102 @@ export default function AboutProject({
         </div>
       </div>
 
-      <Separator className="my-4" />
+        <Separator className="my-4" />
 
-      {/* Attachments */}
-      <div className="space-y-3 ">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label className="font-semibold">Attachments</Label>
+        {/* Attachments */}
+        <div className="space-y-3 ">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Label className="font-semibold">Attachments</Label>
 
-            {projectAttachments.length > 0 && (
-              <span className="text-xs text-muted-foreground">
-                {projectAttachments.length} items
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1">
-            {projectAttachments.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setIsAttachModalOpen(true)}
-                className="p-2 rounded-md bg-muted hover:bg-muted transition"
-              >
-                <Paperclip className="h-5 w-5 text-muted-foreground" />
-              </button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
-            >
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
-            </Button>
-          </div>
-        </div>
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isAttachmentsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-        )}>
-          {projectAttachments.length === 0 ? (
-            <div
-              className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
-              onClick={() => setIsAttachModalOpen(true)}
-              role="button"
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Upload className="h-6 w-6 text-brand-orange" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-medium">Upload sources</p>
-                  <p className="text-xs text-muted-foreground">
-                    Drag & drop or{" "}
-                    <span className="text-brand-orange cursor-pointer">
-                      choose file
-                    </span>{" "}
-                    to upload
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          ) : (
-            <div className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"
-              }`}>
-              {visibleAttachments.map((file) => (
-                <ProjectAttachments
-                  key={file.id}
-                  file={file}
-                  onDownload={handleDownload}
-                  onDelete={handleDelete}
-                  onView={handleView}
-                />
-              ))}
-
-              {projectAttachments.length > 2 && (
-                <div className="text-center">
-                  <button
-                    onClick={() => setShowAll(!showAll)}
-                    className="text-xs text-muted-foreground text-center font-medium hover:underline"
-                  >
-                    {showAll
-                      ? "Show less"
-                      : `Show more (${projectAttachments.length - 2})`}
-                  </button>
-                </div>
+              {projectAttachments.length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {projectAttachments.length} items
+                </span>
               )}
             </div>
-          )}
-        </div>
 
-        <AttachFileModal
-          open={isAttachModalOpen}
-          onClose={() => setIsAttachModalOpen(false)}
-          onAttach={handleAttachFiles}
-        />
+            <div className="flex items-center gap-1">
+              {projectAttachments.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsAttachModalOpen(true)}
+                  className="p-2 rounded-md bg-muted hover:bg-muted transition"
+                >
+                  <Paperclip className="h-5 w-5 text-muted-foreground" />
+                </button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+              >
+                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
+              </Button>
+            </div>
+          </div>
+          <div className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isAttachmentsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+          )}>
+            {projectAttachments.length === 0 ? (
+              <div
+                className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
+                onClick={() => setIsAttachModalOpen(true)}
+                role="button"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Upload className="h-6 w-6 text-brand-orange" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium">Upload sources</p>
+                    <p className="text-xs text-muted-foreground">
+                      Drag & drop or{" "}
+                      <span className="text-brand-orange cursor-pointer">
+                        choose file
+                      </span>{" "}
+                      to upload
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            ) : (
+              <div className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"
+                }`}>
+                {visibleAttachments.map((file) => (
+                  <ProjectAttachments
+                    key={file.id}
+                    file={file}
+                    onDownload={handleDownload}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                  />
+                ))}
+
+                {projectAttachments.length > 2 && (
+                  <div className="text-center">
+                    <button
+                      onClick={() => setShowAll(!showAll)}
+                      className="text-xs text-muted-foreground text-center font-medium hover:underline"
+                    >
+                      {showAll
+                        ? "Show less"
+                        : `Show more (${projectAttachments.length - 2})`}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <AttachFileModal
+            open={isAttachModalOpen}
+            onClose={() => setIsAttachModalOpen(false)}
+            onAttach={handleAttachFiles}
+          />
+        </div>
       </div>
-    </div>
-  )
+      )
 }

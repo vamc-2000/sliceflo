@@ -1007,7 +1007,7 @@ export function DraftTaskTable({
   };
 
   //   Shared cell styles  
-  const headerCellCls = "font-semibold text-muted-foreground uppercase tracking-wide px-3 py-1 select-none";
+  const headerCellCls = "font-semibold text-xs text-muted-foreground uppercase tracking-wide px-3 py-1 select-none";
   const bodyCellCls = "px-3 py-2 text-xs";
 
   return (
@@ -1501,17 +1501,17 @@ export function DraftTaskTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onSelect={() => setDuplicateTaskId(task.id)}>
-                                <Copy className="h-4 w-4 mr-2" />
-                                <span>Duplicate</span>
+                              <DropdownMenuItem onSelect={() => setDuplicateTaskId(task.id)} >
+                                <Copy className="h-3 w-3 mr-2" />
+                                <span className="text-xs">Duplicate</span>
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onSelect={() => setDeleteTaskConfirmId(task.id)}
                                 className="text-red-600 focus:text-red-600 focus:bg-red-50"
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                <span>Delete</span>
+                                <Trash2 className="h-3 w-3 mr-2" />
+                                <span className="text-xs">Delete</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

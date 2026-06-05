@@ -787,6 +787,7 @@ export default function ThreadCard({
                                                                 return (
                                                                     <div
                                                                         ref={pickerRef}
+                                                                        data-mention-dropdown="true"
                                                                         style={{
                                                                             position: "fixed",
                                                                             top: rect.top - 44, // Slightly higher to account for padding
@@ -794,7 +795,7 @@ export default function ThreadCard({
                                                                             transform: "translateX(-50%)",
                                                                             zIndex: 9999,
                                                                         }}
-                                                                        className="flex items-center gap-1 bg-background/80 backdrop-blur-md border border-border rounded-full px-2 py-1 shadow-[0_4px_20px_rgb(0,0,0,0.08)] ring-1 ring-black/5"
+                                                                        className="flex items-center gap-1 bg-background/80 backdrop-blur-md border border-border rounded-full px-2 py-1 shadow-[0_4px_20px_rgb(0,0,0,0.08)] ring-1 ring-black/5 pointer-events-auto"
                                                                     >
                                                                         {["👍", "🙏", "❤️", "🔥", "🚀"].map((emoji) => (
                                                                             <button
@@ -848,6 +849,7 @@ export default function ThreadCard({
                                                                 return (
                                                                     <div
                                                                         ref={pickerRef}
+                                                                        data-mention-dropdown="true"
                                                                         style={{
                                                                             position: "fixed",
                                                                             top: Math.max(margin, Math.min(top, window.innerHeight - pickerHeight - margin)),
@@ -856,7 +858,7 @@ export default function ThreadCard({
                                                                             "--epr-emoji-size": "20px",
                                                                             "--epr-category-navigation-button-size": "24px",
                                                                         } as any}
-                                                                        className="rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.18)] border border-border bg-background animate-in fade-in zoom-in duration-200"
+                                                                        className="rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.18)] border border-border bg-background animate-in fade-in zoom-in duration-200 pointer-events-auto"
                                                                     >
                                                                         <EmojiPicker
                                                                             onEmojiClick={(emojiData) => {
@@ -912,33 +914,35 @@ export default function ThreadCard({
 
                                                 {editId === getReplyId(reply) && editingThreadId === thread.id ? (
                                                     <div className="flex flex-col flex-1 mt-1 relative">
-                                                        <div
-                                                            ref={editMirrorRef}
-                                                            className="pointer-events-none absolute invisible whitespace-pre-wrap wrap-break-word text-[0.75rem]"
-                                                            style={{
-                                                                width: editInputRef.current?.clientWidth,
-                                                                fontFamily: "inherit",
-                                                                lineHeight: "1.25rem",
-                                                                padding: "4px 12px",
-                                                            }}
-                                                        />
                                                         <div className="flex items-center gap-2">
-                                                            <Input
-                                                                ref={editInputRef}
-                                                                data-testid={`input-edit-reply-${getReplyId(reply)}`}
-                                                                value={editText}
-                                                                autoFocus
-                                                                onChange={onEditChange}
-                                                                onKeyDown={(e) => {
-                                                                    onEditKeyDown(e);
-                                                                    if (e.key === "Enter" && !e.shiftKey && !showEditMentionList) {
-                                                                        e.preventDefault();
-                                                                        handleSaveEdit();
-                                                                    }
-                                                                }}
-                                                                placeholder="Edit your reply..."
-                                                                className="text-[0.75rem] text-foreground h-8 flex-1"
-                                                            />
+                                                            <div className="relative flex-1 min-w-0">
+                                                                <div
+                                                                    ref={editMirrorRef}
+                                                                    className="pointer-events-none absolute invisible whitespace-pre-wrap wrap-break-word text-[0.75rem]"
+                                                                    style={{
+                                                                        width: editInputRef.current?.clientWidth,
+                                                                        fontFamily: "inherit",
+                                                                        lineHeight: "1.25rem",
+                                                                        padding: "4px 12px",
+                                                                    }}
+                                                                />
+                                                                <Input
+                                                                    ref={editInputRef}
+                                                                    data-testid={`input-edit-reply-${getReplyId(reply)}`}
+                                                                    value={editText}
+                                                                    autoFocus
+                                                                    onChange={onEditChange}
+                                                                    onKeyDown={(e) => {
+                                                                        onEditKeyDown(e);
+                                                                        if (e.key === "Enter" && !e.shiftKey && !showEditMentionList) {
+                                                                            e.preventDefault();
+                                                                            handleSaveEdit();
+                                                                        }
+                                                                    }}
+                                                                    placeholder="Edit your reply..."
+                                                                    className="text-[0.75rem] text-foreground h-8 w-full"
+                                                                />
+                                                            </div>
                                                             <button
                                                                 type="button"
                                                                 data-testid={`btn-save-edit-${getReplyId(reply)}`}
@@ -964,9 +968,10 @@ export default function ThreadCard({
                                                             </button>
                                                         </div>
 
-                                                        {showEditMentionList && editMentionPosition && (
+                                                        {showEditMentionList && editMentionPosition && createPortal(
                                                             <div
-                                                                className="fixed z-100001 w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl"
+                                                                data-mention-dropdown="true"
+                                                                className="fixed z-[100001] w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl pointer-events-auto"
                                                                 style={{
                                                                     left: editMentionPosition.left,
                                                                     top: editMentionPosition.top,
@@ -994,7 +999,8 @@ export default function ThreadCard({
                                                                         {m.name}
                                                                     </button>
                                                                 ))}
-                                                            </div>
+                                                            </div>,
+                                                            document.body
                                                         )}
                                                     </div>
                                                 ) : (
@@ -1239,9 +1245,10 @@ export default function ThreadCard({
                             </div>
 
                             {/* Mention List - PUT RIGHT AFTER Input */}
-                            {showMentionList && mentionPosition && (
+                            {showMentionList && mentionPosition && createPortal(
                                 <div
-                                    className="fixed z-50 w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl"
+                                    data-mention-dropdown="true"
+                                    className="fixed z-50 w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl pointer-events-auto"
                                     style={{
                                         left: mentionPosition.left,
                                         top: mentionPosition.top,
@@ -1268,7 +1275,8 @@ export default function ThreadCard({
                                             {m.name}
                                         </button>
                                     ))}
-                                </div>
+                                </div>,
+                                document.body
                             )}
                         </div>
 
@@ -1334,7 +1342,8 @@ export default function ThreadCard({
                                         return (
                                             <div
                                                 ref={emojiPickerRef}
-                                                className="fixed z-[100000] bg-background rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.12)] border border-border animate-in fade-in zoom-in duration-200"
+                                                data-mention-dropdown="true"
+                                                className="fixed z-[100000] bg-background rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.12)] border border-border animate-in fade-in zoom-in duration-200 pointer-events-auto"
                                                 style={{
                                                     top: Math.max(margin, Math.min(top, window.innerHeight - pickerHeight - margin)),
                                                     left: Math.max(margin, Math.min(rect.right - pickerWidth, window.innerWidth - pickerWidth - margin)),

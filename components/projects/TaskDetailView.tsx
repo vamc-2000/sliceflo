@@ -708,7 +708,12 @@ export function TaskDetailView({
                         data-[state=closed]:translate-x-full
                         data-[state=open]:translate-x-0
                         "
-
+                    onInteractOutside={(e) => {
+                        const target = e.target as HTMLElement;
+                        if (target?.closest?.('[data-mention-dropdown]')) {
+                            e.preventDefault();
+                        }
+                    }}
                     style={{
                         width: "1050px",      // Fixed width instead of viewport-based
                         maxWidth: "95vw",     // Still responsive on smaller screens
@@ -804,7 +809,6 @@ export function TaskDetailView({
 
                         {/* CONTENT AREA - Two columns */}
                         <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
-
                             {/* Left Panel - Main Content */}
                             <ResizablePanel defaultSize={70} className="flex flex-col overflow-hidden bg-card">
 
@@ -1791,6 +1795,7 @@ export function TaskDetailView({
                             </ResizablePanel>
 
                             <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
+
 
                             {/* Right Sidebar - Properties */}
                             <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="flex flex-col shrink-0">

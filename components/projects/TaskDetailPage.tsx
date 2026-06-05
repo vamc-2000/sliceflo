@@ -746,8 +746,9 @@ export function TaskDetailPage({
 
                 <ResizableHandle className="w-[2px] bg-muted hover:bg-muted-foreground/50 transition-all" />
 
+
                 {/* RIGHT SIDEBAR */}
-                <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="flex flex-col shrink-0">
+                <ResizablePanel defaultSize={30} minSize={20} maxSize={45} className="w-[320px] flex flex-col shrink-0">
                     {/* Full-width pill tab switcher */}
                     <div className="bg-muted p-2 flex items-center gap-1">
                         {(['properties', 'activity'] as const).map(tab => (
@@ -963,6 +964,6 @@ export function TaskDetailPage({
                     </div>
                 </ResizablePanel>
             </ResizablePanelGroup>
-        </div>
+        </div >
     );
 }

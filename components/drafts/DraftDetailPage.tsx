@@ -37,6 +37,7 @@ import {
     ExternalLink,
     ChevronDown,
     GitBranch,
+    Activity,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useDraftsStore } from "@/stores/drafts-store";
@@ -66,7 +67,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md' 
     const dim = size === 'xs' ? 'w-5 h-5 text-[10px]' : size === 'sm' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm';
     if (!name && !src) {
         return (
-            <div className={`${dim} rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 shrink-0`}>
+            <div className={`${dim} rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0`}>
                 <User className="h-3 w-3" />
             </div>
         );
@@ -76,7 +77,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md' 
         <UIAvatar className={cn(dim, "border shrink-0")}>
             {src && <AvatarImage src={src} className="object-cover" />}
             <AvatarFallback
-                className="font-semibold text-white bg-gray-400"
+                className="font-semibold text-foreground bg-muted"
                 style={{ backgroundColor: name ? getAvatarColor(name) : undefined }}
             >
                 {name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-3 w-3" />}
@@ -173,9 +174,9 @@ export function DraftDetailPage({
 
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-white">
-            {/* TOP BAR */}
-            <div className="flex-none bg-white flex items-center justify-between shrink-0 text-sm">
+        <div className="flex flex-col h-screen overflow-hidden bg-background">
+            {/* Header section (fixed at top) */}
+            <div className="flex-none bg-background flex items-center justify-between shrink-0 text-sm">
                 <div className="flex items-center gap-2">
                     <Breadcrumbs />
                     {isSubDraft && (
@@ -185,7 +186,7 @@ export function DraftDetailPage({
                     )}
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-muted-foreground text-xs">
                         Created {currentDraft.createdAt ? format(new Date(currentDraft.createdAt), "MMM d, yyyy") : "—"}
                     </span>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -216,8 +217,8 @@ export function DraftDetailPage({
             {/* Two-column area */}
             <div className="flex flex-1 overflow-hidden">
                 {/* LEFT PANEL */}
-                <div className="flex-1 flex flex-col overflow-hidden bg-white">
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+                <div className="flex-1 flex flex-col overflow-hidden bg-background">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
                         {/* Draft Title */}
                         <div className="flex items-center shrink-0 flex-wrap gap-3">
                             <h1 className="text-4xl font-semibold">{currentDraft.title}</h1>
@@ -250,7 +251,7 @@ export function DraftDetailPage({
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-semibold">Description</Label>
                                 <Button variant="ghost" size="icon" className="h-6 w-6">
-                                    <History className="h-3 w-3 text-gray-500" />
+                                    <History className="h-3 w-3 text-muted-foreground" />
                                 </Button>
                             </div>
                             <ProseMirrorEditor
@@ -299,7 +300,7 @@ export function DraftDetailPage({
                                         <thead className="bg-muted/50">
                                             <tr className="border-b">
                                                 <th className="text-left p-3 text-xs font-medium text-muted-foreground w-10">
-                                                    <input type="checkbox" className="rounded border-gray-300" disabled />
+                                                    <input type="checkbox" className="rounded border-border" disabled />
                                                 </th>
                                                 {["Title", "Assignee", "Status", "Start Date", "Due Date"].map((h) => (
                                                     <th key={h} className="text-left p-3 text-xs font-medium text-muted-foreground">{h}</th>
@@ -310,7 +311,7 @@ export function DraftDetailPage({
                                         <tbody>
                                             {isAddingSubDraft && (
                                                 <tr className="bg-blue-50/30 border-b">
-                                                    <td className="p-3"><input type="checkbox" disabled className="rounded border-gray-300 opacity-50" /></td>
+                                                    <td className="p-3"><input type="checkbox" disabled className="rounded border-border opacity-50" /></td>
                                                     <td className="p-3">
                                                         <Input
                                                             value={newSubDraftTitle}
@@ -339,7 +340,7 @@ export function DraftDetailPage({
                                             )}
                                             {subDrafts.map((sub) => (
                                                 <tr key={sub.id} className="border-b hover:bg-muted/20">
-                                                    <td className="p-3"><input type="checkbox" className="rounded border-gray-300" /></td>
+                                                    <td className="p-3"><input type="checkbox" className="rounded border-border" /></td>
                                                     <td className="p-3 text-sm">{sub.title}</td>
                                                     <td className="p-3 text-sm">
                                                         {sub.assigneeId ? (() => {
@@ -407,7 +408,7 @@ export function DraftDetailPage({
 
                 {/* RIGHT SIDEBAR */}
                 <div className="w-[320px] flex flex-col shrink-0 border-l">
-                    <div className="flex justify-around border-b bg-white shrink-0 p-2">
+                    <div className="flex justify-around border-b bg-background shrink-0 p-2">
                         <Button
                             variant="ghost" size="sm"
                             className="px-4 py-3 font-medium transition-colors underline underline-offset-8 decoration-[#001F3F] text-[#001F3F]"
@@ -419,12 +420,12 @@ export function DraftDetailPage({
                         <div className="space-y-1">
                             {/* STATUS */}
                             <div className="flex items-center justify-between py-1">
-                                <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0">
-                                    <LayoutTemplate className="h-4 w-4" />Status
+                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <Activity className="h-4 w-4" /> Status
                                 </Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.status && "text-gray-400")}>
+                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.status && "text-muted-foreground")}>
                                             {currentDraft.status ? (() => {
                                                 const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
                                                 return (
@@ -451,12 +452,12 @@ export function DraftDetailPage({
 
                             {/* PRIORITY */}
                             <div className="flex items-center justify-between py-1">
-                                <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0">
-                                    <Flag className="h-4 w-4" />Priority
+                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <Flag className="h-4 w-4" /> Priority
                                 </Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.priority && "text-gray-400")}>
+                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.priority && "text-muted-foreground")}>
                                             {currentDraft.priority ? (
                                                 <span className="flex items-center gap-1.5">
                                                     {getPriorityColor(currentDraft.priority) && (
@@ -482,12 +483,12 @@ export function DraftDetailPage({
 
                             {/* START DATE */}
                             <div className="flex items-center justify-between py-1">
-                                <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0">
-                                    <CalendarIcon className="h-4 w-4" />Start Date
+                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <CalendarIcon className="h-4 w-4" /> Start
                                 </Label>
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-gray-200 text-xs", !currentDraft.startDate && "text-gray-400")}>
+                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.startDate && "text-muted-foreground")}>
                                             {currentDraft.startDate ? format(new Date(currentDraft.startDate), "PP") : "—"}
                                         </Button>
                                     </PopoverTrigger>
@@ -517,12 +518,12 @@ export function DraftDetailPage({
 
                             {/* DUE DATE */}
                             <div className="flex items-center justify-between py-1">
-                                <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0">
-                                    <CalendarIcon className="h-4 w-4" />Due Date
+                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <CalendarIcon className="h-4 w-4" /> Due
                                 </Label>
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-gray-200 text-xs", !currentDraft.dueDate && "text-gray-400")}>
+                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentDraft.dueDate && "text-muted-foreground")}>
                                             {currentDraft.dueDate ? format(new Date(currentDraft.dueDate), "PP") : "—"}
                                         </Button>
                                     </PopoverTrigger>
@@ -547,12 +548,12 @@ export function DraftDetailPage({
 
                             {/* ASSIGNEE */}
                             <div className="flex items-center justify-between py-1">
-                                <Label className="text-gray-600 flex items-center gap-2 text-sm shrink-0">
-                                    <User className="h-4 w-4" />Assignee
+                                <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <User className="h-4 w-4" /> Assignee
                                 </Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-gray-200 text-xs", !currentDraft.assigneeId && "text-gray-400")}>
+                                        <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.assigneeId && "text-muted-foreground")}>
                                             {currentDraft.assigneeId ? (() => {
                                                 const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
                                                 return (

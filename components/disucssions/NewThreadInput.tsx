@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Smile, ArrowUp, Paperclip } from 'lucide-react';
 import EmojiPicker, { EmojiStyle, EmojiClickData } from 'emoji-picker-react';
@@ -8,7 +9,7 @@ import EmojiPicker, { EmojiStyle, EmojiClickData } from 'emoji-picker-react';
 import { useProfileStore } from '@/stores/profile-store';
 import { useAuthStore } from '@/stores/auth-store';
 
-import { Input } from '@/components/ui/input';
+
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
@@ -43,7 +44,7 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
   const [showAttachFile, setShowAttachFile] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -103,6 +104,11 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
     setNewThreadText('');
     setAttachedFiles([]);
 
+    // Reset textarea height back to single row
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+
     try {
       await onNewThread({ text, mentions, files });
     } catch (error) {
@@ -119,15 +125,15 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
       {/* <div className="flex items-center gap-2 rounded-lg bg-[#F5F6FA] p-2"> */}
       <div className="relative flex items-center gap-2 rounded-lg bg-background p-2">
 
-        {/* Avatar */}
-        <Avatar className="h-6 w-6">
+        {/* Avatar - aligned to bottom */}
+        <Avatar className="h-6 w-6 shrink-0">
           <AvatarImage src={profilePictureUrl} alt="Profile" />
           <AvatarFallback className={`${getAvatarColor(user?.id || '')} text-[10px] font-semibold text-white`}>
             {initials}
           </AvatarFallback>
         </Avatar>
 
-        {/* Input */}
+        {/* Textarea - auto-grows */}
         <div className="relative flex-1 min-w-0">
           <div
             ref={mirrorRef}
@@ -136,34 +142,40 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
               width: inputRef.current?.clientWidth,
               fontFamily: "inherit",
               lineHeight: "1.25rem",
-              padding: "4px 12px", // Matches py-1 px-3 exactly
+              padding: "4px 12px",
             }}
           />
 
-          <Input
+          <textarea
             ref={inputRef}
             value={newThreadText}
-            onChange={onChange}
+            rows={1}
+            onChange={(e) => {
+              onChange(e as any);
+              // auto-resize
+              const el = e.target as HTMLTextAreaElement;
+              el.style.height = 'auto';
+              el.style.height = el.scrollHeight + 'px';
+            }}
             data-testid="input-new-thread"
             onKeyDown={(e) => {
-              onKeyDown(e);
-
-              if (e.key === "Enter" && !showMentionList) {
+              onKeyDown(e as any);
+              if (e.key === 'Enter' && !e.shiftKey && !showMentionList) {
                 e.preventDefault();
                 handleNewThread();
               }
             }}
             placeholder="Create new thread"
-            // className="border-0 bg-transparent text-sm font-medium text-[#001F3F] placeholder:text-xs placeholder:font-semibold placeholder:text-[#8E8E93] focus-visible:ring-0"
-            className="border-none shadow-none bg-transparent text-sm font-medium text-foreground 
-             placeholder:text-xs placeholder:font-semibold placeholder:text-muted-foreground 
-             focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-
+            className="block box-border m-0 w-full resize-none overflow-hidden bg-transparent text-sm font-medium text-foreground
+              placeholder:text-xs placeholder:font-semibold placeholder:text-muted-foreground
+              border-none outline-none focus:outline-none shadow-none py-[4px] px-3 leading-5"
+            style={{ minHeight: '1.75rem', maxHeight: '10rem' }}
           />
         </div>
-        {showMentionList && filteredMembers.length > 0 && mentionPosition && (
+        {showMentionList && filteredMembers.length > 0 && mentionPosition && createPortal(
           <div
-            className="fixed z-50 w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl"
+            data-mention-dropdown="true"
+            className="fixed z-50 w-64 max-h-64 overflow-auto rounded-xl border border-border bg-popover shadow-2xl pointer-events-auto"
             style={{
               left: mentionPosition.left,
               top: mentionPosition.top,
@@ -175,14 +187,14 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
                 key={m.id}
                 type="button"
                 data-testid={`btn-mention-${m.id}`}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted ${idx === mentionIndex ? "bg-muted" : ""
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-muted ${idx === mentionIndex ? "bg-muted" : ""
                   }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   onMentionSelect(m);
                 }}
               >
-                <Avatar className="h-6 w-6">
+                <Avatar className="h-5 w-5">
                   <AvatarImage src={m.profilePictureUrl} alt={m.name} />
                   <AvatarFallback className={`${getAvatarColor(m.id)} text-white text-[10px]`}>
                     {getInitials(m.name)}
@@ -191,7 +203,8 @@ export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-
                 <span>{m.name}</span>
               </button>
             ))}
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Attach file */}
