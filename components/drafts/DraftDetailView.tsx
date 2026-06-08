@@ -195,7 +195,7 @@ export function DraftDetailView({
 
                     <div className="flex flex-col h-full w-full overflow-hidden rounded-lg">
                         {/* UNIFIED HEADER */}
-                        <div className="px-5 py-2 flex items-center justify-between bg-background shrink-0 text-xs">
+                        <div className="px-5 py-2 flex items-center justify-between bg-background shrink-0 text-xs border-b">
                             <div className="flex items-center gap-2">
                                 <span className="text-muted-foreground flex items-center gap-1">
                                     <span className="hover:underline cursor-pointer">{currentWorkspace?.name || "Workspace"}</span>
@@ -623,6 +623,6 @@ export function DraftDetailView({
                     </div>
                 </DialogPrimitive.Content>
             </DialogPrimitive.Portal>
-        </DialogPrimitive.Root>
+        </DialogPrimitive.Root >
     );
 }

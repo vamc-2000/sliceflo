@@ -443,12 +443,12 @@ export function DraftDetailPage({
                                 )}>
                                     {/* STATUS */}
                                     <div className="flex items-center justify-between py-1">
-                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
                                             <Activity className="h-4 w-4" /> Status
                                         </Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.status && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.status && "text-muted-foreground")}>
                                                     {currentDraft.status ? (() => {
                                                         const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
                                                         return (
@@ -475,7 +475,7 @@ export function DraftDetailPage({
 
                                     {/* PRIORITY */}
                                     <div className="flex items-center justify-between py-1">
-                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
                                             <Flag className="h-4 w-4" /> Priority
                                         </Label>
                                         <DropdownMenu>
@@ -576,7 +576,7 @@ export function DraftDetailPage({
                                         </Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.assigneeId && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.assigneeId && "text-blue-400 dark:text-blue-500/70")}>
                                                     {currentDraft.assigneeId ? (() => {
                                                         const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
                                                         return (
@@ -603,6 +603,7 @@ export function DraftDetailPage({
                                     </div>
                                 </div>
                             </div>
+
 
                             {/* Attachments collapsible section */}
                             <div className="space-y-2">

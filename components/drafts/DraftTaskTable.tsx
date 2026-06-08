@@ -198,7 +198,7 @@ const getResolvedTaskType = (typeValue: string, taskTypesList: TaskTypeConfig[])
 const getDraftTaskTypes = (taskTypesList: TaskTypeConfig[]): TaskTypeConfig[] => {
   const defaults = ['task', 'milestone', 'approval', 'meeting', 'archive', 'subtask'];
   const list = [...taskTypesList];
-  
+
   defaults.forEach(defValue => {
     if (!list.some(t => t.value === defValue)) {
       list.push({
@@ -212,7 +212,7 @@ const getDraftTaskTypes = (taskTypesList: TaskTypeConfig[]): TaskTypeConfig[] =>
       });
     }
   });
-  
+
   return list;
 };
 
@@ -1033,55 +1033,56 @@ export function DraftTaskTable({
     const alwaysFrozenColumns = {
       'checkbox': { width: 48, order: -1 },
       'projectSlug': { width: 100, order: 0 },
-      'task': { width: columnWidths['task'] ?? 260, order: 1 },
-      'project': { width: 150, order: 2 }
+      'task': { width: columnWidths['task'] ?? 250, order: 1 },
+      'project': { width: 140, order: 2 }
     };
     if (alwaysFrozenColumns[columnId as keyof typeof alwaysFrozenColumns]) {
       const config = alwaysFrozenColumns[columnId as keyof typeof alwaysFrozenColumns];
       let leftOffset = 0;
       if (columnId === 'projectSlug') leftOffset = 48;
       if (columnId === 'task') leftOffset = 48 + 100;
-      if (columnId === 'project') leftOffset = 48 + 100 + (columnWidths['task'] ?? 260);
+      if (columnId === 'project') leftOffset = 48 + 100 + (columnWidths['task'] ?? 250);
 
       const baseStyle: React.CSSProperties = {
         position: 'sticky',
         left: `${leftOffset}px`,
-        zIndex: isHeader ? 20 : 10,
-        backgroundColor: isHeader ? 'transparent' : 'var(--background)',
+        zIndex: isHeader ? 25 : 15,
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--background)',
         minWidth: `${config.width}px`,
         width: `${config.width}px`,
-        borderRight: '1px solid var(--border)',
+        boxShadow: 'inset -1px 0 0 var(--border)',
       };
 
       // The checkbox cell carries the group-color left accent border
       if (columnId === 'checkbox') {
         const borderCol = rowGroupColor;
-        baseStyle.boxShadow = `inset 4px 0 0 0px ${borderCol}`;
+        baseStyle.boxShadow = `inset -1px 0 0 var(--border), inset 4px 0 0 0px ${borderCol}`;
       }
 
       return baseStyle;
     }
     if (columnConfig && columnConfig.columnFreezed && !columnConfig.isSystemColumn) {
-      const baseOffset = 48 + 100 + (columnWidths['task'] ?? 260) + 150; // checkbox + slug + task + project
+      const baseOffset = 48 + 100 + (columnWidths['task'] ?? 250) + 140; // checkbox + slug + task + project
       const frozenBefore = visibleColumnConfigs
         .filter(c => c.columnFreezed && c.columnOrder < columnConfig.columnOrder && !c.isSystemColumn)
         .sort((a, b) => a.columnOrder - b.columnOrder);
       let leftOffset = baseOffset;
-      frozenBefore.forEach(() => { leftOffset += 150; });
+      frozenBefore.forEach((c) => { 
+        leftOffset += (columnWidths[c.id] ?? DEFAULT_COL_WIDTH); 
+      });
       const w = columnWidths[columnId] ?? DEFAULT_COL_WIDTH;
       return {
         position: 'sticky',
         left: `${leftOffset}px`,
         zIndex: isHeader ? 20 : 10,
-        backgroundColor: isHeader ? 'var(--muted)' : 'inherit',
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--background)',
         minWidth: `${w}px`,
         width: `${w}px`,
-        borderRight: '1px solid var(--border)',
-        boxShadow: '2px 0 4px rgba(0,0,0,0.04)',
+        boxShadow: 'inset -1px 0 0 var(--border), 2px 0 4px rgba(0,0,0,0.04)',
       };
     }
     const w = columnWidths[columnId] ?? DEFAULT_COL_WIDTH;
-    return { minWidth: `${w}px`, width: `${w}px`, borderRight: "1px solid var(--border)" };
+    return { minWidth: `${w}px`, width: `${w}px`, boxShadow: 'inset -1px 0 0 var(--border)' };
   };
 
   const shouldShowColumn = (columnId: string): boolean => {
@@ -1126,8 +1127,8 @@ export function DraftTaskTable({
   };
 
   //   Shared cell styles  
-  const headerCellCls = "font-semibold text-xs text-muted-foreground uppercase tracking-wide px-3 py-1 select-none";
-  const bodyCellCls = "px-3 py-2 text-xs";
+  const headerCellCls = "!h-9 font-semibold text-xs text-muted-foreground uppercase tracking-wide px-3 py-0 select-none border-r border-border bg-card";
+  const bodyCellCls = "!h-9 px-3 py-0 text-xs border-r border-border";
 
   return (
     <>
@@ -1154,7 +1155,7 @@ export function DraftTaskTable({
 
                 {/* Slug */}
                 <TableHead className={`${headerCellCls} text-center relative group`} style={getColumnStyle('projectSlug', true)}>
-                  <span className="truncate">Slug</span>
+                  <span className="truncate">Project ID</span>
                   <ResizeHandle
                     columnId="projectSlug"
                     onResize={handleColumnResize}
@@ -1206,24 +1207,26 @@ export function DraftTaskTable({
 
                 {/* Actions Column Header (sticky) */}
                 <TableHead
-                  className={cn("w-[240px] text-center text-xs")}
+                  className={cn("w-[140px] text-center text-xs !h-9")}
                   style={{
                     position: 'sticky',
                     right: 0,
                     zIndex: 20,
-                    backgroundColor: 'var(--background)',
+                    backgroundColor: 'var(--card)',
                     borderLeft: '1px solid var(--border)',
                     boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                    padding: 4,
+                    padding: 0,
                     margin: 0,
                   }}
                 >
-                  <div className="flex items-center justify-center gap-2">
-                    <span>Actions</span>
-                    <DraftFieldVisibilityPopup
-                      visibleFields={visibleFields}
-                      onToggle={toggleField}
-                    />
+                  <div className="flex items-center justify-center w-full relative">
+                    <span className="pr-6">Actions</span>
+                    <div className="absolute right-0">
+                      <DraftFieldVisibilityPopup
+                        visibleFields={visibleFields}
+                        onToggle={toggleField}
+                      />
+                    </div>
                   </div>
                 </TableHead>
               </TableRow>
@@ -1342,75 +1345,64 @@ export function DraftTaskTable({
 
                       {/* Task Type Cell */}
                       {shouldShowField('taskType', 'Type') && (
-                        <TableCell
-                          className={cn(bodyCellCls, "text-center")}
-                          style={getColumnStyle('taskType', false)}
-                        >
-                          <Select
-                            value={task.taskType || 'task'}
-                            onValueChange={(value) => updateTask(task.id, { taskType: value })}
-                          >
-                            <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
-                              <SelectValue>
+                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('taskType', false), height: '1px' }}>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild className="w-full h-full">
+                              <button className="w-full h-full flex items-center justify-center gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2 hover:bg-muted">
                                 {(() => {
                                   const typeValue = task.taskType || 'task';
                                   const selectedType = getResolvedTaskType(typeValue, taskTypes);
+
                                   return (
-                                    <div className="flex items-center gap-2">
-                                      {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
-                                      <span>{selectedType.label}</span>
-                                    </div>
+                                    <>
+                                      {renderDraftTaskTypeVisual(selectedType, "w-3.5 h-3.5")}
+                                      <span className="truncate text-xs font-medium text-foreground">
+                                        {selectedType.label}
+                                      </span>
+                                    </>
                                   );
                                 })()}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                               {getDraftTaskTypes(taskTypes).map((type) => (
-                                <SelectItem key={type._id} value={type.value}>
-                                  <div className="flex items-center gap-2">
-                                    {renderDraftTaskTypeVisual(type, "w-3 h-3")}
-                                    <span>{type.label}</span>
+                                <DropdownMenuItem key={type._id} onSelect={() => updateTask(task.id, { taskType: type.value })} className="p-0 focus:bg-transparent">
+                                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted px-3 bg-muted text-foreground">
+                                    {renderDraftTaskTypeVisual(type, "w-3.5 h-3.5")}
+                                    <span className="truncate">{type.label}</span>
                                   </div>
-                                </SelectItem>
+                                </DropdownMenuItem>
                               ))}
-                            </SelectContent>
-                          </Select>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       )}
 
                       {/* Status */}
                       {shouldShowField('status', 'Status') && (
-                        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('status', false)}>
+                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('status', false), height: '1px' }}>
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-muted transition-colors text-foreground border border-border">
-                                {(() => {
-                                  console.log('Rendering status for task:', task.name, 'with status value:', task.status);
-                                  console.log("taskStatusConfig", taskStatusConfigs)
-                                  const cfg = taskStatusConfigs.find(c => c.value === task.status);
-                                  console.log('Found status config:', cfg);
-                                  return cfg ? (
-                                    <span className="flex items-center gap-1.5">
-                                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                                      {cfg.label}
-                                    </span>
-                                  ) : (
-                                    <span className="text-muted-foreground">-</span>
-                                  );
-                                })()}
+                            <DropdownMenuTrigger asChild className="w-full h-full">
+                              <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3"
+                                style={{ backgroundColor: taskStatusConfigs.find(c => c.value === task.status)?.color || '#c4c4c4' }}>
+                                <span className="truncate w-full text-center">
+                                  {taskStatusConfigs.find(c => c.value === task.status)?.label || '—'}
+                                </span>
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="text-xs">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                               {taskStatusConfigs.map(config => (
-                                <DropdownMenuItem key={config._id} onSelect={() => updateTask(task.id, { status: config.value })}>
-                                  {config.color && <div className="w-2.5 h-2.5 rounded-full mr-2 text-xs" style={{ backgroundColor: config.color }} />}
-                                  {config.label}
+                                <DropdownMenuItem key={config._id} onSelect={() => updateTask(task.id, { status: config.value })} className="p-0 focus:bg-transparent">
+                                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                    style={{ backgroundColor: config.color || '#c4c4c4' }}>
+                                    <span className="truncate w-full text-center">{config.label}</span>
+                                  </div>
                                 </DropdownMenuItem>
                               ))}
                               {taskStatusConfigs.length > 0 && <DropdownMenuSeparator />}
                               {isAddingStatus ? (
                                 <div className="flex gap-1 p-2">
-                                  <Input value={newStatusName} onChange={(e) => setNewStatusName(e.target.value)} placeholder="Status name" className="h-6 " autoFocus
+                                  <Input value={newStatusName} onChange={(e) => setNewStatusName(e.target.value)} placeholder="Status name" className="h-6" autoFocus
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddStatus(newStatusName, task.id); if (e.key === 'Escape') { setIsAddingStatus(false); setNewStatusName(''); } }} />
                                   <Button size="sm" className="h-6" onClick={() => handleAddStatus(newStatusName, task.id)}>Add</Button>
                                 </div>
@@ -1427,25 +1419,27 @@ export function DraftTaskTable({
 
                       {/* Assignee */}
                       {shouldShowField('assignee', 'Assignee') && (
-                        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('assignee', false)}>
+                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('assignee', false), height: '1px' }}>
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="inline-flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
-                                {/*   Find member by userId and display name */}
+                            <DropdownMenuTrigger asChild className="w-full h-full">
+                              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
                                 {(() => {
                                   const m = members.find(m => m.userId === task.assignee);
                                   return <Avatar name={m?.name} src={getProfilePictureUrl(m?.avatar)} />;
                                 })()}
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem onSelect={() => updateTask(task.id, { assignee: undefined })}>
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                              <DropdownMenuItem onSelect={() => updateTask(task.id, { assignee: undefined })} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
                                 Clear
                               </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               {members.map(member => (
-                                <DropdownMenuItem key={member.userId} onSelect={() => updateTask(task.id, { assignee: member.userId })}>
-                                  <Avatar name={member.name} src={getProfilePictureUrl(member.avatar)} size="sm" />
-                                  <span className="ml-2">{member.name}</span>
+                                <DropdownMenuItem key={member.userId} onSelect={() => updateTask(task.id, { assignee: member.userId })} className="p-0 focus:bg-transparent">
+                                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                                    <Avatar name={member.name} src={getProfilePictureUrl(member.avatar)} size="sm" />
+                                    <span className="truncate">{member.name}</span>
+                                  </div>
                                 </DropdownMenuItem>
                               ))}
                             </DropdownMenuContent>
@@ -1510,35 +1504,31 @@ export function DraftTaskTable({
 
                       {/* Priority */}
                       {shouldShowField('priority', 'Priority') && (
-                        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('priority', false)}>
+                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="inline-flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
-                                <PriorityFlag priority={task.priority} color={getPriorityColor(task.priority, taskPriorityConfigs)} />
+                            <DropdownMenuTrigger asChild className="w-full h-full">
+                              <button className="w-full h-full flex items-center justify-center gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
+                                style={{ backgroundColor: `${getPriorityColor(task.priority, taskPriorityConfigs) || '#9CA3AF'}33` }}>
+                                <span className={cn("truncate text-xs font-medium", task.priority ? "text-foreground" : "text-muted-foreground")}>
+                                  {taskPriorityConfigs.find(p => p.value === task.priority)?.label || '—'}
+                                </span>
+                                <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(task.priority, taskPriorityConfigs) || '#9CA3AF' }} />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                               {taskPriorityConfigs.map(option => (
-                                <DropdownMenuItem
-                                  className="flex justify-between items-center"
-                                  key={option._id} onSelect={() => updateTask(task.id, { priority: option.value })}>
-                                  {option.label}
-                                  <Badge
-                                    variant="secondary"
-                                    className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
-                                    style={{
-                                      backgroundColor: `${option.color}20`,
-                                      color: option.color
-                                    }}
-                                  >
-                                    <PriorityFlag priority={option.value} color={option.color} />
-                                  </Badge>
+                                <DropdownMenuItem key={option._id} onSelect={() => updateTask(task.id, { priority: option.value })} className="p-0 focus:bg-transparent">
+                                  <div className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                                    style={{ backgroundColor: `${option.color || '#9CA3AF'}33` }}>
+                                    <span className="truncate">{option.label}</span>
+                                    <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: option.color || '#9CA3AF' }} />
+                                  </div>
                                 </DropdownMenuItem>
                               ))}
                               {taskPriorityConfigs.length > 0 && <DropdownMenuSeparator />}
                               {isAddingPriority ? (
                                 <div className="flex gap-1 p-2">
-                                  <Input value={newPriorityName} onChange={(e) => setNewPriorityName(e.target.value)} placeholder="Priority name" className="h-6 " autoFocus
+                                  <Input value={newPriorityName} onChange={(e) => setNewPriorityName(e.target.value)} placeholder="Priority name" className="h-6" autoFocus
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddPriority(newPriorityName, task.id); if (e.key === 'Escape') { setIsAddingPriority(false); setNewPriorityName(''); } }} />
                                   <Button size="sm" className="h-6" onClick={() => handleAddPriority(newPriorityName, task.id)}>Add</Button>
                                 </div>
@@ -1556,23 +1546,23 @@ export function DraftTaskTable({
 
                       {/* Row actions */}
                       <TableCell
-                        className={cn("w-[240px] text-center")}
+                        className={cn("w-[140px] text-center")}
                         style={{
                           position: 'sticky',
                           right: 0,
                           zIndex: 10,
-                          backgroundColor: 'var(--background)',
+                          backgroundColor: 'var(--card)',
                           borderLeft: '1px solid var(--border)',
                           boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                          padding: '0 8px',
+                          padding: 0,
                           margin: 0,
                         }}
                       >
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-between w-full pl-1 pr-1">
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="h-8 px-3 text-xs"
+                            className="h-7 px-1 text-xs"
                             onClick={() => handleMoveToProject(task as unknown as DraftResponse)}
                           >
                             Move to project
@@ -1580,26 +1570,25 @@ export function DraftTaskTable({
 
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
-                              >
+                              <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-all flex-shrink-0">
                                 <MoreHorizontal className="h-4 w-4" />
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onSelect={() => setDuplicateTaskId(task.id)} >
-                                <Copy className="h-3 w-3 mr-2" />
-                                <span className="text-xs">Duplicate</span>
+                            <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary p-1.5 min-w-[210px]">
+                              <DropdownMenuItem
+                                className="gap-2 cursor-pointer text-xs"
+                                onSelect={() => setDuplicateTaskId(task.id)}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                                Duplicate
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onSelect={() => setDeleteTaskConfirmId(task.id)}
-                                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                className="gap-2 cursor-pointer text-xs text-red-600 focus:text-red-600 focus:bg-red-50"
                               >
-                                <Trash2 className="h-3 w-3 mr-2" />
-                                <span className="text-xs">Delete</span>
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1669,77 +1658,66 @@ export function DraftTaskTable({
 
                           {/* Subtask Task Type Cell */}
                           {shouldShowField('taskType', 'Type') && (
-                            <TableCell
-                              className={cn(bodyCellCls, "text-center")}
-                              style={getColumnStyle('taskType', false)}
-                            >
-                              <Select
-                                value={subtask.taskType || 'task'}
-                                onValueChange={async (value) => {
-                                  try {
-                                    await updateSubtask(subtask.id, { taskType: value });
-                                  } catch {
-                                    // handle error if needed
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
-                                  <SelectValue>
+                            <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('taskType', false), height: '1px' }}>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild className="w-full h-full">
+                                  <button className="w-full h-full flex items-center justify-center gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2 hover:bg-muted">
                                     {(() => {
                                       const typeValue = subtask.taskType || 'task';
                                       const selectedType = getResolvedTaskType(typeValue, taskTypes);
                                       return (
-                                        <div className="flex items-center gap-2">
-                                          {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
-                                          <span>{selectedType.label}</span>
-                                        </div>
+                                        <>
+                                          {renderDraftTaskTypeVisual(selectedType, "w-3.5 h-3.5")}
+                                          <span className="truncate text-xs font-medium text-foreground">
+                                            {selectedType.label}
+                                          </span>
+                                        </>
                                       );
                                     })()}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                                   {getDraftTaskTypes(taskTypes).map((type) => (
-                                    <SelectItem key={type._id} value={type.value}>
-                                      <div className="flex items-center gap-2">
-                                        {renderDraftTaskTypeVisual(type, "w-3 h-3")}
-                                        <span>{type.label}</span>
+                                    <DropdownMenuItem key={type._id} onSelect={async () => {
+                                      try {
+                                        await updateSubtask(subtask.id, { taskType: type.value });
+                                      } catch {}
+                                    }} className="p-0 focus:bg-transparent">
+                                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted px-3 bg-muted text-foreground">
+                                        {renderDraftTaskTypeVisual(type, "w-3.5 h-3.5")}
+                                        <span className="truncate">{type.label}</span>
                                       </div>
-                                    </SelectItem>
+                                    </DropdownMenuItem>
                                   ))}
-                                </SelectContent>
-                              </Select>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           )}
 
 
                           {/* Subtask Status */}
                           {shouldShowField('status', 'Status') && (
-                            <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('status', false)}>
+                            <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('status', false), height: '1px' }}>
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium hover:bg-muted transition-colors text-foreground border border-border">
-                                    {(() => {
-                                      const cfg = taskStatusConfigs.find(c => c.value === subtask.status);
-                                      return cfg ? (
-                                        <span className="flex items-center gap-1.5">
-                                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                                          {cfg.label}
-                                        </span>
-                                      ) : (
-                                        <span className="text-muted-foreground"> </span>
-                                      );
-                                    })()}
+                                <DropdownMenuTrigger asChild className="w-full h-full">
+                                  <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3"
+                                    style={{ backgroundColor: taskStatusConfigs.find(c => c.value === subtask.status)?.color || '#c4c4c4' }}>
+                                    <span className="truncate w-full text-center">
+                                      {taskStatusConfigs.find(c => c.value === subtask.status)?.label || '—'}
+                                    </span>
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent>
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                                   {taskStatusConfigs.map(config => (
-                                    <DropdownMenuItem key={config._id} onSelect={() => updateSubtask(subtask.id, { status: config.value })}>
-                                      {config.color && <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: config.color }} />}
-                                      {config.label}
+                                    <DropdownMenuItem key={config._id} onSelect={() => updateSubtask(subtask.id, { status: config.value })} className="p-0 focus:bg-transparent">
+                                      <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                                        style={{ backgroundColor: config.color || '#c4c4c4' }}>
+                                        <span className="truncate w-full text-center">{config.label}</span>
+                                      </div>
                                     </DropdownMenuItem>
                                   ))}
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { status: undefined })}>Clear</DropdownMenuItem>
+                                  <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { status: undefined })} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">Clear</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -1747,23 +1725,27 @@ export function DraftTaskTable({
 
                           {/* Subtask Assignee */}
                           {shouldShowField('assignee', 'Assignee') && (
-                            <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('assignee', false)}>
+                            <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('assignee', false), height: '1px' }}>
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="inline-flex justify-center cursor-pointer hover:opacity-80 transition-opacity">
-                                    {/*   Find member by userId and display name */}
+                                <DropdownMenuTrigger asChild className="w-full h-full">
+                                  <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
                                     {(() => {
                                       const m = members.find(m => m.userId === subtask.assignee);
-                                      return <Avatar name={m?.name} src={m?.avatar} />;
+                                      return <Avatar name={m?.name} src={getProfilePictureUrl(m?.avatar)} />;
                                     })()}
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { assignee: undefined })}>Clear</DropdownMenuItem>
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { assignee: undefined })} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                                    Clear
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
                                   {members.map(member => (
-                                    <DropdownMenuItem key={member.userId} onSelect={() => updateSubtask(subtask.id, { assignee: member.userId })}>
-                                      <Avatar name={member.name} src={member.avatar} />
-                                      <span className="ml-2">{member.name}</span>
+                                    <DropdownMenuItem key={member.userId} onSelect={() => updateSubtask(subtask.id, { assignee: member.userId })} className="p-0 focus:bg-transparent">
+                                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                                        <Avatar name={member.name} src={getProfilePictureUrl(member.avatar)} size="sm" />
+                                        <span className="truncate">{member.name}</span>
+                                      </div>
                                     </DropdownMenuItem>
                                   ))}
                                 </DropdownMenuContent>
@@ -1828,33 +1810,28 @@ export function DraftTaskTable({
 
                           {/* Subtask Priority */}
                           {shouldShowField('priority', 'Priority') && (
-                            <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('priority', false)}>
+                            <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className="inline-flex justify-center cursor-pointer hover:opacity-80 transition-opacity">
-                                    <PriorityFlag priority={subtask.priority} color={getPriorityColor(subtask.priority, taskPriorityConfigs)} />
+                                <DropdownMenuTrigger asChild className="w-full h-full">
+                                  <button className="w-full h-full flex items-center justify-center gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
+                                    style={{ backgroundColor: `${getPriorityColor(subtask.priority, taskPriorityConfigs) || '#9CA3AF'}33` }}>
+                                    <span className={cn("truncate text-xs font-medium", subtask.priority ? "text-foreground" : "text-muted-foreground")}>
+                                      {taskPriorityConfigs.find(p => p.value === subtask.priority)?.label || '—'}
+                                    </span>
+                                    <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(subtask.priority, taskPriorityConfigs) || '#9CA3AF' }} />
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent>
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                                   {taskPriorityConfigs.map(option => (
-                                    <DropdownMenuItem
-                                      className="flex justify-between items-center"
-                                      key={option._id} onSelect={() => updateSubtask(subtask.id, { priority: option.value })}>
-                                      {option.label}
-                                      <Badge
-                                        variant="secondary"
-                                        className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
-                                        style={{
-                                          backgroundColor: `${option.color}20`,
-                                          color: option.color
-                                        }}
-                                      >
-                                        <PriorityFlag priority={option.value} color={option.color} />
-                                      </Badge>
+                                    <DropdownMenuItem key={option._id} onSelect={() => updateSubtask(subtask.id, { priority: option.value })} className="p-0 focus:bg-transparent">
+                                      <div className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                                        style={{ backgroundColor: `${option.color || '#9CA3AF'}33` }}>
+                                        <span className="truncate">{option.label}</span>
+                                        <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: option.color || '#9CA3AF' }} />
+                                      </div>
                                     </DropdownMenuItem>
                                   ))}
                                   {taskPriorityConfigs.length > 0 && <DropdownMenuSeparator />}
-                                  {/* <DropdownMenuSeparator /> */}
                                   <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { priority: undefined })}>Clear</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -1864,23 +1841,23 @@ export function DraftTaskTable({
 
                           {/* Subtask actions */}
                           <TableCell
-                            className={cn("w-[240px] text-center")}
+                            className={cn("w-[140px] text-center")}
                             style={{
                               position: 'sticky',
                               right: 0,
                               zIndex: 10,
-                              backgroundColor: 'var(--background)',
+                              backgroundColor: 'var(--card)',
                               borderLeft: '1px solid var(--border)',
                               boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                              padding: '0 8px',
+                              padding: 0,
                               margin: 0,
                             }}
                           >
-                            <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center justify-between w-full pl-2 pr-1">
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                className="h-8 px-3 text-xs"
+                                className="h-7 px-2 text-[10px]"
                                 onClick={() => handleMoveToProject(subtask as unknown as DraftResponse)}
                               >
                                 Move to project
@@ -1888,26 +1865,25 @@ export function DraftTaskTable({
 
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  >
+                                  <button className="p-1 pl-2 rounded hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-all flex-shrink-0">
                                     <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
+                                  </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onSelect={() => setDuplicateSubtaskId(subtask.id)}>
-                                    <Copy className="h-4 w-4 mr-2" />
-                                    <span>Duplicate</span>
+                                <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary p-1.5 min-w-[210px]">
+                                  <DropdownMenuItem
+                                    className="gap-2 cursor-pointer text-xs"
+                                    onSelect={() => setDuplicateSubtaskId(subtask.id)}
+                                  >
+                                    <Copy className="h-3.5 w-3.5" />
+                                    Duplicate
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
                                     onSelect={() => setDeleteSubtaskConfirmId(subtask.id)}
-                                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                                    className="gap-2 cursor-pointer text-xs text-destructive focus:text-destructive focus:bg-destructive/10"
                                   >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    <span>Delete</span>
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Delete
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -1960,38 +1936,36 @@ export function DraftTaskTable({
 
                             //   Task Type  
                             if (h.key === 'taskType') {
-                              const selType = taskTypes.find(t => t.value === newSubtaskData.taskType);
                               return (
-                                <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
-                                  <Select
-                                    value={newSubtaskData.taskType || 'task'}
-                                    onValueChange={(value) => setNewSubtaskData(prev => ({ ...prev, taskType: value }))}
-                                  >
-                                    <SelectTrigger className="h-8 w-full max-w-[140px] mx-auto">
-                                      <SelectValue>
+                                <TableCell key={h.key} className="!p-0 text-center" style={{ ...getColumnStyle(h.key, false), height: '1px' }}>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild className="w-full h-full">
+                                      <button className="w-full h-full flex items-center justify-center gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2 hover:bg-muted">
                                         {(() => {
                                           const typeValue = newSubtaskData.taskType || 'task';
                                           const selectedType = getResolvedTaskType(typeValue, taskTypes);
                                           return (
-                                            <div className="flex items-center gap-2">
-                                              {renderDraftTaskTypeVisual(selectedType, "w-3 h-3")}
-                                              <span>{selectedType.label}</span>
-                                            </div>
+                                            <>
+                                              {renderDraftTaskTypeVisual(selectedType, "w-3.5 h-3.5")}
+                                              <span className="truncate text-xs font-medium text-foreground">
+                                                {selectedType.label}
+                                              </span>
+                                            </>
                                           );
                                         })()}
-                                      </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="p-4 w-[200px] space-y-1">
                                       {getDraftTaskTypes(taskTypes).map((type) => (
-                                        <SelectItem key={type._id} value={type.value}>
-                                          <div className="flex items-center gap-2">
-                                            {renderDraftTaskTypeVisual(type, "w-3 h-3")}
-                                            <span>{type.label}</span>
+                                        <DropdownMenuItem key={type._id} onSelect={() => setNewSubtaskData(prev => ({ ...prev, taskType: type.value }))} className="p-0 focus:bg-transparent">
+                                          <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted px-3 bg-muted text-foreground">
+                                            {renderDraftTaskTypeVisual(type, "w-3.5 h-3.5")}
+                                            <span className="truncate">{type.label}</span>
                                           </div>
-                                        </SelectItem>
+                                        </DropdownMenuItem>
                                       ))}
-                                    </SelectContent>
-                                  </Select>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </TableCell>
                               );
                             }
@@ -2192,9 +2166,10 @@ export function DraftTaskTable({
                               position: 'sticky',
                               right: 0,
                               zIndex: 10,
-                              backgroundColor: 'var(--background)',
+                              backgroundColor: 'var(--card)',
                               borderLeft: '1px solid var(--border)',
                               boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
+                              padding: 0,
                             }}
                           >
                             <div className="flex gap-1">
@@ -2224,19 +2199,33 @@ export function DraftTaskTable({
 
               {/*   Add Task Button Row   */}
               <TableRow
-                className="group border-none hover:bg-transparent"
+                className="bg-card hover:bg-card border-b border-border"
+                onMouseEnter={() => setIsAddTaskRowHovered(true)}
+                onMouseLeave={() => setIsAddTaskRowHovered(false)}
                 onClick={onDraftTask}
               >
                 <TableCell className="p-0" style={getColumnStyle('checkbox', false, `${groupColor}44`)} />
                 <TableCell style={getColumnStyle('projectSlug', false)} className={bodyCellCls} />
                 <TableCell
-                  className={cn(bodyCellCls, "cursor-pointer hover:bg-muted transition-colors")}
+                  className={bodyCellCls}
                   style={getColumnStyle('task', false)}
                   colSpan={headers.length + 3}
                 >
-                  <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-medium text-xs">
-                    <Plus className="h-3 w-3" />
-                    <span>Draft a task</span>
+                  <div className="flex items-center gap-1 pl-4">
+                    <div className={cn(
+                      "flex items-center rounded-sm transition-all",
+                      isAddTaskRowHovered ? "border border-primary/30" : "border border-transparent"
+                    )}>
+                      <button
+                        className={cn(
+                          "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs",
+                          isAddTaskRowHovered ? "text-primary/60" : "text-muted-foreground"
+                        )}
+                      >
+                        <Plus className={cn("h-3 w-3", isAddTaskRowHovered ? "text-primary/60" : "text-muted-foreground")} />
+                        Draft a task
+                      </button>
+                    </div>
                   </div>
                 </TableCell>
               </TableRow>

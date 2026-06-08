@@ -228,7 +228,7 @@ export const TeamsDashboard: React.FC = () => {
               <TooltipContent side="bottom">
                 <p>More options</p>
               </TooltipContent>
-              <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuContent align="start" className="w-56 border-0 border-b-[5px] border-primary">
                 <DropdownMenuItem
                   data-testid={`btn-team-settings-${teamIdFromUrl}`}
                   onClick={() => {
@@ -297,7 +297,7 @@ export const TeamsDashboard: React.FC = () => {
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-md transition-colors cursor-pointer",
                     activeTab === 'Overview'
-                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground '
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                   )}
                 >
@@ -323,7 +323,7 @@ export const TeamsDashboard: React.FC = () => {
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded transition-colors cursor-pointer",
                     activeTab === 'Team Members'
-                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
+                      ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground '
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   )}
                 >
@@ -349,7 +349,6 @@ export const TeamsDashboard: React.FC = () => {
                       ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   )}
-                  title='All Work'
                 >
                   <Flag className="w-4 h-4" />
                 </Button>
@@ -373,7 +372,6 @@ export const TeamsDashboard: React.FC = () => {
                       ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   )}
-                  title='Standup Call'
                 >
                   <BsPersonRaisedHand className="w-6 h-4" />
                 </Button>
@@ -397,7 +395,6 @@ export const TeamsDashboard: React.FC = () => {
                       ? 'text-primary-foreground bg-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                   )}
-                  title='Discussions'
                 >
                   <MessageSquare className="w-4 h-4" />
                 </Button>

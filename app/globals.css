@@ -135,8 +135,10 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  /* --primary: oklch(0.922 0 0); */
+  --primary: #000000;
+  /* --primary-foreground: oklch(0.205 0 0); */
+  --primary-foreground: #FFFFFF;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -510,9 +512,10 @@ footnote:hover {
 .ProseMirror li {
   margin-bottom: 4px;
 }
-  .scrollbar-none {
-    scrollbar-width: none;
-    /* Firefox */
+
+.scrollbar-none {
+  scrollbar-width: none;
+  /* Firefox */
   -ms-overflow-style: none;
   /* IE/Edge */
 }
@@ -535,13 +538,16 @@ footnote:hover {
   }
 
   /* Reset layout for printing */
-  .flex, .flex-col, .h-screen {
+  .flex,
+  .flex-col,
+  .h-screen {
     display: block !important;
     height: auto !important;
     overflow: visible !important;
   }
 
-  .overflow-hidden, .overflow-y-auto {
+  .overflow-hidden,
+  .overflow-y-auto {
     overflow: visible !important;
   }
 
@@ -558,7 +564,7 @@ footnote:hover {
   }
 
   /* Hide all buttons, popovers, and dialogs when printing */
-  button, 
+  button,
   [role="button"],
   .no-print,
   [data-radix-popper-content-wrapper],
@@ -578,5 +584,3 @@ footnote:hover {
     max-width: none !important;
   }
 }
-
-

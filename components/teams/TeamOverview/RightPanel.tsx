@@ -59,7 +59,7 @@ const RightPanel = ({ team: propTeam }: RightPanelProps) => {
             className={`
               flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer
               ${activeTab === tab.value
-                ? 'bg-primary text-primary-foreground shadow-sm'
+                ? 'bg-primary text-primary-foreground shadow-sm '
                 : 'text-muted-foreground hover:text-foreground'
               }
             `}
