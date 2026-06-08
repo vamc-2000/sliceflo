@@ -108,7 +108,7 @@ export default function AboutProject({
     updateProjectLeaders,
   } = useProjectsStore()
   const { portfolios, fetchPortfolios } = usePortfoliosStore()
-  const { documents, addProjectToDocument, removeProjectFromDocument } = useDocStore()
+  const { documents, addProjectToDocument, removeProjectFromDocument, fetchRootDocuments } = useDocStore()
 
   const {
     workspaceCustomFieldsConfig,
@@ -133,6 +133,11 @@ export default function AboutProject({
       fetchTasks(projectId)
     }
   }, [projectId])
+
+  useEffect(() => {
+    fetchRootDocuments();
+  }, [fetchRootDocuments]);
+
   const [projectAttachments, setProjectAttachments] = useState<FileAttachment[]>([]);
   const visibleAttachments = showAll
     ? projectAttachments

@@ -74,7 +74,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isWithinInterval, isFuture } from "date-fns";
 import {
   getRelationshipIcon,
   getRelationshipIconColor,
@@ -90,6 +90,7 @@ import {
   TaskTypeConfig,
 } from "@/stores/projects-store";
 import { formatTaskId } from '@/utils/task-utils';
+import { formatCycleName } from '@/utils/cycle-utils';
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { toast } from "@/components/ui/sonner";
@@ -265,6 +266,17 @@ export function TaskTable({
   const systemFieldVisibility = useTasksStore(state => state.systemFieldVisibility);
 
   const project = projects.find((p) => p.id === projectId);
+  const allCycles = project?.cycles || [];
+  const activeOrUpcomingCycles = React.useMemo(() => {
+    const now = new Date();
+    return allCycles.filter((c) => {
+      const start = new Date(c.startDate);
+      const end = new Date(c.endDate);
+      const isActive = isWithinInterval(now, { start, end });
+      const isUpcoming = isFuture(start);
+      return isActive || isUpcoming;
+    });
+  }, [allCycles]);
   const projectSlug = project?.slug ?? 'TASK';
   const customFields = getTaskCustomFields(projectId);
   const taskTypes = getTaskTypesByProject(projectId);
@@ -1508,12 +1520,12 @@ export function TaskTable({
                             <DropdownMenuTrigger asChild className="w-full h-full">
                               <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                                 <span className="truncate w-full text-center flex items-center justify-center">
-                                  {task.cycle?.name || project?.cycles?.find(c => c.id === task.cycleId)?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                  {task.cycle ? formatCycleName(task.cycle.name, task.cycle.cycleNumber) : (() => { const c = project?.cycles?.find(c => c.id === task.cycleId); return c ? formatCycleName(c.name, c.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />; })()}
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {project?.cycles?.map(c => (
+                              {activeOrUpcomingCycles.map(c => (
                                 <DropdownMenuItem
                                   key={c.id}
                                   onSelect={() => updateTask(task.id, { cycleId: c.id })}
@@ -1521,15 +1533,15 @@ export function TaskTable({
                                 >
                                   <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                     <span className="truncate w-full text-center">
-                                      {c.name}
+                                      {formatCycleName(c.name, c.cycleNumber)}
                                     </span>
                                   </div>
                                 </DropdownMenuItem>
                               ))}
-                              {(!project?.cycles || project.cycles.length === 0) && (
+                              {activeOrUpcomingCycles.length === 0 && (
                                 <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                               )}
-                              {(project?.cycles?.length || 0) > 0 && <DropdownMenuSeparator />}
+                              {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
                               <DropdownMenuItem onSelect={() => updateTask(task.id, { cycleId: null })}
                                 className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
                               >
@@ -2197,12 +2209,12 @@ export function TaskTable({
                               <DropdownMenuTrigger asChild className="w-full h-full">
                                 <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                                   <span className="truncate w-full text-center flex items-center justify-center">
-                                    {subtask.cycle?.name || project?.cycles?.find(c => c.id === subtask.cycleId)?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                    {subtask.cycle ? formatCycleName(subtask.cycle.name, subtask.cycle.cycleNumber) : (() => { const c = project?.cycles?.find(c => c.id === subtask.cycleId); return c ? formatCycleName(c.name, c.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />; })()}
                                   </span>
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                {project?.cycles?.map(c => (
+                                {activeOrUpcomingCycles.map(c => (
                                   <DropdownMenuItem
                                     key={c.id}
                                     onSelect={() => updateSubtask(subtask.id, { cycleId: c.id })}
@@ -2210,15 +2222,15 @@ export function TaskTable({
                                   >
                                     <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                       <span className="truncate w-full text-center">
-                                        {c.name}
+                                        {formatCycleName(c.name, c.cycleNumber)}
                                       </span>
                                     </div>
                                   </DropdownMenuItem>
                                 ))}
-                                {(!project?.cycles || project.cycles.length === 0) && (
+                                {activeOrUpcomingCycles.length === 0 && (
                                   <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                                 )}
-                                {(project?.cycles?.length || 0) > 0 && <DropdownMenuSeparator />}
+                                {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
                                 <DropdownMenuItem onSelect={() => updateSubtask(subtask.id, { cycleId: null })}
                                   className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
                                 >
@@ -2766,12 +2778,12 @@ export function TaskTable({
                                     <DropdownMenuTrigger asChild className="w-full h-full">
                                       <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                                         <span className="truncate w-full text-center flex items-center justify-center">
-                                          {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                          {selCycle ? formatCycleName(selCycle.name, selCycle.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                         </span>
                                       </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                      {project?.cycles?.map(c => (
+                                      {activeOrUpcomingCycles.map(c => (
                                         <DropdownMenuItem
                                           key={c.id}
                                           onSelect={() => setNewSubtaskData(prev => ({ ...prev, cycleId: c.id }))}
@@ -2779,15 +2791,15 @@ export function TaskTable({
                                         >
                                           <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
                                             <span className="truncate w-full text-center">
-                                              {c.name}
+                                              {formatCycleName(c.name, c.cycleNumber)}
                                             </span>
                                           </div>
                                         </DropdownMenuItem>
                                       ))}
-                                      {(!project?.cycles || project.cycles.length === 0) && (
+                                      {activeOrUpcomingCycles.length === 0 && (
                                         <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                                       )}
-                                      {(project?.cycles?.length || 0) > 0 && <DropdownMenuSeparator />}
+                                      {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
                                       <DropdownMenuItem onSelect={() => setNewSubtaskData(prev => ({ ...prev, cycleId: null }))}
                                         className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
                                       >
@@ -3248,29 +3260,29 @@ export function TaskTable({
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild className="w-full h-full">
                               <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                <span className="truncate w-full text-center flex items-center justify-center">
-                                  {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
-                                </span>
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {project?.cycles?.map(c => (
-                                <DropdownMenuItem
-                                  key={c.id}
-                                  onSelect={() => setNewTaskData(prev => ({ ...prev, cycleId: c.id }))}
-                                  className="p-0 focus:bg-transparent"
-                                >
-                                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
-                                    <span className="truncate w-full text-center">
-                                      {c.name}
-                                    </span>
-                                  </div>
+                                  <span className="truncate w-full text-center flex items-center justify-center">
+                                    {selCycle ? formatCycleName(selCycle.name, selCycle.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                  </span>
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                {activeOrUpcomingCycles.map(c => (
+                                  <DropdownMenuItem
+                                    key={c.id}
+                                    onSelect={() => setNewTaskData(prev => ({ ...prev, cycleId: c.id }))}
+                                    className="p-0 focus:bg-transparent"
+                                  >
+                                    <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                                      <span className="truncate w-full text-center">
+                                        {formatCycleName(c.name, c.cycleNumber)}
+                                      </span>
+                                    </div>
                                 </DropdownMenuItem>
                               ))}
-                              {(!project?.cycles || project.cycles.length === 0) && (
+                              {activeOrUpcomingCycles.length === 0 && (
                                 <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
                               )}
-                              {(project?.cycles?.length || 0) > 0 && <DropdownMenuSeparator />}
+                              {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
                               <DropdownMenuItem onSelect={() => setNewTaskData(prev => ({ ...prev, cycleId: null }))}
                                 className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
                               >

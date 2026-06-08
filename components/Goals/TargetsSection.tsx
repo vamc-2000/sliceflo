@@ -36,7 +36,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useTeamStore } from "@/stores/teams-store";
 import { UpdateTargetModal } from "./UpdateTargetModal";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -61,12 +62,66 @@ interface TargetsSectionProps {
 }
 
 export function TargetsSection({ goalId, targets, onOpenCreateTarget, onOpenEditTarget, isLoading }: TargetsSectionProps) {
-  const { deleteTarget, targetsByGoal, updateTarget, currentGoal } = useGoalsStore();
+  const { deleteTarget, targetsByGoal, updateTarget, currentGoal, goals } = useGoalsStore();
   const { currentWorkspace } = useWorkspaceStore();
   const { projects } = useProjectsStore();
   const currentUser = useProfileStore((state) => state.user);
   const { workspaceMembers } = useWorkspaceStore();
   const { tasks } = useTasksStore();
+  const { teams: allTeams, fetchTeams } = useTeamStore();
+
+  useEffect(() => {
+    if (allTeams.length === 0) {
+      fetchTeams().catch(console.error);
+    }
+  }, [allTeams.length, fetchTeams]);
+
+  // Find project IDs associated with the current goal's teams
+  const goalProjectIds = useMemo(() => {
+    const targetGoal = goals.find(g => g.id === goalId) || currentGoal;
+    if (!targetGoal) return null;
+
+    const goalTeamIds = new Set<string>();
+    
+    if (Array.isArray(targetGoal.assignedTeams)) {
+      targetGoal.assignedTeams.forEach(id => {
+        if (id) goalTeamIds.add(String(id));
+      });
+    }
+    if (Array.isArray(targetGoal.teams)) {
+      targetGoal.teams.forEach((t: any) => {
+        const teamId = typeof t === 'object' ? (t?.id || t?._id) : t;
+        if (teamId) goalTeamIds.add(String(teamId));
+      });
+    }
+
+    if (goalTeamIds.size === 0) {
+      return null;
+    }
+
+    const linkedProjectIds = new Set<string>();
+    allTeams.forEach(team => {
+      const teamIdStr = String(team.id);
+      if (goalTeamIds.has(teamIdStr)) {
+        if (Array.isArray(team.projectIds)) {
+          team.projectIds.forEach(pId => linkedProjectIds.add(String(pId)));
+        }
+        if (Array.isArray(team.projects)) {
+          team.projects.forEach((p: any) => {
+            const pId = typeof p === 'object' ? (p.id || p._id) : p;
+            if (pId) linkedProjectIds.add(String(pId));
+          });
+        }
+      }
+    });
+
+    return linkedProjectIds;
+  }, [goalId, goals, currentGoal, allTeams]);
+
+  const filteredProjects = useMemo(() => {
+    if (!goalProjectIds) return projects;
+    return projects.filter(p => p.id && goalProjectIds.has(String(p.id)));
+  }, [projects, goalProjectIds]);
 
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [activeTarget, setActiveTarget] = useState<GoalTarget | null>(null);
@@ -430,17 +485,28 @@ export function TargetsSection({ goalId, targets, onOpenCreateTarget, onOpenEdit
                                         </div>
                                         <div className="max-h-[300px] overflow-y-auto p-1.5 space-y-0.5">
                                           {(() => {
-                                            const filteredProjects = projects.filter(project =>
+                                            const assigneeIds = new Set<string>();
+                                            if (t.assignedTo) {
+                                              const assignees = Array.isArray(t.assignedTo) ? t.assignedTo : [t.assignedTo];
+                                              assignees.forEach(item => {
+                                                const uId = getTargetUserId(item);
+                                                if (uId) assigneeIds.add(uId);
+                                              });
+                                            }
+
+                                            const projectsToShow = filteredProjects.filter(project =>
                                               tasks.some(task =>
                                                 task.projectId === project.id &&
-                                                task.name.toLowerCase().includes(taskSearch.toLowerCase())
+                                                task.name.toLowerCase().includes(taskSearch.toLowerCase()) &&
+                                                (assigneeIds.size === 0 || (task.assignee && assigneeIds.has(task.assignee)))
                                               )
                                             );
 
-                                            return filteredProjects.map(project => {
+                                            return projectsToShow.map(project => {
                                               const projectTasks = tasks.filter(task =>
                                                 task.projectId === project.id &&
-                                                task.name.toLowerCase().includes(taskSearch.toLowerCase())
+                                                task.name.toLowerCase().includes(taskSearch.toLowerCase()) &&
+                                                (assigneeIds.size === 0 || (task.assignee && assigneeIds.has(task.assignee)))
                                               );
                                               const isExpanded = expandedBoards.has(project.id || "");
                                               const isFullyLinked = projectTasks.length > 0 && projectTasks.every(task => t.linkedTaskIds?.includes(task.id));

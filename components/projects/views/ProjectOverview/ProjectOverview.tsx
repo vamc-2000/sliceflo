@@ -235,7 +235,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
     }, [project]);
 
     const enterEditMode = () => {
-        const currentStatus = project?.currentProjectStatus || (statusConfigs[0]?.value || '');
+        const currentStatus = project?.currentProjectUpdate || (statusConfigs[0]?.value || '');
         setSelectedStatus(currentStatus);
         setStatusMessage('');
         setIsEditingStatus(true);
@@ -321,15 +321,6 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                         Summarize progress, blockers, and next steps. Keeps stakeholders aligned without meetings
                                     </p>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setIsHistoryOpen(true)}
-                                    className="text-xs text-primary hover:text-primary/95 flex items-center gap-1.5 h-8 px-2"
-                                >
-                                    <History className="h-3.5 w-3.5" />
-                                    <span>View history</span>
-                                </Button>
                             </div>
                             <Card className="p-3">
                                 <CardContent className="space-y-3 px-0 pb-0">
@@ -403,11 +394,75 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                                 </div>
                                             </div>
                                         </div>
+                                    ) : project?.statusHistory && project.statusHistory.length > 0 ? (
+                                        (() => {
+                                            const latestStatus = project.statusHistory[0];
+                                            const latestStatusConfig = statusConfigs.find((c: any) => c.value === latestStatus.status);
+                                            return (
+                                                <div className="flex flex-col gap-3">
+                                                    <div className="flex items-center justify-between">
+                                                        {/* Status Badge Dropdown */}
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="secondary"
+                                                                    size="sm"
+                                                                    className="h-7 px-2.5 rounded-full hover:bg-muted text-xs font-semibold capitalize flex items-center gap-1 cursor-pointer border border-transparent shadow-none"
+                                                                    style={{
+                                                                        backgroundColor: (latestStatusConfig?.color || '#6b7280') + '15',
+                                                                        color: latestStatusConfig?.color || '#6b7280',
+                                                                    }}
+                                                                >
+                                                                    <span>{latestStatusConfig?.label || latestStatus.status}</span>
+                                                                    <ChevronDown className="h-3.5 w-3.5 opacity-75" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="start" className="w-40">
+                                                                {statusConfigs.map((level: any) => (
+                                                                    <DropdownMenuItem
+                                                                        key={level.value}
+                                                                        onClick={() => handleStatusButtonClick(level.value)}
+                                                                        className="text-xs"
+                                                                    >
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: level.color }} />
+                                                                            <span>{level.label}</span>
+                                                                        </div>
+                                                                    </DropdownMenuItem>
+                                                                ))}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+
+                                                        {/* Actions Links */}
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground select-none">
+                                                            <button
+                                                                onClick={() => setIsHistoryOpen(true)}
+                                                                className="hover:underline hover:text-foreground font-semibold text-[#737373] cursor-pointer"
+                                                            >
+                                                                See all
+                                                            </button>
+                                                            <span className="text-muted-foreground/30 font-light">|</span>
+                                                            <button
+                                                                onClick={enterEditMode}
+                                                                className="hover:underline hover:text-foreground font-semibold text-[#737373] cursor-pointer"
+                                                            >
+                                                                New update
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Message Content */}
+                                                    <div className="mt-1 text-sm text-foreground leading-relaxed">
+                                                        {latestStatus.message || 'No description provided.'}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()
                                     ) : (
                                         <>
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                                 {statusConfigs.map((config: any) => {
-                                                    const isActive = project?.currentProjectStatus === config.value;
+                                                    const isActive = project?.currentProjectUpdate === config.value;
                                                     return (
                                                         <Button
                                                             key={config._id || config.value}
@@ -745,7 +800,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                 projectName={project?.name || 'Project'}
                 projectStatusConfigs={statusConfigs}
                 history={project?.statusHistory || []}
-                currentStatusValue={project?.currentProjectStatus || ''}
+                currentUpdateValue={project?.currentProjectUpdate || ''}
                 projectLeader={resolvedLeader}
             />
         </div>

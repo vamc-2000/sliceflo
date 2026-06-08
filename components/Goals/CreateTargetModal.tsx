@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { X, Calendar, ChevronDown, Search, Users, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import { format } from "date-fns";
 import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
 import { cn } from "@/lib/utils";
 import { useGoalsStore } from "@/stores/goals-store";
+import { useTeamStore } from "@/stores/teams-store";
 import { GoalTarget, TargetType } from "@/types/goal.types";
 import { useProjectsStore } from "@/stores/projects-store";
 import { useTasksStore } from "@/stores/tasks-store";
@@ -75,14 +76,73 @@ export default function CreateTargetModal({
     targetToEdit,
     goalAssignedTo = [],
 }: CreateTargetModalProps) {
-    const { createTarget, updateTarget, currentGoal } = useGoalsStore();
+    const { createTarget, updateTarget, currentGoal, goals } = useGoalsStore();
     const { workspaceMembers } = useWorkspaceStore();
     const { user: currentUser } = useProfileStore();
     const { projects, fetchProjects, getMembersByProject } = useProjectsStore();
     const { tasks } = useTasksStore();
     const { currentWorkspace } = useWorkspaceStore();
+    const { teams: allTeams, fetchTeams } = useTeamStore();
 
     const fetchTasks = useTasksStore(state => state.fetchTasks);
+
+    useEffect(() => {
+        if (isOpen && allTeams.length === 0) {
+            fetchTeams().catch(console.error);
+        }
+    }, [isOpen, allTeams.length, fetchTeams]);
+
+    // Find project IDs associated with the current goal's teams
+    const goalProjectIds = useMemo(() => {
+        const targetGoal = goals.find(g => g.id === goalId) || currentGoal;
+        if (!targetGoal) return null;
+
+        // Get team IDs assigned to the goal
+        const goalTeamIds = new Set<string>();
+        
+        // Check targetGoal.assignedTeams
+        if (Array.isArray(targetGoal.assignedTeams)) {
+            targetGoal.assignedTeams.forEach(id => {
+                if (id) goalTeamIds.add(String(id));
+            });
+        }
+        // Check targetGoal.teams
+        if (Array.isArray(targetGoal.teams)) {
+            targetGoal.teams.forEach((t: any) => {
+                const teamId = typeof t === 'object' ? (t?.id || t?._id) : t;
+                if (teamId) goalTeamIds.add(String(teamId));
+            });
+        }
+
+        // If no teams are assigned to the goal, return null (meaning all projects are shown)
+        if (goalTeamIds.size === 0) {
+            return null;
+        }
+
+        // Find all project IDs linked to those teams
+        const linkedProjectIds = new Set<string>();
+        allTeams.forEach(team => {
+            const teamIdStr = String(team.id);
+            if (goalTeamIds.has(teamIdStr)) {
+                if (Array.isArray(team.projectIds)) {
+                    team.projectIds.forEach(pId => linkedProjectIds.add(String(pId)));
+                }
+                if (Array.isArray(team.projects)) {
+                    team.projects.forEach((p: any) => {
+                        const pId = typeof p === 'object' ? (p.id || p._id) : p;
+                        if (pId) linkedProjectIds.add(String(pId));
+                    });
+                }
+            }
+        });
+
+        return linkedProjectIds;
+    }, [goalId, goals, currentGoal, allTeams]);
+
+    const filteredProjects = useMemo(() => {
+        if (!goalProjectIds) return projects;
+        return projects.filter(p => p.id && goalProjectIds.has(String(p.id)));
+    }, [projects, goalProjectIds]);
 
     useEffect(() => {
         if (isOpen) {
@@ -1159,17 +1219,22 @@ export default function CreateTargetModal({
                                                                     <span>Owner</span>
                                                                 </div>
                                                                 <div className="divide-y divide-border">
-                                                                    {projects
+                                                                    {filteredProjects
                                                                         .filter(project =>
                                                                             project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                                                             tasks.some(task =>
                                                                                 task.projectId === project.id &&
-                                                                                task.name.toLowerCase().includes(searchQuery.toLowerCase())
+                                                                                task.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                                                                                (!selectedOwner || task.assignee === selectedOwner.userId)
                                                                             )
                                                                         )
                                                                         .map((project) => {
                                                                             const isExpanded = expandedProjects.has(project.id || "");
-                                                                            const projectTasks = tasks.filter(t => t.projectId === project.id);
+                                                                            const projectTasks = tasks.filter(t => {
+                                                                                const matchesProject = t.projectId === project.id;
+                                                                                const matchesOwner = selectedOwner ? t.assignee === selectedOwner.userId : true;
+                                                                                return matchesProject && matchesOwner;
+                                                                            });
 
                                                                             const projectMembers = getMembersByProject(project.id || "");
                                                                             const leaderId = project.leaders?.[0] || project.projectLeader;

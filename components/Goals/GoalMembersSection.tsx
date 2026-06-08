@@ -8,7 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Trash2, Users, ChevronRight } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface GoalMembersSectionProps {
     goalId: string;
@@ -16,6 +18,7 @@ interface GoalMembersSectionProps {
     onAddMember: (userId: string) => Promise<void>;
     onRemoveMember: (userId: string) => Promise<void>;
     onInviteClick: () => void;
+    readOnly?: boolean;
 }
 
 const GoalMembersSection: React.FC<GoalMembersSectionProps> = ({
@@ -24,6 +27,7 @@ const GoalMembersSection: React.FC<GoalMembersSectionProps> = ({
     onAddMember,
     onRemoveMember,
     onInviteClick,
+    readOnly = false,
 }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -127,7 +131,7 @@ const GoalMembersSection: React.FC<GoalMembersSectionProps> = ({
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => { setShowAddInterface(false); setSearchQuery(""); }}
-                        className="p-1 hover:bg-gray-150 rounded"
+                        className="p-1 hover:bg-muted rounded"
                         data-testid="back-button"
                     >
                         <ChevronRight className="h-4 w-4 rotate-180" />
@@ -146,58 +150,73 @@ const GoalMembersSection: React.FC<GoalMembersSectionProps> = ({
                     />
                 </div>
 
-                <div className="space-y-1 max-h-64 overflow-y-auto pr-1" data-testid="available-members-list">
-                    {filteredAvailable.length === 0 ? (
-                        <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-available-members-state">
-                            No members found
-                        </div>
-                    ) : (
-                        filteredAvailable.map((member: any) => {
-                            const memberId = member.userId || member.id;
-                            return (
-                                <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`available-member-item-${memberId}`}>
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <Avatar className="h-8 w-8 shrink-0" data-testid={`available-member-avatar-${memberId}`}>
-                                            <AvatarImage src={member.image} />
-                                            <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
-                                                {member.initials}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-medium truncate" data-testid={`available-member-name-${memberId}`}>{member.name}</p>
-                                            <p className="text-[10px] text-muted-foreground truncate" data-testid={`available-member-email-${memberId}`}>{member.email}</p>
+                <ScrollArea className="max-h-64 pr-2" data-testid="available-members-list">
+                    <div className="space-y-1">
+                        {filteredAvailable.length === 0 ? (
+                            <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-available-members-state">
+                                No members found
+                            </div>
+                        ) : (
+                            filteredAvailable.map((member: any) => {
+                                const memberId = member.userId || member.id;
+                                return (
+                                    <div key={memberId} className="flex items-center justify-between p-2 hover:bg-muted rounded-md transition-colors" data-testid={`available-member-item-${memberId}`}>
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <Avatar className="h-8 w-8 shrink-0" data-testid={`available-member-avatar-${memberId}`}>
+                                                <AvatarImage src={member.image} />
+                                                <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                                    {member.initials}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-medium truncate" data-testid={`available-member-name-${memberId}`}>{member.name}</p>
+                                                <p className="text-[10px] text-muted-foreground truncate" data-testid={`available-member-email-${memberId}`}>{member.email}</p>
+                                            </div>
                                         </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleAdd(member.userId || member.id)}
+                                            disabled={isLoading}
+                                            className="h-8 w-8 text-emerald-600 hover:text-emerald-700"
+                                            data-testid={`add-member-btn-${memberId}`}
+                                        >
+                                            <Plus className="h-4 w-4 border-2 border-current rounded-full p-0.5" />
+                                        </Button>
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                    onClick={() => handleAdd(member.userId || member.id)}
-                                        disabled={isLoading}
-                                        className="h-8 w-8 text-green-600 hover:text-green-700"
-                                        data-testid={`add-member-btn-${memberId}`}
-                                    >
-                                        <Plus className="h-4 w-4 border-2 border-current rounded-full p-0.5" />
-                                    </Button>
-                                </div>
-                            );
-                        })
-                    )}
-                </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </ScrollArea>
             </div>
         );
     }
 
     return (
-        <div className="space-y-3" data-testid="assignees-container">
+        <div 
+            className={cn(
+                "space-y-3",
+                readOnly && "bg-muted/40 dark:bg-muted/20 p-4 -m-4 rounded-xl border border-border/40"
+            )} 
+            data-testid="assignees-container"
+        >
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium" data-testid="assignees-title">Assignees</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium" data-testid="assignees-title">
+                        {readOnly ? "Team Members" : "Assignees"}
+                    </span>
+                    {readOnly && (
+                        <span className="text-[10px] font-bold text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded-md">
+                            Read Only
+                        </span>
+                    )}
                     <div className="flex items-center -space-x-2" data-testid="assignees-avatars-group">
                         {memberDetails.slice(0, 4).map((member: any, index) => {
                             const memberId = member.userId || member.id;
                             return (
                                 <Avatar
-                                key={member.userId || member.id}
+                                    key={member.userId || member.id}
                                     className="h-7 w-7 border-2 border-white ring-1 ring-gray-200"
                                     style={{ zIndex: index + 1 }}
                                     data-testid={`assignee-avatar-${memberId}`}
@@ -229,58 +248,65 @@ const GoalMembersSection: React.FC<GoalMembersSectionProps> = ({
                 />
             </div>
 
-            <div className="space-y-1 max-h-64 overflow-y-auto pr-1" data-testid="assigned-members-list">
-                {filteredCurrent.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-assigned-members-state">
-                        {searchQuery ? "No members found" : "No members assigned yet"}
-                    </div>
-                ) : (
-                    filteredCurrent.map((member: any) => {
-                        const memberId = member.userId || member.id;
-                        return (
-                            <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`assigned-member-item-${memberId}`}>
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <Avatar className="h-8 w-8 shrink-0" data-testid={`assigned-member-avatar-${memberId}`}>
-                                        <AvatarImage src={member.image} />
-                                        <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
-                                            {member.initials}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="min-w-0">
-                                        <p className="text-xs font-medium truncate" data-testid={`assigned-member-name-${memberId}`}>{member.name}</p>
-                                        <p className="text-[10px] text-muted-foreground truncate" data-testid={`assigned-member-email-${memberId}`}>{member.email}</p>
+            <ScrollArea className="max-h-64 pr-2" data-testid="assigned-members-list">
+                <div className="space-y-1">
+                    {filteredCurrent.length === 0 ? (
+                        <div className="text-center py-8 text-sm text-muted-foreground" data-testid="no-assigned-members-state">
+                            {searchQuery ? "No members found" : "No members assigned yet"}
+                        </div>
+                    ) : (
+                        filteredCurrent.map((member: any) => {
+                            const memberId = member.userId || member.id;
+                            return (
+                                <div key={memberId} className="flex items-center justify-between p-2 hover:bg-muted rounded-md transition-colors" data-testid={`assigned-member-item-${memberId}`}>
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <Avatar className="h-8 w-8 shrink-0" data-testid={`assigned-member-avatar-${memberId}`}>
+                                            <AvatarImage src={member.image} />
+                                            <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                                {member.initials}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-medium truncate" data-testid={`assigned-member-name-${memberId}`}>{member.name}</p>
+                                            <p className="text-[10px] text-muted-foreground truncate" data-testid={`assigned-member-email-${memberId}`}>{member.email}</p>
+                                        </div>
                                     </div>
+                                    {!readOnly && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleRemove(memberId)}
+                                            disabled={isLoading}
+                                            className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                                            data-testid={`remove-member-btn-${memberId}`}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleRemove(memberId)}
-                                    disabled={isLoading}
-                                    className="h-8 w-8 text-muted-foreground hover:text-red-600"
-                                    data-testid={`remove-member-btn-${memberId}`}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
+                            );
+                        })
+                    )}
+                </div>
+            </ScrollArea>
 
-            <Separator />
-
-            <div className="grid grid-cols-1 gap-2">
-                <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => setShowAddInterface(true)}
-                    className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white text-xs h-8"
-                    data-testid="open-add-interface-btn"
-                >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Add
-                </Button>
-            </div>
+            {!readOnly && (
+                <>
+                    <Separator />
+                    <div className="grid grid-cols-1 gap-2">
+                        <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => setShowAddInterface(true)}
+                            className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white text-xs h-8"
+                            data-testid="open-add-interface-btn"
+                        >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add
+                        </Button>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

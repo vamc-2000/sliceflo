@@ -24,7 +24,8 @@ export default function TailoredViewPage({
         projects,
         fetchProjectById,
         tailoredViews,
-        fetchViews
+        fetchViews,
+        fetchProjectStatusHistory
     } = useProjectsStore();
     const { workspaceMembers } = useWorkspaceStore();
     const { fetchTasks } = useTasksStore();
@@ -65,10 +66,11 @@ export default function TailoredViewPage({
             await fetchProjectById(projectId);
             await fetchViews(projectId);
             await fetchTasks(projectId);
+            await fetchProjectStatusHistory(projectId);
             setIsReady(true);
         };
         loadData();
-    }, [projectId, fetchProjectById, fetchViews, fetchTasks]);
+    }, [projectId, fetchProjectById, fetchViews, fetchTasks, fetchProjectStatusHistory]);
 
     const project = projects.find((p) => p.id === projectId);
     const view = tailoredViews.find((v) => v.id === viewId);
@@ -138,11 +140,7 @@ export default function TailoredViewPage({
                 </div>
                 <ProjectHeader
                     projectName={project.name}
-                    status={
-                        ["completed", "active", "planning", "on-hold", "archived"].includes(project.status as string)
-                            ? project.status as any
-                            : "active"
-                    }
+                    update={project.statusHistory?.[0]?.status || project.currentProjectUpdate}
                     projectId={projectId}
                     onCollapseAllGroups={collapseAllGroupsRef.current}
                     onExpandAllGroups={expandAllGroupsRef.current}

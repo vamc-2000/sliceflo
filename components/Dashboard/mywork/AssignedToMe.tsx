@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Info, Plus, ChevronRight as ChevronRightIcon } from "lucide-react";
+import { Info, Plus, ChevronRight as ChevronRightIcon, LayoutTemplate } from "lucide-react";
 import { useProjectsStore } from "@/stores/projects-store";
 import { useProfileStore } from "@/stores/profile-store";
 import { PriorityBadge } from "./utils";
@@ -13,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { formatTaskId } from "@/utils/task-utils";
+import { iconComponentMap } from "@/components/ColorIconPicker";
 
 function getContrastYIQ(hexcolor: string) {
   if (!hexcolor) return "#334155";
@@ -33,6 +33,52 @@ function getContrastYIQ(hexcolor: string) {
 const isCompleted = (status?: string) => {
   const s = status?.toLowerCase().trim() ?? "";
   return s === "done" || s === "completed" || s === "wont_do";
+};
+
+const renderTaskTypeIcon = (type?: any) => {
+  const className = "h-3.5 w-3.5 shrink-0";
+  if (!type) {
+    return <ChevronRightIcon className={className} />;
+  }
+
+  if (type.icon?.type === "file" && type.icon?.presignedUrl) {
+    return (
+      <img
+        src={type.icon.presignedUrl}
+        alt={type.label}
+        className={`${className} object-contain`}
+      />
+    );
+  }
+
+  if (type.displayImage) {
+    return (
+      <img
+        src={type.displayImage}
+        alt={type.label}
+        className={`${className} object-contain`}
+      />
+    );
+  }
+
+  if (type.iconId && type.icon?.type === "icon" && type.icon?.name) {
+    const Icon = iconComponentMap[type.icon.name];
+    if (Icon) {
+      return (
+        <Icon
+          className={className}
+          color={type.icon.color || type.color || "#3B82F6"}
+        />
+      );
+    }
+  }
+
+  return (
+    <LayoutTemplate
+      className={className}
+      color={type.color || "#6B7280"}
+    />
+  );
 };
 
 export function AssignedToMe() {
@@ -59,6 +105,50 @@ export function AssignedToMe() {
     });
 
     return statuses;
+  }, [allProjects]);
+
+  const dynamicTaskTypes = useMemo(() => {
+    const seen = new Set<string>();
+    const types: { value: string; label: string; color: string; icon?: any; iconId?: string | null; displayImage?: string | null }[] = [];
+
+    allProjects.forEach((p) => {
+      (p.taskTypeConfig ?? []).forEach((t) => {
+        if (!seen.has(t.value)) {
+          seen.add(t.value);
+          types.push({
+            value: t.value,
+            label: t.label,
+            color: t.color || "#3b82f6",
+            icon: t.icon,
+            iconId: t.iconId,
+            displayImage: t.displayImage,
+          });
+        }
+      });
+    });
+
+    return types;
+  }, [allProjects]);
+
+  const dynamicPriorities = useMemo(() => {
+    const seen = new Set<string>();
+    const priorities: { value: string; label: string; color: string; order?: number }[] = [];
+
+    allProjects.forEach((p) => {
+      (p.taskPriorityConfig ?? []).forEach((pr) => {
+        if (!seen.has(pr.value)) {
+          seen.add(pr.value);
+          priorities.push({
+            value: pr.value,
+            label: pr.label,
+            color: pr.color,
+            order: pr.order,
+          });
+        }
+      });
+    });
+
+    return priorities;
   }, [allProjects]);
 
   const myTasks = useMemo(() => {
@@ -131,20 +221,34 @@ export function AssignedToMe() {
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-hidden">
-      <div className="flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between shrink-0 gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-sm font-semibold tracking-tight" data-testid="assigned-to-me-title">Assigned to me</h2>
-          <Select value={filterType} onValueChange={(val) => setFilterType(val as any)}>
-            <SelectTrigger className="h-7 w-[130px] text-[11px] font-medium bg-background" data-testid="assigned-to-me-filter-trigger">
-              <SelectValue placeholder="Filter tasks" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs" data-testid="assigned-to-me-filter-item-all">All Tasks</SelectItem>
-              <SelectItem value="overdue" className="text-xs" data-testid="assigned-to-me-filter-item-overdue">Overdue</SelectItem>
-              <SelectItem value="today" className="text-xs" data-testid="assigned-to-me-filter-item-today">Due Today</SelectItem>
-              <SelectItem value="week" className="text-xs" data-testid="assigned-to-me-filter-item-week">Due This Week</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-0.5 bg-muted/65 p-0.5 rounded-lg border border-border">
+            {[
+              { value: "all", label: "All Tasks" },
+              { value: "overdue", label: "Overdue" },
+              { value: "today", label: "Due Today" },
+              { value: "week", label: "Due This Week" }
+            ].map((tab) => {
+              const active = filterType === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => setFilterType(tab.value as any)}
+                  className={cn(
+                    "text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all whitespace-nowrap",
+                    active
+                      ? "bg-background text-foreground shadow-xs border border-border/40 font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                  data-testid={`assigned-to-me-filter-tab-${tab.value}`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground" data-testid="assigned-to-me-add-btn-header">
           <Plus className="h-3.5 w-3.5" /> Add Task
@@ -195,6 +299,19 @@ export function AssignedToMe() {
                         const statusColor = statusCfg?.color || "#e2e8f0";
                         const statusLabel = statusCfg?.label || item.status || "To Do";
 
+                        const taskTypeCfg = dynamicTaskTypes.find(
+                          (t) => t.value.toLowerCase().trim() === (item.taskType ?? "").toLowerCase().trim() ||
+                                  t.label.toLowerCase().trim() === (item.taskType ?? "").toLowerCase().trim()
+                        );
+
+                        const priorityCfg = dynamicPriorities.find(
+                          (p) => p.value.toLowerCase().trim() === (item.priority ?? "").toLowerCase().trim() ||
+                                  p.label.toLowerCase().trim() === (item.priority ?? "").toLowerCase().trim()
+                        );
+                        const priorityColor = priorityCfg?.color || "#6b7280";
+                        const priorityLabel = priorityCfg?.label || item.priority || "Medium";
+                        const isPriorityHex = priorityColor.startsWith("#");
+
                         return (
                           <TableRow key={item.id} className="group bg-card hover:bg-card border-b border-border transition-colors" data-testid={`assigned-to-me-task-row-${item.id}`}>
                             <TableCell className="!h-9 px-3 py-0 text-left pl-4 border-r border-border w-10">
@@ -205,7 +322,7 @@ export function AssignedToMe() {
                             </TableCell>
                             <TableCell className="!h-7 px-2 py-0 text-left border-r border-border overflow-hidden max-w-0 w-full">
                               <div className="flex items-center gap-2 min-w-0">
-                                <ChevronRightIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                {renderTaskTypeIcon(taskTypeCfg)}
                                 <span className="text-sm font-medium truncate">{item.name}</span>
                               </div>
                             </TableCell>
@@ -213,7 +330,17 @@ export function AssignedToMe() {
                               {formatDate(item.endDate)}
                             </TableCell>
                             <TableCell className={bodyCellCls}>
-                              <PriorityBadge priority={item.priority || "medium"} />
+                              <span 
+                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-90 capitalize"
+                                style={{
+                                  borderColor: isPriorityHex ? `${priorityColor}40` : "currentColor",
+                                  backgroundColor: isPriorityHex ? `${priorityColor}15` : "transparent",
+                                  color: priorityColor,
+                                }}
+                              >
+                                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: priorityColor }} />
+                                {priorityLabel}
+                              </span>
                             </TableCell>
                             <TableCell className="!p-0.5 text-center min-w-[90px] border-r border-border" style={{ height: "1px" }}>
                               <div

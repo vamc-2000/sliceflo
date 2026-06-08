@@ -8,6 +8,7 @@ import { CyclesHeader } from "@/components/projects/cycles/CyclesHeader";
 import { CycleList } from "@/components/projects/cycles/CycleList";
 import { CycleConfigSettings } from "@/components/projects/cycles/CycleConfigSettings";
 import { useRouter } from "next/navigation";
+import { useTasksStore } from "@/stores/tasks-store";
 import { LandingPage } from "@/components/LandingPage";
 
 
@@ -24,6 +25,7 @@ export default function ProjectCyclesPage({
         fetchCycleConfig,
         fetchParallelCycleConfigs,
     } = useProjectsStore();
+    const { fetchTasks } = useTasksStore();
 
     const router = useRouter();
     const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -42,11 +44,12 @@ export default function ProjectCyclesPage({
                 fetchCycles(id),
                 fetchCycleConfig(id),
                 fetchParallelCycleConfigs(id),
+                fetchTasks(id, true),
             ]);
             setIsLoading(false);
         };
         loadData();
-    }, [id, fetchProjectById, fetchCycles, fetchCycleConfig, fetchParallelCycleConfigs]);
+    }, [id, fetchProjectById, fetchCycles, fetchCycleConfig, fetchParallelCycleConfigs, fetchTasks]);
 
     if (!project || isLoading) {
         return (

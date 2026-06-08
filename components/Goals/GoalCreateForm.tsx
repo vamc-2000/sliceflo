@@ -211,6 +211,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                 owner: ownerName
             }));
 
+            setSelectedTeams(cachedGoal.assignedTeams || []);
             if (cachedGoal.visibility === 'team') {
                 setSelectedMembers(cachedGoal.assignedTo || []);
             } else if (cachedGoal.visibility === 'organization') {
@@ -237,6 +238,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                     owner: ownerName
                 }));
 
+                setSelectedTeams(goal.assignedTeams || []);
                 if (goal.visibility === 'team') {
                     setSelectedMembers(goal.assignedTo || []);
                 } else if (goal.visibility === 'organization') {
@@ -377,6 +379,69 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
             ...formData,
             assignedTo: newSelectedMembers
         });
+    };
+
+    const renderMemberStack = (onAddClick: () => void) => {
+        const selectedMemberObjects = selectedMembers.map(id => {
+            const wsMember = workspaceMembers.find(m => m.userId === id);
+            if (wsMember) {
+                return {
+                    id: wsMember.userId,
+                    name: wsMember.name || wsMember.email || '',
+                    avatar: getProfilePictureUrl(wsMember.profilePicture)
+                };
+            }
+            for (const t of teams) {
+                const teamMember = t.teamMembers?.find((m: any) => m.id === id);
+                if (teamMember) {
+                    return {
+                        id: teamMember.id,
+                        name: teamMember.name || teamMember.email || '',
+                        avatar: teamMember.avatar
+                    };
+                }
+            }
+            return null;
+        }).filter((m): m is any => m !== null);
+
+        const maxAvatars = 3;
+        const displayMembers = selectedMemberObjects.slice(0, maxAvatars);
+        const extraCount = selectedMemberObjects.length - maxAvatars;
+
+        return (
+            <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center -space-x-3.5 text-foreground">
+                    {displayMembers.map((member) => {
+                        const initials = member.name
+                            ?.split(" ")
+                            .map((n: string) => n[0])
+                            .join("")
+                            .substring(0, 2)
+                            .toUpperCase() || "?";
+                        return (
+                            <Avatar key={member.id} className="h-8 w-8 border-[2px] border-white bg-card shadow-sm shrink-0">
+                                {member.avatar && <AvatarImage src={member.avatar} alt={member.name} />}
+                                <AvatarFallback className="bg-orange-100 text-orange-600 text-[10px] font-semibold">
+                                    {initials}
+                                </AvatarFallback>
+                            </Avatar>
+                        );
+                    })}
+                    {extraCount > 0 && (
+                        <div className="h-8 w-8 rounded-full border-[2px] border-white bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shadow-sm z-10 shrink-0">
+                            +{extraCount}
+                        </div>
+                    )}
+                    <button
+                        type="button"
+                        onClick={onAddClick}
+                        className="h-8 w-8 rounded-full bg-[#001F3F] border-[2px] border-white hover:opacity-90 flex items-center justify-center text-white shadow-sm z-10 shrink-0 transition-opacity"
+                    >
+                        <Users size={14} />
+                    </button>
+                </div>
+            </div>
+        );
     };
 
     const getTeamAvatar = (team: any) => {
@@ -910,18 +975,22 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                     <div className="flex-1 max-w-md space-y-2">
                                         {!showTeamPanel ? (
                                             <div className="flex justify-end">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    className="w-[320px] justify-between h-auto px-3 py-2 border border-border bg-card text-foreground hover:bg-muted"
-                                                    onClick={() => setShowTeamPanel(true)}
-                                                >
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Users size={16} className="text-muted-foreground" />
-                                                        <span className="text-xs font-medium text-muted-foreground">Add Teams</span>
-                                                    </div>
-                                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                                </Button>
+                                                {selectedMembers.length > 0 ? (
+                                                    renderMemberStack(() => setShowTeamPanel(true))
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        className="w-[320px] justify-between h-auto px-3 py-2 border border-border bg-card text-foreground hover:bg-muted"
+                                                        onClick={() => setShowTeamPanel(true)}
+                                                    >
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Users size={16} className="text-muted-foreground" />
+                                                            <span className="text-xs font-medium text-muted-foreground">Add Teams</span>
+                                                        </div>
+                                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         ) : (
                                             <>
@@ -1132,18 +1201,22 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                     <div className="flex-1 max-w-md space-y-2">
                                         {!showMemberPanel ? (
                                             <div className="flex justify-end">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    className="w-[320px] justify-between h-auto px-3 py-2 border border-border bg-card text-foreground hover:bg-muted"
-                                                    onClick={() => setShowMemberPanel(true)}
-                                                >
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Users size={16} className="text-muted-foreground" />
-                                                        <span className="text-xs font-medium text-muted-foreground">Add Members</span>
-                                                    </div>
-                                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                                </Button>
+                                                {selectedMembers.length > 0 ? (
+                                                    renderMemberStack(() => setShowMemberPanel(true))
+                                                ) : (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        className="w-[320px] justify-between h-auto px-3 py-2 border border-border bg-card text-foreground hover:bg-muted"
+                                                        onClick={() => setShowMemberPanel(true)}
+                                                    >
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Users size={16} className="text-muted-foreground" />
+                                                            <span className="text-xs font-medium text-muted-foreground">Add Members</span>
+                                                        </div>
+                                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         ) : (
                                             <>

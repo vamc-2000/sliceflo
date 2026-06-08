@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Task } from "@/types/task.types";
 import { Project } from "@/stores/projects-store";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CycleProgressCardProps {
     isEmpty: boolean;
@@ -13,6 +14,8 @@ interface CycleProgressCardProps {
 }
 
 export function CycleProgressCard({ isEmpty, tasks, project }: CycleProgressCardProps) {
+    const [activeTab, setActiveTab] = useState<"status" | "priority">("status");
+
     if (isEmpty) {
         return (
             <div className="flex flex-col space-y-2">
@@ -33,7 +36,7 @@ export function CycleProgressCard({ isEmpty, tasks, project }: CycleProgressCard
 
     // Calculate Chart Data
     const statusConfig = project.taskStatusConfig || [];
-    const chartData = statusConfig.map(status => {
+    const statusChartData = statusConfig.map(status => {
         const count = tasks.filter(t => t.status === status.value).length;
         return {
             name: status.label,
@@ -42,13 +45,45 @@ export function CycleProgressCard({ isEmpty, tasks, project }: CycleProgressCard
         };
     }).filter(d => d.value > 0);
 
+    const priorityConfig = project.taskPriorityConfig || [];
+    const priorityChartData = priorityConfig.map(priority => {
+        const count = tasks.filter(t => t.priority === priority.value || t.priority === priority.label).length;
+        return {
+            name: priority.label,
+            value: count,
+            color: priority.color || "#94a3b8"
+        };
+    }).filter(d => d.value > 0);
+
+    const chartData = activeTab === "status" ? statusChartData : priorityChartData;
+    const currentLegendConfig = activeTab === "status" ? statusConfig : priorityConfig;
     const totalTasks = tasks.length;
 
     return (
         <div className="flex flex-col space-y-2">
             <h3 className="text-sm font-semibold text-foreground">Progress</h3>
-            <div data-testid="cycle-progress-card-chart" className="bg-card border border-border rounded-md p-2 shadow-sm min-h-[280px] flex flex-col">
-                <div className="flex-1 flex flex-row items-center justify-between px-2">
+            <div data-testid="cycle-progress-card-chart" className="bg-card border border-border rounded-md p-3 shadow-sm min-h-[280px] flex flex-col justify-between">
+                {/* Tabs aligned to top right inside the card */}
+                <div className="flex justify-end flex-none">
+                    <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="w-auto">
+                        <TabsList className="flex bg-muted h-8 p-1 rounded-md">
+                            <TabsTrigger
+                                value="status"
+                                className="text-xs px-3 py-2 font-semibold rounded-sm transition-all"
+                            >
+                                Status
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="priority"
+                                className="text-xs px-3 py-2 font-semibold rounded-sm transition-all"
+                            >
+                                Priority
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+
+                <div className="flex-1 flex flex-row items-center justify-between px-2 pt-1">
                     {/* Left Side: Pie Chart */}
                     <div className="relative w-36 h-36 flex-none">
                         <ResponsiveContainer width="100%" height="100%">
@@ -84,13 +119,15 @@ export function CycleProgressCard({ isEmpty, tasks, project }: CycleProgressCard
 
                     {/* Right Side: Legend (Single Column) */}
                     <div className="flex flex-col gap-2 flex-1 max-w-[200px] ml-4">
-                        {statusConfig.map((status) => {
-                            const count = tasks.filter(t => t.status === status.value).length;
+                        {currentLegendConfig.map((item) => {
+                            const count = activeTab === "status"
+                                ? tasks.filter(t => t.status === item.value).length
+                                : tasks.filter(t => t.priority === item.value || t.priority === item.label).length;
                             return (
-                                <div data-testid={`cycle-progress-card-legend-${status.value}`} key={status.value} className="flex items-center justify-between group">
+                                <div data-testid={`cycle-progress-card-legend-${item.value}`} key={item.value} className="flex items-center justify-between group">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: status.color }} />
-                                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{status.label}</span>
+                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{item.label}</span>
                                     </div>
                                     <span className="text-xs font-bold text-foreground">{count}</span>
                                 </div>

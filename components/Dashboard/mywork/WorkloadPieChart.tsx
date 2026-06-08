@@ -93,6 +93,23 @@ export function WorkloadPieChart() {
     color: s.color
   }));
 
+  const dynamicTaskTypes = useMemo(() => {
+    const allConfigs = projects.flatMap(p => p.taskTypeConfig || []);
+    const uniqueMap: Record<string, { label: string; color: string; value: string }> = {};
+
+    allConfigs.forEach(config => {
+      if (!uniqueMap[config.value]) {
+        uniqueMap[config.value] = {
+          label: config.label,
+          color: config.color,
+          value: config.value
+        };
+      }
+    });
+
+    return Object.values(uniqueMap);
+  }, [projects]);
+
   const total = myTasks.length;
   const completedCount = workloadData
     .filter(s => normalize(s.value).includes('complete') || normalize(s.value).includes('done'))
@@ -105,13 +122,19 @@ export function WorkloadPieChart() {
 
   const taskTypeData = useMemo(() => {
     const apiTypes = myWork?.taskTypes || [];
-    return apiTypes.map((t, idx) => ({
-      taskType: t.taskType,
-      count: t.count,
-      percentage: t.percentage,
-      color: taskTypeColors[idx % taskTypeColors.length],
-    }));
-  }, [myWork]);
+    return apiTypes.map((t, idx) => {
+      const match = dynamicTaskTypes.find(
+        (dt) => dt.value.toLowerCase().trim() === t.taskType.toLowerCase().trim() ||
+                dt.label.toLowerCase().trim() === t.taskType.toLowerCase().trim()
+      );
+      return {
+        taskType: t.taskType,
+        count: t.count,
+        percentage: t.percentage,
+        color: match?.color || taskTypeColors[idx % taskTypeColors.length],
+      };
+    });
+  }, [myWork, dynamicTaskTypes]);
 
   const taskTypesTotal = useMemo(() => {
     return taskTypeData.reduce((acc, t) => acc + t.count, 0);

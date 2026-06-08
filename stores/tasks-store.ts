@@ -666,12 +666,21 @@ export const useTasksStore = create<TasksState>()(
               cycleId: updates.cycleId,
             };
 
-            await updateTaskApi(id, payload);
+            const response = await updateTaskApi(id, payload);
+            // console.log("update task", response)
+            const mappedTask = mapAPITaskToStore(response, task.projectId);
+            // console.log("mapped task", mappedTask)
 
             // Optimistic local update still uses field IDs (store uses IDs internally)
             set((state) => ({
               tasks: state.tasks.map((t) =>
-                t.id === id ? { ...t, ...updates } : t
+                t.id === id ? {
+                  ...t,
+                  ...mappedTask,
+                  subtasks: t.subtasks,
+                  order: t.order,
+                  completed: updates.completed !== undefined ? updates.completed : t.completed
+                } : t
               ),
             }), false, 'updateTask');
 
@@ -1034,7 +1043,8 @@ export const useTasksStore = create<TasksState>()(
               cycleId: updates.cycleId,
             };
 
-            await updateTaskApi(id, payload);
+            const response = await updateTaskApi(id, payload);
+            const mappedSubtask = mapAPISubtaskToStore(response, parentTask.projectId);
 
             // Local state update + re-parenting if parentTaskId changed
             set(
@@ -1043,7 +1053,13 @@ export const useTasksStore = create<TasksState>()(
                 const newParentId = updates.parentTaskId ?? oldParentId;
 
                 const updatedSubtasks = state.subtasks.map((st) =>
-                  st.id === id ? { ...st, ...updates, parentTaskId: newParentId } : st
+                  st.id === id ? {
+                    ...st,
+                    ...mappedSubtask,
+                    parentTaskId: newParentId,
+                    order: st.order,
+                    completed: updates.completed !== undefined ? updates.completed : st.completed
+                  } : st
                 );
 
                 let updatedTasks = state.tasks;

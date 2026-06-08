@@ -322,7 +322,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
     if (!isMounted) {
         return (
             <div className={`prose-mirror-wrapper border rounded-lg ${className}`}>
-                <div className="h-32 bg-gray-50 animate-pulse" />
+                <div className="h-32 bg-muted animate-pulse" />
             </div>
         );
     }
@@ -349,7 +349,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                     className="prose-mirror-editor p-3 ProseMirror outline-none focus:outline-none focus-visible:outline-none"
                 />
                 {placeholder && !isFocused && (!viewRef.current || viewRef.current.state.doc.textContent.length === 0) && (
-                    <div className="absolute top-3 left-3 text-gray-400 pointer-events-none select-none">
+                    <div className="absolute top-3 left-3 text-muted-foreground pointer-events-none select-none">
                         {placeholder}
                     </div>
                 )}

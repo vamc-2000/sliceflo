@@ -91,7 +91,7 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
             setCycleNumber(nextNum);
             const base = `${config.cycleSlugPrefix}-${nextNum}`;
             setSlug(base);
-            if (!name) setName(`${config.name} #${nextNum}`);
+            if (!name) setName(config.name);
 
             // 2. Dates
             const cycles = project?.cycles || [];

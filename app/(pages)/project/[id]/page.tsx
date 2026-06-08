@@ -246,11 +246,7 @@ export default function ProjectDetailsPage({
                 <ProjectHeader
                     data-testid="project-header"
                     projectName={project.name}
-                    status={
-                        ["completed", "active", "planning", "on-hold", "archived"].includes(project.status as string)
-                            ? project.status as "completed" | "active" | "planning" | "on-hold" | "archived"
-                            : "active"
-                    }
+                    update={project.statusHistory?.[0]?.status || project.currentProjectUpdate}
                     projectId={id}
                     onCollapseAllGroups={collapseAllGroupsRef.current}
                     onExpandAllGroups={expandAllGroupsRef.current}

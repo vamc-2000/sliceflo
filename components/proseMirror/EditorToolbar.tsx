@@ -148,7 +148,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ view }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <label
-              className="w-8 h-8 flex items-center justify-center border rounded cursor-pointer hover:bg-gray-100 relative"
+              className="w-8 h-8 flex items-center justify-center border border-input rounded cursor-pointer hover:bg-muted text-muted-foreground hover:text-foreground relative"
               onMouseDown={(e) => e.preventDefault()}
             >
               <Highlighter className="h-4 w-4" />
@@ -166,24 +166,24 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ view }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <div
-              className="flex items-center border rounded h-8 px-1 gap-0.5 hover:bg-gray-100"
+              className="flex items-center border border-input rounded h-8 px-1 gap-0.5 hover:bg-muted text-muted-foreground hover:text-foreground"
               onMouseDown={(e) => e.preventDefault()}
             >
-              <ALargeSmall className="h-4 w-4 text-gray-600" />
+              <ALargeSmall className="h-4 w-4 text-muted-foreground" />
               <select
-                defaultValue="16px"
-                className="text-sm bg-transparent outline-none cursor-pointer"
+                defaultValue="12px"
+                className="text-sm bg-transparent outline-none cursor-pointer text-foreground"
                 onMouseDown={(e) => e.stopPropagation()}
                 onChange={(e) => executeCommand(setTextStyle({ fontSize: e.target.value }))}
               >
-                <option value="12px">12</option>
-                <option value="14px">14</option>
-                <option value="16px">16</option>
-                <option value="18px">18</option>
-                <option value="20px">20</option>
-                <option value="24px">24</option>
-                <option value="28px">28</option>
-                <option value="32px">32</option>
+                <option value="12px" className="bg-popover text-popover-foreground">12</option>
+                <option value="14px" className="bg-popover text-popover-foreground">14</option>
+                <option value="16px" className="bg-popover text-popover-foreground">16</option>
+                <option value="18px" className="bg-popover text-popover-foreground">18</option>
+                <option value="20px" className="bg-popover text-popover-foreground">20</option>
+                <option value="24px" className="bg-popover text-popover-foreground">24</option>
+                <option value="28px" className="bg-popover text-popover-foreground">28</option>
+                <option value="32px" className="bg-popover text-popover-foreground">32</option>
               </select>
             </div>
           </TooltipTrigger>

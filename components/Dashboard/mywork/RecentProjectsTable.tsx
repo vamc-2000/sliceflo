@@ -17,6 +17,8 @@ import { useProfileStore } from "@/stores/profile-store";
 import { StatusBadge } from "./utils";
 import { ALL_PORTFOLIO_FIELDS } from "@/components/portfolios/views/list-view/common/PortfolioFieldVisibilityPopup";
 
+const RECENT_PROJECT_FIELDS = ALL_PORTFOLIO_FIELDS.filter(f => f.id !== "members" && f.id !== "viewers");
+
 const PAGE_SIZE = 8;
 
 // Format date nicely
@@ -29,11 +31,10 @@ export function RecentProjectsTable() {
   const { projects: storeProjects } = useProjectsStore();
   const { myWork } = useProfileStore();
   const { currentWorkspace, workspaceMembers, fetchWorkspaceMembers } = useWorkspaceStore();
-
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(0);
-  const [visibleCols, setVisibleCols] = useState<Set<string>>(new Set(ALL_PORTFOLIO_FIELDS.map(f => f.id)));
+  const [visibleCols, setVisibleCols] = useState<Set<string>>(new Set(RECENT_PROJECT_FIELDS.map(f => f.id)));
 
   useEffect(() => {
     if (currentWorkspace?.id && workspaceMembers.length === 0) {
@@ -48,6 +49,27 @@ export function RecentProjectsTable() {
   const tasks = useMemo(() => {
     return myWork?.tasks?.list || [];
   }, [myWork]);
+
+  const dynamicProjectPriorities = useMemo(() => {
+    const seen = new Set<string>();
+    const priorities: { value: string; label: string; color: string; order?: number }[] = [];
+
+    storeProjects.forEach((p) => {
+      (p.projectPriorityConfig ?? []).forEach((pr) => {
+        if (!seen.has(pr.value)) {
+          seen.add(pr.value);
+          priorities.push({
+            value: pr.value,
+            label: pr.label,
+            color: pr.color,
+            order: pr.order,
+          });
+        }
+      });
+    });
+
+    return priorities;
+  }, [storeProjects]);
 
   const filtered = projects.filter((p) =>
     p.name.toLowerCase().includes(filter.toLowerCase())
@@ -71,7 +93,7 @@ export function RecentProjectsTable() {
   };
 
   const toggleCol = (col: string) => {
-    const field = ALL_PORTFOLIO_FIELDS.find(f => f.id === col);
+    const field = RECENT_PROJECT_FIELDS.find(f => f.id === col);
     if (field?.required) return;
 
     const next = new Set(visibleCols);
@@ -116,7 +138,7 @@ export function RecentProjectsTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
-              {ALL_PORTFOLIO_FIELDS.map((field) => (
+              {RECENT_PROJECT_FIELDS.map((field) => (
                 <DropdownMenuCheckboxItem
                   key={field.id}
                   checked={visibleCols.has(field.id)}
@@ -140,20 +162,19 @@ export function RecentProjectsTable() {
                 <TableHead className="w-12 pl-4 h-8 py-0.5 align-middle">
                   <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} className="h-4 w-4" data-testid="recent-projects-checkbox-select-all" />
                 </TableHead>
-                {ALL_PORTFOLIO_FIELDS.map(field =>
+                {RECENT_PROJECT_FIELDS.map(field =>
                   visibleCols.has(field.id) && (
                     <TableHead key={field.id} className="text-xs font-semibold text-muted-foreground whitespace-nowrap h-8 py-0.5 align-middle">
                       {field.label}
                     </TableHead>
                   )
                 )}
-                <TableHead className="w-12 h-8 py-0.5 align-middle" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={ALL_PORTFOLIO_FIELDS.length + 2} className="text-center text-xs text-muted-foreground py-10">
+                  <TableCell colSpan={visibleCols.size + 1} className="text-center text-xs text-muted-foreground py-10">
                     No projects found.
                   </TableCell>
                 </TableRow>
@@ -173,7 +194,7 @@ export function RecentProjectsTable() {
                         <Checkbox checked={isSelected} onCheckedChange={() => toggleRow(p.id!)} className="h-4 w-4" data-testid={`recent-projects-checkbox-row-${p.id}`} />
                       </TableCell>
 
-                      {ALL_PORTFOLIO_FIELDS.map(field => {
+                      {RECENT_PROJECT_FIELDS.map(field => {
                         if (!visibleCols.has(field.id)) return null;
 
                         switch (field.id) {
@@ -233,43 +254,48 @@ export function RecentProjectsTable() {
                               </TableCell>
                             );
                           }
-                          case "members":
-                            return (
-                              <TableCell key={field.id} className="py-1 h-9 align-middle">
-                                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                  {(p.members ?? []).length > 0 ? `${(p.members ?? []).length} member(s)` : "—"}
-                                </span>
-                              </TableCell>
-                            );
-                          case "viewers":
-                            return (
-                              <TableCell key={field.id} className="py-1 h-9 align-middle">
-                                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                  {(p.viewers ?? []).length > 0 ? `${(p.viewers ?? []).length} viewer(s)` : "—"}
-                                </span>
-                              </TableCell>
-                            );
+                         
                           case "priority": {
-                            const priority = p.priority || "medium";
-                            let color = "#6B7280";
-                            let bg = "#F3F4F6";
-                            if (priority.toLowerCase() === "high") {
-                              color = "#EF4444";
-                              bg = "#FEE2E2";
-                            } else if (priority.toLowerCase() === "medium") {
-                              color = "#F59E0B";
-                              bg = "#FEF3C7";
-                            } else if (priority.toLowerCase() === "low") {
-                              color = "#10B981";
-                              bg = "#D1FAE5";
+                            const priorityVal = p.priority || "medium";
+                            const fullProject = storeProjects.find((sp) => sp.id === p.id);
+
+                            const priorityCfg = (fullProject?.projectPriorityConfig ?? []).find(
+                              (pr: any) => pr.value.toLowerCase().trim() === priorityVal.toLowerCase().trim() ||
+                                            pr.label.toLowerCase().trim() === priorityVal.toLowerCase().trim()
+                            ) || dynamicProjectPriorities.find(
+                              (pr) => pr.value.toLowerCase().trim() === priorityVal.toLowerCase().trim() ||
+                                      pr.label.toLowerCase().trim() === priorityVal.toLowerCase().trim()
+                            );
+
+                            let priorityColor = priorityCfg?.color;
+                            let priorityLabel = priorityCfg?.label || priorityVal;
+
+                            if (!priorityColor) {
+                              if (priorityVal.toLowerCase() === "high") {
+                                priorityColor = "#EF4444";
+                              } else if (priorityVal.toLowerCase() === "medium") {
+                                priorityColor = "#F59E0B";
+                              } else if (priorityVal.toLowerCase() === "low") {
+                                priorityColor = "#10B981";
+                              } else {
+                                priorityColor = "#6B7280";
+                              }
                             }
+
+                            const isPriorityHex = priorityColor.startsWith("#");
+
                             return (
                               <TableCell key={field.id} className="py-1 h-9 align-middle">
                                 <span
-                                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider"
-                                  style={{ backgroundColor: bg, color: color }}
+                                  className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider border"
+                                  style={{
+                                    borderColor: isPriorityHex ? `${priorityColor}40` : "currentColor",
+                                    backgroundColor: isPriorityHex ? `${priorityColor}15` : "transparent",
+                                    color: priorityColor,
+                                  }}
                                 >
-                                  {priority}
+                                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: priorityColor }} />
+                                  {priorityLabel}
                                 </span>
                               </TableCell>
                             );
@@ -302,21 +328,7 @@ export function RecentProjectsTable() {
                         }
                       })}
 
-                      {/* Actions */}
-                      <TableCell className="py-1 h-9 align-middle pr-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`recent-projects-actions-trigger-${p.id}`}>
-                              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View</DropdownMenuItem>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                    
                     </TableRow>
                   );
                 })

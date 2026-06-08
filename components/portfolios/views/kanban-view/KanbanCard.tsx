@@ -104,6 +104,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
 
   const [isPriorityOpen, setIsPriorityOpen] = useState(false);
   const taskPriorityConfigs = getTaskPriorityConfigs(project.id!);
+  const displayUpdate = project.statusHistory?.[0]?.status || project.currentProjectUpdate || "On Track";
 
   const leaderIds = project.leaders?.length
     ? project.leaders
@@ -238,7 +239,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
               color: groupColor
             }}
           >
-            <span className="truncate">{assignedPhase?.label || project.status || "On track"}</span>
+            <span className="truncate">{assignedPhase?.label || ""}</span>
           </Badge>
         </div>
 
