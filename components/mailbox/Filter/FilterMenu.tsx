@@ -452,7 +452,7 @@ export default function FilterMenu({
                     </Popover>
 
                     {/* Task Type */}
-                    <Popover open={openMilestone} onOpenChange={setOpenMilestone}>
+                    {/* <Popover open={openMilestone} onOpenChange={setOpenMilestone}>
                         <PopoverTrigger asChild>
                             <button
                                 data-testid="filter-menu-task-type-trigger"
@@ -511,10 +511,10 @@ export default function FilterMenu({
                                 ))
                             )}
                         </PopoverContent>
-                    </Popover>
+                    </Popover> */}
 
                     {/* Task Priority */}
-                    <Popover open={openPriority} onOpenChange={setOpenPriority}>
+                    {/* <Popover open={openPriority} onOpenChange={setOpenPriority}>
                         <PopoverTrigger asChild>
                             <button
                                 data-testid="filter-menu-priority-trigger"
@@ -540,8 +540,8 @@ export default function FilterMenu({
                                         key={priority.value}
                                         data-testid={`filter-menu-priority-item-${priority.value}`}
                                         onClick={() => {
-                                            // toggleFilter(`priority:${priority.value}`);
-                                            selectPriority(priority.value); // ✅ replaces toggleFilter
+                                            
+                                            selectPriority(priority.value); 
                                             setOpenPriority(false);
                                             setOpen(false);
                                         }}
@@ -550,7 +550,6 @@ export default function FilterMenu({
                                             : "border-l-transparent"
                                             }`}
                                     >
-                                        {/* Color dot */}
                                         <span
                                             className="h-2.5 w-2.5 rounded-full shrink-0"
                                             style={{ backgroundColor: priority.color }}
@@ -574,10 +573,10 @@ export default function FilterMenu({
                                 ))
                             )}
                         </PopoverContent>
-                    </Popover>
+                    </Popover> */}
 
                     {/* Task Status */}
-                    <Popover open={openStatus} onOpenChange={setOpenStatus}>
+                    {/* <Popover open={openStatus} onOpenChange={setOpenStatus}>
                         <PopoverTrigger asChild>
                             <button
                                 data-testid="filter-menu-status-trigger"
@@ -612,7 +611,6 @@ export default function FilterMenu({
                                             : "border-l-transparent"
                                             }`}
                                     >
-                                        {/* Color dot */}
                                         <span
                                             className="h-2.5 w-2.5 rounded-full shrink-0"
                                             style={{ backgroundColor: status.color }}
@@ -635,7 +633,7 @@ export default function FilterMenu({
                                 ))
                             )}
                         </PopoverContent>
-                    </Popover>
+                    </Popover> */}
 
                     {/* <DropdownMenuSeparator  /> */}
                     <div className="border-t border-border w-50 mx-auto" />

@@ -88,7 +88,7 @@ const MailList: React.FC<MailListProps> = ({
   // console.log("Current userId:", currentUserId);
 
   return (
-    <div data-testid="mail-list-container" className="divide-y divide-border">
+    <div data-testid="mail-list-container" className="flex flex-col">
       {filteredEmails.length === 0 ? (
         <div data-testid="mail-list-no-results" className="p-4 text-center text-sm text-muted-foreground">
           No emails found for this date range.
@@ -99,12 +99,12 @@ const MailList: React.FC<MailListProps> = ({
             key={email._id}
             data-testid={`mail-list-item-${email._id}`}
             onClick={() => onEmailSelect(email)}
-            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors border-r-2 ${
+            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors border-r-2 border-b ${
               selectedEmail?._id === email._id
-                ? "bg-muted border-brand-orange text-foreground font-semibold"
+                ? "bg-muted border-r-brand-orange border-b-transparent text-foreground font-semibold"
                 : email.read
-                ? "bg-background border-transparent text-muted-foreground font-normal hover:bg-muted"
-                : "bg-background border-transparent text-foreground font-semibold hover:bg-primary/10"
+                ? "bg-background border-r-transparent border-border text-muted-foreground font-normal hover:bg-muted"
+                : "bg-background border-r-transparent border-border text-foreground font-semibold hover:bg-primary/10"
             }`}
           >
             {/* Email content */}
