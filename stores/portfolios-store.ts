@@ -141,7 +141,7 @@ export const usePortfoliosStore = create<PortfoliosState>()(
       toggleFieldVisibility: (portfolioId, fieldId, viewType = "list") => {
         set((state) => {
           const key = `${portfolioId}-${viewType}`;
-          const currentVisible = state.fieldVisibility[key] || ["id", "name", "phase", "status", "leaders", "members", "viewers", "priority", "startDate", "endDate"];
+          const currentVisible = state.fieldVisibility[key] || ["id", "name", "phase", "update", "leaders", "members", "viewers", "priority", "startDate", "endDate"];
           const nextVisible = currentVisible.includes(fieldId)
             ? currentVisible.filter((id) => id !== fieldId)
             : [...currentVisible, fieldId];

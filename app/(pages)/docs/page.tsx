@@ -18,13 +18,27 @@ import { LandingPage } from "@/components/LandingPage";
 import { CreateDocumentDialog } from "@/components/docs/CreateDocumentDialog";
 import { BiExpandAlt } from "react-icons/bi";
 import { PiLinkSimple } from "react-icons/pi";
+import { useWorkspaceStore } from "@/stores/workspace-store";
+import { useAuthStore } from "@/stores/auth-store";
+
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 export default function DocsPage() {
   const router = useRouter();
   const { documents, setActiveDoc, fetchRootDocuments, toggleFavorite } = useDocStore();
+  const { workspaceMembers, currentWorkspace, fetchWorkspaceMembers } = useWorkspaceStore();
+  const { user } = useAuthStore();
+
   const [activeTab, setActiveTab] = useState("all");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const loading = useDocStore(state => state.isLoading);
+
+  // Fetch workspace members
+  useEffect(() => {
+    if (currentWorkspace?.id && workspaceMembers.length === 0) {
+      fetchWorkspaceMembers(currentWorkspace.id);
+    }
+  }, [currentWorkspace?.id, workspaceMembers.length, fetchWorkspaceMembers]);
 
   // Initial load of root documents
   useEffect(() => {
@@ -48,13 +62,41 @@ export default function DocsPage() {
   // Creator info helper
   const getCreatorInfo = (doc: any) => {
     const creator = doc.createdBy;
+    const creatorId = typeof creator === 'object' && creator ? creator.userId : creator;
+
+    // 1. Try to look up the creator in workspace members first
+    if (creatorId) {
+      const member = workspaceMembers.find(
+        (m: any) => String(m.userId) === String(creatorId) || String(m.id) === String(creatorId)
+      ) as any;
+      if (member) {
+        return {
+          name: member.name || "Unknown",
+          image: member.profilePicture || member.avatar || member.profilePictureUrl || undefined,
+          initials: member.name ? member.name.split(" ").map((n: string) => n[0]).join("").toUpperCase() : "U",
+        };
+      }
+    }
+
+    // 2. If it matches the current user, fall back to the current user's profile info
+    if (creatorId && user && String(creatorId) === String(user.id)) {
+      return {
+        name: user.name || "You",
+        image: user.profilePictureUrl || undefined,
+        initials: user.name ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase() : "Y",
+      };
+    }
+
+    // 3. If creator is an object, use its own name/image properties
     if (typeof creator === 'object' && creator) {
       return {
         name: creator.name || "Unknown",
         image: creator.profilePictureUrl || undefined,
+        initials: creator.name ? creator.name.substring(0, 2).toUpperCase() : "U",
       };
     }
-    return { name: "You", initials: "Y" };
+
+    return { name: "Unknown", initials: "U" };
   };
 
   // Favorite documents (top 5 for cards)
@@ -81,11 +123,28 @@ export default function DocsPage() {
   };
 
   const getFilteredDocs = () => {
+    const currentUserId = user?.id;
     switch (activeTab) {
       case "favorites":
         return rootDocsList.filter((doc) => doc.isFavorite);
       case "recent":
         return [...rootDocsList].sort((a, b) => (b.viewedAt || b.updatedAt || 0) - (a.viewedAt || a.updatedAt || 0));
+      case "sharedWith":
+        return rootDocsList.filter((doc) => {
+          const creator = doc.createdBy;
+          const creatorId = typeof creator === 'object' && creator ? creator.userId : creator;
+          return creatorId && currentUserId && String(creatorId) !== String(currentUserId);
+        });
+      case "sharedBy":
+        return rootDocsList.filter((doc) => {
+          const creator = doc.createdBy as any;
+          const creatorId = typeof creator === 'object' 
+            ? (creator?.userId || creator?.id || creator?._id) 
+            : creator;
+          const isOwnedByMe = !creatorId || (currentUserId && String(creatorId) === String(currentUserId));
+          const hasOtherMembers = Array.isArray(doc.members) && doc.members.some((m: string) => currentUserId && String(m) !== String(currentUserId));
+          return !!(isOwnedByMe && hasOtherMembers);
+        });
       default:
         return rootDocsList;
     }
@@ -178,18 +237,25 @@ export default function DocsPage() {
           const creator = getCreatorInfo(row.original);
           return (
             <div className="text-center">
-              <Avatar className="h-8 w-8 inline-flex border border-border">
-                {creator.image && <AvatarImage src={creator.image} />}
-                <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-medium">
-                  {creator.initials || creator.name?.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Avatar className="h-8 w-8 inline-flex border border-border cursor-help">
+                    {creator.image && <AvatarImage src={creator.image} />}
+                    <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-medium">
+                      {creator.initials || creator.name?.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{creator.name}</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           );
         },
       },
     ],
-    [router, toggleFavorite]
+    [router, toggleFavorite, workspaceMembers, user]
   );
 
   if (loading) {
@@ -302,6 +368,8 @@ export default function DocsPage() {
             <TabsTrigger value="all">All Docs</TabsTrigger>
             <TabsTrigger value="favorites">Favorites</TabsTrigger>
             <TabsTrigger value="recent">Recent</TabsTrigger>
+            <TabsTrigger value="sharedWith">Shared With Me</TabsTrigger>
+            <TabsTrigger value="sharedBy">Shared By Me</TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab}>

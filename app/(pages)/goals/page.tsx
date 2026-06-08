@@ -8,7 +8,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { Button } from "@/components/ui/button";
 import { Plus, Star, Share2, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
@@ -33,35 +33,63 @@ export default function GoalsPage() {
   const router = useRouter();
   const { goals, fetchGoals, isLoading, toggleFavorite } = useGoalsStore();
   const { currentWorkspace, workspaceMembers, fetchWorkspaceMembers } = useWorkspaceStore();
+  const {user:currentUser ,fetchUserProfile}=useProfileStore();
   const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
+    fetchUserProfile().catch(console.error);
     if (currentWorkspace?.id) {
       fetchGoals(currentWorkspace.id);
       fetchWorkspaceMembers(currentWorkspace.id);
     }
-  }, [currentWorkspace?.id, fetchGoals, fetchWorkspaceMembers]);
+  }, [currentWorkspace?.id, fetchGoals, fetchWorkspaceMembers,fetchUserProfile]);
 
   const getCreatorInfo = (goal: any) => {
     const creator = goal.createdBy;
-    if (typeof creator === 'object' && creator) {
+    const creatorId=typeof creator === 'object'
+    ? (creator?.userId || creator?.id || creator?._id)
+    :creator;
+    const creatorName= typeof creator ==="object" ? creator?.name:undefined;
+    const creatorImage= typeof creator ==="object" ? creator?.profilePictureUrl ||  creator?.profilePicture ||  creator?.avatar:undefined
+    const currentUserId= currentUser?.id || currentUser?._id
+    const member = workspaceMembers.find((m: any) => m.userId === creatorId ||(creatorName && m.name === creatorName));
+    if(member){
       return {
-        name: creator.name || "Unknown",
-        image: creator.profilePictureUrl || creator.profilePicture || creator.avatar || undefined,
-      };
-    }
-
-    if (typeof creator === 'string' && workspaceMembers.length > 0) {
-      const member = workspaceMembers.find((m: any) => m.userId === creator || m.id === creator || m._id === creator);
-      if (member) {
-        return {
-          name: member.name || "Unknown",
-          image: member.profilePicture || member.avatar || (member as any).profilePictureUrl || undefined,
-        };
+        name :member.name ,
+        image:member.profilePicture || undefined,
+        intiials: member.name?.split("").map((n:string)=>n?.[0]).join("").toUpperCase() || "M"
       }
     }
+    if (creatorName) {
+      return {
+        name: creatorName,
+        image: creatorImage || undefined,
+        initials: creatorName
+          ?.split(" ")
+          .map((n: string) => n?.[0])
+          .filter(Boolean)
+          .join("")
+          .toUpperCase() || "U",
+      };
+    }
+   if (!creatorId || creatorId === currentUserId) {
+      if (currentUser) {
+        return {
+          name: currentUser.name || "You",
+          image: currentUser.profilePictureUrl || undefined,
+          initials: currentUser.name
+            ?.split(" ")
+            .map((n: string) => n?.[0])
+            .filter(Boolean)
+            .join("")
+            .toUpperCase() || "Y",
+        };
+      }
+      return { name: "You", initials: "Y" };
+    }
 
-    return { name: "Unknown", image: undefined };
+    // If it's another user but we couldn't resolve details, show Shared User
+    return { name: creatorName || "Shared User", initials: "SU" };
   };
 
   const favoriteGoals = goals
@@ -99,6 +127,8 @@ export default function GoalsPage() {
   };
 
   const getFilteredGoals = () => {
+    const currentUserId= currentUser?.id || currentUser?._id;
+    const getUserId = (u: any) => typeof u === 'object' ? (u?.userId || u?.id || u?._id) : u;
     switch (activeTab) {
       case "my":
         return goals.filter((goal: any) => goal.type === "Personal");
@@ -108,6 +138,25 @@ export default function GoalsPage() {
         return goals.filter((goal: any) => goal.type === "Team");
       case "private":
         return goals.filter((goal: any) => goal.isPrivate);
+      case "shared-with-me":
+        return goals.filter((goal: any) => {
+          const creator = goal.createdBy as any;
+          const creatorId = typeof creator === 'object' 
+            ? (creator?.userId || creator?.id || creator?._id) 
+            : creator;
+          return creatorId && creatorId !== currentUserId;
+        });
+      case "shared-by-me":
+        return goals.filter((goal: any) => {
+          const creator = goal.createdBy as any;
+          const creatorId = typeof creator === 'object' 
+            ? (creator?.userId || creator?.id || creator?._id) 
+            : creator;
+          const isOwnedByMe = !creatorId || creatorId === currentUserId;
+          const otherOwners = goal.owners && goal.owners.filter((o: any) => getUserId(o) !== currentUserId).length > 0;
+          const otherAssigned = goal.assignedTo && goal.assignedTo.filter((a: any) => getUserId(a) !== currentUserId).length > 0;
+          return isOwnedByMe && (otherOwners || otherAssigned);
+        });
       default:
         return goals;
     }
@@ -198,29 +247,33 @@ export default function GoalsPage() {
       },
 
       // Sharing column — change text-right to text-center
+    // Created by column
       {
-        accessorKey: "sharing",
-        header: () => <div className="text-center">Sharing</div>,
+        accessorKey: "createdBy",
+        header: () => <div className="text-left pl-2">Created by</div>,
         cell: ({ row }) => {
-          const goal = row.original;
-          const createdByName = typeof goal.createdBy === "string"
-            ? "RM"
-            : goal.createdBy?.name?.substring(0, 2).toUpperCase() || "RM";
-
+          const creator = getCreatorInfo(row.original);
           return (
-            <div className="text-center">
-              <Avatar className="h-8 w-8 inline-flex bg-muted">
-                <AvatarFallback className="bg-muted text-muted-foreground text-xs font-medium">
-                  {createdByName}
+            <div className="flex items-center gap-2 pl-2">
+              <Avatar className="h-6 w-6 border border-border">
+                {creator.image && (
+                  <AvatarImage 
+                    src={creator.image.startsWith('http') || creator.image.startsWith('data:') ? creator.image : `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${creator.image}`} 
+                    alt={creator.name} 
+                  />
+                )}
+                <AvatarFallback className="bg-muted text-muted-foreground text-[9px] font-medium">
+                  {creator.initials || creator.name?.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
+              <span className="text-xs text-muted-foreground font-medium">{creator.name}</span>
             </div>
           );
         },
       },
 
     ],
-    [toggleFavorite]
+    [toggleFavorite,workspaceMembers, currentUser, currentWorkspace]
   );
 
   // if (isLoading) {

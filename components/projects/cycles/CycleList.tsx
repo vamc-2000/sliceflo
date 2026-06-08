@@ -2,7 +2,9 @@
 
 import React, { useState, useMemo } from "react";
 import { useProjectsStore } from "@/stores/projects-store";
+import { useTasksStore } from "@/stores/tasks-store";
 import { CycleCard } from "./CycleCard";
+import TransferCycleTasksDialog from "./TransferCycleTasksDialog";
 import {
   ChevronDown,
   ChevronUp,
@@ -29,15 +31,26 @@ interface CoolingPeriod {
 
 export function CycleList({ projectId }: CycleListProps) {
   const { projects, deleteCycle } = useProjectsStore();
+  const { tasks } = useTasksStore();
 
   const project = projects.find(p => p.id === projectId);
   const cycles = project?.cycles || [];
+
+  const getCycleTaskCount = (cycleId: string) => {
+    return tasks.filter(task => {
+      return task.projectId === projectId &&
+        (task.cycleId === cycleId || task.cycle?.id === cycleId);
+    }).length;
+  };
 
   const [expandedGroups, setExpandedGroups] = useState({
     active: true,
     upcoming: true,
     completed: false
   });
+
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [transferSourceCycleId, setTransferSourceCycleId] = useState<string | undefined>(undefined);
 
   // Helper to normalize dates to midnight for robust gap calculation
   const getMidnight = (d: Date) => {
@@ -81,12 +94,15 @@ export function CycleList({ projectId }: CycleListProps) {
     return periods;
   }, [cycles]);
 
-  // Upcoming cycles sorted ascending
-  const upcomingCycles = useMemo(() => {
-    return cycles
-      .filter(c => isFuture(new Date(c.startDate)))
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-  }, [cycles]);
+  // Combine upcoming cycles and upcoming cooling periods, sorted ascending chronologically
+  const upcomingItems = useMemo(() => {
+    const upCycles = cycles.filter(c => isFuture(new Date(c.startDate)));
+    const upCooling = coolingPeriods.filter(p => isFuture(new Date(p.startDate)));
+
+    return [...upCycles, ...upCooling].sort(
+      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+  }, [cycles, coolingPeriods]);
 
   // Active cycles
   const activeCycles = useMemo(() => {
@@ -95,6 +111,8 @@ export function CycleList({ projectId }: CycleListProps) {
       isWithinInterval(now, { start: new Date(c.startDate), end: new Date(c.endDate) })
     );
   }, [cycles]);
+
+  const activeCycleId = activeCycles[0]?.id || "";
 
   // Combine completed cycles and completed cooling periods, sorted descending chronologically
   const completedItems = useMemo(() => {
@@ -106,12 +124,17 @@ export function CycleList({ projectId }: CycleListProps) {
     );
   }, [cycles, coolingPeriods]);
 
-  // Standalone active or upcoming cooling period (between latest active/completed and future cycles)
+  // Standalone currently active cooling period
   const activeCoolingPeriod = useMemo(() => {
-    const activeOrUpcoming = coolingPeriods.filter(p => !isPast(new Date(p.endDate)));
-    if (activeOrUpcoming.length === 0) return null;
-    return activeOrUpcoming.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0];
+    const now = new Date();
+    return coolingPeriods.find(p =>
+      isWithinInterval(now, { start: new Date(p.startDate), end: new Date(p.endDate) })
+    ) || null;
   }, [coolingPeriods]);
+
+  const isCurrentlyInCoolingPeriod = useMemo(() => {
+    return !!activeCoolingPeriod;
+  }, [activeCoolingPeriod]);
 
   const toggleGroup = (group: keyof typeof expandedGroups) => {
     setExpandedGroups(prev => ({ ...prev, [group]: !prev[group] }));
@@ -171,7 +194,7 @@ export function CycleList({ projectId }: CycleListProps) {
                   <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
                     <Link2 className="h-3 w-3 text-muted-foreground" />
                     <span className="text-[10px] font-bold text-muted-foreground">
-                      {items[0].taskCount || 0} tasks
+                      {getCycleTaskCount(items[0].id)} tasks
                     </span>
                   </div>
                 </>
@@ -201,17 +224,12 @@ export function CycleList({ projectId }: CycleListProps) {
                             Cooling Period
                           </h3>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
+                          <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm pr-4">
                             <Calendar className="h-3 w-3 text-muted-foreground" />
                             <span className="text-[10px] font-bold text-muted-foreground">
                               {format(new Date(item.startDate), "MMM d")} - {format(new Date(item.endDate), "MMM d, yyyy")}
                             </span>
                           </div>
-                          <Button variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" data-testid={`cycle-list-cooling-menu-${item.id}`}>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </div>
                       </div>
                     ) : (
                       <CycleCard
@@ -220,14 +238,24 @@ export function CycleList({ projectId }: CycleListProps) {
                         hideBadges={type === "active"}
                         onEdit={(c) => console.log("Edit", c)}
                         onDelete={(id) => deleteCycle(projectId, id)}
+                        onTransferTasks={(cycleId) => {
+                          setTransferSourceCycleId(cycleId);
+                          setTransferDialogOpen(true);
+                        }}
                       />
                     )}
                   </div>
                 ))
               ) : (
-                <div className="py-10 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground text-sm italic bg-muted/20">
-                  No {type} cycles found
-                </div>
+                type === "active" && isCurrentlyInCoolingPeriod && activeCoolingPeriod ? (
+                  <div className="py-10 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground text-sm bg-muted/20 px-4 text-center">
+                    No active cycles. you are in cooling period {format(new Date(activeCoolingPeriod.startDate), "MMM d")} to {format(new Date(activeCoolingPeriod.endDate), "MMM d, yyyy")}.
+                  </div>
+                ) : (
+                  <div className="py-10 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground text-sm italic bg-muted/20">
+                    No {type} cycles found
+                  </div>
+                )
               )}
             </div>
           )}
@@ -243,7 +271,7 @@ export function CycleList({ projectId }: CycleListProps) {
         "upcoming",
         "Upcoming cycle",
         <RefreshCw />,
-        upcomingCycles,
+        upcomingItems,
         {
           border: "border-border",
           bg: "bg-card",
@@ -264,16 +292,13 @@ export function CycleList({ projectId }: CycleListProps) {
               Cooling period
             </h3>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
+          <div className="flex items-center gap-3 pr-2">
+            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm pr-4">
               <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-[10px] font-bold text-muted-foreground">
                 {format(new Date(activeCoolingPeriod.startDate), "MMM d")} - {format(new Date(activeCoolingPeriod.endDate), "MMM d, yyyy")}
               </span>
             </div>
-            <Button variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" data-testid="cycle-list-active-cooling-menu">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       )}
@@ -312,6 +337,18 @@ export function CycleList({ projectId }: CycleListProps) {
           accent: "border-l-emerald-500",
           connector: "bg-emerald-500/20"
         }
+      )}
+      {transferSourceCycleId && (
+        <TransferCycleTasksDialog
+          open={transferDialogOpen}
+          onClose={() => {
+            setTransferDialogOpen(false);
+            setTransferSourceCycleId(undefined);
+          }}
+          projectId={projectId}
+          sourceCycleId={transferSourceCycleId}
+          defaultTargetCycleId={activeCycleId}
+        />
       )}
     </div>
   );

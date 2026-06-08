@@ -11,6 +11,7 @@ import { useTasksStore } from '@/stores/tasks-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { MemberAvatar } from '../MemberAvatar'
 import { Task, Subtask } from '@/types/task.types'
+import { formatCycleName } from '@/utils/cycle-utils'
 
 interface Props {
   open: boolean
@@ -195,6 +196,23 @@ export default function LinkCycleTasksDialog({
     })
   }, [availableTasks, collapsedParentIds])
 
+  const isAllSelected = useMemo(() => {
+    return availableTasks.length > 0 && availableTasks.every((t) => selectedIds.has(t.id))
+  }, [availableTasks, selectedIds])
+
+  const isSomeSelected = useMemo(() => {
+    return availableTasks.some((t) => selectedIds.has(t.id)) && !isAllSelected
+  }, [availableTasks, selectedIds, isAllSelected])
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(availableTasks.map((t) => t.id))
+      setSelectedIds(allIds)
+    } else {
+      setSelectedIds(new Set())
+    }
+  }
+
   const handleLinkTasks = async () => {
     if (selectedIds.size === 0 || isLinking) return;
     setIsLinking(true);
@@ -237,7 +255,13 @@ export default function LinkCycleTasksDialog({
           <div className="w-full border border-border rounded-md relative">
             {/* Table Header */}
             <div className="grid grid-cols-[55px_80px_1fr_100px_40px] px-3 py-2 text-xs font-semibold items-center text-primary border-b bg-muted/40">
-              <div />
+              <div className="flex items-center pl-6">
+                <Checkbox
+                  checked={isAllSelected ? true : isSomeSelected ? 'indeterminate' : false}
+                  onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                  data-testid="link-cycle-tasks-select-all"
+                />
+              </div>
               <div>ID</div>
               <div className="pr-2">Task Name</div>
               <div className="text-center">Status</div>
@@ -302,7 +326,7 @@ export default function LinkCycleTasksDialog({
                         <span className="truncate">{task.name}</span>
                         {task.cycle?.name && (
                           <span className="ml-2 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                            {task.cycle.name}
+                            {formatCycleName(task.cycle.name, task.cycle.cycleNumber)}
                           </span>
                         )}
                       </div>

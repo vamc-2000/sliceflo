@@ -55,7 +55,6 @@ export default function ProjectDashboardPage() {
     init();
   }, [fetchProjects, fetchProjectById, fetchTasks, fetchTeams, fetchGoals, currentWorkspace?.id, fetchWorkspaceMembers]);
 
-  // Fetch myWork whenever days selection changes
   useEffect(() => {
     fetchMyWork(days);
   }, [days, fetchMyWork]);

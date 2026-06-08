@@ -224,10 +224,10 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     </div>
                   </TableHead>
                 )}
-                {isVisible("status") && (
+                {isVisible("update") && (
                   <TableHead className={`${headerCellCls} text-center`}>
                     <div className="flex items-center justify-center gap-2">
-                      Status
+                      Update
                     </div>
                   </TableHead>
                 )}
@@ -355,15 +355,33 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                       </TableCell>
                     )}
 
-                    {isVisible("status") && (
-                      <TableCell className={`${bodyCellCls} text-center`}>
-                        <Badge
-                          className={cn("px-2 py-0.5 text-[11px] font-medium h-5", statusColors[project.status as string] || statusColors.active)}
-                          variant="secondary"
-                        >
-                          {String(project.status || 'Active').toUpperCase()}
-                        </Badge>
-                      </TableCell>
+                    {isVisible("update") && (
+                      (() => {
+                        const displayUpdate = project.statusHistory?.[0]?.status || project.currentProjectUpdate || "";
+                        const updateConfigs = project.projectStatusConfig || [];
+                        const updateConfig = updateConfigs.find((c: any) => c.value === displayUpdate);
+                        return (
+                          <TableCell className={`${bodyCellCls} text-center`}>
+                            <Badge
+                              className={cn(
+                                "px-2 py-0.5 text-[11px] font-medium h-5",
+                                !updateConfig && "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              )}
+                              variant="secondary"
+                              style={
+                                updateConfig
+                                  ? {
+                                      backgroundColor: updateConfig.color + "15",
+                                      color: updateConfig.color,
+                                    }
+                                  : undefined
+                              }
+                            >
+                              {updateConfig?.label || displayUpdate || "No update"}
+                            </Badge>
+                          </TableCell>
+                        );
+                      })()
                     )}
 
                     {isVisible("leader") && (

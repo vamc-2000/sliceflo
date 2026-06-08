@@ -9,11 +9,14 @@ import { useTasksStore } from "@/stores/tasks-store";
 import { useMemo } from "react";
 import { useProfileStore } from "@/stores/profile-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useTeamStore } from "@/stores/teams-store";
+import { TeamIcon } from "@/components/teams/TeamIcon";
 
 export function WorkloadRightSidebar() {
   const { tasks } = useTasksStore();
   const { user } = useAuthStore();
   const { myWork } = useProfileStore();
+  const { teams: storeTeams } = useTeamStore();
 
   const myTeams = myWork?.teams || [];
 
@@ -37,25 +40,30 @@ export function WorkloadRightSidebar() {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="flex flex-col gap-1.5 pr-4">
-              {myTeams.map((team) => (
-                <div
-                  key={team.id}
-                  className="group flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all cursor-pointer border border-transparent hover:border-border"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
-                    {team.name?.[0].toUpperCase() ?? "T"}
-                  </div>
+              {myTeams.map((team) => {
+                const fullTeam = storeTeams.find((t) => t.id === team.id) || team;
+                return (
+                  <div
+                    key={team.id}
+                    className="group flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-all cursor-pointer border border-transparent hover:border-border"
+                  >
+                    <TeamIcon
+                      team={fullTeam}
+                      size={8}
+                      className="w-8 h-8 rounded-lg text-xs font-bold shrink-0"
+                    />
 
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-semibold truncate group-hover:text-blue-600 transition-colors">
-                      {team.name}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate">
-                      {team.teamMembers ? `${team.teamMembers.length} members` : (team.role || "Member")}
-                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold truncate group-hover:text-blue-600 transition-colors">
+                        {team.name}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground truncate">
+                        {team.teamMembers ? `${team.teamMembers.length} members` : (team.role || "Member")}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {myTeams.length === 0 && (
                 <p className="text-[10px] text-muted-foreground px-2">You are not in any teams.</p>
               )}

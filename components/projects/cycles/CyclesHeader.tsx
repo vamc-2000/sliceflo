@@ -7,6 +7,8 @@ import { ProjectIconAvatar } from "@/components/projects/ProjectIconAvatar";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
+import { formatCycleName } from "@/utils/cycle-utils";
+
 interface CyclesHeaderProps {
     project: any;
     hasConfig: boolean;
@@ -23,6 +25,9 @@ export function CyclesHeader({
     const projectId = params.id as string;
     const cycleId = params.cycleId as string;
     const cycle = project?.cycles?.find((c: any) => c.id === cycleId);
+    const config = project?.parallelCycleConfigs?.find((cfg: any) => cfg && cfg.id === cycle?.cycleConfigId) ||
+                   project?.parallelCycleConfigs?.find((cfg: any) => cfg && cfg.id !== null);
+    const cycleConfigName = config?.name || "Cycles";
 
     const handleConfigClick = () => {
         if (!hasConfig) {
@@ -43,23 +48,23 @@ export function CyclesHeader({
 
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
 
-                {cycle ? (
-                    <div className="flex items-center gap-2">
-                        <Link href={`/project/${projectId}/cycles`} className="flex items-center gap-2 hover:opacity-80" data-testid="cycles-header-back-link">
+                {cycleId && cycle ? (
+                    <>
+                        <Link href={`/project/${projectId}/cycles`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/70 border border-border/50 shadow-sm">
                                 <CalendarRange className="h-4 w-4 text-foreground" strokeWidth={2.5} />
                             </div>
-                            <span className="text-base font-semibold text-muted-foreground">Cycles</span>
+                            <span className="text-base font-semibold text-foreground">{cycleConfigName}</span>
                         </Link>
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-base font-semibold text-foreground">{cycle.name}</span>
-                    </div>
+                        <span className="text-base font-semibold text-muted-foreground">{formatCycleName(cycle.name, cycle.cycleNumber)}</span>
+                    </>
                 ) : (
                     <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/70 border border-border/50 shadow-sm">
                             <CalendarRange className="h-4 w-4 text-foreground" strokeWidth={2.5} />
                         </div>
-                        <span className="text-base font-semibold text-foreground">Cycles</span>
+                        <span className="text-base font-semibold text-foreground">{cycleConfigName}</span>
                     </div>
                 )}
             </div>

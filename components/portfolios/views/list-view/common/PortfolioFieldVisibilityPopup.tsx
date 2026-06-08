@@ -23,7 +23,7 @@ export const ALL_PORTFOLIO_FIELDS = [
     { id: "id", label: "ID", required: true, type: "number" },
     { id: "name", label: "Project", required: true, type: "text" },
     { id: "phase", label: "Phase", type: "dropdown" },
-    { id: "status", label: "Status", type: "status" },
+    { id: "update", label: "Update", type: "update" },
     { id: "leader", label: "Leader", type: "user" },
     { id: "members", label: "Members", type: "users" },
     { id: "viewers", label: "Viewers", type: "users" },

@@ -77,7 +77,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface ProjectHeaderProps {
     projectName: string;
-    status: "active" | "planning" | "completed" | "on-hold" | "archived";
+    update?: string;
     // viewers?: number;
     projectId: string;
     onCollapseAllGroups?: (() => void) | null;
@@ -95,7 +95,7 @@ interface ProjectHeaderProps {
 
 export function ProjectHeader({
     projectName,
-    status,
+    update,
     // viewers= 1,
     projectId,
     onCollapseAllGroups,
@@ -132,6 +132,11 @@ export function ProjectHeader({
     const { fetchTeams, teams } = useTeamStore();
 
     const project = projects.find((p) => p.id === projectId);
+    const latestStatus = project?.statusHistory?.[0];
+    const displayUpdate = latestStatus?.status || project?.currentProjectUpdate || update;
+    const statusConfigs = project?.projectStatusConfig || [];
+    const displayUpdateConfig = statusConfigs.find((c: any) => c.value === displayUpdate);
+
     // console.log("Project data in project header:", project);
     const viewers = (project?.viewers || []).map((v: any) =>
         typeof v === 'string' ? v : v.userId
@@ -662,16 +667,21 @@ export function ProjectHeader({
                             <div
                                 className={cn(
                                     "inline-flex items-center px-2 py-1 h-8 text-xs font-medium rounded-md capitalize",
-                                    status === "active" && "bg-green-100 text-green-700",
-                                    status === "planning" && "bg-blue-100 text-blue-700",
-                                    status === "completed" && "bg-purple-100 text-purple-700",
-                                    status === "on-hold" && "bg-orange-100 text-orange-700",
-                                    !status && "bg-muted text-muted-foreground"
+                                    !displayUpdateConfig && "bg-muted text-muted-foreground"
                                 )}
-                                data-testid="project-header-status"
+                                style={
+                                    displayUpdateConfig
+                                        ? {
+                                              backgroundColor: displayUpdateConfig.color + "15",
+                                              color: displayUpdateConfig.color,
+                                          }
+                                        : undefined
+                                }
+                                data-testid="project-header-update"
                             >
-                                {status || "No status"}
+                                {displayUpdateConfig?.label || displayUpdate || "No update"}
                             </div>
+
 
                             {/* Viewers */}
                             <Popover open={isViewersOpen} onOpenChange={setIsViewersOpen}>

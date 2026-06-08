@@ -476,7 +476,7 @@ export interface Project {
   cycles?: Cycle[];
   usesParallelCycleConfigs?: boolean;
   statusHistory?: StatusHistoryEntry[];
-  currentProjectStatus?: string;
+  currentProjectUpdate?: string;
 }
 
 interface ProjectsState {
@@ -2636,7 +2636,7 @@ export const useProjectsStore = create<ProjectsState>()(
                 ? {
                   ...p,
                   statusHistory: data.history || [],
-                  currentProjectStatus: data.currentProjectStatus || ''
+                  currentProjectUpdate: data.currentProjectStatus || ''
                 }
                 : p
             ),
@@ -2662,7 +2662,7 @@ export const useProjectsStore = create<ProjectsState>()(
               return {
                 ...p,
                 statusHistory: [data.entry, ...currentHistory],
-                currentProjectStatus: data.currentProjectStatus || ''
+                currentProjectUpdate: data.currentProjectStatus || ''
               };
             }),
             isLoading: false

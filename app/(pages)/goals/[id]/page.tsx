@@ -775,7 +775,11 @@ export default function GoalDetailPage() {
                                                 className="w-8 h-8 rounded-full bg-[#001F3F] hover:bg-[#001F3F]/90 text-white flex items-center justify-center border-[2px] border-card shadow-sm cursor-pointer hover:scale-105 transition-transform"
                                                 style={{ marginLeft: assignedMembers.length > 0 ? "-10px" : "0" }}
                                             >
-                                                <UserPlus className="w-3.5 h-3.5" />
+                                                {goal.visibility === 'team' ? (
+                                                    <Users className="w-3.5 h-3.5" />
+                                                ) : (
+                                                    <UserPlus className="w-3.5 h-3.5" />
+                                                )}
                                             </div>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-[400px] p-4 border border-b-[5px] border-b-[#001F3F]" align="start">
@@ -788,6 +792,7 @@ export default function GoalDetailPage() {
                                                     setIsMembersPopoverOpen(false);
                                                     toast("info", { title: "Invite dialog coming soon" });
                                                 }}
+                                                readOnly={goal.visibility === 'team'}
                                             />
                                         </PopoverContent>
                                     </Popover>

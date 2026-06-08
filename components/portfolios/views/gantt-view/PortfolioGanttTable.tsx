@@ -207,7 +207,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
               </th>
             )}
             {isVisible("phase") && <th className={cn(headerCellCls, "min-w-[140px]")}>Phase</th>}
-            {isVisible("status") && <th className={cn(headerCellCls, "min-w-[120px]")}>Status</th>}
+            {isVisible("update") && <th className={cn(headerCellCls, "min-w-[120px]")}>Update</th>}
             {isVisible("leader") && <th className={cn(headerCellCls, "min-w-[100px]")}>Leader</th>}
             {isVisible("members") && <th className={cn(headerCellCls, "min-w-[120px]")}>Members</th>}
             {isVisible("viewers") && <th className={cn(headerCellCls, "min-w-[120px]")}>Viewers</th>}
@@ -286,15 +286,33 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                   </td>
                 )}
 
-                {isVisible("status") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
-                    <Badge
-                      className={cn("px-2 py-0.5 text-[10px] font-medium h-5", statusColors[project.status as string] || statusColors.active)}
-                      variant="secondary"
-                    >
-                      {String(project.status || 'Active').toUpperCase()}
-                    </Badge>
-                  </td>
+                {isVisible("update") && (
+                  (() => {
+                    const displayUpdate = project.statusHistory?.[0]?.status || project.currentProjectUpdate || "";
+                    const updateConfigs = project.projectStatusConfig || [];
+                    const updateConfig = updateConfigs.find((c: any) => c.value === displayUpdate);
+                    return (
+                      <td className={cn(bodyCellCls, "text-center")}>
+                        <Badge
+                          className={cn(
+                            "px-2 py-0.5 text-[10px] font-medium h-5",
+                            !updateConfig && "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          )}
+                          variant="secondary"
+                          style={
+                            updateConfig
+                              ? {
+                                  backgroundColor: updateConfig.color + "15",
+                                  color: updateConfig.color,
+                                }
+                              : undefined
+                          }
+                        >
+                          {updateConfig?.label || displayUpdate || "No update"}
+                        </Badge>
+                      </td>
+                    );
+                  })()
                 )}
 
                 {isVisible("leader") && (

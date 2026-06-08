@@ -30,7 +30,7 @@ export function ListView({ portfolioId }: ListViewProps) {
   const portfolioProjectIds = portfolio?.projects || [];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [groupBy, setGroupBy] = useState<"phase" | "status" | "none">("phase");
+  const [groupBy, setGroupBy] = useState<"phase" | "update" | "none">("phase");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [openLinkProjectDialog, setOpenLinkProjectDialog] = useState(false);
@@ -69,17 +69,26 @@ export function ListView({ portfolioId }: ListViewProps) {
       return groups;
     }
 
-    if (groupBy === "status") {
-      const defaultStatuses = [
-        { id: "active", name: "Active", color: "#10B981" },
-        { id: "archived", name: "Archived", color: "#6B7280" },
-      ];
-
-      defaultStatuses.forEach((status) => {
-        groups[status.id] = { ...status, projects: [] };
+    if (groupBy === "update") {
+      const uniqueConfigsMap = new Map<string, { id: string; name: string; color: string }>();
+      
+      filteredProjects.forEach(project => {
+        (project.projectStatusConfig || []).forEach(config => {
+          const valLower = config.value.toLowerCase();
+          if (!uniqueConfigsMap.has(valLower)) {
+            uniqueConfigsMap.set(valLower, {
+              id: valLower,
+              name: config.label,
+              color: config.color
+            });
+          }
+        });
+      });
+      
+      uniqueConfigsMap.forEach((update) => {
+        groups[update.id] = { ...update, projects: [] };
       });
 
-      // "Unassigned" fallback
       groups["unassigned"] = {
         id: "unassigned",
         name: "No value",
@@ -88,9 +97,9 @@ export function ListView({ portfolioId }: ListViewProps) {
       };
 
       filteredProjects.forEach((project) => {
-        const s = project.status?.toLowerCase() || "unassigned";
-        if (groups[s]) {
-          groups[s].projects.push(project);
+        const displayUpdate = (project.statusHistory?.[0]?.status || project.currentProjectUpdate || "").toLowerCase();
+        if (displayUpdate && groups[displayUpdate]) {
+          groups[displayUpdate].projects.push(project);
         } else {
           groups["unassigned"].projects.push(project);
         }
@@ -171,10 +180,10 @@ export function ListView({ portfolioId }: ListViewProps) {
                 Phase
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setGroupBy("status")}
+                onClick={() => setGroupBy("update")}
                 className="cursor-pointer text-xs"
               >
-                Status
+                Update
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setGroupBy("none")}

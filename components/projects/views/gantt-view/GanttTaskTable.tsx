@@ -49,7 +49,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isWithinInterval, isFuture } from "date-fns";
 import { useTasksStore, SYSTEM_FIELDS } from "@/stores/tasks-store";
 import { Task, ColumnConfig } from '@/types/task.types';
 import { useProjectsStore, TaskTypeConfig, } from "@/stores/projects-store";
@@ -59,6 +59,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CustomFieldDropdown } from "@/components/projects/views/list-view/common/CustomFieldDropdown";
 import { TaskDetailView } from "@/components/projects/TaskDetailView";
 import { formatTaskId } from '@/utils/task-utils';
+import { formatCycleName } from '@/utils/cycle-utils';
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { GanttFieldVisibilityPopup } from "./GanttFieldVisibilityPopup";
 import { RelationshipDetailDialog } from "../list-view/common/RelationshipDetailDialog";
@@ -267,7 +268,17 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
     const taskPriorityConfigs = getTaskPriorityConfigs(projectId);
     const customFields = getTaskCustomFields(projectId);
     const taskTypes = getTaskTypesByProject(projectId);
-    const cycles = currentProject?.cycles || [];
+    const allCycles = currentProject?.cycles || [];
+    const cycles = useMemo(() => {
+        const now = new Date();
+        return allCycles.filter((c) => {
+            const start = new Date(c.startDate);
+            const end = new Date(c.endDate);
+            const isActive = isWithinInterval(now, { start, end });
+            const isUpcoming = isFuture(start);
+            return isActive || isUpcoming;
+        });
+    }, [allCycles]);
 
     const systemFieldVisibility = useTasksStore(state => state.systemFieldVisibility);
 
@@ -772,13 +783,13 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
         }
 
         if (h.key === 'cycle') {
-            const cycle = cycles.find(c => c.id === item.cycleId);
+            const cycle = allCycles.find(c => c.id === item.cycleId);
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                             <span className={cn("truncate w-full text-center flex items-center justify-center", !cycle && "text-muted-foreground font-normal")}>
-                                {cycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                {cycle ? formatCycleName(cycle.name, cycle.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                             </span>
                         </button>
                     </DropdownMenuTrigger>
@@ -786,7 +797,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                         {cycles.map(c => (
                             <DropdownMenuItem key={c.id} onClick={() => updateFn(item.id, { cycleId: c.id })} className="p-0 focus:bg-transparent">
                                 <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
-                                    <span className="truncate w-full text-center">{c.name}</span>
+                                    <span className="truncate w-full text-center">{formatCycleName(c.name, c.cycleNumber)}</span>
                                 </div>
                             </DropdownMenuItem>
                         ))}
@@ -1092,14 +1103,14 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                     );
                                                 }
                                                 if (h.key === 'cycle') {
-                                                    const selCycle = cycles.find(c => c.id === newSubtaskData.cycleId);
+                                                    const selCycle = allCycles.find(c => c.id === newSubtaskData.cycleId);
                                                     return (
                                                         <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger asChild>
                                                                     <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                                                                         <span className={cn("truncate w-full text-center flex items-center justify-center", !selCycle && "text-muted-foreground font-normal")}>
-                                                                            {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                                                            {selCycle ? formatCycleName(selCycle.name, selCycle.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                                                         </span>
                                                                     </button>
                                                                 </DropdownMenuTrigger>
@@ -1107,7 +1118,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                     {cycles.map(c => (
                                                                         <DropdownMenuItem key={c.id} onClick={() => setNewSubtaskData(prev => ({ ...prev, cycleId: c.id }))} className="p-0 focus:bg-transparent">
                                                                             <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
-                                                                                <span className="truncate w-full text-center">{c.name}</span>
+                                                                                <span className="truncate w-full text-center">{formatCycleName(c.name, c.cycleNumber)}</span>
                                                                             </div>
                                                                         </DropdownMenuItem>
                                                                     ))}
@@ -1429,14 +1440,14 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                         );
                                     }
                                     if (h.key === 'cycle') {
-                                        const selCycle = cycles.find(c => c.id === newTaskData.cycleId);
+                                        const selCycle = allCycles.find(c => c.id === newTaskData.cycleId);
                                         return (
                                             <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                                                             <span className={cn("truncate w-full text-center flex items-center justify-center", !selCycle && "text-muted-foreground font-normal")}>
-                                                                {selCycle?.name || <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
+                                                                {selCycle ? formatCycleName(selCycle.name, selCycle.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />}
                                                             </span>
                                                         </button>
                                                     </DropdownMenuTrigger>
@@ -1444,7 +1455,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                         {cycles.map(c => (
                                                             <DropdownMenuItem key={c.id} onClick={() => setNewTaskData(prev => ({ ...prev, cycleId: c.id }))} className="p-0 focus:bg-transparent">
                                                                 <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
-                                                                    <span className="truncate w-full text-center">{c.name}</span>
+                                                                    <span className="truncate w-full text-center">{formatCycleName(c.name, c.cycleNumber)}</span>
                                                                 </div>
                                                             </DropdownMenuItem>
                                                         ))}
