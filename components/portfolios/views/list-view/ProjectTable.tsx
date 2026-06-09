@@ -161,6 +161,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
   const [leaderSearchQuery, setLeaderSearchQuery] = useState('');
   const [memberSearchQuery, setMemberSearchQuery] = useState('');
+  const [viewerSearchQuery, setViewerSearchQuery] = useState('');
 
   const getFilteredLeaderMembers = (projectUsers: any[]) => {
     const query = leaderSearchQuery.startsWith('@') ? leaderSearchQuery.slice(1) : leaderSearchQuery;
@@ -172,6 +173,14 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
   const getFilteredMemberMembers = (projectUsers: any[]) => {
     const query = memberSearchQuery.startsWith('@') ? memberSearchQuery.slice(1) : memberSearchQuery;
+    if (!query) return projectUsers;
+    return projectUsers.filter(member =>
+      member && member.name && member.name.toLowerCase().includes(query.toLowerCase())
+    );
+  };
+
+  const getFilteredViewerMembers = (projectUsers: any[]) => {
+    const query = viewerSearchQuery.startsWith('@') ? viewerSearchQuery.slice(1) : viewerSearchQuery;
     if (!query) return projectUsers;
     return projectUsers.filter(member =>
       member && member.name && member.name.toLowerCase().includes(query.toLowerCase())
@@ -264,17 +273,18 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
       return {
         ...baseStyle,
         position: 'sticky',
-        left: '40px',
+        left: '39px',
         zIndex: isHeader ? 30 : 20,
+        borderRight: '1px solid var(--border)',
       };
     }
 
     if (columnId === 'name') {
-      const leftOffset = isVisible("id") ? 40 + (columnWidths['id'] ?? 80) : 40;
+      const leftOffset = isVisible("id") ? 39 + (columnWidths['id'] ?? 80) : 39;
       return {
         ...baseStyle,
         position: 'sticky',
-        left: `${leftOffset}px`,
+        left: `${leftOffset - 1}px`,
         zIndex: isHeader ? 30 : 20,
         boxShadow: 'inset -1px 0 0 var(--border), 2px 0 4px rgba(0,0,0,0.04)',
       };
@@ -365,7 +375,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
       minWidth: '40px',
       width: '40px',
       maxWidth: '40px',
-      boxShadow: `inset 4px 0 0 0 ${customColor || groupColor}`,
+      boxShadow: `inset 4px 0 0 0 ${customColor || groupColor}, inset -1px 0 0 var(--border)`,
       borderRight: '1px solid var(--border)',
       padding: 0,
     };
@@ -378,7 +388,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
           <Table className="relative border-y border-border text-xs min-w-full">
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead className={cn(headerCellCls, "bg-muted")} style={getDragColumnStyle(true)} />
+                <TableHead className="!h-9 select-none border-r border-border bg-muted p-0" style={getDragColumnStyle(true)} />
                 {isVisible("id") && (
                   <TableHead className={cn(headerCellCls, "text-center relative group bg-card")} style={getColumnStyle("id", true)}>
                     ID
@@ -542,7 +552,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
                 const projectUsers: typeof workspaceMembers = [];
                 const seenIds = new Set<string>();
-                [...projectLeaders, ...projectMembers].forEach(u => {
+                [...projectLeaders, ...projectMembers, ...projectViewers].forEach(u => {
                   if (u && !seenIds.has(u.userId)) {
                     seenIds.add(u.userId);
                     projectUsers.push(u);
@@ -694,9 +704,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                       key={member.userId}
                                       onSelect={(e) => {
                                         e.preventDefault();
-                                        if (project.id) {
-                                          handleUpdateLeader(project.id, leaderIds, member.userId);
-                                        }
                                       }}
                                       className="p-0 focus:bg-transparent"
                                     >
@@ -788,9 +795,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                       key={member.userId}
                                       onSelect={(e) => {
                                         e.preventDefault();
-                                        if (project.id) {
-                                          handleUpdateMember(project.id, project.members || [], member.userId);
-                                        }
                                       }}
                                       className="p-0 focus:bg-transparent"
                                     >
@@ -823,8 +827,93 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     )}
 
                     {isVisible("viewers") && (
-                      <TableCell className={`${bodyCellCls} text-center`} style={getColumnStyle("viewers", false)}>
-                        <AvatarGroup users={projectViewers} label="Project Viewers" />
+                      <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('viewers', false), height: '1px' }}>
+                        <DropdownMenu onOpenChange={(open) => {
+                          if (!open) setViewerSearchQuery('');
+                        }}>
+                          <DropdownMenuTrigger asChild className="w-full h-full">
+                            <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
+                              <div className="flex items-center justify-center -space-x-2">
+                                {projectViewers.length > 0 ? (
+                                  projectViewers.slice(0, 3).map((u, i) => {
+                                    if (!u) return null;
+                                    return (
+                                      <Avatar key={u.userId || i} className="h-6 w-6 relative" style={{ zIndex: 10 - i }}>
+                                        {u.profilePicture && <AvatarImage src={getProfilePictureUrl(u.profilePicture)} className="object-cover" />}
+                                        <AvatarFallback
+                                          className="text-white text-[10px] font-semibold bg-muted-foreground"
+                                          style={{ backgroundColor: getAvatarColor(u.name || "?") }}
+                                        >
+                                          {getInitials(u.name)}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground">
+                                    <User className="h-3 w-3" />
+                                  </div>
+                                )}
+                                {projectViewers.length > 3 && (
+                                  <div className="h-6 min-w-[24px] rounded-full bg-gray-50 flex items-center justify-center relative z-0 px-1">
+                                    <span className="text-[10px] text-gray-600 font-medium whitespace-nowrap">+{projectViewers.length - 3}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                              <Input
+                                placeholder="Type @ or name..."
+                                value={viewerSearchQuery}
+                                onChange={(e) => setViewerSearchQuery(e.target.value)}
+                                className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                                autoFocus
+                              />
+                            </div>
+
+                            <div className="max-h-60 overflow-y-auto space-y-1">
+                              {getFilteredViewerMembers(projectUsers).length === 0 ? (
+                                <div className="text-center py-2 text-xs text-muted-foreground">
+                                  No members found
+                                </div>
+                              ) : (
+                                getFilteredViewerMembers(projectUsers).map(member => {
+                                  const isViewer = project.viewers?.includes(member.userId);
+                                  return (
+                                    <DropdownMenuItem
+                                      key={member.userId}
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                      }}
+                                      className="p-0 focus:bg-transparent"
+                                    >
+                                      <div className={cn(
+                                        "w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-transparent text-foreground",
+                                        isViewer && "bg-muted/50"
+                                      )}>
+                                        <div className="flex items-center gap-3 truncate">
+                                          <Avatar className="h-6 w-6 shrink-0">
+                                            {member.profilePicture && <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />}
+                                            <AvatarFallback
+                                              className="text-white text-[10px] font-semibold bg-muted-foreground"
+                                              style={{ backgroundColor: getAvatarColor(member.name || "?") }}
+                                            >
+                                              {getInitials(member.name)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span className="truncate">{member.name}</span>
+                                        </div>
+                                        {isViewer && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
+                                      </div>
+                                    </DropdownMenuItem>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     )}
 
