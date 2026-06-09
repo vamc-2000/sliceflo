@@ -52,8 +52,8 @@ const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, la
             </Avatar>
           ))}
           {overflowCount > 0 && (
-            <div className="h-6 min-w-[24px] rounded-full border-2 border-white bg-gray-50 flex items-center justify-center relative z-0 px-1">
-              <span className="text-[10px] text-gray-600 font-medium whitespace-nowrap">+{overflowCount}</span>
+            <div className="h-6 min-w-[24px] rounded-full border-2 border-card bg-muted flex items-center justify-center relative z-0 px-1">
+              <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">+{overflowCount}</span>
             </div>
           )}
         </div>
@@ -89,19 +89,19 @@ const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, la
 const PriorityFlag = ({ priority, color }: { priority?: string; color?: string }) => {
   if (!priority) {
     return (
-      <div className="w-7 h-7 rounded-full border border-dashed border-gray-300 flex items-center justify-center mx-auto">
-        <Flag className="h-3 w-3 text-gray-300" />
+      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted mx-auto">
+        <Flag className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
     );
   }
   const bg = color || '#9CA3AF';
   return (
     <div
-      className="w-7 h-7 rounded-full flex items-center justify-center mx-auto"
-      style={{ backgroundColor: `${bg}22`, border: `1.5px solid ${bg}` }}
+      className="w-6 h-6 rounded-full flex items-center justify-center mx-auto"
+      style={{ backgroundColor: `${bg}22` }}
       title={priority}
     >
-      <Flag className="h-3 w-3" style={{ color: bg }} fill={bg} />
+      <Flag className="h-3.5 w-3.5" style={{ color: bg }} />
     </div>
   );
 };
@@ -188,8 +188,8 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
     return fallbacks[project.priority.toLowerCase()] || fallbacks.low;
   };
 
-  const headerCellCls = "h-[60px] px-4 text-center align-middle font-medium text-muted-foreground uppercase text-sm border-r bg-card last:border-r-0";
-  const bodyCellCls = "px-4 h-[48px] align-middle border-r last:border-r-0";
+  const headerCellCls = "h-9 px-3 py-0 text-center align-middle font-semibold text-muted-foreground uppercase tracking-wide text-xs border-r bg-card last:border-r-0 select-none";
+  const bodyCellCls = "h-9 px-0 py-0 align-middle border-r last:border-r-0 whitespace-nowrap overflow-hidden text-center";
 
   return (
     <div
@@ -197,9 +197,9 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
       onScroll={onScroll}
       className="w-full h-full overflow-auto rounded-tl-lg bg-background border-r scrollbar-thin"
     >
-      <table className="w-full border-collapse table-auto min-w-max text-sm">
+      <table className="w-full border-collapse table-auto min-w-max text-xs relative">
         <thead className="sticky top-0 z-20 bg-card shadow-sm">
-          <tr className="h-[60px] border-b">
+          <tr className="h-9 border-b">
             {isVisible("id") && <th className={cn(headerCellCls, "min-w-[70px]")}>ID</th>}
             {isVisible("name") && (
               <th className={cn(headerCellCls, "text-left min-w-[250px]")}>
@@ -223,7 +223,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
             </th>
           </tr>
         </thead>
-        <tbody className="bg-card">
+        <tbody className="bg-background">
           {projects.map((project, index) => {
             const leaderIds = project.leaders?.length
               ? project.leaders
@@ -238,7 +238,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
             return (
               <tr
                 key={project.id}
-                className="border-b hover:bg-muted/30 h-[48px] group transition-colors"
+                className="border-b hover:bg-muted/30 h-9 group transition-colors relative"
               >
                 {isVisible("id") && (
                   <td
@@ -256,7 +256,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
 
                 {isVisible("name") && (
                   <td
-                    className={cn(bodyCellCls, "min-w-[250px]")}
+                    className={cn(bodyCellCls, "min-w-[250px] px-4 text-left")}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 shrink-0">
@@ -264,7 +264,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                       </div>
                       <Link
                         href={`/project/${project.id}`}
-                        className="text-sm font-medium truncate hover:underline"
+                        className="text-xs font-medium truncate hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {project.name}
@@ -278,7 +278,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                     {assignedPhase ? (
                       <div className="flex items-center justify-center gap-2">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ background: assignedPhase.color || '#3B82F6' }} />
-                        <span className="text-sm font-medium text-gray-700 truncate">{assignedPhase.label}</span>
+                        <span className="text-xs font-medium truncate">{assignedPhase.label}</span>
                       </div>
                     ) : (
                       <span className="text-gray-400">—</span>
@@ -302,9 +302,9 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                           style={
                             updateConfig
                               ? {
-                                  backgroundColor: updateConfig.color + "15",
-                                  color: updateConfig.color,
-                                }
+                                backgroundColor: updateConfig.color + "15",
+                                color: updateConfig.color,
+                              }
                               : undefined
                           }
                         >
@@ -345,7 +345,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                 {isVisible("startDate") && (
                   <td className={cn(bodyCellCls, "text-center")}>
                     {project.startDate ? (
-                      <span className="text-sm text-gray-700">{format(new Date(project.startDate), 'd MMM')}</span>
+                      <span className="text-xs">{format(new Date(project.startDate), 'd MMM')}</span>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
@@ -355,7 +355,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                 {isVisible("endDate") && (
                   <td className={cn(bodyCellCls, "text-center")}>
                     {project.endDate ? (
-                      <span className="text-sm text-gray-700">{format(new Date(project.endDate), 'd MMM')}</span>
+                      <span className="text-xs">{format(new Date(project.endDate), 'd MMM')}</span>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
@@ -400,7 +400,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
             );
           })}
           <tr
-            className="border-b h-[48px] group transition-colors"
+            className="border-b h-9 group transition-colors relative"
             onMouseEnter={() => setIsAddProjectRowHovered(true)}
             onMouseLeave={() => {
               setIsAddProjectRowHovered(false);
@@ -409,7 +409,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
           >
             {isVisible("id") && <td className={bodyCellCls} />}
             {isVisible("name") && (
-              <td className={cn(bodyCellCls, "min-w-[250px]")}>
+              <td className={cn(bodyCellCls, "min-w-[250px] px-4 text-left")}>
                 <div className="flex items-center gap-1">
                   <div
                     className={cn(
@@ -419,7 +419,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                   >
                     <button
                       className={cn(
-                        "flex items-center gap-1 px-2 py-0.5 transition-colors text-sm focus:outline-none",
+                        "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs focus:outline-none",
                         (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground"
                       )}
                       onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
@@ -464,7 +464,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                                 setShowAddProjectMenu(false);
                                 router.push(`/portfolio/${portfolioId}/create-project`);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left"
                             >
                               <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                               <span>Add new project</span>
@@ -474,7 +474,7 @@ export const PortfolioGanttTable = forwardRef<HTMLDivElement, PortfolioGanttTabl
                                 setShowAddProjectMenu(false);
                                 onAddProject?.();
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left border-t border-border"
+                              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left border-t border-border"
                             >
                               <LinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
                               <span>Add existing project</span>

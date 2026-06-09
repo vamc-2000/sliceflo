@@ -151,7 +151,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
           <Link href={`/project/${project.id}`} onClick={(e) => e.stopPropagation()}>
             <Badge
               variant="secondary"
-              className="text-sm px-2 py-0.5 rounded-sm hover:underline"
+              className="text-xs px-2 py-0.5 rounded-sm hover:underline"
               style={{
                 backgroundColor: `${groupColor}20`,
                 color: groupColor
@@ -233,7 +233,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
           {/* Status Pill (Phase or Status) */}
           <Badge
             variant="secondary"
-            className={"text-sm px-2 py-0 h-5 truncate"}
+            className={"text-xs px-2 py-0 h-5 truncate"}
             style={{
               backgroundColor: `${groupColor}20`,
               color: groupColor
@@ -251,7 +251,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       {/* Project Name */}
       <Link
         href={`/project/${project.id}`}
-        className="text-base font-bold text-foreground hover:underline mb-2 line-clamp-2 transition-colors block"
+        className="text-xs font-semibold text-foreground hover:underline mb-2 line-clamp-2 transition-colors block"
         onClick={(e) => e.stopPropagation()}
       >
         {project.name}
@@ -262,9 +262,12 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
         <div className="flex items-center gap-2">
           {/* Date Range Badge */}
           {dateRangeStr && (
-            <Badge variant="secondary" className="flex items-center gap-1.5 h-6 px-2 py-1 rounded-sm">
-              <CalendarIcon className="h-4 w-4" />
-              <span className="text-sm whitespace-nowrap">{dateRangeStr}</span>
+            <Badge
+              variant="secondary"
+              className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted"
+            >
+              <CalendarIcon className="h-3.5 w-3.5" />
+              <span className="mt-0.5 whitespace-nowrap">{dateRangeStr}</span>
             </Badge>
           )}
 

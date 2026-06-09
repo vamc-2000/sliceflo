@@ -41,8 +41,8 @@ export function TableView({ portfolioId }: TableViewProps) {
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Action Bar */}
-      <div className="bg-card border-b border-border p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-1">
           {/* Search bar */}
           <div className="relative flex">
             <Input
@@ -50,7 +50,7 @@ export function TableView({ portfolioId }: TableViewProps) {
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-2 pr-8 rounded w-[240px]"
+              className="pl-2 pr-8 rounded text-xs"
             />
             <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
           </div>
@@ -60,7 +60,7 @@ export function TableView({ portfolioId }: TableViewProps) {
               variant="secondary"
               size="sm"
               onClick={() => setShowSortOptions(!showSortOptions)}
-              className={`rounded cursor-pointer ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
+              className={`rounded cursor-pointer text-xs ${showSortOptions ? "bg-primary text-primary-foreground hover:bg-primary" : ""}`}
             >
               <SlidersVertical className="h-4 w-4" />
             </Button>
@@ -69,55 +69,36 @@ export function TableView({ portfolioId }: TableViewProps) {
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <ArrowUpDown className="h-4 w-4" />
                       Sort
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
                     <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <Funnel className="h-4 w-4" />
                       Filter
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
                     <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
-                      <Pin className="h-4 w-4" />
-                      Freeze Fields
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-[#001F3F]">
-                    <p className="text-xs text-gray-500">Coming soon for portfolios...</p>
-                  </DropdownMenuContent>
-                </DropdownMenu> */}
-
-                {/* <PortfolioFieldVisibilityPopup portfolioId={portfolioId} viewType="table">
-                  <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
-                    <EyeOff className="h-4 w-4" />
-                    Hide Fields
-                  </Button>
-                </PortfolioFieldVisibilityPopup> */}
-
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer">
+                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
                       <Monitor className="h-4 w-4" />
                       Display
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="p-4 border-b-4 border-b-primary">
+                  <DropdownMenuContent align="center" className="p-4 border-b-5 border-b-primary">
                     <p className="text-xs text-muted-foreground">Coming soon for portfolios...</p>
                   </DropdownMenuContent>
                 </DropdownMenu>

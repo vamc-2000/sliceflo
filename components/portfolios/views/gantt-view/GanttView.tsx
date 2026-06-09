@@ -166,21 +166,21 @@ export function GanttView({ portfolioId }: GanttViewProps) {
     return (
         <div className="w-full h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="bg-card border-b border-border p-4 flex items-center justify-between">
+            <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="relative flex">
                         <Input
                             placeholder="Search projects..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-2 pr-8 rounded"
+                            className="pl-2 pr-8 rounded text-xs"
                         />
                         <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="secondary" size="sm" onClick={() => handleNavigate('today')}>
+                    <Button variant="secondary" size="sm" onClick={() => handleNavigate('today')} className="h-8 px-2 rounded text-xs font-medium">
                         Today
                     </Button>
                     <div className="flex items-center gap-1">
@@ -189,7 +189,7 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                         </Button>
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" className="h-8 px-3 text-sm font-semibold hover:bg-muted flex items-center gap-1">
+                                <Button variant="ghost" className="h-8 px-3 text-xs font-semibold hover:bg-muted flex items-center gap-1">
                                     {getDateLabel()}
                                 </Button>
                             </PopoverTrigger>
@@ -268,8 +268,8 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                         range={range}
                         startDate={currentDate}
                         zoom={zoom}
-                        headerHeight={60}
-                        rowHeight={48}
+                        headerHeight={36}
+                        rowHeight={36}
                         className="h-full w-full overflow-hidden"
                         weekendDays={weekendDays}
                         containerRef={timelineRef}
@@ -289,13 +289,13 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                                                 key={feature.id}
                                                 {...feature}
                                                 onMove={handleMoveFeature}
-                                                hideLabels={true}
+                                                hideLabels={false}
                                             />
-                                        ) : (
-                                            <div key={project.id} style={{ height: 48 }} className="border-b border-gray-100/50" />
+                                        ) : (   
+                                            <div key={project.id} style={{ height: 36 }} className="border-b border-gray-100/50" />
                                         );
                                     })}
-                                    <div style={{ height: 48 }} className="border-b border-gray-100/50 w-full" />
+                                    <div style={{ height: 36 }} className="border-b border-gray-100/50 w-full" />
                                 </GanttFeatureList>
                                 <GanttToday />
                             </GanttTimeline>
@@ -303,7 +303,7 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                     </GanttProvider>
 
                     {/* Zoom Controls */}
-                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border border-borderbg-card shadow-md">
+                    <div className="absolute bottom-6 right-6 z-20 flex overflow-hidden rounded-md border bg-card shadow-md">
                         <Button
                             variant="ghost"
                             size="sm"

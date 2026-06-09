@@ -692,12 +692,12 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-1">
-                              {getFilteredLeaderMembers(projectUsers).length === 0 ? (
+                              {getFilteredLeaderMembers(projectMembers).length === 0 ? (
                                 <div className="text-center py-2 text-xs text-muted-foreground">
                                   No members found
                                 </div>
                               ) : (
-                                getFilteredLeaderMembers(projectUsers).map(member => {
+                                getFilteredLeaderMembers(projectMembers).map(member => {
                                   const isLeader = leaderIds.includes(member.userId);
                                   return (
                                     <DropdownMenuItem
@@ -723,7 +723,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                           </Avatar>
                                           <span className="truncate">{member.name}</span>
                                         </div>
-                                        {isLeader && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
                                       </div>
                                     </DropdownMenuItem>
                                   );
@@ -783,12 +782,12 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-1">
-                              {getFilteredMemberMembers(projectUsers).length === 0 ? (
+                              {getFilteredMemberMembers(projectMembers).length === 0 ? (
                                 <div className="text-center py-2 text-xs text-muted-foreground">
                                   No members found
                                 </div>
                               ) : (
-                                getFilteredMemberMembers(projectUsers).map(member => {
+                                getFilteredMemberMembers(projectMembers).map(member => {
                                   const isMember = project.members?.some(m => m.userId === member.userId);
                                   return (
                                     <DropdownMenuItem
@@ -814,7 +813,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                           </Avatar>
                                           <span className="truncate">{member.name}</span>
                                         </div>
-                                        {isMember && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
                                       </div>
                                     </DropdownMenuItem>
                                   );
@@ -874,12 +872,12 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-1">
-                              {getFilteredViewerMembers(projectUsers).length === 0 ? (
+                              {getFilteredViewerMembers(projectMembers).length === 0 ? (
                                 <div className="text-center py-2 text-xs text-muted-foreground">
                                   No members found
                                 </div>
                               ) : (
-                                getFilteredViewerMembers(projectUsers).map(member => {
+                                getFilteredViewerMembers(projectMembers).map(member => {
                                   const isViewer = project.viewers?.includes(member.userId);
                                   return (
                                     <DropdownMenuItem

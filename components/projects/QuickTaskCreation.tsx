@@ -112,8 +112,15 @@ export function QuickTaskCreation({
   }, [team]);
 
   const members = useMemo(() => {
+    if (project) {
+      const projectUserIds = new Set<string>();
+      if (project.members) {
+        project.members.forEach(m => projectUserIds.add(m.userId));
+      }
+      return workspaceMembers.filter(m => projectUserIds.has(m.userId));
+    }
     return workspaceMembers.length > 0 ? workspaceMembers : teamMembers;
-  }, [workspaceMembers, teamMembers]);
+  }, [project, workspaceMembers, teamMembers]);
 
   // Filter projects by team and initial assignee if provided
   const filteredProjects = useMemo(() => {
