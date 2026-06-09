@@ -15,7 +15,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function DraftsPage() {
   const { drafts, fetchDrafts, saveDraft, deleteDraft, isLoading } = useDraftsStore();
-  const { projects } = useProjectsStore();
+  const { projects, fetchProjects } = useProjectsStore();
   const { workspaceMembers, currentWorkspace, fetchWorkspaceMembers } = useWorkspaceStore();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,13 +28,29 @@ export default function DraftsPage() {
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
 
-  // Fetch drafts and workspace members
+  // Fetch drafts, projects and workspace members
   useEffect(() => {
     if (currentWorkspace?.id) {
       fetchDrafts(currentWorkspace.id);
       fetchWorkspaceMembers(currentWorkspace.id);
+      fetchProjects();
     }
-  }, [currentWorkspace?.id, fetchDrafts, fetchWorkspaceMembers]);
+  }, [currentWorkspace?.id, fetchDrafts, fetchWorkspaceMembers, fetchProjects]);
+
+  // Temporary console logs for debugging project details
+  useEffect(() => {
+    if (drafts.length > 0 || projects.length > 0) {
+      console.log("=== Drafts Project Filter Debug ===");
+      console.log("Draft project IDs:", drafts.map(d => d.projectId).filter(Boolean));
+      console.log("Projects store data:", projects.map(p => ({ id: p.id, name: p.name })));
+      const matchedNames = drafts.map(d => {
+        const match = projects.find(p => p.id === d.projectId);
+        return { draftId: d.id, projectId: d.projectId, matchedName: match ? match.name : "No match" };
+      });
+      console.log("Matched project names:", matchedNames);
+      console.log("===================================");
+    }
+  }, [drafts, projects]);
 
   const filteredTasks = useMemo(() => {
     let result = drafts;
@@ -50,11 +66,10 @@ export default function DraftsPage() {
       });
     }
 
-    // Project filter (if workspaceId matches a project in projects store)
+    // Project filter
     if (activeFilters.project) {
       result = result.filter((draft) => {
-        const projectName = projects.find(p => p.id === draft.workspaceId)?.name || draft.workspaceId;
-        return projectName === activeFilters.project;
+        return draft.projectId === activeFilters.project;
       });
     }
 
@@ -76,8 +91,8 @@ export default function DraftsPage() {
 
   const filterData = useMemo(() => {
     // Unique projects from draft tasks
-    const workspaceIds = new Set(drafts.map(t => t.workspaceId).filter(Boolean));
-    const uniqueProjects = Array.from(workspaceIds).map(id => {
+    const projectIds = new Set(drafts.map(t => t.projectId).filter(Boolean));
+    const uniqueProjects = Array.from(projectIds).map(id => {
       const p = projects.find(proj => proj.id === id);
       return { id: id as string, name: p?.name || id as string };
     }).sort((a, b) => a.name.localeCompare(b.name));

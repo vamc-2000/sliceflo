@@ -115,10 +115,10 @@ export function DraftHeader({
                       {filterData.projects.map((p) => (
                         <DropdownMenuItem
                           key={p.id}
-                          onClick={() => onFilterChange('project', p.name)}
+                          onClick={() => onFilterChange('project', p.id)}
                           className="relative text-xs"
                         >
-                          {activeFilters.project === p.name && (
+                          {activeFilters.project === p.id && (
                             <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                           )}
                           {p.name}
