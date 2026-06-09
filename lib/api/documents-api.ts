@@ -74,6 +74,7 @@ function normalizeNoteToDoc(note: any): DocumentRecord {
     // Timestamps
     createdAt: note?.createdAt,
     updatedAt: note?.updatedAt,
+    createdBy: note?.createdBy,
   } as DocumentRecord;
 }
 
@@ -106,6 +107,11 @@ export interface DocumentRecord {
   contentJson?: any[];
   createdAt?: string;
   updatedAt?: string;
+  createdBy?: {
+    userId: string;
+    name: string;
+    profilePictureUrl?: string;
+  } | string;
 }
 
 export async function createRootDocument(title?: string) {

@@ -9,7 +9,7 @@ interface UserProps {
 }
 
 const User: FC<UserProps> = ({ onSelect, selectedFilters = [] }) => {
-  const options = ["Mentioned", "Assigned by me"];
+  const options = ["Mentioned", "Assigned to me"];
 
   return (
     <div data-testid="user-filter-menu-container" className="w-50 p-2 flex flex-col rounded-lg text-xs">

@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import Image from "next/image";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, Download, Trash2, Maximize2, Paperclip } from "lucide-react";
 import {
@@ -121,6 +122,7 @@ export const DraftAttachments: React.FC<DraftAttachmentsProps> = ({
         <div className="space-y-3 pt-4">
             <div className="flex items-center justify-between">
                 <div className="flex gap-2">
+                    <Label className="font-semibold text-sm">Attachments</Label>
                     {displayAttachments.length > 0 && (
                         <span className="text-xs text-[#AEAEB2]">
                             {displayAttachments.length} items
