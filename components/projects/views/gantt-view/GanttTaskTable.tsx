@@ -49,7 +49,8 @@ import {
     RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, isWithinInterval, isFuture } from "date-fns";
+import { isWithinInterval, isFuture } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 import { useTasksStore, SYSTEM_FIELDS } from "@/stores/tasks-store";
 import { Task, ColumnConfig } from '@/types/task.types';
 import { useProjectsStore, TaskTypeConfig, } from "@/stores/projects-store";
@@ -82,12 +83,8 @@ const parseDateSafe = (dateString?: string): Date | undefined => {
 
 const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
-    try {
-        const d = new Date(dateStr);
-        return format(new Date(d.getFullYear(), d.getMonth(), d.getDate()), 'd MMM');
-    } catch {
-        return dateStr;
-    }
+    const formatted = formatLocalDate(dateStr);
+    return formatted === "—" ? dateStr : formatted;
 };
 // ── Avatar helper ────────────────────────────────────────────────────────────
 const AVATAR_COLORS = [
@@ -327,6 +324,7 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
     const [selectedAddTaskType, setSelectedAddTaskType] = useState('task');
     const [newSubtaskName, setNewSubtaskName] = useState("");
     const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+    const [openDatePopoverId, setOpenDatePopoverId] = useState<string | null>(null);
     const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null);
     const [selectedTaskForDetail, setSelectedTaskForDetail] = useState<Task | null>(null);
     const [showTaskDetail, setShowTaskDetail] = useState(false);
@@ -478,8 +476,8 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
             status: capturedData.status || undefined,
             cycleId: capturedData.cycleId || undefined,
             assignee: capturedData.assignee || undefined,
-            startDate: capturedData.startDate?.toISOString() || new Date().toISOString(),
-            endDate: capturedData.endDate?.toISOString(),
+            startDate: capturedData.startDate ? convertSelectedDateToUTC(capturedData.startDate) : convertSelectedDateToUTC(new Date()),
+            endDate: capturedData.endDate ? convertSelectedDateToUTC(capturedData.endDate) : undefined,
             priority: capturedData.priority || undefined,
             completed: false,
         }, (realId) => {
@@ -509,8 +507,8 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
             status: capturedSubtask.status || parentTask?.status || undefined,
             cycleId: capturedSubtask.cycleId || undefined,
             assignee: capturedSubtask.assignee || undefined,
-            startDate: capturedSubtask.startDate?.toISOString() || new Date().toISOString(),
-            endDate: capturedSubtask.endDate?.toISOString() || parentTask?.endDate || undefined,
+            startDate: capturedSubtask.startDate ? convertSelectedDateToUTC(capturedSubtask.startDate) : convertSelectedDateToUTC(new Date()),
+            endDate: capturedSubtask.endDate ? convertSelectedDateToUTC(capturedSubtask.endDate) : parentTask?.endDate || undefined,
             priority: capturedSubtask.priority || undefined,
             completed: false,
         });
@@ -692,8 +690,18 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
 
         if (h.key === 'startDate' || h.key === 'endDate') {
             const dateValue = item[h.key] ? new Date(item[h.key]) : undefined;
+            const popoverId = `${item.id}-${h.key}`;
             return (
-                <Popover>
+                <Popover
+                    open={openDatePopoverId === popoverId}
+                    onOpenChange={(open) => {
+                        if (open) {
+                            setOpenDatePopoverId(popoverId);
+                        } else if (openDatePopoverId === popoverId) {
+                            setOpenDatePopoverId(null);
+                        }
+                    }}
+                >
                     <PopoverTrigger asChild>
                         <div className={cellCls}>
                             {dateValue ? (
@@ -711,13 +719,22 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                             selected={dateValue}
                             onSelect={(date) => {
                                 if (!date) return;
-                                const updates: any = { [h.key]: date.toISOString() };
+                                const updates: any = { [h.key]: convertSelectedDateToUTC(date) };
                                 if (h.key === 'startDate' && item.endDate && new Date(item.endDate) < date) {
                                     updates.endDate = undefined;
                                 }
                                 updateFn(item.id, updates);
+                                setOpenDatePopoverId(null);
                             }}
-                            disabled={h.key === 'endDate' ? (date) => (item.startDate ? date < new Date(new Date(item.startDate).setHours(0, 0, 0, 0)) : false) : undefined}
+                            disabled={(date) => {
+                                if (h.key === 'startDate') {
+                                    const endDateCal = item.endDate ? convertUTCToCalendarDate(item.endDate) : undefined;
+                                    return endDateCal ? date > endDateCal : false;
+                                } else {
+                                    const startDateCal = item.startDate ? convertUTCToCalendarDate(item.startDate) : undefined;
+                                    return startDateCal ? date < startDateCal : false;
+                                }
+                            }}
                             initialFocus
                         />
                     </PopoverContent>
@@ -1204,14 +1221,24 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                 }
                                                 if (h.key === 'startDate' || h.key === 'endDate') {
                                                     const dateValue = h.key === 'startDate' ? newSubtaskData.startDate : newSubtaskData.endDate;
+                                                    const popoverId = `new-subtask-${h.key}`;
                                                     return (
                                                         <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
-                                                            <Popover>
+                                                            <Popover
+                                                                open={openDatePopoverId === popoverId}
+                                                                onOpenChange={(open) => {
+                                                                    if (open) {
+                                                                        setOpenDatePopoverId(popoverId);
+                                                                    } else if (openDatePopoverId === popoverId) {
+                                                                        setOpenDatePopoverId(null);
+                                                                    }
+                                                                }}
+                                                            >
                                                                 <PopoverTrigger asChild>
                                                                     <div className={cellCls}>
                                                                         {dateValue ? (
                                                                             <span className="text-xs">
-                                                                                {format(dateValue, 'd MMM')}
+                                                                                {formatLocalDate(dateValue)}
                                                                             </span>
                                                                         ) : (
                                                                             <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
@@ -1230,8 +1257,17 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                                 }
                                                                                 return updates;
                                                                             });
+                                                                            setOpenDatePopoverId(null);
                                                                         }}
-                                                                        disabled={h.key === 'endDate' ? (date) => (newSubtaskData.startDate ? date < new Date(new Date(newSubtaskData.startDate).setHours(0, 0, 0, 0)) : false) : undefined}
+                                                                        disabled={(date) => {
+                                                                            if (h.key === 'startDate') {
+                                                                                const endDateCal = newSubtaskData.endDate;
+                                                                                return endDateCal ? date > endDateCal : false;
+                                                                            } else {
+                                                                                const startDateCal = newSubtaskData.startDate;
+                                                                                return startDateCal ? date < startDateCal : false;
+                                                                            }
+                                                                        }}
                                                                         initialFocus
                                                                     />
                                                                 </PopoverContent>
@@ -1541,14 +1577,24 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                     }
                                     if (h.key === 'startDate' || h.key === 'endDate') {
                                         const dateValue = h.key === 'startDate' ? newTaskData.startDate : newTaskData.endDate;
+                                        const popoverId = `new-task-${h.key}`;
                                         return (
                                             <td key={h.key} className={cn(bodyCellCls, "min-w-[150px]")}>
-                                                <Popover>
+                                                <Popover
+                                                    open={openDatePopoverId === popoverId}
+                                                    onOpenChange={(open) => {
+                                                        if (open) {
+                                                            setOpenDatePopoverId(popoverId);
+                                                        } else if (openDatePopoverId === popoverId) {
+                                                            setOpenDatePopoverId(null);
+                                                        }
+                                                    }}
+                                                >
                                                     <PopoverTrigger asChild>
                                                         <div className={cellCls}>
                                                             {dateValue ? (
                                                                 <span className="text-xs">
-                                                                    {format(dateValue, 'd MMM')}
+                                                                    {formatLocalDate(dateValue)}
                                                                 </span>
                                                             ) : (
                                                                 <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
@@ -1567,8 +1613,17 @@ export const GanttTaskTable = React.forwardRef<HTMLDivElement, GanttTaskTablePro
                                                                     }
                                                                     return updates;
                                                                 });
+                                                                setOpenDatePopoverId(null);
                                                             }}
-                                                            disabled={h.key === 'endDate' ? (date) => (newTaskData.startDate ? date < new Date(new Date(newTaskData.startDate).setHours(0, 0, 0, 0)) : false) : undefined}
+                                                            disabled={(date) => {
+                                                                if (h.key === 'startDate') {
+                                                                    const endDateCal = newTaskData.endDate;
+                                                                    return endDateCal ? date > endDateCal : false;
+                                                                } else {
+                                                                    const startDateCal = newTaskData.startDate;
+                                                                    return startDateCal ? date < startDateCal : false;
+                                                                }
+                                                            }}
                                                             initialFocus
                                                         />
                                                     </PopoverContent>

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { format } from 'date-fns'
+import { formatLocalDate } from '@/utils/timezone-utils'
 import { Flag } from 'lucide-react'
 import { Task } from '@/types/task.types'
 import { useTasksStore } from '@/stores/tasks-store'
@@ -21,11 +21,8 @@ interface ProjectMilestonesListProps {
 
 const formatDueDate = (dateStr?: string) => {
   if (!dateStr) return null
-  try {
-    return format(new Date(dateStr), 'MMM d, yyyy')
-  } catch {
-    return null
-  }
+  const formatted = formatLocalDate(dateStr);
+  return formatted === "—" ? null : formatted;
 }
 
 const MilestoneTypeIcon = ({

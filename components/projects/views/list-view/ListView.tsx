@@ -70,6 +70,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import DeleteTaskModal from "@/components/projects/views/list-view/common/DeleteTaskModal";
 import { ConvertToSubtaskDialog } from "@/components/projects/ConvertToSubtaskDialog";
 import DuplicateTaskDialog from "@/components/projects/DuplicateTaskDialog";
+import { convertSelectedDateToUTC, formatLocalDate } from "@/utils/timezone-utils";
 
 type GroupByOption = 'status' | 'assignee' | 'priority' | 'dueDate' | 'none' | string;
 
@@ -1889,8 +1890,8 @@ export function ListView({
                                                                 if (date) {
                                                                     setFilterConfig(prev => {
                                                                         const existing = prev.find(f => f.field === 'dueDate');
-                                                                        if (existing) return prev.map(f => f.field === 'dueDate' ? { ...f, value: date.toISOString() } : f);
-                                                                        return [...prev, { id: Math.random().toString(36).substr(2, 9), field: 'dueDate', condition: 'date-equals', value: date.toISOString() }];
+                                                                        if (existing) return prev.map(f => f.field === 'dueDate' ? { ...f, value: convertSelectedDateToUTC(date) } : f);
+                                                                        return [...prev, { id: Math.random().toString(36).substr(2, 9), field: 'dueDate', condition: 'date-equals', value: convertSelectedDateToUTC(date) }];
                                                                     });
                                                                 }
                                                             }}

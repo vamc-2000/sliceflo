@@ -287,6 +287,7 @@ const mapAPITaskToStore = (apiTask: TaskResponse, projectId: string): Task => ({
   subtasks: [],
   labelIds: apiTask.labelIds || [],
   labels: apiTask.labels || [],
+  linkedDocuments: apiTask.linkedDocuments || [],
   cycleId: apiTask.cycleId,
   cycle: apiTask.cycle,
 });
@@ -315,6 +316,7 @@ const mapAPISubtaskToStore = (apiTask: TaskResponse, projectId: string): Subtask
   attachmentIds: apiTask.attachments ? apiTask.attachments.map(a => a.id) : [],
   labelIds: apiTask.labelIds || [],
   labels: apiTask.labels || [],
+  linkedDocuments: apiTask.linkedDocuments || [],
   cycleId: apiTask.cycleId,
   cycle: apiTask.cycle,
 });
@@ -1311,30 +1313,72 @@ export const useTasksStore = create<TasksState>()(
           }, false, 'reorderTasks');
         },
 
-        addTaskDocument: (taskId: string, docId: string) => {
+        addTaskDocument: async (taskId: string, docId: string) => {
+          const task = get().tasks.find((t) => t.id === taskId) || get().subtasks.find((st) => st.id === taskId) as unknown as Task;
+          if (!task) return;
+          const nextDocs = Array.from(new Set([...(task.linkedDocuments || []), docId]));
+
+          // Optimistic local update
           set((state) => ({
-            tasks: state.tasks.map((task) =>
-              task.id === taskId
-                ? {
-                  ...task,
-                  linkedDocuments: Array.from(new Set([...(task.linkedDocuments || []), docId])),
-                }
-                : task
+            tasks: state.tasks.map((t) =>
+              t.id === taskId ? { ...t, linkedDocuments: nextDocs } : t
             ),
-          }), false, 'addTaskDocument');
+            subtasks: state.subtasks.map((st) =>
+              st.id === taskId ? { ...st, linkedDocuments: nextDocs } : st
+            ),
+          }), false, 'addTaskDocument/optimistic');
+
+          try {
+            await updateTaskApi(taskId, {
+              linkedDocuments: nextDocs,
+            });
+          } catch (error) {
+            console.error("Failed to add task document:", error);
+            // Rollback
+            set((state) => ({
+              tasks: state.tasks.map((t) =>
+                t.id === taskId ? { ...t, linkedDocuments: task.linkedDocuments } : t
+              ),
+              subtasks: state.subtasks.map((st) =>
+                st.id === taskId ? { ...st, linkedDocuments: task.linkedDocuments } : st
+              ),
+            }));
+            toast("error", { title: "Failed to link document" });
+          }
         },
 
-        removeTaskDocument: (taskId: string, docId: string) => {
+        removeTaskDocument: async (taskId: string, docId: string) => {
+          const task = get().tasks.find((t) => t.id === taskId) || get().subtasks.find((st) => st.id === taskId) as unknown as Task;
+          if (!task) return;
+          const nextDocs = (task.linkedDocuments || []).filter(id => id !== docId);
+
+          // Optimistic local update
           set((state) => ({
-            tasks: state.tasks.map((task) =>
-              task.id === taskId
-                ? {
-                  ...task,
-                  linkedDocuments: (task.linkedDocuments || []).filter(id => id !== docId),
-                }
-                : task
+            tasks: state.tasks.map((t) =>
+              t.id === taskId ? { ...t, linkedDocuments: nextDocs } : t
             ),
-          }), false, 'removeTaskDocument');
+            subtasks: state.subtasks.map((st) =>
+              st.id === taskId ? { ...st, linkedDocuments: nextDocs } : st
+            ),
+          }), false, 'removeTaskDocument/optimistic');
+
+          try {
+            await updateTaskApi(taskId, {
+              linkedDocuments: nextDocs,
+            });
+          } catch (error) {
+            console.error("Failed to remove task document:", error);
+            // Rollback
+            set((state) => ({
+              tasks: state.tasks.map((t) =>
+                t.id === taskId ? { ...t, linkedDocuments: task.linkedDocuments } : t
+              ),
+              subtasks: state.subtasks.map((st) =>
+                st.id === taskId ? { ...st, linkedDocuments: task.linkedDocuments } : st
+              ),
+            }));
+            toast("error", { title: "Failed to unlink document" });
+          }
         },
 
         reorderSubtasks: (parentTaskId: string, subtaskIds: string[]) => {

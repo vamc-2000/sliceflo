@@ -14,7 +14,8 @@ import {
   Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, isWithinInterval, isPast, isFuture } from "date-fns";
+import { isWithinInterval, isPast, isFuture } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { Button } from "@/components/ui/button";
 
 interface CycleListProps {
@@ -188,7 +189,7 @@ export function CycleList({ projectId }: CycleListProps) {
                   <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
                     <Calendar className="h-3 w-3 text-muted-foreground" />
                     <span className="text-[10px] font-bold text-muted-foreground">
-                      {format(new Date(items[0].startDate), "MMM d")} - {format(new Date(items[0].endDate), "MMM d, yyyy")}
+                      {formatLocalDate(items[0].startDate)} - {formatLocalDate(items[0].endDate)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
@@ -227,7 +228,7 @@ export function CycleList({ projectId }: CycleListProps) {
                           <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm pr-4">
                             <Calendar className="h-3 w-3 text-muted-foreground" />
                             <span className="text-[10px] font-bold text-muted-foreground">
-                              {format(new Date(item.startDate), "MMM d")} - {format(new Date(item.endDate), "MMM d, yyyy")}
+                              {formatLocalDate(item.startDate)} - {formatLocalDate(item.endDate)}
                             </span>
                           </div>
                       </div>
@@ -249,7 +250,7 @@ export function CycleList({ projectId }: CycleListProps) {
               ) : (
                 type === "active" && isCurrentlyInCoolingPeriod && activeCoolingPeriod ? (
                   <div className="py-10 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground text-sm bg-muted/20 px-4 text-center">
-                    No active cycles. you are in cooling period {format(new Date(activeCoolingPeriod.startDate), "MMM d")} to {format(new Date(activeCoolingPeriod.endDate), "MMM d, yyyy")}.
+                    No active cycles. you are in cooling period {formatLocalDate(activeCoolingPeriod.startDate)} to {formatLocalDate(activeCoolingPeriod.endDate)}.
                   </div>
                 ) : (
                   <div className="py-10 border-2 border-dashed border-border rounded-xl flex items-center justify-center text-muted-foreground text-sm italic bg-muted/20">
@@ -296,7 +297,7 @@ export function CycleList({ projectId }: CycleListProps) {
             <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm pr-4">
               <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-[10px] font-bold text-muted-foreground">
-                {format(new Date(activeCoolingPeriod.startDate), "MMM d")} - {format(new Date(activeCoolingPeriod.endDate), "MMM d, yyyy")}
+                {formatLocalDate(activeCoolingPeriod.startDate)} - {formatLocalDate(activeCoolingPeriod.endDate)}
               </span>
             </div>
           </div>

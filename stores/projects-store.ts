@@ -1229,7 +1229,11 @@ export const useProjectsStore = create<ProjectsState>()(
           // 2️⃣ Update state ONLY after API succeeds
           const currentProject = get().projects.find(p => p.id === projectId);
           const existingValues = currentProject?.customFieldValues || {};
-          const mergedLocalValues = { ...existingValues, [fieldId]: value };
+          const mergedLocalValues = {
+            ...existingValues,
+            [fieldId]: value,
+            [fieldName]: value,
+          };
 
           set((state) => ({
             projects: state.projects.map((p) =>

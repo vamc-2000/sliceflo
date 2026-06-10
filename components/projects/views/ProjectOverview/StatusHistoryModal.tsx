@@ -18,7 +18,7 @@ import {
   ChevronUp,
   ChevronDown
 } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatLocalDateTime } from '@/utils/timezone-utils'
 import { StatusHistoryEntry } from '@/lib/api/projects-api'
 import { ProjectStatusConfig } from '@/stores/projects-store'
 import { cn } from '@/lib/utils'
@@ -181,7 +181,7 @@ export default function StatusHistoryModal({
                               Status Update
                             </span>
                             <span className="block text-[10px] text-muted-foreground">
-                              {format(new Date(entry.changedAt), 'PPp')}
+                              {formatLocalDateTime(entry.changedAt)}
                             </span>
                           </div>
                         </div>

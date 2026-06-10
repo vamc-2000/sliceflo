@@ -194,6 +194,7 @@ export interface TaskResponse {
   startsAfter?: Array<{ id: string; title: string; status?: string; priority?: string; taskType?: string; taskNumber?: number }>;
   finishesBefore?: Array<{ id: string; title: string; status?: string; priority?: string; taskType?: string; taskNumber?: number }>;
   finishesAfter?: Array<{ id: string; title: string; status?: string; priority?: string; taskType?: string; taskNumber?: number }>;
+  linkedDocuments?: string[];
 }
 
 export interface CreateTaskRequest {
@@ -222,6 +223,7 @@ export interface CreateTaskRequest {
   finishesBefore?: string[];
   finishesAfter?: string[];
   labelIds?: string[];
+  linkedDocuments?: string[];
 }
 
 export type UpdateTaskRequest = Partial<CreateTaskRequest>;

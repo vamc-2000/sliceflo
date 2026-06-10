@@ -74,7 +74,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, isWithinInterval, isFuture } from "date-fns";
+import { isWithinInterval, isFuture } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import {
   getRelationshipIcon,
   getRelationshipIconColor,
@@ -722,8 +723,8 @@ export function TaskTable({
         name: capturedData.name,
         taskType,
         assignee,
-        startDate: capturedData.startDate ? capturedData.startDate.toISOString() : undefined,
-        endDate: capturedData.endDate ? capturedData.endDate.toISOString() : undefined,
+        startDate: capturedData.startDate ? convertSelectedDateToUTC(capturedData.startDate) : undefined,
+        endDate: capturedData.endDate ? convertSelectedDateToUTC(capturedData.endDate) : undefined,
         priority,
         status,
         cycleId: capturedData.cycleId,
@@ -810,8 +811,8 @@ export function TaskTable({
       parentTaskId,
       projectId,
       assignee: capturedSubtask.assignee || undefined,
-      startDate: capturedSubtask.startDate?.toISOString(),
-      endDate: capturedSubtask.endDate?.toISOString(),
+      startDate: capturedSubtask.startDate ? convertSelectedDateToUTC(capturedSubtask.startDate) : undefined,
+      endDate: capturedSubtask.endDate ? convertSelectedDateToUTC(capturedSubtask.endDate) : undefined,
       priority: capturedSubtask.priority || undefined,
       status: capturedSubtask.status || undefined,
       cycleId: capturedSubtask.cycleId,
@@ -1034,11 +1035,8 @@ export function TaskTable({
   // Format date nicely: "10 Dec"
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
-    try {
-      return format(new Date(dateStr), 'd MMM');
-    } catch {
-      return dateStr;
-    }
+    const formatted = formatLocalDate(dateStr);
+    return formatted === "—" ? dateStr : formatted;
   };
 
   // ── Shared cell styles ────────────────────────────────────────────────────
@@ -1624,7 +1622,7 @@ export function TaskTable({
                                 selected={task.startDate ? new Date(task.startDate) : undefined}
                                 onSelect={(date) => {
                                   if (date) {
-                                    const updates: any = { startDate: date.toISOString() };
+                                    const updates: any = { startDate: convertSelectedDateToUTC(date) };
                                     if (task.endDate && new Date(task.endDate) < date) {
                                       updates.endDate = undefined;
                                     }
@@ -1659,7 +1657,7 @@ export function TaskTable({
                                 selected={task.endDate ? new Date(task.endDate) : undefined}
                                 onSelect={(date) => {
                                   if (date) {
-                                    updateTask(task.id, { endDate: date.toISOString() });
+                                    updateTask(task.id, { endDate: convertSelectedDateToUTC(date) });
                                     document.getElementById(`close-end-${task.id}`)?.click();
                                   }
                                 }}
@@ -2313,7 +2311,7 @@ export function TaskTable({
                                   selected={subtask.startDate ? new Date(subtask.startDate) : undefined}
                                   onSelect={(date) => {
                                     if (date) {
-                                      const updates: any = { startDate: date.toISOString() };
+                                      const updates: any = { startDate: convertSelectedDateToUTC(date) };
                                       if (subtask.endDate && new Date(subtask.endDate) < date) {
                                         updates.endDate = undefined;
                                       }
@@ -2348,7 +2346,7 @@ export function TaskTable({
                                   selected={subtask.endDate ? new Date(subtask.endDate) : undefined}
                                   onSelect={(date) => {
                                     if (date) {
-                                      updateSubtask(subtask.id, { endDate: date.toISOString() });
+                                      updateSubtask(subtask.id, { endDate: convertSelectedDateToUTC(date) });
                                       document.getElementById(`close-sub-end-${subtask.id}`)?.click();
                                     }
                                   }}
@@ -2872,7 +2870,7 @@ export function TaskTable({
                                     <PopoverTrigger asChild>
                                       <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.startDate ? (
-                                          <span className="font-medium">{format(newSubtaskData.startDate, 'd MMM')}</span>
+                                          <span className="font-medium">{formatLocalDate(newSubtaskData.startDate)}</span>
                                         ) : (
                                           <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
@@ -2922,7 +2920,7 @@ export function TaskTable({
                                     <PopoverTrigger asChild>
                                       <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.endDate ? (
-                                          <span className="font-medium">{format(newSubtaskData.endDate, 'd MMM')}</span>
+                                          <span className="font-medium">{formatLocalDate(newSubtaskData.endDate)}</span>
                                         ) : (
                                           <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
@@ -3355,7 +3353,7 @@ export function TaskTable({
                             <PopoverTrigger asChild>
                               <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {newTaskData.startDate ? (
-                                  <span className="font-medium">{format(newTaskData.startDate, 'd MMM')}</span>
+                                  <span className="font-medium">{formatLocalDate(newTaskData.startDate)}</span>
                                 ) : (
                                   <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                 )}
@@ -3405,7 +3403,7 @@ export function TaskTable({
                             <PopoverTrigger asChild>
                               <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {newTaskData.endDate ? (
-                                  <span className="font-medium">{format(newTaskData.endDate, 'd MMM')}</span>
+                                  <span className="font-medium">{formatLocalDate(newTaskData.endDate)}</span>
                                 ) : (
                                   <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                 )}
@@ -3617,14 +3615,14 @@ export function TaskTable({
                     <span className="text-xs font-medium truncate block flex-1 min-w-0 max-w-[220px]">{t.name}</span>
                     {t.startDate && (
                       <span className="text-[10px] text-muted-foreground shrink-0">
-                        {format(new Date(t.startDate), "MM/dd/yy")}
+                        {formatLocalDate(t.startDate)}
                       </span>
                     )}
                     {t.endDate && (
                       <>
                         <ChevronRight className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
                         <span className="text-[10px] text-muted-foreground shrink-0">
-                          {format(new Date(t.endDate), "MM/dd/yy")}
+                          {formatLocalDate(t.endDate)}
                         </span>
                       </>
                     )}

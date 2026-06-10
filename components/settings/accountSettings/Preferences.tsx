@@ -345,7 +345,7 @@ export default function PreferencesPage() {
                                         <SelectValue placeholder="Choose an option" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {["YYYY-MM-DD", "MM-DD-YYYY", "DD-MM-YYYY"].map((format) => (
+                                        {["YYYY-MM-DD", "MM-DD-YYYY", "DD-MM-YYYY", "DD MMM YYYY", "MMM DD, YYYY"].map((format) => (
                                             <SelectItem key={format} value={format} data-testid={`preferences-date-format-option-${format}`}>
                                                 {format}
                                             </SelectItem>

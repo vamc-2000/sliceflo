@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Task } from "@/types/task.types";
 import { X, Flag, UserPlus, GitBranch } from "lucide-react";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { cn } from "@/lib/utils";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
@@ -165,7 +165,7 @@ export function ConvertToSubtaskDialog({
                     <div className="flex items-center gap-2 flex-shrink-0 mx-4">
                         {endDate && (
                             <span className="text-xs text-muted-foreground font-medium px-2 py-0.5 rounded">
-                                {format(new Date(endDate), "MMM d")}
+                                {formatLocalDate(endDate)}
                             </span>
                         )}
                     </div>
@@ -230,7 +230,7 @@ export function ConvertToSubtaskDialog({
                                     )}
                                     data-testid="convert-subtask-duedate-btn"
                                 >
-                                    {endDate ? format(new Date(endDate), "MMM d, yyyy") : "Set due date"}
+                                    {endDate ? formatLocalDate(endDate) : "Set due date"}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">

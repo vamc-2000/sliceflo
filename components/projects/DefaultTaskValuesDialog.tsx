@@ -16,7 +16,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { useProjectsStore } from "@/stores/projects-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -145,7 +145,7 @@ export function DefaultTaskValuesDialog({
                                 <button className={valueBtnCls} data-testid="default-task-startdate-btn">
                                     <span className={`w-full text-center ${values.startDate ? "text-foreground" : "text-muted-foreground text-xs"}`}>
                                         {values.startDate
-                                            ? format(new Date(values.startDate), "d MMM")
+                                            ? formatLocalDate(values.startDate)
                                             : "Set date"}
                                     </span>
                                 </button>
@@ -175,7 +175,7 @@ export function DefaultTaskValuesDialog({
                                 <button className={valueBtnCls} data-testid="default-task-enddate-btn">
                                     <span className={`w-full text-center ${values.endDate ? "text-foreground" : "text-muted-foreground text-xs"}`}>
                                         {values.endDate
-                                            ? format(new Date(values.endDate), "d MMM")
+                                            ? formatLocalDate(values.endDate)
                                             : "Set date"}
                                     </span>
                                 </button>

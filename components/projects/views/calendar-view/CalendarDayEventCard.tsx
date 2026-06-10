@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { Task, Subtask } from '@/types/task.types';
 import { useProjectsStore } from '@/stores/projects-store';
 import { formatTaskId } from '@/utils/task-utils';
+import { formatLocalDate, convertSelectedDateToUTC } from '@/utils/timezone-utils';
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
     getRelationshipIcon,
@@ -95,7 +96,7 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
     const formatDate = (dateString?: string) => {
         if (!dateString) return null;
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+        return formatLocalDate(date);
     };
 
     const getDaysRemaining = (date?: string) => {
@@ -159,14 +160,14 @@ export const CalendarDayEventCard = ({ task, projectId, onClick, isSubtask = fal
 
     const handleStartDateChange = (date: Date | undefined) => {
         if (date) {
-            updateItem({ startDate: date.toISOString() });
+            updateItem({ startDate: convertSelectedDateToUTC(date) });
             setIsStartDateOpen(false);
         }
     }
 
     const handleEndDateChange = (date: Date | undefined) => {
         if (date) {
-            updateItem({ endDate: date.toISOString() });
+            updateItem({ endDate: convertSelectedDateToUTC(date) });
             setIsEndDateOpen(false);
         }
     }

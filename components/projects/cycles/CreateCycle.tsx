@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { format, addDays } from "date-fns";
+import { addDays } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { CalendarIcon, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,8 +172,8 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                 cycleNumber,
                 description,
                 status,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
+                startDate: convertSelectedDateToUTC(startDate),
+                endDate: convertSelectedDateToUTC(endDate),
                 sortOrder: 0,
             });
             if (onCreated) {
@@ -294,7 +295,7 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                                         )}
                                         data-testid="cycle-start-date-button"
                                     >
-                                        <span>{startDate ? format(startDate, "PP") : "Set date"}</span>
+                                        <span>{startDate ? formatLocalDate(startDate) : "Set date"}</span>
                                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </PopoverTrigger>
@@ -331,7 +332,7 @@ export function CreateCycle({ projectId, onCancel, onCreated }: CreateCycleProps
                                         )}
                                         data-testid="cycle-end-date-button"
                                     >
-                                        <span>{endDate ? format(endDate, "PP") : "Set date"}</span>
+                                        <span>{endDate ? formatLocalDate(endDate) : "Set date"}</span>
                                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </PopoverTrigger>

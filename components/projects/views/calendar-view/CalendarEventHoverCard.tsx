@@ -11,6 +11,7 @@ import { useTasksStore } from '@/stores/tasks-store';
 import { cn } from '@/lib/utils';
 import { Task, Subtask } from '@/types/task.types';
 import { formatTaskId } from '@/utils/task-utils';
+import { formatLocalDate } from '@/utils/timezone-utils';
 import {
     Popover,
     PopoverContent,
@@ -63,7 +64,7 @@ export const CalendarEventHoverCard = ({ task, position, isSubtask = false, pare
     const formatDate = (dateString?: string) => {
         if (!dateString) return null;
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+        return formatLocalDate(date);
     };
 
     const getDaysRemaining = (date?: string) => {

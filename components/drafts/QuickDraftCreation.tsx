@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
@@ -391,7 +392,7 @@ export function QuickDraftCreation({
                 <PopoverTrigger asChild>
                   <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors flex items-center gap-2">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{startDate ? format(startDate, "MMM d, yyyy") : "Start Date"}</span>
+                    <span className="truncate">{startDate ? formatLocalDate(startDate) : "Start Date"}</span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -416,7 +417,7 @@ export function QuickDraftCreation({
                 <PopoverTrigger asChild>
                   <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors flex items-center gap-2">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{endDate ? format(endDate, "MMM d, yyyy") : "Due Date"}</span>
+                    <span className="truncate">{endDate ? formatLocalDate(endDate) : "Due Date"}</span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">

@@ -62,7 +62,7 @@ import {
     getRelationshipIconColor,
     getRelationshipLabel
 } from '@/utils/relationship-utils';
-import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 import { MemberAvatar } from "./MemberAvatar";
 import { useTasksStore } from "@/stores/tasks-store";
 import {
@@ -432,7 +432,7 @@ export function TaskDetailPage({
                     {isSubtask && <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Subtask</span>}
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Created {currentTask.createdAt ? format(new Date(currentTask.createdAt), "MMM d, yyyy") : "—"}</span>
+                    <span className="text-muted-foreground">Created {formatLocalDate(currentTask.createdAt)}</span>
                     <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-more-btn">
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -724,8 +724,8 @@ export function TaskDetailPage({
                                                         })() : <span className="text-xs text-muted-foreground">—</span>}
                                                     </td>
                                                     <td className="p-3 text-xs">{subtask.status ? <span className="px-2 py-1 rounded text-xs bg-muted">{subtask.status}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
-                                                    <td className="p-3 text-xs text-muted-foreground">{subtask.startDate ? format(new Date(subtask.startDate), "MMM dd, yyyy") : "—"}</td>
-                                                    <td className="p-3 text-xs text-muted-foreground">{subtask.endDate ? format(new Date(subtask.endDate), "MMM dd, yyyy") : "—"}</td>
+                                                    <td className="p-3 text-xs text-muted-foreground">{formatLocalDate(subtask.startDate)}</td>
+                                                    <td className="p-3 text-xs text-muted-foreground">{formatLocalDate(subtask.endDate)}</td>
                                                     <td className="p-3">
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`task-detail-subtask-menu-trigger-${subtask.id}`}><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
@@ -830,16 +830,17 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between py-1">
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Start Date</Label>
                                     <Popover>
-                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.startDate && "text-muted-foreground")} data-testid="task-detail-start-date-trigger">{currentTask.startDate ? format(new Date(currentTask.startDate), "PP") : "—"}</Button></PopoverTrigger>
+                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.startDate && "text-muted-foreground")} data-testid="task-detail-start-date-trigger">{formatLocalDate(currentTask.startDate)}</Button></PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="end">
                                             <Calendar
                                                 mode="single"
-                                                selected={currentTask.startDate ? new Date(currentTask.startDate) : undefined}
+                                                selected={convertUTCToCalendarDate(currentTask.startDate)}
                                                 onSelect={(d) => {
                                                     if (d) {
-                                                        const newStartDateStr = format(d, "yyyy-MM-dd");
+                                                        const newStartDateStr = convertSelectedDateToUTC(d);
                                                         const updates: any = { startDate: newStartDateStr };
-                                                        if (currentTask.endDate && new Date(currentTask.endDate) < d) {
+                                                        const endLocal = convertUTCToCalendarDate(currentTask.endDate);
+                                                        if (endLocal && endLocal < d) {
                                                             updates.endDate = undefined;
                                                         }
                                                         handleUpdateTask(updates);
@@ -855,13 +856,16 @@ export function TaskDetailPage({
                                 <div className="flex items-center justify-between py-1">
                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Due Date</Label>
                                     <Popover>
-                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.endDate && "text-muted-foreground")} data-testid="task-detail-due-date-trigger">{currentTask.endDate ? format(new Date(currentTask.endDate), "PP") : "—"}</Button></PopoverTrigger>
+                                        <PopoverTrigger asChild><Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal hover:bg-muted text-xs", !currentTask.endDate && "text-muted-foreground")} data-testid="task-detail-due-date-trigger">{formatLocalDate(currentTask.endDate)}</Button></PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="end">
                                             <Calendar
                                                 mode="single"
-                                                selected={currentTask.endDate ? new Date(currentTask.endDate) : undefined}
-                                                onSelect={(d) => { if (d) handleUpdateTask({ endDate: format(d, "yyyy-MM-dd") }); }}
-                                                disabled={(date) => (currentTask.startDate ? date < new Date(new Date(currentTask.startDate).setHours(0, 0, 0, 0)) : false)}
+                                                selected={convertUTCToCalendarDate(currentTask.endDate)}
+                                                onSelect={(d) => { if (d) handleUpdateTask({ endDate: convertSelectedDateToUTC(d) }); }}
+                                                disabled={(date) => {
+                                                    const startLocal = convertUTCToCalendarDate(currentTask.startDate);
+                                                    return startLocal ? date < new Date(startLocal.setHours(0, 0, 0, 0)) : false;
+                                                }}
                                                 initialFocus
                                             />
                                             {currentTask.endDate && <div className="p-2 border-t"><Button variant="ghost" size="sm" className="w-full text-xs text-red-500" onClick={() => handleUpdateTask({ endDate: undefined })}>Clear date</Button></div>}

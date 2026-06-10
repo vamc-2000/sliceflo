@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { format, parseISO, startOfWeek, endOfWeek, addDays, startOfDay, endOfDay } from "date-fns";
+import { convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar';
 // ✅ Import the DnD HOC
@@ -629,21 +630,38 @@ interface SpanEvent {
 }
 
 const buildSpanRows = (events: CalendarEvent[], sprintDates: Date[]): SpanEvent[][] => {
-    const spanEvents: SpanEvent[] = events.map(event => {
+    if (sprintDates.length === 0) return [];
+    const sprintStart = startOfDay(sprintDates[0]);
+    const sprintEnd = startOfDay(sprintDates[sprintDates.length - 1]);
+
+    // Filter events to only keep those that overlap with the active sprint range
+    const activeEvents = events.filter(event => {
+        const eventStart = startOfDay(event.start);
+        const eventEnd = startOfDay(event.end);
+        return eventEnd >= sprintStart && eventStart <= sprintEnd;
+    });
+
+    const spanEvents: SpanEvent[] = activeEvents.map(event => {
         const eventStart = startOfDay(event.start);
         const eventEnd = startOfDay(event.end);
 
-        // Find first sprint day that falls within the event range
-        let startCol = sprintDates.findIndex(d => startOfDay(d) >= eventStart);
-        if (startCol === -1) startCol = 0;
-
-        // Find last sprint day that falls within the event range (no findLastIndex)
+        let startCol = 0;
         let endCol = 0;
-        for (let i = sprintDates.length - 1; i >= 0; i--) {
-            if (startOfDay(sprintDates[i]) <= eventEnd) {
-                endCol = i;
-                break;
-            }
+
+        // Find start index
+        if (eventStart < sprintStart) {
+            startCol = 0;
+        } else {
+            startCol = sprintDates.findIndex(d => startOfDay(d).getTime() === eventStart.getTime());
+            if (startCol === -1) startCol = 0;
+        }
+
+        // Find end index
+        if (eventEnd > sprintEnd) {
+            endCol = sprintDates.length - 1;
+        } else {
+            endCol = sprintDates.findIndex(d => startOfDay(d).getTime() === eventEnd.getTime());
+            if (endCol === -1) endCol = sprintDates.length - 1;
         }
 
         return { event, startCol, endCol };
@@ -778,8 +796,8 @@ const SprintView = ({
                 const subtask = !task ? subtasks.find(s => s.id === resizingEvent.eventId) : null;
 
                 const updates = {
-                    startDate: newStartDate.toISOString(),
-                    endDate: newEndDate.toISOString(),
+                    startDate: convertSelectedDateToUTC(newStartDate),
+                    endDate: convertSelectedDateToUTC(newEndDate),
                 };
 
                 if (subtask) updateSubtask(resizingEvent.eventId, updates);
@@ -890,11 +908,11 @@ const SprintView = ({
                                             let newEnd: string | undefined = undefined;
                                             if (oldStart && oldEnd) {
                                                 const duration = oldEnd.getTime() - oldStart.getTime();
-                                                newEnd = new Date(currentDate.getTime() + duration).toISOString();
+                                                newEnd = convertSelectedDateToUTC(new Date(currentDate.getTime() + duration));
                                             }
 
                                             const updates = {
-                                                startDate: currentDate.toISOString(),
+                                                startDate: convertSelectedDateToUTC(currentDate),
                                                 ...(newEnd ? { endDate: newEnd } : {}),
                                             };
 
@@ -1228,8 +1246,8 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                 projectId: taskData.projectId,
                 name: taskData.name,
                 description: taskData.description,
-                startDate: taskData.startDate.toISOString(),
-                endDate: taskData.endDate ? taskData.endDate.toISOString() : taskData.startDate.toISOString(),
+                startDate: convertSelectedDateToUTC(taskData.startDate),
+                endDate: taskData.endDate ? convertSelectedDateToUTC(taskData.endDate) : convertSelectedDateToUTC(taskData.startDate),
                 priority: taskData.priority || undefined,
                 assignee: taskData.assignee || undefined,
                 status: taskData.status || undefined,
@@ -1281,7 +1299,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
     };
 
     const handleScheduleTask = (taskId: string) => {
-        const today = new Date().toISOString();
+        const today = convertSelectedDateToUTC(new Date());
         updateTask(taskId, {
             startDate: today,
             endDate: today,  // This is the due date field
@@ -1307,13 +1325,13 @@ export function CalendarView({ projectId }: CalendarViewProps) {
 
         if (event.resource.isSubtask) {
             updateSubtask(event.id, {
-                startDate: newStart.toISOString(),
-                endDate: adjustedEnd.toISOString(),
+                startDate: convertSelectedDateToUTC(newStart),
+                endDate: convertSelectedDateToUTC(adjustedEnd),
             });
         } else {
             updateTask(event.id, {
-                startDate: newStart.toISOString(),
-                endDate: adjustedEnd.toISOString(),
+                startDate: convertSelectedDateToUTC(newStart),
+                endDate: convertSelectedDateToUTC(adjustedEnd),
             });
         }
     };
@@ -1329,13 +1347,13 @@ export function CalendarView({ projectId }: CalendarViewProps) {
 
         if (event.resource.isSubtask) {
             updateSubtask(event.id, {
-                startDate: newStart.toISOString(),
-                endDate: adjustedEnd.toISOString(),
+                startDate: convertSelectedDateToUTC(newStart),
+                endDate: convertSelectedDateToUTC(adjustedEnd),
             });
         } else {
             updateTask(event.id, {
-                startDate: newStart.toISOString(),
-                endDate: adjustedEnd.toISOString(),
+                startDate: convertSelectedDateToUTC(newStart),
+                endDate: convertSelectedDateToUTC(adjustedEnd),
             });
         }
     };
@@ -1539,7 +1557,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                                             const taskId = (window as any).draggedTaskId;
                                             if (taskId) {
                                                 updateTask(taskId, {
-                                                    startDate: date.toISOString(),
+                                                    startDate: convertSelectedDateToUTC(date),
                                                 });
                                                 (window as any).draggedTaskId = null;
                                             }

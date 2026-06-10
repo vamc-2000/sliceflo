@@ -58,6 +58,7 @@ import {
 } from 'lucide-react';
 import ProjectMembersSection from "@/components/projects/ProjectMembersSection";
 import { GanttTaskTable } from '@/components/projects/views/gantt-view/GanttTaskTable';
+import { convertSelectedDateToUTC, formatLocalDate } from "@/utils/timezone-utils";
 import { GanttFieldVisibilityPopup } from '@/components/projects/views/gantt-view/GanttFieldVisibilityPopup';
 import { CustomGanttCalendarPicker } from './CustomGanttCalendarPicker';
 import { format, addDays } from 'date-fns';
@@ -315,8 +316,7 @@ const GanttConnectors = ({
 };
 
 const toLocalISOString = (date: Date): string => {
-    const local = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
-    return local.toISOString()
+    return convertSelectedDateToUTC(date);
 }
 
 interface SortField {
@@ -1254,8 +1254,8 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                                                 if (date) {
                                                                     setFilterConfig(prev => {
                                                                         const existing = prev.find(f => f.field === 'dueDate');
-                                                                        if (existing) return prev.map(f => f.field === 'dueDate' ? { ...f, value: date.toISOString() } : f);
-                                                                        return [...prev, { id: Math.random().toString(36).substr(2, 9), field: 'dueDate', condition: 'date-equals', value: date.toISOString() }];
+                                                                        if (existing) return prev.map(f => f.field === 'dueDate' ? { ...f, value: convertSelectedDateToUTC(date) } : f);
+                                                                        return [...prev, { id: Math.random().toString(36).substr(2, 9), field: 'dueDate', condition: 'date-equals', value: convertSelectedDateToUTC(date) }];
                                                                     });
                                                                 }
                                                             }}

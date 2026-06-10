@@ -1,5 +1,5 @@
 import React from 'react';
-import { format } from 'date-fns';
+import { formatLocalDate } from '@/utils/timezone-utils';
 import {
   GitMerge,
   ChevronRight,
@@ -67,14 +67,14 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
           <span className="text-xs font-medium truncate block flex-1 min-w-0">{sourceTask.name}</span>
           {sourceTask.startDate && (
             <span className="text-[10px] text-muted-foreground shrink-0">
-              {format(new Date(sourceTask.startDate), "MM/dd/yy")}
+              {formatLocalDate(sourceTask.startDate)}
             </span>
           )}
           {sourceTask.endDate && (
             <>
               <ChevronRight className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
               <span className="text-[10px] text-muted-foreground shrink-0">
-                {format(new Date(sourceTask.endDate), "MM/dd/yy")}
+                {formatLocalDate(sourceTask.endDate)}
               </span>
             </>
           )}
@@ -100,7 +100,7 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
           <div className="flex items-center gap-1 shrink-0 ml-1">
             {targetTask.startDate && (
               <span className="text-[10px] text-muted-foreground shrink-0">
-                {format(new Date(targetTask.startDate), "MM/dd/yy")}
+                {formatLocalDate(targetTask.startDate)}
               </span>
             )}
             {targetTask.startDate && targetTask.endDate && (
@@ -108,7 +108,7 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
             )}
             {targetTask.endDate && (
               <span className="text-[10px] text-muted-foreground shrink-0">
-                {format(new Date(targetTask.endDate), "MM/dd/yy")}
+                {formatLocalDate(targetTask.endDate)}
               </span>
             )}
           </div>

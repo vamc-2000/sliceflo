@@ -38,6 +38,7 @@ import ColorIconPicker, { IconData, iconLibrary } from '@/components/ColorIconPi
 import { uploadIcon, uploadFile, deleteUpload } from '@/lib/api/uploads-api'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 
 type Privacy = "private" | "public";
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -74,6 +75,8 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
+  const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
   const [portfolioLeader, setPortfolioLeader] = useState("");
   const [priority, setPriority] = useState<Priority | undefined>('medium');
   const [privacy, setPrivacy] = useState<Privacy>("private");
@@ -327,7 +330,7 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
 
                 <div className="w-80">
                   <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Start date</label>
-                  <Popover>
+                  <Popover open={isStartDatePopoverOpen} onOpenChange={setIsStartDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -337,20 +340,25 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(new Date(startDate), "PP") : "Select date"}
+                        {startDate ? formatLocalDate(startDate) : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={startDate ? new Date(startDate) : undefined}
+                        selected={startDate ? convertUTCToCalendarDate(startDate) : undefined}
                         onSelect={(date) => {
-                          const newDate = date ? date.toISOString() : "";
+                          const newDate = date ? convertSelectedDateToUTC(date) : "";
                           setStartDate(newDate);
                           // If there's an end date and the new start date is after it, clear the end date
                           if (endDate && date && new Date(endDate) < date) {
                             setEndDate("");
                           }
+                          setIsStartDatePopoverOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const endDateCal = endDate ? convertUTCToCalendarDate(endDate) : undefined;
+                          return endDateCal ? date > endDateCal : false;
                         }}
                         initialFocus
                       />
@@ -360,7 +368,7 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
 
                 <div className="w-80">
                   <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">End date</label>
-                  <Popover>
+                  <Popover open={isEndDatePopoverOpen} onOpenChange={setIsEndDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -370,15 +378,21 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(new Date(endDate), "PP") : "Select date"}
+                        {endDate ? formatLocalDate(endDate) : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={endDate ? new Date(endDate) : undefined}
-                        onSelect={(date) => setEndDate(date ? date.toISOString() : "")}
-                        disabled={(date) => (startDate ? date < new Date(startDate) : false)}
+                        selected={endDate ? convertUTCToCalendarDate(endDate) : undefined}
+                        onSelect={(date) => {
+                          setEndDate(date ? convertSelectedDateToUTC(date) : "");
+                          setIsEndDatePopoverOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const startDateCal = startDate ? convertUTCToCalendarDate(startDate) : undefined;
+                          return startDateCal ? date < startDateCal : false;
+                        }}
                         initialFocus
                       />
                     </PopoverContent>

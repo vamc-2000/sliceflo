@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MoreHorizontal, Lock, Globe } from "lucide-react";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { TailoredView } from "@/stores/projects-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -131,7 +131,7 @@ export const ViewCard: React.FC<ViewCardProps> = ({ view, projectName = "Project
                 <div className="flex flex-col min-w-[120px]">
                     <span className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Created on</span>
                     <span className="font-semibold text-foreground">
-                        {view.createdAt ? format(new Date(view.createdAt), "MMM d, yyyy") : "N/A"}
+                        {formatLocalDate(view.createdAt)}
                     </span>
                 </div>
 

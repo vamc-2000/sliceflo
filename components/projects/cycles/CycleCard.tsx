@@ -1,7 +1,7 @@
 "use client";
 
 import { Cycle, useProjectsStore } from "@/stores/projects-store";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { Calendar, MoreHorizontal, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,14 @@ interface CycleCardProps {
   onTransferTasks?: (cycleId: string) => void;
 }
 
-export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, onTransferTasks }: CycleCardProps) {
+export function CycleCard({
+  cycle,
+  onEdit,
+  onDelete,
+  type,
+  hideBadges = false,
+  onTransferTasks,
+}: CycleCardProps) {
   const startDate = new Date(cycle.startDate);
   const endDate = new Date(cycle.endDate);
 
@@ -33,16 +40,18 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
   const { updateCycle, projects } = useProjectsStore();
   const { tasks } = useTasksStore();
 
-  const project = projects.find(p => p.id === cycle.projectId);
+  const project = projects.find((p) => p.id === cycle.projectId);
 
-  const cycleTasks = tasks.filter(task => {
-    return task.projectId === cycle.projectId &&
-      (task.cycleId === cycle.id || task.cycle?.id === cycle.id);
+  const cycleTasks = tasks.filter((task) => {
+    return (
+      task.projectId === cycle.projectId &&
+      (task.cycleId === cycle.id || task.cycle?.id === cycle.id)
+    );
   });
 
   const totalCount = cycleTasks.length;
 
-  const incompleteTasks = cycleTasks.filter(task => {
+  const incompleteTasks = cycleTasks.filter((task) => {
     if (task.completed === true) return false;
     const status = task.status?.toLowerCase().trim() ?? "";
     if (status === "done" || status === "completed") return false;
@@ -62,7 +71,7 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
 
       await updateCycle(cycle.projectId, cycle.id, {
         startDate: today.toISOString(),
-        endDate: newEnd.toISOString()
+        endDate: newEnd.toISOString(),
       });
     } catch (error) {
       console.error("Failed to start cycle today:", error);
@@ -75,33 +84,35 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
       border: "border-primary/20",
       text: "text-primary font-semibold",
       icon: "text-primary",
-      dots: "text-primary"
+      dots: "text-primary",
     },
     upcoming: {
       bg: "bg-muted",
       border: "border-border",
       text: "text-muted-foreground font-semibold",
       icon: "text-muted-foreground",
-      dots: "text-muted-foreground"
+      dots: "text-muted-foreground",
     },
     completed: {
       bg: "bg-emerald-500/10",
       border: "border-emerald-500/20",
       text: "text-emerald-600 dark:text-emerald-400 font-semibold",
       icon: "text-emerald-600 dark:text-emerald-400",
-      dots: "text-emerald-600 dark:text-emerald-400"
-    }
+      dots: "text-emerald-600 dark:text-emerald-400",
+    },
   };
 
   const currentTheme = themes[type];
 
   return (
     <div
-      onClick={() => router.push(`/project/${cycle.projectId}/cycles/${cycle.id}`)}
+      onClick={() =>
+        router.push(`/project/${cycle.projectId}/cycles/${cycle.id}`)
+      }
       className={cn(
         "group flex items-center justify-between p-1.5 rounded-lg border transition-all hover:brightness-95 cursor-pointer",
         currentTheme.bg,
-        currentTheme.border
+        currentTheme.border,
       )}
       data-testid={`cycle-card-${cycle.id}`}
     >
@@ -118,11 +129,17 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
               <Button
                 variant="outline"
                 size="sm"
-                className={cn("h-7 text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm", currentTheme.text)}
+                className={cn(
+                  "h-7 text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm",
+                  currentTheme.text,
+                )}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  console.log(`Transfer ${incompleteCount} tasks for cycle ${cycle.name} (${cycle.id})`, incompleteTasks);
+                  console.log(
+                    `Transfer ${incompleteCount} tasks for cycle ${cycle.name} (${cycle.id})`,
+                    incompleteTasks,
+                  );
                   if (onTransferTasks) {
                     onTransferTasks(cycle.id);
                   }
@@ -136,7 +153,7 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
             <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-border shadow-sm">
               <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-[10px] font-bold text-muted-foreground">
-                {format(startDate, "MMM d")} - {format(endDate, "MMM d, yyyy")}
+                {formatLocalDate(startDate)} - {formatLocalDate(endDate)}
               </span>
             </div>
 
@@ -158,7 +175,8 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
               className={cn(
                 "h-7 w-7 p-0 transition-opacity flex items-center justify-center",
                 type === "active" ? "text-primary" : "text-muted-foreground",
-                type === "completed" && "text-emerald-600 dark:text-emerald-400"
+                type === "completed" &&
+                  "text-emerald-600 dark:text-emerald-400",
               )}
               onClick={(e) => e.stopPropagation()}
               data-testid={`cycle-card-menu-trigger-${cycle.id}`}
@@ -194,7 +212,10 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                window.open(`/project/${cycle.projectId}/cycles/${cycle.id}`, '_blank');
+                window.open(
+                  `/project/${cycle.projectId}/cycles/${cycle.id}`,
+                  "_blank",
+                );
               }}
               data-testid={`cycle-card-open-tab-${cycle.id}`}
             >
@@ -204,10 +225,12 @@ export function CycleCard({ cycle, onEdit, onDelete, type, hideBadges = false, o
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                navigator.clipboard.writeText(`${window.location.origin}/project/${cycle.projectId}/cycles/${cycle.id}`);
+                navigator.clipboard.writeText(
+                  `${window.location.origin}/project/${cycle.projectId}/cycles/${cycle.id}`,
+                );
                 toast("success", {
                   title: "Link copied",
-                  description: "Cycle link has been copied to your clipboard."
+                  description: "Cycle link has been copied to your clipboard.",
                 });
               }}
               data-testid={`cycle-card-copy-link-${cycle.id}`}

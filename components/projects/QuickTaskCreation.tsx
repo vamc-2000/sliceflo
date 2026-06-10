@@ -1,12 +1,10 @@
 // components/projects/QuickTaskCreation.tsx
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  X, Calendar as CalendarIcon, Flag, User
-} from "lucide-react";
+import { X, Calendar as CalendarIcon, Flag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
@@ -15,9 +13,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Avatar as UIAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar as UIAvatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { useTasksStore } from "@/stores/tasks-store";
-import { useProjectsStore, getTaskTypeDisplayImage } from "@/stores/projects-store";
+import {
+  useProjectsStore,
+  getTaskTypeDisplayImage,
+} from "@/stores/projects-store";
 import { useTeamStore } from "@/stores/teams-store"; // ✅ Added team store
 import { cn } from "@/lib/utils";
 import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
@@ -60,22 +65,36 @@ export function QuickTaskCreation({
   onClose,
   onCreateTask,
 }: QuickTaskCreationProps) {
-  const { projects, getTaskStatusConfigs, fetchProjectById, getTaskPriorityConfigs, getTaskTypesByProject } = useProjectsStore();
+  const {
+    projects,
+    getTaskStatusConfigs,
+    fetchProjectById,
+    getTaskPriorityConfigs,
+    getTaskTypesByProject,
+  } = useProjectsStore();
   const { teams } = useTeamStore();
   const { workspaceMembers } = useWorkspaceStore();
 
-  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(projectId);
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    string | undefined
+  >(projectId);
   const [taskName, setTaskName] = useState(initialTaskName);
   const [taskDescription, setTaskDescription] = useState("");
   const [startDate, setStartDate] = useState(selectedDate || new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [selectedAssignee, setSelectedAssignee] = useState<string | undefined>(initialAssigneeId || undefined);
-  const [selectedPriority, setSelectedPriority] = useState<string | undefined>(undefined);
+  const [selectedAssignee, setSelectedAssignee] = useState<string | undefined>(
+    initialAssigneeId || undefined,
+  );
+  const [selectedPriority, setSelectedPriority] = useState<string | undefined>(
+    undefined,
+  );
   const [isPriorityOpen, setIsPriorityOpen] = useState(false);
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
   const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
   const [isAssigneeOpen, setIsAssigneeOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(
+    undefined,
+  );
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [isProjectOpen, setIsProjectOpen] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState(initialTaskType);
@@ -85,30 +104,34 @@ export function QuickTaskCreation({
   const taskStatusConfigs = getTaskStatusConfigs(selectedProjectId || "");
   const taskPriorityConfigs = getTaskPriorityConfigs(selectedProjectId || "");
   const taskTypes = getTaskTypesByProject(selectedProjectId || "");
-  const selectedTaskTypeConfig = taskTypes.find((t) => t.value === selectedTaskType);
+  const selectedTaskTypeConfig = taskTypes.find(
+    (t) => t.value === selectedTaskType,
+  );
   const isMilestone = selectedTaskType === "milestone";
   const lockTaskType = initialTaskType === "milestone";
 
   const mentionableMembers = useMemo(() => {
     if (!project?.members || !workspaceMembers) return [];
-    const projectUserIds = new Set(project.members.map(m => m.userId));
+    const projectUserIds = new Set(project.members.map((m) => m.userId));
     return workspaceMembers
-      .filter(m => projectUserIds.has(m.userId))
-      .map(m => ({
+      .filter((m) => projectUserIds.has(m.userId))
+      .map((m) => ({
         id: m.userId,
         name: m.name,
-        avatar: m.avatar || m.profilePicture || ''
+        avatar: m.avatar || m.profilePicture || "",
       }));
   }, [project?.members, workspaceMembers]);
 
   const team = teams.find((t: any) => t.id === teamId);
   const teamMembers = useMemo(() => {
-    return team?.teamMembers?.map(m => ({
-      userId: m.userId || m.id,
-      name: m.name,
-      avatar: m.avatar,
-      profilePicture: m.avatar
-    })) || [];
+    return (
+      team?.teamMembers?.map((m) => ({
+        userId: m.userId || m.id,
+        name: m.name,
+        avatar: m.avatar,
+        profilePicture: m.avatar,
+      })) || []
+    );
   }, [team]);
 
   const members = useMemo(() => {
@@ -129,12 +152,16 @@ export function QuickTaskCreation({
     if (teamId) {
       const team = teams.find((t: any) => t.id === teamId);
       if (team) {
-        result = result.filter(p => team.projectIds?.includes(p.id as string));
+        result = result.filter((p) =>
+          team.projectIds?.includes(p.id as string),
+        );
       }
     }
 
     if (initialAssigneeId) {
-      result = result.filter(p => p.members?.some(m => m.userId === initialAssigneeId));
+      result = result.filter((p) =>
+        p.members?.some((m) => m.userId === initialAssigneeId),
+      );
     }
 
     return result;
@@ -156,7 +183,10 @@ export function QuickTaskCreation({
   }, [filteredProjects, selectedProjectId]);
 
   useEffect(() => {
-    if (selectedProjectId && (taskStatusConfigs.length === 0 || taskPriorityConfigs.length === 0)) {
+    if (
+      selectedProjectId &&
+      (taskStatusConfigs.length === 0 || taskPriorityConfigs.length === 0)
+    ) {
       fetchProjectById(selectedProjectId);
     }
   }, [selectedProjectId, fetchProjectById]);
@@ -202,9 +232,11 @@ export function QuickTaskCreation({
   };
 
   const assignedMember = members.find((m) => m.userId === selectedAssignee);
-  const selectedPriorityOption = taskPriorityConfigs.find((p) => p.value === selectedPriority);
+  const selectedPriorityOption = taskPriorityConfigs.find(
+    (p) => p.value === selectedPriority,
+  );
   const selectedStatusOption = taskStatusConfigs.find(
-    (c) => c.value === selectedStatus
+    (c) => c.value === selectedStatus,
   );
 
   return (
@@ -228,7 +260,7 @@ export function QuickTaskCreation({
             // "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             // "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
             // "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
-            "border-b-[5px] border-b-primary"
+            "border-b-[5px] border-b-primary",
           )}
         >
           <VisuallyHidden.Root>
@@ -239,7 +271,8 @@ export function QuickTaskCreation({
           {/* Header */}
           <div className="px-5 py-3 border-b border-border flex items-center justify-between">
             <h2 className="text-xs font-medium text-muted-foreground">
-              {isMilestone ? "Milestone" : "Task"} / {taskName || (isMilestone ? "New milestone" : "New task")}{" "}
+              {isMilestone ? "Milestone" : "Task"} /{" "}
+              {taskName || (isMilestone ? "New milestone" : "New task")}{" "}
               {project ? `(${project.name})` : ""}
             </h2>
             <DialogPrimitive.Close asChild>
@@ -259,7 +292,9 @@ export function QuickTaskCreation({
             <div className="flex-1 p-5 space-y-3">
               {/* Task Name */}
               <Input
-                placeholder={isMilestone ? "Milestone name...." : "Task name...."}
+                placeholder={
+                  isMilestone ? "Milestone name...." : "Task name...."
+                }
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value)}
                 onKeyDown={(e) => {
@@ -294,7 +329,7 @@ export function QuickTaskCreation({
                       disabled={lockTaskType}
                       className={cn(
                         "w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors",
-                        lockTaskType && "opacity-80 cursor-default"
+                        lockTaskType && "opacity-80 cursor-default",
                       )}
                       data-testid="quick-task-type-trigger"
                     >
@@ -302,12 +337,16 @@ export function QuickTaskCreation({
                         <span className="flex items-center gap-2">
                           {getTaskTypeDisplayImage(selectedTaskTypeConfig) ? (
                             <img
-                              src={getTaskTypeDisplayImage(selectedTaskTypeConfig)!}
+                              src={
+                                getTaskTypeDisplayImage(selectedTaskTypeConfig)!
+                              }
                               alt=""
                               className="h-4 w-4 object-contain shrink-0"
                             />
                           ) : null}
-                          <span className="truncate">{selectedTaskTypeConfig.label}</span>
+                          <span className="truncate">
+                            {selectedTaskTypeConfig.label}
+                          </span>
                         </span>
                       ) : (
                         "Type"
@@ -315,7 +354,10 @@ export function QuickTaskCreation({
                     </button>
                   </PopoverTrigger>
                   {!lockTaskType && (
-                    <PopoverContent className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card" align="start">
+                    <PopoverContent
+                      className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card"
+                      align="start"
+                    >
                       {taskTypes.map((type) => (
                         <button
                           key={type._id || type.value}
@@ -327,7 +369,11 @@ export function QuickTaskCreation({
                           data-testid={`quick-task-type-option-${type.value}`}
                         >
                           {getTaskTypeDisplayImage(type) ? (
-                            <img src={getTaskTypeDisplayImage(type)!} alt="" className="h-4 w-4 object-contain" />
+                            <img
+                              src={getTaskTypeDisplayImage(type)!}
+                              alt=""
+                              className="h-4 w-4 object-contain"
+                            />
                           ) : null}
                           {type.label}
                         </button>
@@ -341,7 +387,10 @@ export function QuickTaskCreation({
               {(!projectId || teamId) && (
                 <Popover open={isProjectOpen} onOpenChange={setIsProjectOpen}>
                   <PopoverTrigger asChild>
-                    <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-project-trigger">
+                    <button
+                      className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors"
+                      data-testid="quick-task-project-trigger"
+                    >
                       {project ? (
                         <span className="truncate">{project.name}</span>
                       ) : (
@@ -349,7 +398,10 @@ export function QuickTaskCreation({
                       )}
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[170px] p-2 border-0 border-b-[5px] border-b-primary bg-card" align="start">
+                  <PopoverContent
+                    className="w-[170px] p-2 border-0 border-b-[5px] border-b-primary bg-card"
+                    align="start"
+                  >
                     <div className="max-h-60 overflow-y-auto">
                       {filteredProjects.map((p) => (
                         <button
@@ -364,7 +416,8 @@ export function QuickTaskCreation({
                           }}
                           className={cn(
                             "w-full text-left px-3 py-2 rounded hover:bg-muted text-xs",
-                            selectedProjectId === p.id && "bg-blue-50 text-blue-600 font-medium"
+                            selectedProjectId === p.id &&
+                              "bg-blue-50 text-blue-600 font-medium",
                           )}
                           data-testid={`quick-task-project-option-${p.id}`}
                         >
@@ -379,23 +432,35 @@ export function QuickTaskCreation({
               {/* Status */}
               <Popover open={isStatusOpen} onOpenChange={setIsStatusOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-status-trigger">
+                  <button
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors"
+                    data-testid="quick-task-status-trigger"
+                  >
                     {selectedStatusOption ? (
                       <span className="flex items-center gap-2">
                         <span
                           className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: selectedStatusOption.color }}
+                          style={{
+                            backgroundColor: selectedStatusOption.color,
+                          }}
                         />
-                        <span className="truncate">{selectedStatusOption.label}</span>
+                        <span className="truncate">
+                          {selectedStatusOption.label}
+                        </span>
                       </span>
                     ) : (
                       "Status"
                     )}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card" align="start">
+                <PopoverContent
+                  className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card"
+                  align="start"
+                >
                   {taskStatusConfigs.length === 0 ? (
-                    <p className="text-xs text-muted-foreground px-3 py-2">Loading statuses...</p>
+                    <p className="text-xs text-muted-foreground px-3 py-2">
+                      Loading statuses...
+                    </p>
                   ) : (
                     taskStatusConfigs.map((config) => (
                       <button
@@ -421,20 +486,33 @@ export function QuickTaskCreation({
               {/* Priority */}
               <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-priority-trigger">
+                  <button
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors"
+                    data-testid="quick-task-priority-trigger"
+                  >
                     {selectedPriorityOption ? (
                       <span className="flex items-center gap-2">
-                        <Flag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: selectedPriorityOption.color }} />
-                        <span className="truncate">{selectedPriorityOption.label}</span>
+                        <Flag
+                          className="w-3.5 h-3.5 flex-shrink-0"
+                          style={{ color: selectedPriorityOption.color }}
+                        />
+                        <span className="truncate">
+                          {selectedPriorityOption.label}
+                        </span>
                       </span>
                     ) : (
                       "Priority"
                     )}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card" align="start">
+                <PopoverContent
+                  className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card"
+                  align="start"
+                >
                   {taskPriorityConfigs.length === 0 ? (
-                    <p className="px-2 py-2 text-xs text-muted-foreground italic">No priorities configured</p>
+                    <p className="px-2 py-2 text-xs text-muted-foreground italic">
+                      No priorities configured
+                    </p>
                   ) : (
                     taskPriorityConfigs.map((priority) => (
                       <button
@@ -446,8 +524,13 @@ export function QuickTaskCreation({
                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
                         data-testid={`quick-task-priority-option-${priority.value}`}
                       >
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: priority.color }} />
-                        <span style={{ color: priority.color }}>{priority.label}</span>
+                        <span
+                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: priority.color }}
+                        />
+                        <span style={{ color: priority.color }}>
+                          {priority.label}
+                        </span>
                       </button>
                     ))
                   )}
@@ -457,12 +540,18 @@ export function QuickTaskCreation({
               {/* Assignee */}
               <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors" data-testid="quick-task-assignee-trigger">
+                  <button
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors"
+                    data-testid="quick-task-assignee-trigger"
+                  >
                     {assignedMember ? (
                       <span className="flex items-center gap-2">
                         <MemberAvatar
                           name={assignedMember.name}
-                          src={assignedMember.avatar || assignedMember.profilePicture}
+                          src={
+                            assignedMember.avatar ||
+                            assignedMember.profilePicture
+                          }
                         />
                         <span className="truncate">{assignedMember.name}</span>
                       </span>
@@ -473,7 +562,10 @@ export function QuickTaskCreation({
                     )}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card" align="start">
+                <PopoverContent
+                  className="w-42.5 p-2 border-0 border-b-[5px] border-b-primary bg-card"
+                  align="start"
+                >
                   {members.map((member) => (
                     <button
                       key={member.userId}
@@ -495,11 +587,19 @@ export function QuickTaskCreation({
               </Popover>
 
               {/* Start Date Picker */}
-              <Popover open={isStartCalendarOpen} onOpenChange={setIsStartCalendarOpen}>
+              <Popover
+                open={isStartCalendarOpen}
+                onOpenChange={setIsStartCalendarOpen}
+              >
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2" data-testid="quick-task-start-date-trigger">
+                  <button
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2"
+                    data-testid="quick-task-start-date-trigger"
+                  >
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{startDate ? format(startDate, "MMM d, yyyy") : "Start Date"}</span>
+                    <span className="truncate">
+                      {startDate ? formatLocalDate(startDate) : "Start Date"}
+                    </span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -521,11 +621,19 @@ export function QuickTaskCreation({
               </Popover>
 
               {/* Due Date Picker */}
-              <Popover open={isEndCalendarOpen} onOpenChange={setIsEndCalendarOpen}>
+              <Popover
+                open={isEndCalendarOpen}
+                onOpenChange={setIsEndCalendarOpen}
+              >
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2" data-testid="quick-task-due-date-trigger">
+                  <button
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-left text-xs text-muted-foreground hover:border-input transition-colors flex items-center gap-2"
+                    data-testid="quick-task-due-date-trigger"
+                  >
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{endDate ? format(endDate, "MMM d, yyyy") : "Due Date"}</span>
+                    <span className="truncate">
+                      {endDate ? formatLocalDate(endDate) : "Due Date"}
+                    </span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -536,7 +644,12 @@ export function QuickTaskCreation({
                       setEndDate(date);
                       setIsEndCalendarOpen(false);
                     }}
-                    disabled={(date) => (startDate ? date < new Date(new Date(startDate).setHours(0, 0, 0, 0)) : false)}
+                    disabled={(date) =>
+                      startDate
+                        ? date <
+                          new Date(new Date(startDate).setHours(0, 0, 0, 0))
+                        : false
+                    }
                     initialFocus
                   />
                 </PopoverContent>

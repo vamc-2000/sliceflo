@@ -1,24 +1,40 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { ProseMirrorEditor } from '@/components/proseMirror/ProseMirrorEditor'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/sonner";
-import { Hash, Plus, Flag, User, X, FileText, SquareArrowOutUpRight, Calendar as CalendarIcon, Users, Hexagon, BadgeCent, Upload, Paperclip, Check, ChevronDown } from 'lucide-react'
-import { useProfileStore } from '@/stores/profile-store'
-import { useProjectsStore } from '@/stores/projects-store'
-import { useDocStore } from '@/stores/useDoc-store'
-import { useTasksStore } from '@/stores/tasks-store'
-import { LabelPicker } from '@/components/shared/labels/LabelPicker';
-import { LabelBadge } from '@/components/shared/labels/LabelBadge';
-import { Tag } from 'lucide-react';
-import { uploadFile, getUpload } from "@/lib/api/uploads-api"
-import { updateDocument as updateDocumentApi } from "@/lib/api/documents-api"
+import {
+  Hash,
+  Plus,
+  Flag,
+  User,
+  X,
+  FileText,
+  SquareArrowOutUpRight,
+  Calendar as CalendarIcon,
+  Users,
+  Hexagon,
+  BadgeCent,
+  Upload,
+  Paperclip,
+  Check,
+  ChevronDown,
+} from "lucide-react";
+import { useProfileStore } from "@/stores/profile-store";
+import { useProjectsStore } from "@/stores/projects-store";
+import { useDocStore } from "@/stores/useDoc-store";
+import { useTasksStore } from "@/stores/tasks-store";
+import { LabelPicker } from "@/components/shared/labels/LabelPicker";
+import { LabelBadge } from "@/components/shared/labels/LabelBadge";
+import { Tag } from "lucide-react";
+import { uploadFile, getUpload } from "@/lib/api/uploads-api";
+import { updateDocument as updateDocumentApi } from "@/lib/api/documents-api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +42,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
@@ -36,52 +52,56 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { Separator } from '@/components/ui/separator'
-import { format } from 'date-fns'
-import Link from 'next/link'
-import { useWorkspaceStore } from '@/stores/workspace-store'
-import { cn } from '@/lib/utils'
-import AttachFileModal from '@/components/disucssions/AttachFileModal'
-import { ProjectAttachments } from './ProjectAttachments'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { usePortfoliosStore } from '@/stores/portfolios-store'
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Separator } from "@/components/ui/separator";
+import {
+  formatLocalDate,
+  convertSelectedDateToUTC,
+  convertUTCToCalendarDate,
+} from "@/utils/timezone-utils";
+import Link from "next/link";
+import { useWorkspaceStore } from "@/stores/workspace-store";
+import { cn } from "@/lib/utils";
+import AttachFileModal from "@/components/disucssions/AttachFileModal";
+import { ProjectAttachments } from "./ProjectAttachments";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePortfoliosStore } from "@/stores/portfolios-store";
 
 interface AboutProjectProps {
-  projectDescription?: string
-  projectName?: string
+  projectDescription?: string;
+  projectName?: string;
   projectLeader?: {
-    name?: string
-    avatar?: string | null
-  }
-  projectPriority?: string
-  projectStatus?: string
-  projectStartDate?: string
-  projectEndDate?: string
-  projectId?: string
-  workspaceId?: string
-  customFieldValues?: Record<string, string>
+    name?: string;
+    avatar?: string | null;
+  };
+  projectPriority?: string;
+  projectStatus?: string;
+  projectStartDate?: string;
+  projectEndDate?: string;
+  projectId?: string;
+  workspaceId?: string;
+  customFieldValues?: Record<string, string>;
 }
 
-import { FileAttachment } from '@/types/attachment.types'
+import { FileAttachment } from "@/types/attachment.types";
 
 export default function AboutProject({
-  projectDescription = '',
-  projectName = '',
+  projectDescription = "",
+  projectName = "",
   projectLeader = {},
-  projectPriority = 'medium',
-  projectStatus = 'active',
+  projectPriority = "medium",
+  projectStatus = "active",
   projectStartDate,
   projectEndDate,
   projectId,
   workspaceId,
   customFieldValues = {},
 }: AboutProjectProps) {
-  const [content, setContent] = useState(projectDescription)
-  const [charCount, setCharCount] = useState(0)
-  const [isAttachModalOpen, setIsAttachModalOpen] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
+  const [content, setContent] = useState(projectDescription);
+  const [charCount, setCharCount] = useState(0);
+  const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [isPortfolioDialogOpen, setIsPortfolioDialogOpen] = useState(false);
 
@@ -89,11 +109,14 @@ export default function AboutProject({
   const [isLabelsExpanded, setIsLabelsExpanded] = useState(false);
   const [isAboutProjectExpanded, setIsAboutProjectExpanded] = useState(false);
   const [isAttachmentsExpanded, setIsAttachmentsExpanded] = useState(false);
-  const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] = useState(true);
+  const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] =
+    useState(true);
   const [isCustomFieldsExpanded, setIsCustomFieldsExpanded] = useState(false);
+  const [openPopoverFieldId, setOpenPopoverFieldId] = useState<string | null>(null);
+  const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
+  const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
 
-
-  const { user: profile } = useProfileStore()
+  const { user: profile } = useProfileStore();
   const {
     projects,
     updateProject,
@@ -106,9 +129,14 @@ export default function AboutProject({
     getProjectPriorityConfigs,
     updateProjectLabels,
     updateProjectLeaders,
-  } = useProjectsStore()
-  const { portfolios, fetchPortfolios } = usePortfoliosStore()
-  const { documents, addProjectToDocument, removeProjectFromDocument, fetchRootDocuments } = useDocStore()
+  } = useProjectsStore();
+  const { portfolios, fetchPortfolios } = usePortfoliosStore();
+  const {
+    documents,
+    addProjectToDocument,
+    removeProjectFromDocument,
+    fetchRootDocuments,
+  } = useDocStore();
 
   const {
     workspaceCustomFieldsConfig,
@@ -116,29 +144,32 @@ export default function AboutProject({
     workspaceMembers,
     projectPhases,
     fetchWorkspaceCustomFieldsConfig,
-  } = useWorkspaceStore()
+  } = useWorkspaceStore();
 
-  const { tasks, fetchTasks } = useTasksStore()
+  const { tasks, fetchTasks } = useTasksStore();
 
-  const resolvedWorkspaceId = workspaceId || currentWorkspace?.id || ''
-  const workspaceCustomFields = workspaceCustomFieldsConfig[resolvedWorkspaceId] || []
+  const resolvedWorkspaceId = workspaceId || currentWorkspace?.id || "";
+  const workspaceCustomFields =
+    workspaceCustomFieldsConfig[resolvedWorkspaceId] || [];
 
   // Get current project
-  const currentProject = projects.find(p => p.id === projectId)
+  const currentProject = projects.find((p) => p.id === projectId);
 
   const projectCustomFieldValues = currentProject?.customFieldValues ?? {};
 
   useEffect(() => {
     if (projectId) {
-      fetchTasks(projectId)
+      fetchTasks(projectId);
     }
-  }, [projectId])
+  }, [projectId]);
 
   useEffect(() => {
     fetchRootDocuments();
   }, [fetchRootDocuments]);
 
-  const [projectAttachments, setProjectAttachments] = useState<FileAttachment[]>([]);
+  const [projectAttachments, setProjectAttachments] = useState<
+    FileAttachment[]
+  >([]);
   const visibleAttachments = showAll
     ? projectAttachments
     : projectAttachments.slice(0, 2);
@@ -146,8 +177,10 @@ export default function AboutProject({
   // Sync attachments from the store to component state
   useEffect(() => {
     const projAttachmentsList = currentProject?.attachments || [];
-    const projectTasks = tasks.filter(t => t.projectId === projectId);
-    const taskAttachmentsList = projectTasks.flatMap(t => t.attachments || []);
+    const projectTasks = tasks.filter((t) => t.projectId === projectId);
+    const taskAttachmentsList = projectTasks.flatMap(
+      (t) => t.attachments || [],
+    );
 
     const allAttachments = [...projAttachmentsList, ...taskAttachmentsList];
 
@@ -156,31 +189,43 @@ export default function AboutProject({
       return;
     }
 
-    const resolved = allAttachments.filter(Boolean).map((att: any, index: number) => {
-      const isString = typeof att === 'string';
-      const attId = isString ? att : (att.id || att._id);
+    const resolved = allAttachments
+      .filter(Boolean)
+      .map((att: any, index: number) => {
+        const isString = typeof att === "string";
+        const attId = isString ? att : att.id || att._id;
 
-      // Use fileName from project store or name/id as fallback
-      const fileName = isString ? attId : (att.fileName || att.name || att.id || 'Unknown');
+        // Use fileName from project store or name/id as fallback
+        const fileName = isString
+          ? attId
+          : att.fileName || att.name || att.id || "Unknown";
 
-      const uploaderId = !isString
-        ? (typeof att.uploadedBy === 'string' ? att.uploadedBy : (att.uploadedBy?.id || att.uploadedBy?._id || att.uploadedBy))
-        : '';
+        const uploaderId = !isString
+          ? typeof att.uploadedBy === "string"
+            ? att.uploadedBy
+            : att.uploadedBy?.id || att.uploadedBy?._id || att.uploadedBy
+          : "";
 
-      const uploader = workspaceMembers.find(m => m.userId === uploaderId);
+        const uploader = workspaceMembers.find((m) => m.userId === uploaderId);
 
-      return {
-        id: attId || `unknown-${index}`,
-        name: fileName,
-        size: !isString && att.fileSize ? `${Math.round(att.fileSize / 1024)} KB` : '0 KB',
-        type: !isString ? (att.mimeType || 'unknown') : 'unknown',
-        uploadedOn: !isString && att.createdAt ? format(new Date(att.createdAt), 'MMM d, yyyy') : '',
-        uploadedBy: {
-          name: uploader?.name || 'Unknown',
-          id: uploaderId
-        }
-      };
-    });
+        return {
+          id: attId || `unknown-${index}`,
+          name: fileName,
+          size:
+            !isString && att.fileSize
+              ? `${Math.round(att.fileSize / 1024)} KB`
+              : "0 KB",
+          type: !isString ? att.mimeType || "unknown" : "unknown",
+          uploadedOn:
+            !isString && att.createdAt
+              ? formatLocalDate(att.createdAt)
+              : "",
+          uploadedBy: {
+            name: uploader?.name || "Unknown",
+            id: uploaderId,
+          },
+        };
+      });
 
     setProjectAttachments(resolved as FileAttachment[]);
   }, [currentProject?.attachments, tasks, projectId, workspaceMembers]);
@@ -189,9 +234,7 @@ export default function AboutProject({
   const linkedDocs = useMemo(() => {
     if (!projectId) return [];
     return Array.from(documents.values()).filter(
-      (doc) =>
-        doc.linkedProjects?.includes(projectId) &&
-        !doc.parentId
+      (doc) => doc.linkedProjects?.includes(projectId) && !doc.parentId,
     );
   }, [documents, projectId]);
 
@@ -199,71 +242,91 @@ export default function AboutProject({
   const availableDocs = useMemo(() => {
     if (!projectId) return [];
     return Array.from(documents.values()).filter(
-      (doc) =>
-        !doc.linkedProjects?.includes(projectId) &&
-        !doc.parentId
+      (doc) => !doc.linkedProjects?.includes(projectId) && !doc.parentId,
     );
   }, [documents, projectId]);
 
+  useMemo(() => {
+    if (currentProject) {
+      console.log("[AboutProject Date Debug]:", {
+        projectId,
+        rawStartDate: currentProject.startDate,
+        rawEndDate: currentProject.endDate,
+        timeZone: profile?.preferences?.timeZone,
+        dateFormat: profile?.preferences?.dateFormat,
+        calendarStartDate: currentProject.startDate
+          ? convertUTCToCalendarDate(currentProject.startDate)
+          : undefined,
+        calendarEndDate: currentProject.endDate
+          ? convertUTCToCalendarDate(currentProject.endDate)
+          : undefined,
+      });
+    }
+  }, [
+    currentProject?.startDate,
+    currentProject?.endDate,
+    profile?.preferences?.timeZone,
+  ]);
+
   const getTextLength = (html: string): number => {
-    const temp = document.createElement('div')
-    temp.innerHTML = html
-    return temp.textContent?.trim().length || 0
-  }
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.textContent?.trim().length || 0;
+  };
 
   const handleContentChange = (newContent: string) => {
-    setContent(newContent)
-    setCharCount(getTextLength(newContent))
-  }
+    setContent(newContent);
+    setCharCount(getTextLength(newContent));
+  };
 
   const mentionableMembers = useMemo(() => {
     if (!currentProject?.members || !workspaceMembers) return [];
 
     // Create a set of project member user IDs for efficient lookup
-    const projectUserIds = new Set(currentProject.members.map(m => m.userId));
+    const projectUserIds = new Set(currentProject.members.map((m) => m.userId));
 
     // Filter workspace members to only those who are in the project
     return workspaceMembers
-      .filter(m => projectUserIds.has(m.userId))
-      .map(m => ({
+      .filter((m) => projectUserIds.has(m.userId))
+      .map((m) => ({
         id: m.userId,
         name: m.name,
-        avatar: m.avatar || m.profilePicture || ''
+        avatar: m.avatar || m.profilePicture || "",
       }));
   }, [currentProject?.members, workspaceMembers]);
 
   useEffect(() => {
     if (projectDescription) {
-      setContent(projectDescription)
-      setCharCount(getTextLength(projectDescription))
+      setContent(projectDescription);
+      setCharCount(getTextLength(projectDescription));
     }
-  }, [projectDescription])
+  }, [projectDescription]);
 
   useEffect(() => {
     if (resolvedWorkspaceId && workspaceCustomFields.length === 0) {
       // Already imported: fetchWorkspaceCustomFieldsConfig
       // Add to destructuring from useWorkspaceStore:
-      fetchWorkspaceCustomFieldsConfig(resolvedWorkspaceId)
+      fetchWorkspaceCustomFieldsConfig(resolvedWorkspaceId);
     }
-  }, [resolvedWorkspaceId])
+  }, [resolvedWorkspaceId]);
   const handleAttachFiles = async (files: File[]) => {
-    if (!projectId) return
+    if (!projectId) return;
 
-    setIsUploading(true)
+    setIsUploading(true);
     try {
-      const uploadPromises = files.map(file => uploadFile(file))
-      const results = await Promise.all(uploadPromises)
+      const uploadPromises = files.map((file) => uploadFile(file));
+      const results = await Promise.all(uploadPromises);
 
-      const uploadIds = results.map(r => r.id)
-      await attachUploadsToProject(projectId, uploadIds)
+      const uploadIds = results.map((r) => r.id);
+      await attachUploadsToProject(projectId, uploadIds);
 
-      setIsAttachModalOpen(false)
+      setIsAttachModalOpen(false);
     } catch (error: any) {
-      toast('error', { title: error?.message || "Failed to upload files" })
+      toast("error", { title: error?.message || "Failed to upload files" });
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const handleDownload = async (id: string) => {
     try {
@@ -273,9 +336,9 @@ export default function AboutProject({
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
 
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = (uploadData as any).fileName || 'file';
+        link.download = (uploadData as any).fileName || "file";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -283,8 +346,8 @@ export default function AboutProject({
         setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       }
     } catch (error) {
-      console.error('Failed to download file:', error);
-      toast('error', { title: "Failed to download file" });
+      console.error("Failed to download file:", error);
+      toast("error", { title: "Failed to download file" });
     }
   };
 
@@ -292,11 +355,11 @@ export default function AboutProject({
     try {
       const uploadData = await getUpload(id);
       if (uploadData.presignedUrl) {
-        window.open(uploadData.presignedUrl, '_blank');
+        window.open(uploadData.presignedUrl, "_blank");
       }
     } catch (error) {
-      console.error('Failed to view file:', error);
-      toast('error', { title: "Failed to view file" });
+      console.error("Failed to view file:", error);
+      toast("error", { title: "Failed to view file" });
     }
   };
 
@@ -305,7 +368,7 @@ export default function AboutProject({
     try {
       await removeUploadsFromProject(projectId, [attachmentId]);
     } catch (error) {
-      toast('error', { title: 'Failed to delete attachment' });
+      toast("error", { title: "Failed to delete attachment" });
       throw error;
     }
   };
@@ -318,11 +381,13 @@ export default function AboutProject({
         if (doc) {
           const currentProjects = doc.linkedProjects || [];
           if (!currentProjects.includes(projectId)) {
-            await updateDocumentApi(docId, { linkedProjects: [...currentProjects, projectId] });
+            await updateDocumentApi(docId, {
+              linkedProjects: [...currentProjects, projectId],
+            });
           }
         }
       } catch (err: any) {
-        toast('error', { title: err?.message ?? "Failed to link document" });
+        toast("error", { title: err?.message ?? "Failed to link document" });
       }
     }
   };
@@ -334,10 +399,12 @@ export default function AboutProject({
         const doc = documents.get(docId);
         if (doc) {
           const currentProjects = doc.linkedProjects || [];
-          await updateDocumentApi(docId, { linkedProjects: currentProjects.filter(id => id !== projectId) });
+          await updateDocumentApi(docId, {
+            linkedProjects: currentProjects.filter((id) => id !== projectId),
+          });
         }
       } catch (err: any) {
-        toast('error', { title: err?.message ?? "Failed to unlink document" });
+        toast("error", { title: err?.message ?? "Failed to unlink document" });
       }
     }
   };
@@ -357,29 +424,35 @@ export default function AboutProject({
 
   const handleUpdateStartDate = (date: Date | undefined) => {
     if (projectId && date) {
-      updateProjectDates(projectId, date.toISOString(), currentProject?.endDate);
+      const utcStr = convertSelectedDateToUTC(date);
+      updateProjectDates(projectId, utcStr, currentProject?.endDate);
     }
-  }
+  };
 
   const handleUpdateEndDate = (date: Date | undefined) => {
     if (projectId && date) {
-      updateProjectDates(projectId, currentProject?.startDate, date.toISOString());
+      console.log("selected date is ", date);
+      const utcStr = convertSelectedDateToUTC(date);
+      console.log("new date is ", utcStr);
+      updateProjectDates(projectId, currentProject?.startDate, utcStr);
     }
-  }
+  };
 
   const handleUpdateLeader = (userId: string) => {
     if (!projectId || !currentProject) return;
 
     const currentLeaders = currentProject.leaders || [];
-    const isLeader = currentLeaders.includes(userId) || currentProject.projectLeader === userId;
+    const isLeader =
+      currentLeaders.includes(userId) ||
+      currentProject.projectLeader === userId;
 
     if (isLeader) {
       // Prevent self-leader removal
       if (userId === profile?.id) {
-        toast('error', { title: "You cannot remove yourself as a leader" });
+        toast("error", { title: "You cannot remove yourself as a leader" });
         return;
       }
-      const newLeaders = currentLeaders.filter(id => id !== userId);
+      const newLeaders = currentLeaders.filter((id) => id !== userId);
       updateProjectLeaders(projectId, newLeaders);
     } else {
       const newLeaders = [...currentLeaders, userId];
@@ -389,8 +462,13 @@ export default function AboutProject({
 
   const assignedLabels = useMemo(() => {
     const workspaceLabels = currentWorkspace?.labels || [];
-    const projectLabelIds = currentProject?.labelIds || currentProject?.labels?.map(l => l.id) || [];
-    return workspaceLabels.filter(label => projectLabelIds.includes(label.id));
+    const projectLabelIds =
+      currentProject?.labelIds ||
+      currentProject?.labels?.map((l) => l.id) ||
+      [];
+    return workspaceLabels.filter((label) =>
+      projectLabelIds.includes(label.id),
+    );
   }, [currentProject, currentWorkspace]);
 
   const handleSelectLabel = async (labelId: string) => {
@@ -405,21 +483,21 @@ export default function AboutProject({
   const handleRemoveLabel = async (labelId: string) => {
     if (!projectId) return;
     const newLabelIds = assignedLabels
-      .filter(l => l.id !== labelId)
-      .map(l => l.id);
+      .filter((l) => l.id !== labelId)
+      .map((l) => l.id);
     await updateProjectLabels(projectId, newLabelIds);
   };
 
   const statusColors = {
-    active: 'bg-green-100 text-green-700',
-    planning: 'bg-blue-100 text-blue-700',
-    'on-hold': 'bg-orange-100 text-orange-700',
-    completed: 'bg-muted text-foreground',
-  }
+    active: "bg-green-100 text-green-700",
+    planning: "bg-blue-100 text-blue-700",
+    "on-hold": "bg-orange-100 text-orange-700",
+    completed: "bg-muted text-foreground",
+  };
 
   // Get avatar color
   const getAvatarColor = (name: string): string => {
-    const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+    const colors = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -428,19 +506,23 @@ export default function AboutProject({
   };
 
   // Priority options — from project config, fallback to empty
-  const projectPriorityConfigs = projectId ? getProjectPriorityConfigs(projectId) : [];
-
-  const priorityLevels = projectPriorityConfigs.length > 0
-    ? projectPriorityConfigs.map(p => ({
-      value: p.value,
-      label: p.label,
-      color: p.color, // use raw hex color
-    }))
+  const projectPriorityConfigs = projectId
+    ? getProjectPriorityConfigs(projectId)
     : [];
 
-  const assignedPhase = projectPhases
-    .flatMap(p => [p, ...(p.children || [])])
-    .find(p => p.value === currentProject?.phase) ?? null
+  const priorityLevels =
+    projectPriorityConfigs.length > 0
+      ? projectPriorityConfigs.map((p) => ({
+          value: p.value,
+          label: p.label,
+          color: p.color, // use raw hex color
+        }))
+      : [];
+
+  const assignedPhase =
+    projectPhases
+      .flatMap((p) => [p, ...(p.children || [])])
+      .find((p) => p.value === currentProject?.phase) ?? null;
 
   return (
     <div className="space-y-3">
@@ -452,16 +534,27 @@ export default function AboutProject({
             variant="ghost"
             size="icon"
             className="h-6 w-6"
-            onClick={() => setIsProjectDetailsExpanded(!isProjectDetailsExpanded)}
+            onClick={() =>
+              setIsProjectDetailsExpanded(!isProjectDetailsExpanded)
+            }
           >
-            <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isProjectDetailsExpanded ? "rotate-180" : "rotate-0")} />
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform duration-200",
+                isProjectDetailsExpanded ? "rotate-180" : "rotate-0",
+              )}
+            />
           </Button>
         </div>
 
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
-          isProjectDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+            isProjectDetailsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
           {/* ✅ State - Left-Right Alignment */}
           <div className="flex items-center justify-between">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs">
@@ -473,42 +566,63 @@ export default function AboutProject({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className={cn("h-8 px-3 hover:bg-muted",
-                    !assignedPhase && "text-muted-foreground")}>
+                  className={cn(
+                    "h-8 px-3 hover:bg-muted",
+                    !assignedPhase && "text-muted-foreground",
+                  )}
+                >
                   {assignedPhase ? (
                     <Badge
-                      className={cn("h-6", statusColors[projectStatus as keyof typeof statusColors])}
-                    // style={{ background: assignedPhase.color }}
+                      className={cn(
+                        "h-6",
+                        statusColors[
+                          projectStatus as keyof typeof statusColors
+                        ],
+                      )}
+                      // style={{ background: assignedPhase.color }}
                     >
                       {assignedPhase.label}
                     </Badge>
-
                   ) : (
                     "—"
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className='w-40'>
-                <DropdownMenuItem onClick={() => projectId && updateProjectPhase(projectId, '')} className="text-xs">
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                  onClick={() => projectId && updateProjectPhase(projectId, "")}
+                  className="text-xs"
+                >
                   Clear
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {projectPhases.map(phase => (
+                {projectPhases.map((phase) => (
                   <React.Fragment key={phase._id}>
                     <DropdownMenuItem
-                      onClick={() => projectId && updateProjectPhase(projectId, phase.value)}
+                      onClick={() =>
+                        projectId && updateProjectPhase(projectId, phase.value)
+                      }
                       className="text-xs"
                     >
-                      <span className="w-2 h-2 rounded-full mr-2" style={{ background: phase.color }} />
+                      <span
+                        className="w-2 h-2 rounded-full mr-2"
+                        style={{ background: phase.color }}
+                      />
                       {phase.label}
                     </DropdownMenuItem>
-                    {phase.children?.map(child => (
+                    {phase.children?.map((child) => (
                       <DropdownMenuItem
                         key={child._id}
                         className="pl-6 text-xs"
-                        onClick={() => projectId && updateProjectPhase(projectId, child.value)}
+                        onClick={() =>
+                          projectId &&
+                          updateProjectPhase(projectId, child.value)
+                        }
                       >
-                        <span className="w-2 h-2 rounded-full mr-2" style={{ background: child.color }} />
+                        <span
+                          className="w-2 h-2 rounded-full mr-2"
+                          style={{ background: child.color }}
+                        />
                         {child.label}
                       </DropdownMenuItem>
                     ))}
@@ -531,23 +645,41 @@ export default function AboutProject({
                   size="sm"
                   className={cn(
                     "h-8 transition-all duration-200",
-                    projectPriority ? "w-8 p-0 rounded-full" : "px-3 bg-secondary hover:bg-muted",
-                    !projectPriority && "text-muted-foreground"
+                    projectPriority
+                      ? "w-8 p-0 rounded-full"
+                      : "px-3 bg-secondary hover:bg-muted",
+                    !projectPriority && "text-muted-foreground",
                   )}
-                  style={projectPriority ? (() => {
-                    const matched = projectPriorityConfigs.find(p => p.value === projectPriority);
-                    return { backgroundColor: matched ? matched.color + '15' : '#e5e7eb15' };
-                  })() : {}}
+                  style={
+                    projectPriority
+                      ? (() => {
+                          const matched = projectPriorityConfigs.find(
+                            (p) => p.value === projectPriority,
+                          );
+                          return {
+                            backgroundColor: matched
+                              ? matched.color + "15"
+                              : "#e5e7eb15",
+                          };
+                        })()
+                      : {}
+                  }
                 >
-                  {projectPriority ? (() => {
-                    const matched = projectPriorityConfigs.find(p => p.value === projectPriority);
-                    return (
-                      <Flag
-                        className="h-4 w-4"
-                        style={{ color: matched ? matched.color : '#6b7280' }}
-                      />
-                    );
-                  })() : "—"}
+                  {projectPriority
+                    ? (() => {
+                        const matched = projectPriorityConfigs.find(
+                          (p) => p.value === projectPriority,
+                        );
+                        return (
+                          <Flag
+                            className="h-4 w-4"
+                            style={{
+                              color: matched ? matched.color : "#6b7280",
+                            }}
+                          />
+                        );
+                      })()
+                    : "—"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -582,24 +714,39 @@ export default function AboutProject({
               <CalendarIcon className="h-4 w-4" />
               Start Date
             </Label>
-            <Popover>
+            <Popover open={isStartDatePopoverOpen} onOpenChange={setIsStartDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
                   size="sm"
                   className={cn(
                     "h-8 px-3 font-normal hover:bg-muted text-xs",
-                    !currentProject?.startDate && "text-muted-foreground"
+                    !currentProject?.startDate && "text-muted-foreground",
                   )}
                 >
-                  {currentProject?.startDate ? format(new Date(currentProject.startDate), "PP") : "—"}
+                  {currentProject?.startDate
+                    ? formatLocalDate(currentProject.startDate)
+                    : "—"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
                   mode="single"
-                  selected={currentProject?.startDate ? new Date(currentProject.startDate) : undefined}
-                  onSelect={handleUpdateStartDate}
+                  selected={
+                    currentProject?.startDate
+                      ? convertUTCToCalendarDate(currentProject.startDate)
+                      : undefined
+                  }
+                  onSelect={(date) => {
+                    handleUpdateStartDate(date);
+                    setIsStartDatePopoverOpen(false);
+                  }}
+                  disabled={(date) => {
+                    const endDateCal = currentProject?.endDate
+                      ? convertUTCToCalendarDate(currentProject.endDate)
+                      : undefined;
+                    return endDateCal ? date > endDateCal : false;
+                  }}
                   initialFocus
                 />
               </PopoverContent>
@@ -612,24 +759,39 @@ export default function AboutProject({
               <CalendarIcon className="h-4 w-4" />
               End Date
             </Label>
-            <Popover>
+            <Popover open={isEndDatePopoverOpen} onOpenChange={setIsEndDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
                   size="sm"
                   className={cn(
                     "h-8 px-3 font-normal hover:bg-muted text-xs",
-                    !currentProject?.endDate && "text-muted-foreground"
+                    !currentProject?.endDate && "text-muted-foreground",
                   )}
                 >
-                  {currentProject?.endDate ? format(new Date(currentProject.endDate), "PP") : "—"}
+                  {currentProject?.endDate
+                    ? formatLocalDate(currentProject.endDate)
+                    : "—"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
                   mode="single"
-                  selected={currentProject?.endDate ? new Date(currentProject.endDate) : undefined}
-                  onSelect={handleUpdateEndDate}
+                  selected={
+                    currentProject?.endDate
+                      ? convertUTCToCalendarDate(currentProject.endDate)
+                      : undefined
+                  }
+                  onSelect={(date) => {
+                    handleUpdateEndDate(date);
+                    setIsEndDatePopoverOpen(false);
+                  }}
+                  disabled={(date) => {
+                    const startDateCal = currentProject?.startDate
+                      ? convertUTCToCalendarDate(currentProject.startDate)
+                      : undefined;
+                    return startDateCal ? date < startDateCal : false;
+                  }}
                   initialFocus
                 />
               </PopoverContent>
@@ -649,20 +811,27 @@ export default function AboutProject({
                   size="sm"
                   className={cn(
                     "h-8 px-2 hover:bg-muted flex items-center gap-1",
-                    (!currentProject?.leaders || currentProject.leaders.length === 0) && !currentProject?.projectLeader && "text-muted-foreground"
+                    (!currentProject?.leaders ||
+                      currentProject.leaders.length === 0) &&
+                      !currentProject?.projectLeader &&
+                      "text-muted-foreground",
                   )}
                 >
                   {(() => {
                     const leaderIds = currentProject?.leaders?.length
                       ? currentProject.leaders
-                      : (currentProject?.projectLeader ? [currentProject.projectLeader] : []);
+                      : currentProject?.projectLeader
+                        ? [currentProject.projectLeader]
+                        : [];
 
                     if (leaderIds.length === 0) return "—";
 
                     return (
                       <div className="flex -space-x-2 overflow-hidden">
                         {leaderIds.map((id, i) => {
-                          const m = workspaceMembers.find(member => member.userId === id);
+                          const m = workspaceMembers.find(
+                            (member) => member.userId === id,
+                          );
                           return (
                             <Avatar
                               key={id}
@@ -670,10 +839,16 @@ export default function AboutProject({
                               style={{ zIndex: 10 - i }}
                               title={m?.name}
                             >
-                              {m?.profilePicture && <AvatarImage src={m.profilePicture} />}
+                              {m?.profilePicture && (
+                                <AvatarImage src={m.profilePicture} />
+                              )}
                               <AvatarFallback
                                 className="text-white text-xs font-semibold"
-                                style={{ backgroundColor: getAvatarColor(m?.name || "U") }}
+                                style={{
+                                  backgroundColor: getAvatarColor(
+                                    m?.name || "U",
+                                  ),
+                                }}
                               >
                                 {m?.name?.charAt(0).toUpperCase() || "?"}
                               </AvatarFallback>
@@ -686,10 +861,14 @@ export default function AboutProject({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold py-1 px-2.5">Project Leaders</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold py-1 px-2.5">
+                  Project Leaders
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {workspaceMembers.map((member) => {
-                  const isLeader = (currentProject?.leaders || []).includes(member.userId) || currentProject?.projectLeader === member.userId;
+                  const isLeader =
+                    (currentProject?.leaders || []).includes(member.userId) ||
+                    currentProject?.projectLeader === member.userId;
                   return (
                     <DropdownMenuItem
                       key={member.userId}
@@ -698,17 +877,23 @@ export default function AboutProject({
                     >
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6 border">
-                          {member.profilePicture && <AvatarImage src={member.profilePicture} />}
+                          {member.profilePicture && (
+                            <AvatarImage src={member.profilePicture} />
+                          )}
                           <AvatarFallback
                             className="text-white text-[10px] font-semibold"
-                            style={{ backgroundColor: getAvatarColor(member.name) }}
+                            style={{
+                              backgroundColor: getAvatarColor(member.name),
+                            }}
                           >
                             {member.name.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <span>{member.name}</span>
                       </div>
-                      {isLeader && <Check className="h-3.5 w-3.5 text-blue-600" />}
+                      {isLeader && (
+                        <Check className="h-3.5 w-3.5 text-blue-600" />
+                      )}
                     </DropdownMenuItem>
                   );
                 })}
@@ -729,21 +914,33 @@ export default function AboutProject({
               className="h-6 w-6"
               onClick={() => setIsCustomFieldsExpanded(!isCustomFieldsExpanded)}
             >
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isCustomFieldsExpanded ? "rotate-180" : "rotate-0")} />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isCustomFieldsExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
             </Button>
           </div>
 
-          <div className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
-            isCustomFieldsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-          )}>
+          <div
+            className={cn(
+              "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+              isCustomFieldsExpanded
+                ? "max-h-[1000px] opacity-100"
+                : "max-h-0 opacity-0 pointer-events-none !mt-0",
+            )}
+          >
             {workspaceCustomFields.map((field) => {
-              const fieldId = field._id || ''
-              const fieldKey = field.name || field.label || '';
-              const currentValue = projectCustomFieldValues[fieldKey] ?? '';
+              const fieldId = field._id || "";
+              const fieldKey = field.name || field.label || "";
+              const currentValue = projectCustomFieldValues[fieldKey] ?? "";
 
               return (
-                <div key={fieldId} className="flex items-center justify-between">
+                <div
+                  key={fieldId}
+                  className="flex items-center justify-between"
+                >
                   <Label className="text-muted-foreground flex items-center gap-2 text-xs">
                     <Hash className="h-4 w-4" />
                     {field.label}
@@ -751,15 +948,21 @@ export default function AboutProject({
                   </Label>
 
                   {/* text — string value */}
-                  {field.type === 'text' && (
+                  {field.type === "text" && (
                     <Input
                       defaultValue={currentValue}
                       onBlur={(e) =>
-                        projectId && updateProjectCustomFieldValue(projectId, fieldId, fieldKey, e.target.value)
+                        projectId &&
+                        updateProjectCustomFieldValue(
+                          projectId,
+                          fieldId,
+                          fieldKey,
+                          e.target.value,
+                        )
                       }
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.currentTarget.blur() // triggers onBlur which calls the update
+                        if (e.key === "Enter") {
+                          e.currentTarget.blur(); // triggers onBlur which calls the update
                         }
                       }}
                       className="h-8 w-auto max-w-[180px] text-xs"
@@ -767,21 +970,22 @@ export default function AboutProject({
                   )}
 
                   {/* number — send as number, not string */}
-                  {field.type === 'number' && (
+                  {field.type === "number" && (
                     <Input
                       type="number"
                       defaultValue={currentValue}
                       onBlur={(e) =>
-                        projectId && updateProjectCustomFieldValue(
+                        projectId &&
+                        updateProjectCustomFieldValue(
                           projectId,
                           fieldId,
                           fieldKey,
-                          e.target.value ? Number(e.target.value) : ''  // 👈 cast to number
+                          e.target.value ? Number(e.target.value) : "", // 👈 cast to number
                         )
                       }
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.currentTarget.blur() // triggers onBlur which calls the update
+                        if (e.key === "Enter") {
+                          e.currentTarget.blur(); // triggers onBlur which calls the update
                         }
                       }}
                       className="h-8 w-auto max-w-[180px] text-xs"
@@ -789,25 +993,39 @@ export default function AboutProject({
                   )}
 
                   {/* date — send as ISO date string */}
-                  {field.type === 'date' && (
-                    <Popover>
+                  {field.type === "date" && (
+                    <Popover
+                      open={openPopoverFieldId === fieldId}
+                      onOpenChange={(open) =>
+                        setOpenPopoverFieldId(open ? fieldId : null)
+                      }
+                    >
                       <PopoverTrigger asChild>
-                        <button className="text-xs text-muted-foreground">
-                          {currentValue ? format(new Date(currentValue), 'PP') : '—'}
+                        <button className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
+                          {currentValue ? (
+                            formatLocalDate(currentValue)
+                          ) : (
+                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                          )}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent>
                         <Calendar
                           mode="single"
-                          selected={currentValue ? new Date(currentValue) : undefined}
+                          selected={
+                            currentValue
+                              ? convertUTCToCalendarDate(currentValue)
+                              : undefined
+                          }
                           onSelect={(date) => {
                             if (date && projectId) {
                               updateProjectCustomFieldValue(
                                 projectId,
                                 fieldId,
                                 fieldKey,
-                                format(date, 'yyyy-MM-dd')  // 👈 plain date string
+                                convertSelectedDateToUTC(date),
                               );
+                              setOpenPopoverFieldId(null);
                             }
                           }}
                           initialFocus
@@ -817,43 +1035,61 @@ export default function AboutProject({
                   )}
 
                   {/* dropdown — send option value string */}
-                  {field.type === 'dropdown' && field.options && field.options.length > 0 && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="text-xs text-muted-foreground">
-                          {currentValue
-                            ? field.options.find(o => o.value === currentValue)?.label || currentValue
-                            : '—'}
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => projectId && updateProjectCustomFieldValue(projectId, fieldId, fieldKey, '')}
-                          className="text-xs"
-                        >
-                          Clear
-                        </DropdownMenuItem>
-                        {field.options.map((option) => (
+                  {field.type === "dropdown" &&
+                    field.options &&
+                    field.options.length > 0 && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="text-xs text-muted-foreground">
+                            {currentValue
+                              ? field.options.find(
+                                  (o) => o.value === currentValue,
+                                )?.label || currentValue
+                              : "—"}
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
                           <DropdownMenuItem
-                            key={option.value}
                             onClick={() =>
-                              projectId && updateProjectCustomFieldValue(projectId, fieldId, fieldKey, option.value)
+                              projectId &&
+                              updateProjectCustomFieldValue(
+                                projectId,
+                                fieldId,
+                                fieldKey,
+                                "",
+                              )
                             }
                             className="text-xs"
                           >
-                            {option.label}
+                            Clear
                           </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                          {field.options.map((option) => (
+                            <DropdownMenuItem
+                              key={option.value}
+                              onClick={() =>
+                                projectId &&
+                                updateProjectCustomFieldValue(
+                                  projectId,
+                                  fieldId,
+                                  fieldKey,
+                                  option.value,
+                                )
+                              }
+                              className="text-xs"
+                            >
+                              {option.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
 
                   {/* fallback for unknown types */}
-                  {!['text', 'number', 'date', 'dropdown'].includes(field.type) && (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
+                  {!["text", "number", "date", "dropdown"].includes(
+                    field.type,
+                  ) && <span className="text-xs text-muted-foreground">—</span>}
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -875,7 +1111,6 @@ export default function AboutProject({
               <DropdownMenuContent align="end" className="w-56 p-0">
                 {linkedDocs.length > 0 && (
                   <>
-
                     <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
                       Linked Documents
                     </div>
@@ -889,7 +1124,9 @@ export default function AboutProject({
                         >
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span className="truncate text-xs">{doc.title}</span>
+                            <span className="truncate text-xs">
+                              {doc.title}
+                            </span>
                           </div>
                           <Button
                             variant="ghost"
@@ -916,7 +1153,11 @@ export default function AboutProject({
                       <span>Link Docs</span>
                     </div>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" side="right" className="w-56 p-0">
+                  <DropdownMenuContent
+                    align="end"
+                    side="right"
+                    className="w-56 p-0"
+                  >
                     {availableDocs.length > 0 ? (
                       <>
                         {/* Fixed header outside scroll */}
@@ -958,15 +1199,24 @@ export default function AboutProject({
               className="h-6 w-6"
               onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
             >
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLinkedItemsExpanded ? "rotate-180" : "rotate-0")} />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isLinkedItemsExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
             </Button>
           </div>
         </div>
 
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isLinkedItemsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLinkedItemsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {linkedDocs.length > 0 ? (
               linkedDocs.map((doc) => (
@@ -978,15 +1228,13 @@ export default function AboutProject({
                     <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <FileText className="w-3 h-3 text-muted-foreground" />
                     </div>
-                    <span className="text-xs font-medium truncate">{doc.title}</span>
+                    <span className="text-xs font-medium truncate">
+                      {doc.title}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Link href={`/docs/${doc.id}`} target="_blank">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                      >
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
                         <SquareArrowOutUpRight className="w-3 h-3" />
                       </Button>
                     </Link>
@@ -1002,7 +1250,9 @@ export default function AboutProject({
                 </div>
               ))
             ) : (
-              <div className="text-xs text-muted-foreground italic">No items linked yet.</div>
+              <div className="text-xs text-muted-foreground italic">
+                No items linked yet.
+              </div>
             )}
           </div>
         </div>
@@ -1016,7 +1266,7 @@ export default function AboutProject({
           <Label className="font-semibold">Labels</Label>
           <div className="flex items-center gap-1">
             <LabelPicker
-              selectedLabelIds={assignedLabels.map(l => l.id)}
+              selectedLabelIds={assignedLabels.map((l) => l.id)}
               onSelect={handleSelectLabel}
               onRemove={handleRemoveLabel}
             >
@@ -1030,15 +1280,24 @@ export default function AboutProject({
               className="h-6 w-6"
               onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
             >
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLabelsExpanded ? "rotate-180" : "rotate-0")} />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isLabelsExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
             </Button>
           </div>
         </div>
 
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isLabelsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLabelsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
           <div className="flex flex-wrap gap-2">
             {assignedLabels.length > 0 ? (
               assignedLabels.map((label) => (
@@ -1049,7 +1308,9 @@ export default function AboutProject({
                 />
               ))
             ) : (
-              <div className="text-xs text-muted-foreground italic">No labels assigned yet.</div>
+              <div className="text-xs text-muted-foreground italic">
+                No labels assigned yet.
+              </div>
             )}
           </div>
         </div>
@@ -1073,15 +1334,24 @@ export default function AboutProject({
               className="h-6 w-6"
               onClick={() => setIsAboutProjectExpanded(!isAboutProjectExpanded)}
             >
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAboutProjectExpanded ? "rotate-180" : "rotate-0")} />
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isAboutProjectExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
             </Button>
           </div>
         </div>
 
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isAboutProjectExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isAboutProjectExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
           <TooltipProvider>
             <ProseMirrorEditor
               initialContent={content}
@@ -1097,102 +1367,113 @@ export default function AboutProject({
         </div>
       </div>
 
-        <Separator className="my-4" />
+      <Separator className="my-4" />
 
-        {/* Attachments */}
-        <div className="space-y-3 ">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Label className="font-semibold">Attachments</Label>
+      {/* Attachments */}
+      <div className="space-y-3 ">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Label className="font-semibold">Attachments</Label>
 
-              {projectAttachments.length > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {projectAttachments.length} items
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1">
-              {projectAttachments.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setIsAttachModalOpen(true)}
-                  className="p-2 rounded-md bg-muted hover:bg-muted transition"
-                >
-                  <Paperclip className="h-5 w-5 text-muted-foreground" />
-                </button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
-              >
-                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
-              </Button>
-            </div>
-          </div>
-          <div className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden",
-            isAttachmentsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
-          )}>
-            {projectAttachments.length === 0 ? (
-              <div
-                className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
-                onClick={() => setIsAttachModalOpen(true)}
-                role="button"
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                    <Upload className="h-6 w-6 text-brand-orange" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium">Upload sources</p>
-                    <p className="text-xs text-muted-foreground">
-                      Drag & drop or{" "}
-                      <span className="text-brand-orange cursor-pointer">
-                        choose file
-                      </span>{" "}
-                      to upload
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-            ) : (
-              <div className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"
-                }`}>
-                {visibleAttachments.map((file) => (
-                  <ProjectAttachments
-                    key={file.id}
-                    file={file}
-                    onDownload={handleDownload}
-                    onDelete={handleDelete}
-                    onView={handleView}
-                  />
-                ))}
-
-                {projectAttachments.length > 2 && (
-                  <div className="text-center">
-                    <button
-                      onClick={() => setShowAll(!showAll)}
-                      className="text-xs text-muted-foreground text-center font-medium hover:underline"
-                    >
-                      {showAll
-                        ? "Show less"
-                        : `Show more (${projectAttachments.length - 2})`}
-                    </button>
-                  </div>
-                )}
-              </div>
+            {projectAttachments.length > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {projectAttachments.length} items
+              </span>
             )}
           </div>
-          <AttachFileModal
-            open={isAttachModalOpen}
-            onClose={() => setIsAttachModalOpen(false)}
-            onAttach={handleAttachFiles}
-          />
+
+          <div className="flex items-center gap-1">
+            {projectAttachments.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsAttachModalOpen(true)}
+                className="p-2 rounded-md bg-muted hover:bg-muted transition"
+              >
+                <Paperclip className="h-5 w-5 text-muted-foreground" />
+              </button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+            >
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isAttachmentsExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
+            </Button>
+          </div>
         </div>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isAttachmentsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
+          {projectAttachments.length === 0 ? (
+            <div
+              className="rounded-lg p-6 text-center bg-muted cursor-pointer hover:bg-muted transition"
+              onClick={() => setIsAttachModalOpen(true)}
+              role="button"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-brand-orange" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Upload sources</p>
+                  <p className="text-xs text-muted-foreground">
+                    Drag & drop or{" "}
+                    <span className="text-brand-orange cursor-pointer">
+                      choose file
+                    </span>{" "}
+                    to upload
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className={`space-y-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                showAll ? "max-h-250 opacity-100" : "max-h-50 opacity-100"
+              }`}
+            >
+              {visibleAttachments.map((file) => (
+                <ProjectAttachments
+                  key={file.id}
+                  file={file}
+                  onDownload={handleDownload}
+                  onDelete={handleDelete}
+                  onView={handleView}
+                />
+              ))}
+
+              {projectAttachments.length > 2 && (
+                <div className="text-center">
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="text-xs text-muted-foreground text-center font-medium hover:underline"
+                  >
+                    {showAll
+                      ? "Show less"
+                      : `Show more (${projectAttachments.length - 2})`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <AttachFileModal
+          open={isAttachModalOpen}
+          onClose={() => setIsAttachModalOpen(false)}
+          onAttach={handleAttachFiles}
+        />
       </div>
-      )
+    </div>
+  );
 }

@@ -78,6 +78,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { SYSTEM_FIELDS, useTasksStore } from "@/stores/tasks-store";
 import { useDraftsStore } from "@/stores/drafts-store";
 import { DraftResponse } from "@/lib/api/drafts-api";
@@ -663,6 +664,7 @@ export function DraftTaskTable({
   const members = workspaceMembers;
 
   const [showAddTask, setShowAddTask] = useState(false);
+  const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
   const [isAddTaskRowHovered, setIsAddTaskRowHovered] = useState(false);
   const [showTaskTypeMenu, setShowTaskTypeMenu] = useState(false);
   const [taskTypeMenuCoords, setTaskTypeMenuCoords] = useState<{ top: number; left: number } | null>(null);
@@ -1116,14 +1118,10 @@ export function DraftTaskTable({
 
 
 
-  // Format date nicely: "10 Dec"
+  // Format date nicely using user settings
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
-    try {
-      return format(new Date(dateStr), 'd MMM');
-    } catch {
-      return dateStr;
-    }
+    return formatLocalDate(dateStr);
   };
 
   //   Shared cell styles  
@@ -1450,7 +1448,10 @@ export function DraftTaskTable({
                       {/*   Start Date (separate from Due Date) */}
                       {shouldShowField('startDate', 'Start Date') && (
                         <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
-                          <Popover>
+                          <Popover
+                            open={activePopoverId === `${task.id}-start`}
+                            onOpenChange={(open) => setActivePopoverId(open ? `${task.id}-start` : null)}
+                          >
                             <PopoverTrigger asChild>
                               <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {task.startDate ? (
@@ -1466,6 +1467,7 @@ export function DraftTaskTable({
                                 selected={task.startDate ? new Date(task.startDate) : undefined}
                                 onSelect={(date) => {
                                   if (date) updateTask(task.id, { startDate: date.toISOString() });
+                                  setActivePopoverId(null);
                                 }}
                                 initialFocus
                               />
@@ -1477,7 +1479,10 @@ export function DraftTaskTable({
                       {/*   Due Date (End Date) */}
                       {shouldShowField('endDate', 'Due Date') && (
                         <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
-                          <Popover>
+                          <Popover
+                            open={activePopoverId === `${task.id}-end`}
+                            onOpenChange={(open) => setActivePopoverId(open ? `${task.id}-end` : null)}
+                          >
                             <PopoverTrigger asChild>
                               <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                 {task.endDate ? (
@@ -1493,6 +1498,7 @@ export function DraftTaskTable({
                                 selected={task.endDate ? new Date(task.endDate) : undefined}
                                 onSelect={(date) => {
                                   if (date) updateTask(task.id, { endDate: date.toISOString() });
+                                  setActivePopoverId(null);
                                 }}
                                 disabled={(date) => (task.startDate ? date < new Date(new Date(task.startDate).setHours(0, 0, 0, 0)) : false)}
                                 initialFocus
@@ -1756,7 +1762,10 @@ export function DraftTaskTable({
                           {/*   Subtask Start Date */}
                           {shouldShowField('startDate', 'Start Date') && (
                             <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
-                              <Popover>
+                              <Popover
+                                open={activePopoverId === `${subtask.id}-start`}
+                                onOpenChange={(open) => setActivePopoverId(open ? `${subtask.id}-start` : null)}
+                              >
                                 <PopoverTrigger asChild>
                                   <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                     {subtask.startDate ? (
@@ -1772,6 +1781,7 @@ export function DraftTaskTable({
                                     selected={subtask.startDate ? new Date(subtask.startDate) : undefined}
                                     onSelect={(date) => {
                                       if (date) updateSubtask(subtask.id, { startDate: date.toISOString() });
+                                      setActivePopoverId(null);
                                     }}
                                     initialFocus
                                   />
@@ -1783,7 +1793,10 @@ export function DraftTaskTable({
                           {/*   Subtask Due Date */}
                           {shouldShowField('endDate', 'Due Date') && (
                             <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
-                              <Popover>
+                              <Popover
+                                open={activePopoverId === `${subtask.id}-end`}
+                                onOpenChange={(open) => setActivePopoverId(open ? `${subtask.id}-end` : null)}
+                              >
                                 <PopoverTrigger asChild>
                                   <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                     {subtask.endDate ? (
@@ -1799,6 +1812,7 @@ export function DraftTaskTable({
                                     selected={subtask.endDate ? new Date(subtask.endDate) : undefined}
                                     onSelect={(date) => {
                                       if (date) updateSubtask(subtask.id, { endDate: date.toISOString() });
+                                      setActivePopoverId(null);
                                     }}
                                     disabled={(date) => (subtask.startDate ? date < new Date(new Date(subtask.startDate).setHours(0, 0, 0, 0)) : false)}
                                     initialFocus
@@ -2042,11 +2056,14 @@ export function DraftTaskTable({
                             if (h.key === 'startDate') {
                               return (
                                 <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
-                                  <Popover>
+                                  <Popover
+                                    open={activePopoverId === `new-subtask-${task.id}-start`}
+                                    onOpenChange={(open) => setActivePopoverId(open ? `new-subtask-${task.id}-start` : null)}
+                                  >
                                     <PopoverTrigger asChild>
                                       <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.startDate ? (
-                                          <span className="font-medium">{format(newSubtaskData.startDate, 'd MMM')}</span>
+                                          <span className="font-medium">{formatLocalDate(newSubtaskData.startDate)}</span>
                                         ) : (
                                           <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
@@ -2056,14 +2073,20 @@ export function DraftTaskTable({
                                       <Calendar
                                         mode="single"
                                         selected={newSubtaskData.startDate}
-                                        onSelect={(date) => setNewSubtaskData(prev => ({ ...prev, startDate: date ?? undefined }))}
+                                        onSelect={(date) => {
+                                          setNewSubtaskData(prev => ({ ...prev, startDate: date ?? undefined }));
+                                          setActivePopoverId(null);
+                                        }}
                                         initialFocus
                                       />
                                       {newSubtaskData.startDate && (
                                         <div className="border-t border-border p-2">
                                           <button
                                             className="w-full text-xs text-muted-foreground hover:text-foreground py-1 rounded hover:bg-muted"
-                                            onClick={() => setNewSubtaskData(prev => ({ ...prev, startDate: undefined }))}
+                                            onClick={() => {
+                                              setNewSubtaskData(prev => ({ ...prev, startDate: undefined }));
+                                              setActivePopoverId(null);
+                                            }}
                                           >
                                             Clear date
                                           </button>
@@ -2079,11 +2102,14 @@ export function DraftTaskTable({
                             if (h.key === 'endDate') {
                               return (
                                 <TableCell key={h.key} className={cn(bodyCellCls, "text-center")} style={getColumnStyle(h.key, false)}>
-                                  <Popover>
+                                  <Popover
+                                    open={activePopoverId === `new-subtask-${task.id}-end`}
+                                    onOpenChange={(open) => setActivePopoverId(open ? `new-subtask-${task.id}-end` : null)}
+                                  >
                                     <PopoverTrigger asChild>
                                       <button className="text-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                         {newSubtaskData.endDate ? (
-                                          <span className="font-medium">{format(newSubtaskData.endDate, 'd MMM')}</span>
+                                          <span className="font-medium">{formatLocalDate(newSubtaskData.endDate)}</span>
                                         ) : (
                                           <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
                                         )}
@@ -2093,14 +2119,21 @@ export function DraftTaskTable({
                                       <Calendar
                                         mode="single"
                                         selected={newSubtaskData.endDate}
-                                        onSelect={(date) => setNewSubtaskData(prev => ({ ...prev, endDate: date ?? undefined }))}
+                                        onSelect={(date) => {
+                                          setNewSubtaskData(prev => ({ ...prev, endDate: date ?? undefined }));
+                                          setActivePopoverId(null);
+                                        }}
+                                        disabled={(date) => (newSubtaskData.startDate ? date < new Date(new Date(newSubtaskData.startDate).setHours(0, 0, 0, 0)) : false)}
                                         initialFocus
                                       />
                                       {newSubtaskData.endDate && (
                                         <div className="border-t border-border p-2">
                                           <button
                                             className="w-full text-xs text-muted-foreground hover:text-foreground py-1 rounded hover:bg-muted"
-                                            onClick={() => setNewSubtaskData(prev => ({ ...prev, endDate: undefined }))}
+                                            onClick={() => {
+                                              setNewSubtaskData(prev => ({ ...prev, endDate: undefined }));
+                                              setActivePopoverId(null);
+                                            }}
                                           >
                                             Clear date
                                           </button>
