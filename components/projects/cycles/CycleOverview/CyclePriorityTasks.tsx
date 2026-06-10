@@ -5,6 +5,7 @@ import { LayoutList, Plus } from "lucide-react";
 import { TaskTable } from "@/components/projects/views/list-view/TaskTable";
 import { Task } from "@/types/task.types";
 import { useTasksStore } from "@/stores/tasks-store";
+import { convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { Button } from "@/components/ui/button";
 import LinkCycleTasksDialog from "../LinkCycleTasksDialog";
 import { QuickTaskCreation } from "../../QuickTaskCreation";
@@ -26,8 +27,8 @@ export function CyclePriorityTasks({ isEmpty, projectId, tasks, cycleId }: Cycle
     const handleCreateTask = async (taskData: any) => {
         await addTask({
             ...taskData,
-            startDate: taskData.startDate.toISOString(),
-            endDate: taskData.endDate?.toISOString(),
+            startDate: taskData.startDate ? convertSelectedDateToUTC(taskData.startDate) : undefined,
+            endDate: taskData.endDate ? convertSelectedDateToUTC(taskData.endDate) : undefined,
             cycleId: cycleId || null,
             relationships: [],
             attachmentIds: [],

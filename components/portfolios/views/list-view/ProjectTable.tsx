@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Project } from '@/stores/projects-store';
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Target, User, Clock, Flag, Hash, CheckCircle2, Plus, MoreHorizontal, Settings, Trash2, Archive, ExternalLink, Pencil, GripVertical, Link as LinkIcon, ChevronUp, Check } from "lucide-react";
@@ -692,12 +693,12 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-1">
-                              {getFilteredLeaderMembers(projectMembers).length === 0 ? (
+                              {getFilteredLeaderMembers(projectLeaders).length === 0 ? (
                                 <div className="text-center py-2 text-xs text-muted-foreground">
                                   No members found
                                 </div>
                               ) : (
-                                getFilteredLeaderMembers(projectMembers).map(member => {
+                                getFilteredLeaderMembers(projectLeaders).map(member => {
                                   const isLeader = leaderIds.includes(member.userId);
                                   return (
                                     <DropdownMenuItem
@@ -927,7 +928,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     {isVisible("startDate") && (
                       <TableCell className={`${bodyCellCls} text-center`} style={getColumnStyle("startDate", false)}>
                         {project.startDate ? (
-                          <span className="text-foreground">{format(new Date(project.startDate), 'd MMM')}</span>
+                          <span className="text-foreground">{formatLocalDate(project.startDate)}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
@@ -937,7 +938,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     {isVisible("endDate") && (
                       <TableCell className={`${bodyCellCls} text-center`} style={getColumnStyle("endDate", false)}>
                         {project.endDate ? (
-                          <span className="text-foreground">{format(new Date(project.endDate), 'd MMM')}</span>
+                          <span className="text-foreground">{formatLocalDate(project.endDate)}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}

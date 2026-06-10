@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { Project, useProjectsStore } from "@/stores/projects-store";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const getAvatarColor = (name: string): string => {
@@ -127,10 +128,12 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
 
   const dateRangeStr = useMemo(() => {
     if (!project.startDate && !project.endDate) return null;
-    const start = project.startDate ? format(new Date(project.startDate), "MMM d") : "";
-    const end = project.endDate ? format(new Date(project.endDate), "MMM d") : "";
-    if (start && end) return `${start} - ${end}`;
-    return start || end;
+    const start = project.startDate ? formatLocalDate(project.startDate) : "";
+    const end = project.endDate ? formatLocalDate(project.endDate) : "";
+    const hasStart = start && start !== "—";
+    const hasEnd = end && end !== "—";
+    if (hasStart && hasEnd) return `${start} - ${end}`;
+    return hasStart ? start : (hasEnd ? end : null);
   }, [project.startDate, project.endDate]);
 
   return (

@@ -1,9 +1,14 @@
 "use client";
 
-import { useProfileStore } from "@/stores/profile-store";
+import { useEffect } from "react";
+import { useConfigStore } from "@/stores/config-store";
 
 export default function UseRole() {
-    const { workspaceRoles } = useProfileStore();
+    const { roles, fetchConfig } = useConfigStore();
+
+    useEffect(() => {
+        fetchConfig();
+    }, [fetchConfig]);
     return (
         <div className="w-full space-y-4">
             {/* Header */}
@@ -16,7 +21,7 @@ export default function UseRole() {
 
             {/* Roles List */}
             <div className="grid gap-2" data-testid="user-roles-list">
-                {workspaceRoles.map((role) => (
+                {roles.map((role) => (
                     <div
                         key={role.id}
                         className="flex items-center justify-between px-4 py-3 bg-muted/30 dark:bg-muted/10 rounded-xl border border-border/50 transition-all hover:bg-muted/50 hover:border-border group"

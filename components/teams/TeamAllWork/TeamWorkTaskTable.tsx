@@ -75,6 +75,7 @@ import {
 } from '@/utils/relationship-utils';
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { useTasksStore, SYSTEM_FIELDS } from "@/stores/tasks-store";
 import { Task, ColumnConfig } from '@/types/task.types';
 import { CustomFieldDropdown } from "@/components/projects/views/list-view/common/CustomFieldDropdown";
@@ -607,8 +608,8 @@ export function TeamWorkTaskTable({
                 name: capturedData.name,
                 taskType,
                 assignee,
-                startDate: capturedData.startDate ? capturedData.startDate.toISOString() : undefined,
-                endDate: capturedData.endDate ? capturedData.endDate.toISOString() : undefined,
+                startDate: capturedData.startDate ? convertSelectedDateToUTC(capturedData.startDate) : undefined,
+                endDate: capturedData.endDate ? convertSelectedDateToUTC(capturedData.endDate) : undefined,
                 priority,
                 status,
                 completed: false,
@@ -665,8 +666,8 @@ export function TeamWorkTaskTable({
             parentTaskId,
             projectId,
             assignee: capturedSubtask.assignee || undefined,
-            startDate: capturedSubtask.startDate?.toISOString(),
-            endDate: capturedSubtask.endDate?.toISOString(),
+            startDate: capturedSubtask.startDate ? convertSelectedDateToUTC(capturedSubtask.startDate) : undefined,
+            endDate: capturedSubtask.endDate ? convertSelectedDateToUTC(capturedSubtask.endDate) : undefined,
             priority: capturedSubtask.priority || undefined,
             status: capturedSubtask.status || undefined,
             completed: false,
@@ -884,11 +885,8 @@ export function TeamWorkTaskTable({
     // Format date nicely: "10 Dec"
     const formatDate = (dateStr?: string) => {
         if (!dateStr) return null;
-        try {
-            return format(new Date(dateStr), 'd MMM');
-        } catch {
-            return dateStr;
-        }
+        const formatted = formatLocalDate(dateStr);
+        return formatted === "—" ? dateStr : formatted;
     };
 
     // ── Shared cell styles ────────────────────────────────────────────────────
@@ -1289,7 +1287,7 @@ export function TeamWorkTaskTable({
                                                                 mode="single"
                                                                 selected={task.startDate ? new Date(task.startDate) : undefined}
                                                                 onSelect={(date) => {
-                                                                    const updates: any = { startDate: date ? date.toISOString() : undefined };
+                                                                    const updates: any = { startDate: date ? convertSelectedDateToUTC(date) : undefined };
                                                                     if (date && task.endDate && new Date(task.endDate) < date) {
                                                                         updates.endDate = undefined;
                                                                     }
@@ -1320,7 +1318,7 @@ export function TeamWorkTaskTable({
                                                                 mode="single"
                                                                 selected={task.endDate ? new Date(task.endDate) : undefined}
                                                                 onSelect={(date) => {
-                                                                    if (date) updateTask(task.id, { endDate: date.toISOString() });
+                                                                    if (date) updateTask(task.id, { endDate: convertSelectedDateToUTC(date) });
                                                                 }}
                                                                 disabled={(date) => (task.startDate ? date < new Date(new Date(task.startDate).setHours(0, 0, 0, 0)) : false)}
                                                                 initialFocus
@@ -1826,7 +1824,7 @@ export function TeamWorkTaskTable({
                                                                     selected={subtask.startDate ? new Date(subtask.startDate) : undefined}
                                                                     onSelect={(date) => {
                                                                         if (date) {
-                                                                            const updates: any = { startDate: date.toISOString() };
+                                                                            const updates: any = { startDate: convertSelectedDateToUTC(date) };
                                                                             if (subtask.endDate && new Date(subtask.endDate) < date) {
                                                                                 updates.endDate = undefined;
                                                                             }
@@ -1858,7 +1856,7 @@ export function TeamWorkTaskTable({
                                                                     mode="single"
                                                                     selected={subtask.endDate ? new Date(subtask.endDate) : undefined}
                                                                     onSelect={(date) => {
-                                                                        if (date) updateSubtask(subtask.id, { endDate: date.toISOString() });
+                                                                        if (date) updateSubtask(subtask.id, { endDate: convertSelectedDateToUTC(date) });
                                                                     }}
                                                                     disabled={(date) => (subtask.startDate ? date < new Date(new Date(subtask.startDate).setHours(0, 0, 0, 0)) : false)}
                                                                     initialFocus
@@ -2274,7 +2272,7 @@ export function TeamWorkTaskTable({
                                                                         <PopoverTrigger asChild>
                                                                             <button className="text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                                                                 {newSubtaskData.startDate ? (
-                                                                                    <span className="font-medium">{format(newSubtaskData.startDate, 'd MMM')}</span>
+                                                                                    <span className="font-medium">{formatLocalDate(newSubtaskData.startDate)}</span>
                                                                                 ) : (
                                                                                     <Clock className="h-3.5 w-3.5 text-muted-foreground/60 mx-auto" />
                                                                                 )}
@@ -2319,7 +2317,7 @@ export function TeamWorkTaskTable({
                                                                         <PopoverTrigger asChild>
                                                                             <button className="text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                                                                 {newSubtaskData.endDate ? (
-                                                                                    <span className="font-medium">{format(newSubtaskData.endDate, 'd MMM')}</span>
+                                                                                    <span className="font-medium">{formatLocalDate(newSubtaskData.endDate)}</span>
                                                                                 ) : (
                                                                                     <Clock className="h-3.5 w-3.5 text-muted-foreground/60 mx-auto" />
                                                                                 )}
@@ -2708,7 +2706,7 @@ export function TeamWorkTaskTable({
                                                         <PopoverTrigger asChild>
                                                             <button className="text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                                                 {newTaskData.startDate ? (
-                                                                    <span className="font-medium">{format(newTaskData.startDate, 'd MMM')}</span>
+                                                                    <span className="font-medium">{formatLocalDate(newTaskData.startDate)}</span>
                                                                 ) : (
                                                                     <Clock className="h-3.5 w-3.5 text-muted-foreground/60 mx-auto" />
                                                                 )}
@@ -2753,7 +2751,7 @@ export function TeamWorkTaskTable({
                                                         <PopoverTrigger asChild>
                                                             <button className="text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
                                                                 {newTaskData.endDate ? (
-                                                                    <span className="font-medium">{format(newTaskData.endDate, 'd MMM')}</span>
+                                                                    <span className="font-medium">{formatLocalDate(newTaskData.endDate)}</span>
                                                                 ) : (
                                                                     <Clock className="h-3.5 w-3.5 text-muted-foreground/60 mx-auto" />
                                                                 )}
@@ -2894,14 +2892,14 @@ export function TeamWorkTaskTable({
                                         <span className="text-sm font-medium truncate block flex-1 min-w-0 max-w-[220px]">{t.name}</span>
                                         {t.startDate && (
                                             <span className="text-[10px] text-muted-foreground shrink-0">
-                                                {format(new Date(t.startDate), "MM/dd/yy")}
+                                                {formatLocalDate(t.startDate)}
                                             </span>
                                         )}
                                         {t.endDate && (
                                             <>
                                                 <ChevronRight className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
                                                 <span className="text-[10px] text-muted-foreground shrink-0">
-                                                    {format(new Date(t.endDate), "MM/dd/yy")}
+                                                    {formatLocalDate(t.endDate)}
                                                 </span>
                                             </>
                                         )}

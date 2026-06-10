@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ChevronRight, Clock, X, Calendar as CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate, getLocalDateParts } from "@/utils/timezone-utils";
 
 interface DateFieldProps {
   onSubmit: (data: {
@@ -36,13 +36,15 @@ export function DateField({
     return 'custom';
   });
   const [customDate, setCustomDate] = useState<Date>(() => {
-    if (initialData?.defaultValue) return new Date(initialData.defaultValue);
+    if (initialData?.defaultValue) return convertUTCToCalendarDate(initialData.defaultValue) || new Date();
     return new Date();
   });
   const [customTime, setCustomTime] = useState(() => {
     if (initialData?.defaultValue) {
-      const d = new Date(initialData.defaultValue);
-      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const parts = getLocalDateParts(initialData.defaultValue);
+      if (parts) {
+        return `${String(parts.hours).padStart(2, '0')}:${String(parts.minutes).padStart(2, '0')}`;
+      }
     }
     return '13:30';
   });
@@ -58,12 +60,12 @@ export function DateField({
 
     if (defaultDateType === 'today') {
       const now = new Date();
-      defaultValue = now.toISOString();
+      defaultValue = convertSelectedDateToUTC(now);
     } else if (defaultDateType === 'custom') {
       const [hours, minutes] = customTime.split(':');
       const dateWithTime = new Date(customDate);
       dateWithTime.setHours(parseInt(hours), parseInt(minutes));
-      defaultValue = dateWithTime.toISOString();
+      defaultValue = convertSelectedDateToUTC(dateWithTime);
     }
     setLoading(true);
     try {
@@ -145,7 +147,7 @@ export function DateField({
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <span className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                      {format(customDate, 'do MMM, yyyy')}
+                      {formatLocalDate(customDate)}
                       <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                     </span>
                   </PopoverTrigger>

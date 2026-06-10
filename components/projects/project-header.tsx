@@ -6,53 +6,53 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-    DropdownMenuSub,
-    DropdownMenuSubTrigger,
-    DropdownMenuSubContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 // import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import {
-    MoreHorizontal,
-    Calendar,
-    Settings,
-    List,
-    Grid3x3,
-    Flag,
-    Users,
-    SquareKanban,
-    ChartGantt,
-    Pencil,
-    Copy,
-    Palette,
-    Layers,
-    MoreVertical,
-    Link,
-    Activity,
-    History,
-    FolderPlus,
-    Upload,
-    Archive,
-    Trash2,
-    ChevronRight,
-    Check,
-    X,
-    Download,
-    FileJson,
-    FileText,
-    Printer,
-    Loader2
+  MoreHorizontal,
+  Calendar,
+  Settings,
+  List,
+  Grid3x3,
+  Flag,
+  Users,
+  SquareKanban,
+  ChartGantt,
+  Pencil,
+  Copy,
+  Palette,
+  Layers,
+  MoreVertical,
+  Link,
+  Activity,
+  History,
+  FolderPlus,
+  Upload,
+  Archive,
+  Trash2,
+  ChevronRight,
+  Check,
+  X,
+  Download,
+  FileJson,
+  FileText,
+  Printer,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -63,11 +63,14 @@ import { useTeamStore } from "@/stores/teams-store";
 import ProjectViewersSection from "./ProjectViewersSection";
 import ProjectInviteDialog from "./ProjectInviteDialog";
 import { ProjectIconAvatar } from "./ProjectIconAvatar";
-import { cn } from "@/lib/utils"
-import ColorIconPicker, { IconData, iconLibrary } from '@/components/ColorIconPicker'
-import { uploadIcon, uploadFile, deleteUpload } from '@/lib/api/uploads-api';
+import { cn } from "@/lib/utils";
+import ColorIconPicker, {
+  IconData,
+  iconLibrary,
+} from "@/components/ColorIconPicker";
+import { uploadIcon, uploadFile, deleteUpload } from "@/lib/api/uploads-api";
 import { toast } from "@/components/ui/sonner";
-import { TestLoaderDropdown } from '@/components/TestLoader';
+import { TestLoaderDropdown } from "@/components/TestLoader";
 import DuplicateProjectDialog from "@/components/projects/DuplicateProjectDialog";
 import { DefaultTaskValuesDialog } from "@/components/projects/DefaultTaskValuesDialog";
 import { CreateTaskByEmailDialog } from "@/components/projects/CreateTaskByEmailDialog";
@@ -76,435 +79,466 @@ import ArchiveProjectModal from "@/components/projects/ArchiveProjectModal";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface ProjectHeaderProps {
-    projectName: string;
-    update?: string;
-    // viewers?: number;
-    projectId: string;
-    onCollapseAllGroups?: (() => void) | null;
-    onExpandAllGroups?: (() => void) | null;
-    onToggleHideEmptyGroups?: (() => void) | null;
-    collapsedGroupsCount?: number;
-    totalGroupsCount?: number;
-    allGroupsCollapsed?: boolean;
-    hideEmptyGroups?: boolean;
-    onExportCSV?: (() => void) | null;
-    onExportExcel?: (() => void) | null;
-    onPrint?: (() => void) | null;
-    onActivityLogClick?: () => void
+  projectName: string;
+  update?: string;
+  // viewers?: number;
+  projectId: string;
+  onCollapseAllGroups?: (() => void) | null;
+  onExpandAllGroups?: (() => void) | null;
+  onToggleHideEmptyGroups?: (() => void) | null;
+  collapsedGroupsCount?: number;
+  totalGroupsCount?: number;
+  allGroupsCollapsed?: boolean;
+  hideEmptyGroups?: boolean;
+  onExportCSV?: (() => void) | null;
+  onExportExcel?: (() => void) | null;
+  onPrint?: (() => void) | null;
+  onActivityLogClick?: () => void;
 }
 
 export function ProjectHeader({
-    projectName,
-    update,
-    // viewers= 1,
-    projectId,
-    onCollapseAllGroups,
-    onExpandAllGroups,
-    onToggleHideEmptyGroups,
-    collapsedGroupsCount = 0,
-    totalGroupsCount = 0,
-    allGroupsCollapsed = false,
-    hideEmptyGroups = false,
-    onExportCSV,
-    onExportExcel,
-    onPrint,
-    onActivityLogClick
+  projectName,
+  update,
+  // viewers= 1,
+  projectId,
+  onCollapseAllGroups,
+  onExpandAllGroups,
+  onToggleHideEmptyGroups,
+  collapsedGroupsCount = 0,
+  totalGroupsCount = 0,
+  allGroupsCollapsed = false,
+  hideEmptyGroups = false,
+  onExportCSV,
+  onExportExcel,
+  onPrint,
+  onActivityLogClick,
 }: ProjectHeaderProps) {
-    const router = useRouter();
-    const {
-        projects,
-        fetchProjectById,
-        addViewersToProject,
-        removeViewersFromProject,
-        // updateProjectPriority,
-        // updateProjectDates,
-        // duplicateProject,
-        renameProject,           // ✅ Now async with API call
-        updateProjectStatus,     // ✅ Now async with API call
-        updateProjectIcon,       // ✅ NEW
-        archiveProject,          // ✅ NEW
-        deleteProject,           // ✅ NEW
-        isLoading,
-        getProjectPriorityConfigs,
-    } = useProjectsStore();
+  const router = useRouter();
+  const {
+    projects,
+    fetchProjectById,
+    addViewersToProject,
+    removeViewersFromProject,
+    // updateProjectPriority,
+    // updateProjectDates,
+    // duplicateProject,
+    renameProject, // ✅ Now async with API call
+    updateProjectStatus, // ✅ Now async with API call
+    updateProjectIcon, // ✅ NEW
+    archiveProject, // ✅ NEW
+    deleteProject, // ✅ NEW
+    isLoading,
+    getProjectPriorityConfigs,
+  } = useProjectsStore();
 
-    const { fetchWorkspaceMembers, workspaceMembers, currentWorkspace } = useWorkspaceStore();
-    const { fetchTeams, teams } = useTeamStore();
+  const { fetchWorkspaceMembers, workspaceMembers, currentWorkspace } =
+    useWorkspaceStore();
+  const { fetchTeams, teams } = useTeamStore();
 
-    const project = projects.find((p) => p.id === projectId);
-    const latestStatus = project?.statusHistory?.[0];
-    const displayUpdate = latestStatus?.status || project?.currentProjectUpdate || update;
-    const statusConfigs = project?.projectStatusConfig || [];
-    const displayUpdateConfig = statusConfigs.find((c: any) => c.value === displayUpdate);
+  const project = projects.find((p) => p.id === projectId);
+  const latestStatus = project?.statusHistory?.[0];
+  const displayUpdate =
+    latestStatus?.status || project?.currentProjectUpdate || update;
+  const statusConfigs = project?.projectStatusConfig || [];
+  const displayUpdateConfig = statusConfigs.find(
+    (c: any) => c.value === displayUpdate,
+  );
 
-    // console.log("Project data in project header:", project);
-    const viewers = (project?.viewers || []).map((v: any) =>
-        typeof v === 'string' ? v : v.userId
-    ).filter(Boolean) as string[];
-    // console.log("Project viewers in project header:", viewers);
+  // console.log("Project data in project header:", project);
+  const viewers = (project?.viewers || [])
+    .map((v: any) => (typeof v === "string" ? v : v.userId))
+    .filter(Boolean) as string[];
+  // console.log("Project viewers in project header:", viewers);
 
-    // state for icon picker
-    const [showIconPicker, setShowIconPicker] = useState(false);
-    const [selectedIconData, setSelectedIconData] = useState<IconData | null>(null);
-    const [isUpdatingIcon, setIsUpdatingIcon] = useState(false);
+  // state for icon picker
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [selectedIconData, setSelectedIconData] = useState<IconData | null>(
+    null,
+  );
+  const [isUpdatingIcon, setIsUpdatingIcon] = useState(false);
 
-    const [isViewersOpen, setIsViewersOpen] = useState(false);
-    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [isViewersOpen, setIsViewersOpen] = useState(false);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
-    // const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    const [isRenaming, setIsRenaming] = useState(false);
-    const [newName, setNewName] = useState(project?.name || "");
+  // const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newName, setNewName] = useState(project?.name || "");
 
-    // const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-    // const [defaultTaskValuesOpen, setDefaultTaskValuesOpen] = useState(false);
-    // const [createTaskByEmailOpen, setCreateTaskByEmailOpen] = useState(false);
-    const [importOpen, setImportOpen] = useState(false);
-    const [showArchiveModal, setShowArchiveModal] = useState(false);
-    const [archiving, setArchiving] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+  // const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  // const [defaultTaskValuesOpen, setDefaultTaskValuesOpen] = useState(false);
+  // const [createTaskByEmailOpen, setCreateTaskByEmailOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleCopyProjectLink = async () => {
-        try {
-            const url = `${window.location.origin}/project/${projectId}`;
-            await navigator.clipboard.writeText(url);
-            toast('success', { title: "Project link copied!" });
-        } catch {
-            toast('error', { title: "Failed to copy link" });
-        }
-    };
+  const handleCopyProjectLink = async () => {
+    try {
+      const url = `${window.location.origin}/project/${projectId}`;
+      await navigator.clipboard.writeText(url);
+      toast("success", { title: "Project link copied!" });
+    } catch {
+      toast("error", { title: "Failed to copy link" });
+    }
+  };
 
-    const handleCopyProjectId = async () => {
-        try {
-            await navigator.clipboard.writeText(projectId);
-            toast('success', { title: "Project ID copied!" });
-        } catch {
-            toast('error', { title: "Failed to copy ID" });
-        }
-    };
+  const handleCopyProjectId = async () => {
+    try {
+      await navigator.clipboard.writeText(projectId);
+      toast("success", { title: "Project ID copied!" });
+    } catch {
+      toast("error", { title: "Failed to copy ID" });
+    }
+  };
 
-    const handleArchiveConfirm = async () => {
-        setArchiving(true);
-        await archiveProject(projectId);
-        setArchiving(false);
-        setShowArchiveModal(false);
-        router.push("/settings?tab=workspace&section=cleanup");
-    };
+  const handleArchiveConfirm = async () => {
+    setArchiving(true);
+    await archiveProject(projectId);
+    setArchiving(false);
+    setShowArchiveModal(false);
+    router.push("/settings?tab=workspace&section=cleanup");
+  };
 
-    useEffect(() => {
-        if (projectId) {
-            fetchProjectById(projectId);
-        }
-
-        if (currentWorkspace?.id) {
-            fetchWorkspaceMembers(currentWorkspace.id);
-            fetchTeams();
-        }
-    }, [projectId, currentWorkspace?.id]);
-
-    // ✅ Handle icon file upload (for image type)
-    const handleIconUpload = async (file: File): Promise<{ id: string; url?: string }> => {
-        try {
-            const result = await uploadFile(file);
-            console.log("Icon upload result:", result);
-            return result;
-        } catch (error) {
-            console.error("Icon upload error:", error);
-            toast('error', { title: "Failed to upload icon" });
-            throw error;
-        }
-    };
-
-    // ✅ ADD THIS - Handle icon delete
-    const handleIconDelete = async (uploadId: string): Promise<void> => {
-        try {
-            console.log('🗑️ Deleting icon upload from header, ID:', uploadId);
-
-            await deleteUpload(uploadId);
-
-            console.log('✅ Icon deleted successfully');
-
-            toast('success', { title: "Icon deleted" });
-
-        } catch (error: any) {
-            console.error('❌ Icon delete failed:', error);
-            toast('error', { title: error?.message || "Failed to delete icon" });
-            throw error;
-        }
-    };
-
-    // ✅ Handle icon selection from picker
-    const handleIconSelect = async (iconData: IconData) => {
-        // Prevent multiple submissions
-        if (isUpdatingIcon) return;
-
-        setIsUpdatingIcon(true);
-        try {
-            let finalIconId: string | null = null;
-
-            console.log('🔄 Processing icon selection...', {
-                type: iconData.type,
-                hasIconId: !!iconData.iconId,
-                hasImageId: !!iconData.imageId
-            });
-
-            // For icon type (from library)
-            if (iconData.type === "icon") {
-                console.log('📤 Uploading icon from library...');
-
-                const iconUploadResult = await uploadIcon({
-                    icon: {
-                        name: iconData.icon || "default",
-                        color: iconData.color,
-                    },
-                });
-
-                finalIconId = iconUploadResult.id;
-                console.log("✅ Icon library uploaded, ID:", finalIconId);
-            }
-            // For image type
-            else if (iconData.type === "file") {
-                if (iconData.imageId) {
-                    finalIconId = iconData.imageId;
-                    console.log("✅ Using uploaded image ID:", finalIconId);
-                } else {
-                    console.error('❌ Image selected but no upload ID found');
-                    toast('error', { title: "Image upload incomplete. Please try uploading again." });
-                    return;
-                }
-            }
-
-            // Update project icon via API
-            if (finalIconId) {
-                console.log('🔄 Updating project icon via API...');
-
-                await updateProjectIcon(projectId, finalIconId);
-
-                console.log('✅ Project icon updated successfully');
-
-                setSelectedIconData(iconData);
-                setShowIconPicker(false);
-
-                toast('success', { title: "Project icon updated!" });
-            } else {
-                console.error('❌ Failed to get final icon ID');
-                toast('error', { title: "Failed to get icon ID" });
-            }
-        } catch (error: any) {
-            console.error("❌ Error selecting icon:", error);
-            toast('error', { title: error?.message || "Failed to update project icon" });
-        } finally {
-            setIsUpdatingIcon(false);
-        }
-    };
-
-    const handleAddViewers = async (viewerIds: string[]) => {
-        await addViewersToProject(projectId, viewerIds);
-    };
-
-    const handleRemoveViewers = async (viewerIds: string[]) => {
-        await removeViewersFromProject(projectId, viewerIds);
-    };
-
-    const handleSendInvite = async (emails: string[]) => {
-        // Implement email invitation logic here
-        console.log("Send invites to:", emails);
-        // You can integrate with your backend email service
-    };
-
-    const handleRename = async () => {
-        if (!newName.trim() || newName === project?.name) {
-            setIsRenaming(false);
-            return;
-        }
-
-        try {
-            await renameProject(projectId, newName.trim());
-            setIsRenaming(false);
-        } catch (error) {
-            // Error already handled in store
-            setNewName(project?.name || "");
-        }
-    };
-
-    // const handleStatusChange = async (newStatus: "active" | "planning" | "completed" | "on-hold") => {
-    //     try {
-    //         await updateProjectStatus(projectId, newStatus);
-    //     } catch (error) {
-    //         // Error already handled in store
-    //     }
-    // };
-
-    const handleDelete = () => {
-        setDeleteDialogOpen(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-        setIsDeleting(true);
-        try {
-            await deleteProject(projectId);
-            setDeleteDialogOpen(false);
-            router.push('/dashboard');
-        } catch (error) {
-            toast('error', { title: "Failed to delete project." });
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    const handleDuplicate = async (newName: string, mode: string, selectedFieldIds?: string[]) => {
-        try {
-            const newProjectId = await useProjectsStore.getState().duplicateProject(projectId, newName, mode, selectedFieldIds);
-            toast('success', { title: "Project duplicated successfully!" });
-            if (newProjectId) {
-                router.push(`/project/${newProjectId}`); // ← navigate to new project
-            }
-        } catch (error) {
-            toast('error', { title: "Failed to duplicate project." });
-            throw error;
-        }
-    };
-
-    // if (isLoading) {
-    //     return <div>Loading project...</div>;
-    // }
-
-    if (!project) {
-        return <div>Project not found</div>;
+  useEffect(() => {
+    if (projectId) {
+      fetchProjectById(projectId);
     }
 
+    if (currentWorkspace?.id) {
+      fetchWorkspaceMembers(currentWorkspace.id);
+      fetchTeams();
+    }
+  }, [projectId, currentWorkspace?.id]);
 
-    // const statusConfig = {
-    //     active: { label: "On Track", color: "bg-green-100 text-green-700" },
-    //     planning: { label: "Planning", color: "bg-blue-100 text-blue-700" },
-    //     completed: { label: "Completed", color: "bg-gray-100 text-gray-700" },
-    //     "on-hold": { label: "On Hold", color: "bg-yellow-100 text-yellow-700" },
-    //     archived: { label: "Archived", color: "bg-red-100 text-red-700" },
-    // } as const;
+  // ✅ Handle icon file upload (for image type)
+  const handleIconUpload = async (
+    file: File,
+  ): Promise<{ id: string; url?: string }> => {
+    try {
+      const result = await uploadFile(file);
+      console.log("Icon upload result:", result);
+      return result;
+    } catch (error) {
+      console.error("Icon upload error:", error);
+      toast("error", { title: "Failed to upload icon" });
+      throw error;
+    }
+  };
 
-    // const config = statusConfig[(project.status || "active") as keyof typeof statusConfig];
+  // ✅ ADD THIS - Handle icon delete
+  const handleIconDelete = async (uploadId: string): Promise<void> => {
+    try {
+      console.log("🗑️ Deleting icon upload from header, ID:", uploadId);
 
-    // Dynamic priority config from store
-    const projectPriorityConfigs = getProjectPriorityConfigs(projectId);
+      await deleteUpload(uploadId);
 
-    // Build a lookup map by value for the trigger button
-    const priorityConfigMap = projectPriorityConfigs.reduce((acc, p) => {
-        acc[p.value] = p;
-        return acc;
-    }, {} as Record<string, { _id: string; value: string; label: string; color: string; order: number }>);
+      console.log("✅ Icon deleted successfully");
 
-    // Current project priority matched config
-    const currentPriorityConfig = priorityConfigMap[project.priority || ''] ?? null;
+      toast("success", { title: "Icon deleted" });
+    } catch (error: any) {
+      console.error("❌ Icon delete failed:", error);
+      toast("error", { title: error?.message || "Failed to delete icon" });
+      throw error;
+    }
+  };
 
-    return (
-        <>
-            <div className="border-b border-border bg-background">
-                {/* Main Header Row */}
-                <div className="flex items-center justify-between px-4 py-1">
-                    {/* Left Section - Project Info, Status & Actions */}
-                    <div className="flex items-center gap-2">
-                        {/* Project Name & Icon */}
-                        <div className="flex items-center gap-3">
-                            {/* <div
+  // ✅ Handle icon selection from picker
+  const handleIconSelect = async (iconData: IconData) => {
+    // Prevent multiple submissions
+    if (isUpdatingIcon) return;
+
+    setIsUpdatingIcon(true);
+    try {
+      let finalIconId: string | null = null;
+
+      console.log("🔄 Processing icon selection...", {
+        type: iconData.type,
+        hasIconId: !!iconData.iconId,
+        hasImageId: !!iconData.imageId,
+      });
+
+      // For icon type (from library)
+      if (iconData.type === "icon") {
+        console.log("📤 Uploading icon from library...");
+
+        const iconUploadResult = await uploadIcon({
+          icon: {
+            name: iconData.icon || "default",
+            color: iconData.color,
+          },
+        });
+
+        finalIconId = iconUploadResult.id;
+        console.log("✅ Icon library uploaded, ID:", finalIconId);
+      }
+      // For image type
+      else if (iconData.type === "file") {
+        if (iconData.imageId) {
+          finalIconId = iconData.imageId;
+          console.log("✅ Using uploaded image ID:", finalIconId);
+        } else {
+          console.error("❌ Image selected but no upload ID found");
+          toast("error", {
+            title: "Image upload incomplete. Please try uploading again.",
+          });
+          return;
+        }
+      }
+
+      // Update project icon via API
+      if (finalIconId) {
+        console.log("🔄 Updating project icon via API...");
+
+        await updateProjectIcon(projectId, finalIconId);
+
+        console.log("✅ Project icon updated successfully");
+
+        setSelectedIconData(iconData);
+        setShowIconPicker(false);
+
+        toast("success", { title: "Project icon updated!" });
+      } else {
+        console.error("❌ Failed to get final icon ID");
+        toast("error", { title: "Failed to get icon ID" });
+      }
+    } catch (error: any) {
+      console.error("❌ Error selecting icon:", error);
+      toast("error", {
+        title: error?.message || "Failed to update project icon",
+      });
+    } finally {
+      setIsUpdatingIcon(false);
+    }
+  };
+
+  const handleAddViewers = async (viewerIds: string[]) => {
+    await addViewersToProject(projectId, viewerIds);
+  };
+
+  const handleRemoveViewers = async (viewerIds: string[]) => {
+    await removeViewersFromProject(projectId, viewerIds);
+  };
+
+  const handleSendInvite = async (emails: string[]) => {
+    // Implement email invitation logic here
+    console.log("Send invites to:", emails);
+    // You can integrate with your backend email service
+  };
+
+  const handleRename = async () => {
+    if (!newName.trim() || newName === project?.name) {
+      setIsRenaming(false);
+      return;
+    }
+
+    try {
+      await renameProject(projectId, newName.trim());
+      setIsRenaming(false);
+    } catch (error) {
+      // Error already handled in store
+      setNewName(project?.name || "");
+    }
+  };
+
+  // const handleStatusChange = async (newStatus: "active" | "planning" | "completed" | "on-hold") => {
+  //     try {
+  //         await updateProjectStatus(projectId, newStatus);
+  //     } catch (error) {
+  //         // Error already handled in store
+  //     }
+  // };
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteProject(projectId);
+      setDeleteDialogOpen(false);
+      router.push("/dashboard");
+    } catch (error) {
+      toast("error", { title: "Failed to delete project." });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDuplicate = async (
+    newName: string,
+    mode: string,
+    selectedFieldIds?: string[],
+  ) => {
+    try {
+      const newProjectId = await useProjectsStore
+        .getState()
+        .duplicateProject(projectId, newName, mode, selectedFieldIds);
+      toast("success", { title: "Project duplicated successfully!" });
+      if (newProjectId) {
+        router.push(`/project/${newProjectId}`); // ← navigate to new project
+      }
+    } catch (error) {
+      toast("error", { title: "Failed to duplicate project." });
+      throw error;
+    }
+  };
+
+  // if (isLoading) {
+  //     return <div>Loading project...</div>;
+  // }
+
+  if (!project) {
+    return <div>Project not found</div>;
+  }
+
+  // const statusConfig = {
+  //     active: { label: "On Track", color: "bg-green-100 text-green-700" },
+  //     planning: { label: "Planning", color: "bg-blue-100 text-blue-700" },
+  //     completed: { label: "Completed", color: "bg-gray-100 text-gray-700" },
+  //     "on-hold": { label: "On Hold", color: "bg-yellow-100 text-yellow-700" },
+  //     archived: { label: "Archived", color: "bg-red-100 text-red-700" },
+  // } as const;
+
+  // const config = statusConfig[(project.status || "active") as keyof typeof statusConfig];
+
+  // Dynamic priority config from store
+  const projectPriorityConfigs = getProjectPriorityConfigs(projectId);
+
+  // Build a lookup map by value for the trigger button
+  const priorityConfigMap = projectPriorityConfigs.reduce(
+    (acc, p) => {
+      acc[p.value] = p;
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        _id: string;
+        value: string;
+        label: string;
+        color: string;
+        order: number;
+      }
+    >,
+  );
+
+  // Current project priority matched config
+  const currentPriorityConfig =
+    priorityConfigMap[project.priority || ""] ?? null;
+
+  return (
+    <>
+      <div className="border-b border-border bg-background">
+        {/* Main Header Row */}
+        <div className="flex items-center justify-between px-4 py-1">
+          {/* Left Section - Project Info, Status & Actions */}
+          <div className="flex items-center gap-2">
+            {/* Project Name & Icon */}
+            <div className="flex items-center gap-3">
+              {/* <div
                                 className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-lg"
                                 style={{ backgroundColor: project.color || "#9333ea" }}
                             > */}
-                            {/* {project.name.charAt(0).toUpperCase()} */}
-                            {/* </div> */}
-                            {/* <Avatar className="h-10 w-10 bg-red-500 rounded-md">
+              {/* {project.name.charAt(0).toUpperCase()} */}
+              {/* </div> */}
+              {/* <Avatar className="h-10 w-10 bg-red-500 rounded-md">
                                 {renderProjectHeaderIcon(project)}
                             </Avatar> */}
-                            {/* <ProjectIconAvatar
+              {/* <ProjectIconAvatar
                                 project={project}
                                 size="lg"
                             /> */}
-                            <button
-                                onClick={() => setShowIconPicker(true)}
-                                disabled={isUpdatingIcon} // ✅ Disable during update
-                                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                                title="Change project icon"
-                                data-testid="project-header-icon-picker-btn"
-                            >
-                                <ProjectIconAvatar
-                                    project={project}
-                                    size="md"
-                                />
-                                {isUpdatingIcon && (
-                                    <Loader2 className="h-4 w-4 animate-spin absolute -right-2 -top-2" />
-                                )}
-                            </button>
+              <button
+                onClick={() => setShowIconPicker(true)}
+                disabled={isUpdatingIcon} // ✅ Disable during update
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                title="Change project icon"
+                data-testid="project-header-icon-picker-btn"
+              >
+                <ProjectIconAvatar project={project} size="md" />
+                {isUpdatingIcon && (
+                  <Loader2 className="h-4 w-4 animate-spin absolute -right-2 -top-2" />
+                )}
+              </button>
 
-                            {/* Icon Picker Dialog - Add at the end of component, before closing tags */}
-                            <ColorIconPicker
-                                isOpen={showIconPicker}
-                                onClose={() => setShowIconPicker(false)}
-                                onSelect={handleIconSelect}
-                                currentIcon={
-                                    project?.icon?.type === 'file'
-                                        ? project?.icon?.presignedUrl   // ✅ for image type use presignedUrl
-                                        : project?.icon?.name || null   // ✅ for icon type use name
-                                }
-                                currentColor={project?.icon?.color || '#6366f1'}
-                                currentType={project?.icon?.type || 'icon'}
-                                onUpload={handleIconUpload}
-                                onDelete={handleIconDelete}
-                            />
+              {/* Icon Picker Dialog - Add at the end of component, before closing tags */}
+              <ColorIconPicker
+                isOpen={showIconPicker}
+                onClose={() => setShowIconPicker(false)}
+                onSelect={handleIconSelect}
+                currentIcon={
+                  project?.icon?.type === "file"
+                    ? project?.icon?.presignedUrl // ✅ for image type use presignedUrl
+                    : project?.icon?.name || null // ✅ for icon type use name
+                }
+                currentColor={project?.icon?.color || "#6366f1"}
+                currentType={project?.icon?.type || "icon"}
+                onUpload={handleIconUpload}
+                onDelete={handleIconDelete}
+              />
 
-                            {isRenaming ? (
-                                <div className="flex items-center gap-2">
-                                    <Input
-                                        value={newName}
-                                        onChange={(e) => setNewName(e.target.value)}
-                                        className="h-8 w-64"
-                                        autoFocus
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                handleRename();
-                                            }
-                                            if (e.key === "Escape") {
-                                                setNewName(project.name);
-                                                setIsRenaming(false);
-                                            }
-                                        }}
-                                        data-testid="project-header-rename-input"
-                                    />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6"
-                                        onClick={() => {
-                                            renameProject(projectId, newName);
-                                            setIsRenaming(false);
-                                        }}
-                                        data-testid="project-header-rename-confirm"
-                                    >
-                                        <Check className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6"
-                                        onClick={() => {
-                                            setNewName(project.name);
-                                            setIsRenaming(false);
-                                        }}
-                                        data-testid="project-header-rename-cancel"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ) : (
-                                <h1 className="text-lg font-semibold text-foreground" data-testid="project-header-name">{project.name}</h1>
-                            )}
-                        </div>
+              {isRenaming ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="h-8 w-64"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleRename();
+                      }
+                      if (e.key === "Escape") {
+                        setNewName(project.name);
+                        setIsRenaming(false);
+                      }
+                    }}
+                    data-testid="project-header-rename-input"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => {
+                      renameProject(projectId, newName);
+                      setIsRenaming(false);
+                    }}
+                    data-testid="project-header-rename-confirm"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => {
+                      setNewName(project.name);
+                      setIsRenaming(false);
+                    }}
+                    data-testid="project-header-rename-cancel"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <h1
+                  className="text-lg font-semibold text-foreground"
+                  data-testid="project-header-name"
+                >
+                  {project.name}
+                </h1>
+              )}
+            </div>
 
-                        {/* Separator */}
-                        <div className="h-6 w-px bg-border" />
+            {/* Separator */}
+            <div className="h-6 w-px bg-border" />
 
-                        {/* Status Badge & Viewers */}
-                        <div className="flex items-center gap-2">
-                            {/* Priority Dropdown */}
-                            {/* <DropdownMenu>
+            {/* Status Badge & Viewers */}
+            <div className="flex items-center gap-2">
+              {/* Priority Dropdown */}
+              {/* <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="ghost"
@@ -548,22 +582,26 @@ export function ProjectHeader({
                                     )}
                                 </DropdownMenuContent>
                             </DropdownMenu> */}
-                            <div
-                                className="h-8 w-8 rounded-full flex items-center justify-center"
-                                style={{
-                                    backgroundColor: (currentPriorityConfig?.color || "#6b7280") + "15"
-                                }}
-                                data-testid="project-header-priority"
-                            >
-                                <Flag
-                                    className="h-4 w-4"
-                                    style={{ color: currentPriorityConfig ? currentPriorityConfig.color : '#6b7280' }}
-                                />
-                            </div>
+              <div
+                className="h-8 w-8 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor:
+                    (currentPriorityConfig?.color || "#6b7280") + "15",
+                }}
+                data-testid="project-header-priority"
+              >
+                <Flag
+                  className="h-4 w-4"
+                  style={{
+                    color: currentPriorityConfig
+                      ? currentPriorityConfig.color
+                      : "#6b7280",
+                  }}
+                />
+              </div>
 
-
-                            {/* Calendar Date Range Picker */}
-                            {/* <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+              {/* Calendar Date Range Picker */}
+              {/* <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                                 <PopoverTrigger asChild>
                                     {project.startDate && project.endDate ? (
                                         <Button
@@ -606,21 +644,25 @@ export function ProjectHeader({
                                     />
                                 </PopoverContent>
                             </Popover> */}
-                            <div
-                                className={`h-8 bg-muted-foreground/20 text-xs px-2 flex items-center gap-1 ${project.startDate && project.endDate ? "rounded-md" : "rounded-full"
-                                    }`}
-                                data-testid="project-header-dates"
-                            >
-                                <Calendar className="h-4 w-4" />
-                                {project.startDate && project.endDate &&
-                                    <span className="mt-0.5">
-                                        {format(new Date(project.startDate), "dd/MM/yyyy")} - {format(new Date(project.endDate), "dd/MM/yyyy")}
-                                    </span>
-                                }
-                            </div>
+              <div
+                className={`h-8 bg-muted-foreground/20 text-xs px-2 flex items-center gap-1 ${
+                  project.startDate && project.endDate
+                    ? "rounded-md"
+                    : "rounded-full"
+                }`}
+                data-testid="project-header-dates"
+              >
+                <Calendar className="h-4 w-4" />
+                {project.startDate && project.endDate && (
+                  <span className="mt-0.5">
+                    {formatLocalDate(project.startDate)} -{" "}
+                    {formatLocalDate(project.endDate)}
+                  </span>
+                )}
+              </div>
 
-                            {/* Status Badge - Make it updatable */}
-                            {/* <DropdownMenu>
+              {/* Status Badge - Make it updatable */}
+              {/* <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="sm" className="gap-2">
                                         <Badge
@@ -664,71 +706,88 @@ export function ProjectHeader({
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu> */}
-                            <div
-                                className={cn(
-                                    "inline-flex items-center px-2 py-1 h-8 text-xs font-medium rounded-md capitalize",
-                                    !displayUpdateConfig && "bg-muted text-muted-foreground"
-                                )}
-                                style={
-                                    displayUpdateConfig
-                                        ? {
-                                              backgroundColor: displayUpdateConfig.color + "15",
-                                              color: displayUpdateConfig.color,
-                                          }
-                                        : undefined
-                                }
-                                data-testid="project-header-update"
-                            >
-                                {displayUpdateConfig?.label || displayUpdate || "No update"}
-                            </div>
+              <div
+                className={cn(
+                  "inline-flex items-center px-2 py-1 h-8 text-xs font-medium rounded-md capitalize",
+                  !displayUpdateConfig && "bg-muted text-muted-foreground",
+                )}
+                style={
+                  displayUpdateConfig
+                    ? {
+                        backgroundColor: displayUpdateConfig.color + "15",
+                        color: displayUpdateConfig.color,
+                      }
+                    : undefined
+                }
+                data-testid="project-header-update"
+              >
+                {displayUpdateConfig?.label || displayUpdate || "No update"}
+              </div>
 
+              {/* Viewers */}
+              <Popover open={isViewersOpen} onOpenChange={setIsViewersOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-8 text-xs"
+                    data-testid="project-header-viewers-btn"
+                  >
+                    <Users className="h-4 w-4" />
+                    Viewers {viewers.length > 0 && `(${viewers.length})`}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-[320px] p-2 border border-b-[5px] border-b-primary bg-popover"
+                  align="start"
+                >
+                  <ProjectViewersSection
+                    projectId={projectId}
+                    viewers={viewers}
+                    onAddViewers={handleAddViewers}
+                    onRemoveViewers={handleRemoveViewers}
+                    onInviteClick={() => {
+                      setIsViewersOpen(false);
+                      setIsInviteDialogOpen(true);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-                            {/* Viewers */}
-                            <Popover open={isViewersOpen} onOpenChange={setIsViewersOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button variant="outline" size="sm" className="gap-2 h-8 text-xs" data-testid="project-header-viewers-btn">
-                                        <Users className="h-4 w-4" />
-                                        Viewers {viewers.length > 0 && `(${viewers.length})`}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[320px] p-2 border border-b-[5px] border-b-primary bg-popover" align="start">
-                                    <ProjectViewersSection                  
-                                        projectId={projectId}
-                                        viewers={viewers}
-                                        onAddViewers={handleAddViewers}
-                                        onRemoveViewers={handleRemoveViewers}
-                                        onInviteClick={() => {
-                                            setIsViewersOpen(false);
-                                            setIsInviteDialogOpen(true);
-                                        }}
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+            {/* More Options */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded h-8 w-8"
+                  data-testid="project-header-more-options-trigger"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="border-b-4 border-b-primary p-1.5"
+              >
+                <DropdownMenuItem
+                  className="p-1.5 justify-center text-xs font-medium bg-primary text-primary-foreground rounded-md"
+                  data-testid="project-header-menu-permissions"
+                >
+                  Sharing & Permissions
+                </DropdownMenuItem>
+                <TestLoaderDropdown />
 
-                        {/* More Options */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded h-8 w-8" data-testid="project-header-more-options-trigger">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="border-b-4 border-b-primary p-1.5">
-
-                                <DropdownMenuItem className="p-1.5 justify-center text-xs font-medium bg-primary text-primary-foreground rounded-md" data-testid="project-header-menu-permissions">
-                                    Sharing & Permissions
-                                </DropdownMenuItem>
-                                <TestLoaderDropdown />
-
-                                <DropdownMenuItem
-                                    onClick={() => setIsRenaming(true)}
-                                    className="text-xs"
-                                    data-testid="project-header-menu-rename"
-                                >
-                                    <Pencil className="mr-2 h-3.5 w-3.5" />
-                                    Rename
-                                </DropdownMenuItem>
-                                {/* 
+                <DropdownMenuItem
+                  onClick={() => setIsRenaming(true)}
+                  className="text-xs"
+                  data-testid="project-header-menu-rename"
+                >
+                  <Pencil className="mr-2 h-3.5 w-3.5" />
+                  Rename
+                </DropdownMenuItem>
+                {/* 
                                 <DropdownMenuItem
                                     onClick={() => setDuplicateDialogOpen(true)}
                                 >
@@ -736,7 +795,7 @@ export function ProjectHeader({
                                     Duplicate Project
                                 </DropdownMenuItem> */}
 
-                                {/* <DropdownMenuItem className="justify-between">
+                {/* <DropdownMenuItem className="justify-between">
                                     <div className="flex items-center">
                                         <Palette className="mr-4 h-4 w-4" />
                                         Assign color & icon
@@ -744,82 +803,103 @@ export function ProjectHeader({
                                     <ChevronRight className="h-4 w-4" />
                                 </DropdownMenuItem> */}
 
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-group-actions">
-                                        <Layers className="mr-2 h-3.5 w-3.5" />
-                                        Group actions
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[200px] p-1.5">
-                                        {/* Collapse / Expand — label flips based on allGroupsCollapsed */}
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                allGroupsCollapsed
-                                                    ? onExpandAllGroups?.()
-                                                    : onCollapseAllGroups?.()
-                                            }
-                                            disabled={totalGroupsCount === 0}
-                                            className="text-xs"
-                                            data-testid="project-header-menu-group-toggle"
-                                        >
-                                            {allGroupsCollapsed ? "Expand all groups" : "Collapse all groups"}
-                                        </DropdownMenuItem>
-                                        {/* Hide / Show empty groups — label flips based on hideEmptyGroups */}
-                                        <DropdownMenuItem
-                                            onClick={() => onToggleHideEmptyGroups?.()}
-                                            disabled={totalGroupsCount === 0}
-                                            className="text-xs"
-                                            data-testid="project-header-menu-group-empty-toggle"
-                                        >
-                                            {hideEmptyGroups ? "Show empty groups" : "Hide empty groups"}
-                                        </DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    data-testid="project-header-menu-group-actions"
+                  >
+                    <Layers className="mr-2 h-3.5 w-3.5" />
+                    Group actions
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[200px] p-1.5">
+                    {/* Collapse / Expand — label flips based on allGroupsCollapsed */}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        allGroupsCollapsed
+                          ? onExpandAllGroups?.()
+                          : onCollapseAllGroups?.()
+                      }
+                      disabled={totalGroupsCount === 0}
+                      className="text-xs"
+                      data-testid="project-header-menu-group-toggle"
+                    >
+                      {allGroupsCollapsed
+                        ? "Expand all groups"
+                        : "Collapse all groups"}
+                    </DropdownMenuItem>
+                    {/* Hide / Show empty groups — label flips based on hideEmptyGroups */}
+                    <DropdownMenuItem
+                      onClick={() => onToggleHideEmptyGroups?.()}
+                      disabled={totalGroupsCount === 0}
+                      className="text-xs"
+                      data-testid="project-header-menu-group-empty-toggle"
+                    >
+                      {hideEmptyGroups
+                        ? "Show empty groups"
+                        : "Hide empty groups"}
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
+                <DropdownMenuSeparator className="mx-2 my-0" />
 
-                                <DropdownMenuSeparator className="mx-2 my-0" />
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    data-testid="project-header-menu-more-actions"
+                  >
+                    <MoreVertical className="mr-2 h-3.5 w-3.5" />
+                    More actions
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
+                    <DropdownMenuItem
+                      className="text-xs"
+                      data-testid="project-header-menu-more-templates"
+                    >
+                      Templates
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-xs"
+                      data-testid="project-header-menu-more-automatons"
+                    >
+                      Automatons
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-xs"
+                      data-testid="project-header-menu-more-integrations"
+                    >
+                      Integrations
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-more-actions">
-                                        <MoreVertical className="mr-2 h-3.5 w-3.5" />
-                                        More actions
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
-                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-templates">
-                                            Templates
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-automatons">
-                                            Automatons
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-xs" data-testid="project-header-menu-more-integrations">
-                                            Integrations
-                                        </DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    data-testid="project-header-menu-copy-info"
+                  >
+                    <Link className="mr-2 h-3.5 w-3.5" />
+                    Copy Project Info
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
+                    <DropdownMenuItem
+                      onClick={handleCopyProjectLink}
+                      className="cursor-pointer text-xs"
+                      data-testid="project-header-menu-copy-link"
+                    >
+                      Project Link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleCopyProjectId}
+                      className="cursor-pointer text-xs"
+                      data-testid="project-header-menu-copy-id"
+                    >
+                      Project ID
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-copy-info">
-                                        <Link className="mr-2 h-3.5 w-3.5" />
-                                        Copy Project Info
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent className="border-b-4 border-b-primary p-1.5">
-                                        <DropdownMenuItem
-                                            onClick={handleCopyProjectLink}
-                                            className="cursor-pointer text-xs"
-                                            data-testid="project-header-menu-copy-link"
-                                        >
-                                            Project Link
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={handleCopyProjectId}
-                                            className="cursor-pointer text-xs"
-                                            data-testid="project-header-menu-copy-id"
-                                        >
-                                            Project ID
-                                        </DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuSub>
-
-                                {/* <DropdownMenuSub>
+                {/* <DropdownMenuSub>
                                     <DropdownMenuSubTrigger>
                                         <Settings className="mr-2 h-4 w-4" />
                                         Project settings
@@ -840,8 +920,8 @@ export function ProjectHeader({
                                     </DropdownMenuSubContent>
                                 </DropdownMenuSub> */}
 
-                                {/* redirect overview page */}
-                                {/* <DropdownMenuItem className="justify-between">
+                {/* redirect overview page */}
+                {/* <DropdownMenuItem className="justify-between">
                                     <div className="flex items-center">
                                         <Settings className="mr-4 h-4 w-4" />
                                         Project settings
@@ -849,7 +929,7 @@ export function ProjectHeader({
                                     <ChevronRight className="h-4 w-4" />
                                 </DropdownMenuItem> */}
 
-                                {/* <DropdownMenuItem className="justify-between">
+                {/* <DropdownMenuItem className="justify-between">
                                     <div className="flex items-center">
                                         <Grid3x3 className="mr-4 h-4 w-4" />
                                         Templates
@@ -857,19 +937,19 @@ export function ProjectHeader({
                                     <ChevronRight className="h-4 w-4" />
                                 </DropdownMenuItem> */}
 
-                                {/* <DropdownMenuItem onClick={() => onActivityLogClick?.()}>
+                {/* <DropdownMenuItem onClick={() => onActivityLogClick?.()}>
                                     <Activity className="mr-2 h-4 w-4" />
                                     Activity log
                                 </DropdownMenuItem> */}
 
-                                {/* <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                                     <History className="mr-2 h-4 w-4" />
                                     Version history
                                 </DropdownMenuItem> */}
 
-                                {/* <DropdownMenuSeparator className="mx-2 my-0" /> */}
+                {/* <DropdownMenuSeparator className="mx-2 my-0" /> */}
 
-                                {/* <DropdownMenuSub>
+                {/* <DropdownMenuSub>
                                     <DropdownMenuSubTrigger>
                                         <FolderPlus className="mr-2 h-4 w-4" />
                                         Add to
@@ -887,105 +967,133 @@ export function ProjectHeader({
                                     </DropdownMenuSubContent>
                                 </DropdownMenuSub> */}
 
-                                <DropdownMenuSeparator className="mx-2 my-0" />
+                <DropdownMenuSeparator className="mx-2 my-0" />
 
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-import-export">
-                                        <Upload className="mr-2 h-3.5 w-3.5" />
-                                        Import / Export
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[160px]">
-                                        {/* Import — opens ImportDialog */}
-                                        <DropdownMenuItem
-                                            onClick={() => setImportOpen(true)}
-                                            className="cursor-pointer text-xs"
-                                            data-testid="project-header-menu-import"
-                                        >
-                                            Import
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger className="cursor-pointer text-xs" data-testid="project-header-menu-export">
-                                                Export
-                                            </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[140px]">
-                                                <DropdownMenuItem
-                                                    onClick={() => { onPrint?.(); }}
-                                                    className="flex items-center gap-2.5 cursor-pointer text-xs"
-                                                    data-testid="project-header-menu-export-pdf"
-                                                >
-                                                    <Image src="/images/pdf.svg" alt="PDF" width={16} height={16} className="object-contain" />
-                                                    PDF
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => { onExportCSV?.(); }}
-                                                    className="flex items-center gap-2.5 cursor-pointer text-xs"
-                                                    data-testid="project-header-menu-export-csv"
-                                                >
-                                                    <Image src="/images/csv.svg" alt="CSV" width={16} height={16} className="object-contain" />
-                                                    CSV
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => { onExportExcel?.(); }}
-                                                    className="flex items-center gap-2.5 cursor-pointer text-xs"
-                                                    data-testid="project-header-menu-export-excel"
-                                                >
-                                                    <Image src="/images/excel.svg" alt="Excel" width={16} height={16} className="object-contain" />
-                                                    Excel
-                                                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    data-testid="project-header-menu-import-export"
+                  >
+                    <Upload className="mr-2 h-3.5 w-3.5" />
+                    Import / Export
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[160px]">
+                    {/* Import — opens ImportDialog */}
+                    <DropdownMenuItem
+                      onClick={() => setImportOpen(true)}
+                      className="cursor-pointer text-xs"
+                      data-testid="project-header-menu-import"
+                    >
+                      Import
+                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger
+                        className="cursor-pointer text-xs"
+                        data-testid="project-header-menu-export"
+                      >
+                        Export
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[140px]">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onPrint?.();
+                          }}
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
+                          data-testid="project-header-menu-export-pdf"
+                        >
+                          <Image
+                            src="/images/pdf.svg"
+                            alt="PDF"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
+                          PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onExportCSV?.();
+                          }}
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
+                          data-testid="project-header-menu-export-csv"
+                        >
+                          <Image
+                            src="/images/csv.svg"
+                            alt="CSV"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
+                          CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onExportExcel?.();
+                          }}
+                          className="flex items-center gap-2.5 cursor-pointer text-xs"
+                          data-testid="project-header-menu-export-excel"
+                        >
+                          <Image
+                            src="/images/excel.svg"
+                            alt="Excel"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
+                          Excel
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                <DropdownMenuSeparator className="mx-2 my-0" />
 
-                                <DropdownMenuSeparator className="mx-2 my-0" />
+                <DropdownMenuItem
+                  onClick={() => setShowArchiveModal(true)}
+                  className="text-xs"
+                  data-testid="project-header-menu-archive"
+                >
+                  <Archive className="mr-2 h-3.5 w-3.5" />
+                  Archive Project
+                </DropdownMenuItem>
 
-                                <DropdownMenuItem
-                                    onClick={() => setShowArchiveModal(true)}
-                                    className="text-xs"
-                                    data-testid="project-header-menu-archive"
-                                >
-                                    <Archive className="mr-2 h-3.5 w-3.5" />
-                                    Archive Project
-                                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive text-xs"
+                  onClick={handleDelete}
+                  disabled={isLoading}
+                  data-testid="project-header-menu-delete"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="mr-2 h-3.5 w-3.5" />
+                      Delete project
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
+          <div>
+            <ViewTabs projectId={projectId} />
+          </div>
+        </div>
+        {/* Project Invite Dialog */}
+        <ProjectInviteDialog
+          open={isInviteDialogOpen}
+          onClose={() => setIsInviteDialogOpen(false)}
+          projectId={projectId}
+          projectName={project?.name || ""}
+          onSendInvite={handleSendInvite}
+        />
 
-                                <DropdownMenuItem
-                                    className="text-destructive focus:text-destructive text-xs"
-                                    onClick={handleDelete}
-                                    disabled={isLoading}
-                                    data-testid="project-header-menu-delete"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                                            Deleting...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                            Delete project
-                                        </>
-                                    )}
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    <div>
-                        <ViewTabs projectId={projectId} />
-                    </div>
-                </div>
-                {/* Project Invite Dialog */}
-                <ProjectInviteDialog
-                    open={isInviteDialogOpen}
-                    onClose={() => setIsInviteDialogOpen(false)}
-                    projectId={projectId}
-                    projectName={project?.name || ""}
-                    onSendInvite={handleSendInvite}
-                />
-
-                {/* <DuplicateProjectDialog
+        {/* <DuplicateProjectDialog
                     open={duplicateDialogOpen}
                     onClose={() => setDuplicateDialogOpen(false)}
                     originalProjectName={projectName}
@@ -994,7 +1102,7 @@ export function ProjectHeader({
                     onDuplicate={handleDuplicate}
                 /> */}
 
-                {/* Default Task Values
+        {/* Default Task Values
                 <DefaultTaskValuesDialog
                     open={defaultTaskValuesOpen}
                     onClose={() => setDefaultTaskValuesOpen(false)}
@@ -1008,35 +1116,35 @@ export function ProjectHeader({
                     projectId={projectId}
                 /> */}
 
-                {/* Import Dialog */}
-                <ImportDialog
-                    open={importOpen}
-                    onClose={() => setImportOpen(false)}
-                    projectId={projectId}
-                />
+        {/* Import Dialog */}
+        <ImportDialog
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          projectId={projectId}
+        />
 
-                {/* Archive Project Modal */}
-                <ArchiveProjectModal
-                    open={showArchiveModal}
-                    onClose={() => setShowArchiveModal(false)}
-                    title="Archive Project"
-                    confirmLabel="Archive"
-                    description={`Are you sure you want to archive "${project?.name ?? "this project"}"? It will be moved to the cleanup section and can be restored later.`}
-                    onConfirm={handleArchiveConfirm}
-                    loading={archiving}
-                />
+        {/* Archive Project Modal */}
+        <ArchiveProjectModal
+          open={showArchiveModal}
+          onClose={() => setShowArchiveModal(false)}
+          title="Archive Project"
+          confirmLabel="Archive"
+          description={`Are you sure you want to archive "${project?.name ?? "this project"}"? It will be moved to the cleanup section and can be restored later.`}
+          onConfirm={handleArchiveConfirm}
+          loading={archiving}
+        />
 
-                {/* Delete Project Dialog */}
-                <ConfirmationModal
-                    open={deleteDialogOpen}
-                    onClose={() => setDeleteDialogOpen(false)}
-                    title="Delete Project"
-                    description={`Are you sure you want to delete "${projectName}"? This action cannot be undone.`}
-                    confirmLabel="Delete"
-                    onConfirm={handleDeleteConfirm}
-                    loading={isDeleting}
-                />
-            </div >
-        </>
-    );
+        {/* Delete Project Dialog */}
+        <ConfirmationModal
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          title="Delete Project"
+          description={`Are you sure you want to delete "${projectName}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={handleDeleteConfirm}
+          loading={isDeleting}
+        />
+      </div>
+    </>
+  );
 }

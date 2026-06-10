@@ -28,6 +28,7 @@ import { usePortfoliosStore } from '@/stores/portfolios-store';
 import { useTasksStore } from '@/stores/tasks-store';
 import { getRelationshipIcon } from '@/utils/relationship-utils';
 import { cn } from '@/lib/utils';
+import { convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import {
   DropdownMenu,
@@ -217,8 +218,8 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
             name: taskData.name,
             description: taskData.description,
             taskType: taskData.taskType || 'milestone',
-            startDate: taskData.startDate.toISOString(),
-            endDate: taskData.endDate?.toISOString(),
+            startDate: convertSelectedDateToUTC(taskData.startDate),
+            endDate: taskData.endDate ? convertSelectedDateToUTC(taskData.endDate) : undefined,
             assignee: taskData.assignee,
             priority: taskData.priority,
             status: taskData.status,

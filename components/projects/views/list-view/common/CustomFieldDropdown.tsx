@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from 'date-fns';
+import { formatLocalDateTime, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from "@/components/ui/button";
@@ -722,7 +722,7 @@ export function CustomFieldDropdown({
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) return dateStr;
 
-      return format(date, 'dd MMM, yyyy h:mm a');
+      return formatLocalDateTime(date);
     };
 
     return (
@@ -752,7 +752,7 @@ export function CustomFieldDropdown({
                   // Use current time from time picker
                   const [hours, minutes] = customTime.split(':');
                   date.setHours(parseInt(hours), parseInt(minutes));
-                  onUpdate(date.toISOString());
+                  onUpdate(convertSelectedDateToUTC(date));
                   if (!showTimeBadge) {
                     setShowTimeBadge(true);
                   }
@@ -773,7 +773,7 @@ export function CustomFieldDropdown({
                       const [hours, minutes] = e.target.value.split(':');
                       const date = new Date(dateValue);
                       date.setHours(parseInt(hours), parseInt(minutes));
-                      onUpdate(date.toISOString());
+                      onUpdate(convertSelectedDateToUTC(date));
                     }
                     setShowTimeBadge(true);
                   }}
@@ -810,7 +810,7 @@ export function CustomFieldDropdown({
                         const [hours, minutes] = e.target.value.split(':');
                         const date = new Date(dateValue);
                         date.setHours(parseInt(hours), parseInt(minutes));
-                        onUpdate(date.toISOString());
+                        onUpdate(convertSelectedDateToUTC(date));
                       }
                     }}
                     className="bg-transparent border-0 text-white font-medium outline-none flex-1 cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
@@ -824,7 +824,7 @@ export function CustomFieldDropdown({
                       if (dateValue) {
                         const date = new Date(dateValue);
                         date.setHours(13, 30);
-                        onUpdate(date.toISOString());
+                        onUpdate(convertSelectedDateToUTC(date));
                       }
                       setShowTimeBadge(false);
                     }}

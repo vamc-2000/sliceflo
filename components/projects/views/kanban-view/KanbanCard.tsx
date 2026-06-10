@@ -38,7 +38,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { formatLocalDate } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 import { formatTaskId } from '@/utils/task-utils';
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -159,11 +159,15 @@ export const CustomKanbanCard = ({
     };
 
     const startDateStr = useMemo(() => {
-        return task.startDate ? format(new Date(task.startDate), 'MMM d') : null;
+        if (!task.startDate) return null;
+        const formatted = formatLocalDate(task.startDate);
+        return formatted === "—" ? null : formatted;
     }, [task.startDate]);
 
     const endDateStr = useMemo(() => {
-        return task.endDate ? format(new Date(task.endDate), 'MMM d') : null;
+        if (!task.endDate) return null;
+        const formatted = formatLocalDate(task.endDate);
+        return formatted === "—" ? null : formatted;
     }, [task.endDate]);
 
     useEffect(() => {

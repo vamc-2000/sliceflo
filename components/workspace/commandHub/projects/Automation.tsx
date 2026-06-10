@@ -56,6 +56,9 @@ interface AutomationSettings {
   setDueDateToday: {
     enabled: boolean;
   };
+  markParentDone: {
+    enabled: boolean;
+  };
 }
 
 const fallbackMembers = [
@@ -104,6 +107,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
     },
     autoCloseInactive: { enabled: false, duration: "1 month", isCustom: false, customValue: "3" },
     setDueDateToday: { enabled: false },
+    markParentDone: { enabled: false },
   });
 
   const [activeDropdown, setActiveDropdown] = useState<"assignee" | "fields" | "duration" | null>(null);
@@ -154,30 +158,20 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
       if (key === "assignCreator") {
         const existing = projectAutomations.find(
-          (a) => a.name === "When task is created assign creator as person"
+          (a) => a.name === "Assign creator as assignee when task is assigned"
         );
         const config = updatedSettings.assignCreator;
 
         const payload = {
-          name: "When task is created assign creator as person",
-          description: "Automatically assigns the task creator as the assignee whenever a new task is created.",
-          trigger: "TASK_CREATED",
+          name: "Assign creator as assignee when task is assigned",
+          description: "When someone assigns a task, automatically reassign it to the task's creator (reporter).",
+          trigger: "TASK_ASSIGNED",
           isActive: config.enabled,
           conditions: [],
           actions: [
             {
               type: "ASSIGN_TASK",
               value: config.assigneeId || (members[0]?.userId || ""),
-              condition: {
-                field: "status",
-                operator: "EQUALS",
-                conditionType: "FIELD_VALUE",
-                value: "",
-                from: "",
-                to: "",
-              },
-              then: [],
-              else: [],
             },
           ],
         };
@@ -201,51 +195,54 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         Object.entries(config.fields).forEach(([fieldId, fieldConfig]) => {
           if (fieldConfig.enabled && fieldConfig.value !== "Select") {
             let actionType = "UPDATE_FIELD";
+            let actionValue: any = fieldConfig.value;
+
             if (fieldId === "status") actionType = "CHANGE_STATUS";
             else if (fieldId === "priority") actionType = "SET_PRIORITY";
-            else if (fieldId === "assignee") actionType = "ASSIGN_TASK";
+            else if (fieldId === "assignee") {
+              if (fieldConfig.value === "ASSIGN_TO_REPORTER") {
+                actionType = "ASSIGN_TO_REPORTER";
+                actionValue = undefined;
+              } else if (fieldConfig.value === "ASSIGN_TO_PROJECT_LEAD") {
+                actionType = "ASSIGN_TO_PROJECT_LEAD";
+                actionValue = undefined;
+              } else {
+                actionType = "ASSIGN_TASK";
+              }
+            }
             else if (fieldId === "dueDate" || fieldId === "date") actionType = "SET_DUE_DATE";
             else if (fieldId === "startDate") actionType = "SET_START_DATE";
 
-            actions.push({
-              type: actionType,
-              value: fieldConfig.value,
-              condition: {
-                field: fieldId,
-                operator: "EQUALS",
-                conditionType: "FIELD_VALUE",
-                value: fieldConfig.value,
-                from: "",
-                to: "",
-              },
-              then: [],
-              else: [],
-            });
+            const actionObj: any = { type: actionType };
+            if (actionValue !== undefined) {
+              actionObj.value = actionValue;
+            }
+            actions.push(actionObj);
           }
         });
 
         // 1. Sync Task Creation trigger automation
         const existingTask = projectAutomations.find(
-          (a) => a.name === "Automatically fill fields on task creation"
+          (a) => a.name === "Fill fields on task creation"
         );
         const taskPayload = {
-          name: "Automatically fill fields on task creation",
+          name: "Fill fields on task creation",
           description: "Pre-fill selected fields like priority, status, due date, or assignee when a task is created.",
           trigger: "TASK_CREATED",
-          isActive: config.enabled && config.triggerTask && actions.length > 0,
+          isActive: config.enabled && config.triggerTask,
           conditions: [],
           actions: actions.length > 0 ? actions : (existingTask?.actions || []),
         };
 
         // 2. Sync Subtask Creation trigger automation
         const existingSubtask = projectAutomations.find(
-          (a) => a.name === "Automatically fill fields on sub task creation"
+          (a) => a.name === "Fill fields on subtask creation"
         );
         const subtaskPayload = {
-          name: "Automatically fill fields on sub task creation",
+          name: "Fill fields on subtask creation",
           description: "Pre-fill selected fields like priority, status, due date, or assignee when a sub task is created.",
           trigger: "SUBTASK_CREATED",
-          isActive: config.enabled && config.triggerSubtask && actions.length > 0,
+          isActive: config.enabled && config.triggerSubtask,
           conditions: [],
           actions: actions.length > 0 ? actions : (existingSubtask?.actions || []),
         };
@@ -377,6 +374,40 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           console.error("Failed to sync setDueDateToday automation", err);
         }
       }
+
+      if (key === "markParentDone") {
+        const existing = projectAutomations.find(
+          (a) => a.name === "Mark parent task as done when all subtasks are done"
+        );
+        const config = updatedSettings.markParentDone;
+        const statuses = currentProject?.taskStatusConfig || [];
+        const doneStatus = statuses.find(
+          (s) => s.value.toLowerCase() === "done" || s.label.toLowerCase() === "done"
+        )?.value || "done";
+
+        const payload = {
+          name: "Mark parent task as done when all subtasks are done",
+          description: "When a subtask is completed, check whether every other subtask under the same parent is also done. If so, automatically mark the parent task as done.",
+          trigger: "SUBTASK_COMPLETED",
+          isActive: config.enabled,
+          conditions: [
+            { conditionType: "ALL_SUBTASKS_DONE" } as any
+          ],
+          actions: [
+            { type: "CHANGE_STATUS", value: doneStatus }
+          ]
+        };
+
+        try {
+          if (existing?.id) {
+            await updateAutomation(projectId, existing.id, payload);
+          } else {
+            await createAutomation(projectId, payload);
+          }
+        } catch (err) {
+          console.error("Failed to sync markParentDone automation", err);
+        }
+      }
     }, 500);
   };
 
@@ -393,19 +424,22 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
     if (hasDatabaseAutomations) {
       const assignCreatorAuto = projectAutomations.find(
-        (a) => a.name === "When task is created assign creator as person"
+        (a) => a.name === "Assign creator as assignee when task is assigned"
       );
       const taskAutoFill = projectAutomations.find(
-        (a) => a.name === "Automatically fill fields on task creation"
+        (a) => a.name === "Fill fields on task creation"
       );
       const subtaskAutoFill = projectAutomations.find(
-        (a) => a.name === "Automatically fill fields on sub task creation"
+        (a) => a.name === "Fill fields on subtask creation"
       );
       const autoClose = projectAutomations.find(
         (a) => a.name === "Auto-close tasks that are inactive"
       );
       const setDueDate = projectAutomations.find(
         (a) => a.name === "Set Due date is today, when status is Done for task/sub task"
+      );
+      const markParent = projectAutomations.find(
+        (a) => a.name === "Mark parent task as done when all subtasks are done"
       );
 
       const newSettings: AutomationSettings = {
@@ -428,6 +462,9 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         setDueDateToday: {
           enabled: setDueDate ? setDueDate.isActive : false,
         },
+        markParentDone: {
+          enabled: markParent ? markParent.isActive : false,
+        },
       };
 
       const fields: Record<string, { enabled: boolean; value: string }> = {};
@@ -440,11 +477,26 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
       const fillFromActions = (actionsList: any[]) => {
         actionsList.forEach((action) => {
-          const fieldId = action.condition?.field;
+          let fieldId = action.condition?.field;
+          let val = action.value || action.condition?.value || "Select";
+          if (!fieldId) {
+            if (action.type === "CHANGE_STATUS") fieldId = "status";
+            else if (action.type === "SET_PRIORITY") fieldId = "priority";
+            else if (action.type === "ASSIGN_TASK") {
+              fieldId = "assignee";
+            } else if (action.type === "ASSIGN_TO_REPORTER") {
+              fieldId = "assignee";
+              val = "ASSIGN_TO_REPORTER";
+            } else if (action.type === "ASSIGN_TO_PROJECT_LEAD") {
+              fieldId = "assignee";
+              val = "ASSIGN_TO_PROJECT_LEAD";
+            } else if (action.type === "SET_DUE_DATE") fieldId = "dueDate";
+            else if (action.type === "SET_START_DATE") fieldId = "startDate";
+          }
           if (fieldId && fields[fieldId]) {
             fields[fieldId] = {
               enabled: true,
-              value: action.value || action.condition?.value || "Select",
+              value: val,
             };
           }
         });
@@ -498,6 +550,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
             syncSettingsToApi("autoFillFields", parsed);
             syncSettingsToApi("autoCloseInactive", parsed);
             syncSettingsToApi("setDueDateToday", parsed);
+            syncSettingsToApi("markParentDone", parsed);
           }, 100);
         } catch (e) {
           console.error("Error loading automations settings", e);
@@ -520,6 +573,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           },
           autoCloseInactive: { enabled: false, duration: "1 month", isCustom: false, customValue: "3" },
           setDueDateToday: { enabled: false },
+          markParentDone: { enabled: false },
         };
         setSettings(defaults);
         setShowCustomRangeInput(false);
@@ -529,6 +583,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           syncSettingsToApi("autoFillFields", defaults);
           syncSettingsToApi("autoCloseInactive", defaults);
           syncSettingsToApi("setDueDateToday", defaults);
+          syncSettingsToApi("markParentDone", defaults);
         }, 100);
       }
     }
@@ -549,6 +604,11 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         enabled: !settings[key].enabled,
       },
     };
+    if (key === "autoFillFields" && updated.autoFillFields.enabled) {
+      if (!updated.autoFillFields.triggerTask && !updated.autoFillFields.triggerSubtask) {
+        updated.autoFillFields.triggerTask = true;
+      }
+    }
     saveSettings(updated, key);
   };
 
@@ -680,7 +740,11 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         ];
       }
       case "assignee":
-        return members.map((m) => ({ label: m.name, value: m.userId }));
+        return [
+          { label: "Reporter (Creator)", value: "ASSIGN_TO_REPORTER" },
+          { label: "Project Lead", value: "ASSIGN_TO_PROJECT_LEAD" },
+          ...members.map((m) => ({ label: m.name, value: m.userId })),
+        ];
       case "date":
       case "startDate":
       case "endDate":
@@ -994,10 +1058,10 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
               <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
-                When task is created assign creator as person
+                Assign creator as assignee when task is assigned
               </h3>
               <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
-                Automatically assigns the task creator as the assignee whenever a new task is created.
+                When someone assigns a task, automatically reassign it to the task's creator (reporter).
               </p>
             </div>
             <Switch
@@ -1008,9 +1072,12 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           </div>
 
           {settings.assignCreator.enabled && (
-            <div className="mt-4 p-4 bg-[#F5F6F8] dark:bg-slate-800/40 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-800 transition-all">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="mt-4 p-4 bg-[#F5F6F8] dark:bg-slate-800/40 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-800 transition-all"
+            >
               <span className="text-[13px] text-gray-600 dark:text-gray-300 font-medium">
-                Select the default assignee for newly created tasks.
+                Select default assignee.
               </span>
               <div className="relative">
                 <button
@@ -1135,7 +1202,10 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                   </button>
 
                   {activeDropdown === "fields" && (
-                    <div className="absolute right-0 mt-1.5 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 p-3 space-y-2">
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 mt-1.5 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 p-3 space-y-2"
+                    >
                       {availableFields.map((field) => {
                         const fieldSetting = settings.autoFillFields.fields[field.id] || { enabled: false, value: "Select" };
                         return (
@@ -1226,7 +1296,10 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
               </button>
 
               {activeDropdown === "duration" && (
-                <div className="absolute right-0 mt-1.5 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden py-1 space-y-0.5">
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 mt-1.5 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden py-1 space-y-0.5"
+                >
                   {durationOptions.map((option) => (
                     <button
                       key={option}
@@ -1295,6 +1368,25 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
             <Switch
               checked={settings.setDueDateToday.enabled}
               onCheckedChange={() => toggleAutomation("setDueDateToday")}
+              className="data-[state=checked]:bg-[#001F3F]"
+            />
+          </div>
+        </div>
+
+        {/* Card 5: Mark parent task as done when all subtasks are done */}
+        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-5 shadow-sm transition-all">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1 pr-6">
+              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+                Mark parent task as done when all subtasks are done
+              </h3>
+              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+                When a subtask is completed, check whether every other subtask under the same parent is also done. If so, automatically mark the parent task as done.
+              </p>
+            </div>
+            <Switch
+              checked={settings.markParentDone?.enabled || false}
+              onCheckedChange={() => toggleAutomation("markParentDone")}
               className="data-[state=checked]:bg-[#001F3F]"
             />
           </div>

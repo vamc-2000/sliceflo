@@ -37,6 +37,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useDraftsStore } from "@/stores/drafts-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -109,6 +110,8 @@ export function DraftDetailView({
     const [isReadOnly] = useState(false);
     const [isDraftDetailsExpanded, setIsDraftDetailsExpanded] = useState(true);
     const [isAttachmentsExpanded, setIsAttachmentsExpanded] = useState(false);
+    const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+    const [isDueDateOpen, setIsDueDateOpen] = useState(false);
 
 
     const storeDraft = draft ? drafts.find((d) => d.id === draft.id) : undefined;
@@ -221,7 +224,7 @@ export function DraftDetailView({
 
                             <div className="flex items-center gap-2">
                                 <span className="text-muted-foreground">
-                                    Created {currentDraft.createdAt ? format(new Date(currentDraft.createdAt), "MMM d, yyyy") : "—"}
+                                    Created {currentDraft.createdAt ? formatLocalDate(currentDraft.createdAt) : "—"}
                                 </span>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">
                                     <MoreHorizontal className="h-4 w-4" />
@@ -381,8 +384,8 @@ export function DraftDetailView({
                                                                 <td className="p-3 text-xs">
                                                                     {sub.status ? <span className="px-2 py-1 rounded text-xs bg-muted">{sub.status}</span> : <span className="text-xs text-muted-foreground">—</span>}
                                                                 </td>
-                                                                <td className="p-3 text-xs text-muted-foreground">{sub.startDate ? format(new Date(sub.startDate), "MMM dd, yyyy") : "—"}</td>
-                                                                <td className="p-3 text-xs text-muted-foreground">{sub.dueDate ? format(new Date(sub.dueDate), "MMM dd, yyyy") : "—"}</td>
+                                                                <td className="p-3 text-xs text-muted-foreground">{sub.startDate ? formatLocalDate(sub.startDate) : "—"}</td>
+                                                                <td className="p-3 text-xs text-muted-foreground">{sub.dueDate ? formatLocalDate(sub.dueDate) : "—"}</td>
                                                                 <td className="p-3">
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger asChild>
@@ -508,10 +511,10 @@ export function DraftDetailView({
                                                 {/* START DATE */}
                                                 <div className="flex items-center justify-between py-1">
                                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Start Date</Label>
-                                                    <Popover>
+                                                    <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
                                                         <PopoverTrigger asChild>
                                                             <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.startDate && "text-blue-400 dark:text-blue-500/70")}>
-                                                                {currentDraft.startDate ? format(new Date(currentDraft.startDate), "PP") : "—"}
+                                                                {currentDraft.startDate ? formatLocalDate(currentDraft.startDate) : "—"}
                                                             </Button>
                                                         </PopoverTrigger>
                                                         <PopoverContent className="w-auto p-0" align="end">
@@ -524,12 +527,13 @@ export function DraftDetailView({
                                                                         if (currentDraft.dueDate && new Date(currentDraft.dueDate) < d) updates.dueDate = undefined;
                                                                         handleUpdateDraft(updates);
                                                                     }
+                                                                    setIsStartDateOpen(false);
                                                                 }}
                                                                 initialFocus
                                                             />
                                                             {currentDraft.startDate && (
                                                                 <div className="p-2 border-t">
-                                                                    <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => handleUpdateDraft({ startDate: undefined })}>Clear date</Button>
+                                                                    <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => { handleUpdateDraft({ startDate: undefined }); setIsStartDateOpen(false); }}>Clear date</Button>
                                                                 </div>
                                                             )}
                                                         </PopoverContent>
@@ -539,23 +543,28 @@ export function DraftDetailView({
                                                 {/* DUE DATE */}
                                                 <div className="flex items-center justify-between py-1">
                                                     <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0"><CalendarIcon className="h-4 w-4" />Due Date</Label>
-                                                    <Popover>
+                                                    <Popover open={isDueDateOpen} onOpenChange={setIsDueDateOpen}>
                                                         <PopoverTrigger asChild>
                                                             <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.dueDate && "text-blue-400 dark:text-blue-500/70")}>
-                                                                {currentDraft.dueDate ? format(new Date(currentDraft.dueDate), "PP") : "—"}
+                                                                {currentDraft.dueDate ? formatLocalDate(currentDraft.dueDate) : "—"}
                                                             </Button>
                                                         </PopoverTrigger>
                                                         <PopoverContent className="w-auto p-0" align="end">
                                                             <Calendar
                                                                 mode="single"
                                                                 selected={currentDraft.dueDate ? new Date(currentDraft.dueDate) : undefined}
-                                                                onSelect={(d) => { if (d) handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") }); }}
+                                                                onSelect={(d) => {
+                                                                    if (d) {
+                                                                        handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") });
+                                                                    }
+                                                                    setIsDueDateOpen(false);
+                                                                }}
                                                                 disabled={(date) => (currentDraft.startDate ? date < new Date(new Date(currentDraft.startDate).setHours(0, 0, 0, 0)) : false)}
                                                                 initialFocus
                                                             />
                                                             {currentDraft.dueDate && (
                                                                 <div className="p-2 border-t">
-                                                                    <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => handleUpdateDraft({ dueDate: undefined })}>Clear date</Button>
+                                                                    <Button variant="ghost" size="sm" className="w-full text-xs text-destructive" onClick={() => { handleUpdateDraft({ dueDate: undefined }); setIsDueDateOpen(false); }}>Clear date</Button>
                                                                 </div>
                                                             )}
                                                         </PopoverContent>

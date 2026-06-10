@@ -21,6 +21,7 @@ import {
   Hexagon
 } from "lucide-react";
 import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 import { usePortfoliosStore } from "@/stores/portfolios-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { uploadFile } from "@/lib/api/uploads-api";
@@ -102,6 +103,8 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const [portfolioAttachments, setPortfolioAttachments] = useState<FileAttachment[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
+  const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
 
   // Collapsible sections state
   const [isPortfolioDetailsExpanded, setIsPortfolioDetailsExpanded] = useState(true);
@@ -293,13 +296,19 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
 
   const handleUpdateStartDate = (date: Date | undefined) => {
     if (portfolioId && date) {
-      updatePortfolioDates(portfolioId, date.toISOString(), portfolio?.endDate);
+      const utcDateStr = convertSelectedDateToUTC(date);
+      updatePortfolioDates(portfolioId, utcDateStr, portfolio?.endDate);
+      setIsStartDatePopoverOpen(false);
+      if (portfolio?.endDate && date && new Date(portfolio.endDate) < date) {
+        updatePortfolioDates(portfolioId, utcDateStr, undefined);
+      }
     }
   };
 
   const handleUpdateEndDate = (date: Date | undefined) => {
     if (portfolioId && date) {
-      updatePortfolioDates(portfolioId, portfolio?.startDate, date.toISOString());
+      updatePortfolioDates(portfolioId, portfolio?.startDate, convertSelectedDateToUTC(date));
+      setIsEndDatePopoverOpen(false);
     }
   };
 
@@ -442,7 +451,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
               <CalendarIcon className="h-4 w-4" />
               Start Date
             </Label>
-            <Popover>
+            <Popover open={isStartDatePopoverOpen} onOpenChange={setIsStartDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
@@ -452,14 +461,18 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                     !portfolio.startDate && "text-muted-foreground"
                   )}
                 >
-                  {portfolio.startDate ? format(new Date(portfolio.startDate), "PP") : "—"}
+                  {portfolio.startDate ? formatLocalDate(portfolio.startDate) : "—"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
                   mode="single"
-                  selected={portfolio.startDate ? new Date(portfolio.startDate) : undefined}
+                  selected={portfolio.startDate ? convertUTCToCalendarDate(portfolio.startDate) : undefined}
                   onSelect={handleUpdateStartDate}
+                  disabled={(date) => {
+                    const endDateCal = portfolio.endDate ? convertUTCToCalendarDate(portfolio.endDate) : undefined;
+                    return endDateCal ? date > endDateCal : false;
+                  }}
                   initialFocus
                 />
               </PopoverContent>
@@ -472,7 +485,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
               <CalendarIcon className="h-4 w-4" />
               End Date
             </Label>
-            <Popover>
+            <Popover open={isEndDatePopoverOpen} onOpenChange={setIsEndDatePopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
@@ -482,14 +495,18 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                     !portfolio.endDate && "text-muted-foreground"
                   )}
                 >
-                  {portfolio.endDate ? format(new Date(portfolio.endDate), "PP") : "—"}
+                  {portfolio.endDate ? formatLocalDate(portfolio.endDate) : "—"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
                   mode="single"
-                  selected={portfolio.endDate ? new Date(portfolio.endDate) : undefined}
+                  selected={portfolio.endDate ? convertUTCToCalendarDate(portfolio.endDate) : undefined}
                   onSelect={handleUpdateEndDate}
+                  disabled={(date) => {
+                    const startDateCal = portfolio.startDate ? convertUTCToCalendarDate(portfolio.startDate) : undefined;
+                    return startDateCal ? date < startDateCal : false;
+                  }}
                   initialFocus
                 />
               </PopoverContent>

@@ -14,6 +14,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import {
   MoreHorizontal, Calendar, Pencil, Link, Activity,
   Archive, Trash2, Check, X, Flag, Users, Loader2,
@@ -362,8 +363,8 @@ export function PortfolioHeader({
                 <Calendar className="h-4 w-4" />
                 {portfolio.startDate && portfolio.endDate && (
                   <span className="mt-0.5">
-                    {format(new Date(portfolio.startDate), "dd/MM/yyyy")} -{" "}
-                    {format(new Date(portfolio.endDate), "dd/MM/yyyy")}
+                    {formatLocalDate(portfolio.startDate)} -{" "}
+                    {formatLocalDate(portfolio.endDate)}
                   </span>
                 )}
               </div>

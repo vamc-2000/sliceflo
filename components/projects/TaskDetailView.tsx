@@ -143,7 +143,7 @@ import {
     getRelationshipIconColor,
     getRelationshipLabel
 } from '@/utils/relationship-utils';
-import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 import { MemberAvatar } from "./MemberAvatar";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useProjectsStore, TaskTypeConfig, } from "@/stores/projects-store";
@@ -220,8 +220,14 @@ export function TaskDetailView({
         getTaskPriorityConfigs,
     } = useProjectsStore();
     const { workspaceMembers, currentWorkspace } = useWorkspaceStore();
-    const { documents } = useDocStore();
+    const { documents, fetchRootDocuments } = useDocStore();
     const allDocs = Array.from(documents.values());
+
+    useEffect(() => {
+        if (open) {
+            fetchRootDocuments();
+        }
+    }, [open, fetchRootDocuments]);
     const [showAllCustomFields, setShowAllCustomFields] = useState(false);
     const [showAddFieldPopover, setShowAddFieldPopover] = useState(false);
 
@@ -774,9 +780,7 @@ export function TaskDetailView({
                             {/* Right: Action Buttons */}
                             <div className="flex items-center gap-2">
                                 <span className="text-muted-foreground">
-                                    Created {currentTask.createdAt
-                                        ? format(new Date(currentTask.createdAt), "MMM d, yyyy")
-                                        : '—'}
+                                    Created {formatLocalDate(currentTask.createdAt)}
                                 </span>
                                 <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="task-detail-more-btn">
                                     <MoreHorizontal className="h-4 w-4" />
@@ -1465,14 +1469,10 @@ export function TaskDetailView({
                                                                     )}
                                                                 </td>
                                                                 <td className="p-3 text-xs text-muted-foreground">
-                                                                    {subtask.startDate
-                                                                        ? format(new Date(subtask.startDate), "MMM dd, yyyy")
-                                                                        : "-"}
+                                                                    {formatLocalDate(subtask.startDate)}
                                                                 </td>
                                                                 <td className="p-3 text-xs text-muted-foreground">
-                                                                    {subtask.endDate
-                                                                        ? format(new Date(subtask.endDate), "MMM dd, yyyy")
-                                                                        : "-"}
+                                                                    {formatLocalDate(subtask.endDate)}
                                                                 </td>
                                                                 <td className="p-3">
                                                                     <DropdownMenu>
@@ -1929,18 +1929,19 @@ export function TaskDetailView({
                                                                 !currentTask.startDate && "text-muted-foreground")}
                                                             data-testid="task-detail-start-date-trigger"
                                                         >
-                                                            {currentTask.startDate ? format(new Date(currentTask.startDate), "PP") : "—"}
+                                                            {formatLocalDate(currentTask.startDate)}
                                                         </Button>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="end">
                                                         <Calendar
                                                             mode="single"
-                                                            selected={currentTask.startDate ? new Date(currentTask.startDate) : undefined}
+                                                            selected={convertUTCToCalendarDate(currentTask.startDate)}
                                                             onSelect={(date) => {
                                                                 if (date) {
-                                                                    const newStartDateStr = format(date, "yyyy-MM-dd");
+                                                                    const newStartDateStr = convertSelectedDateToUTC(date);
                                                                     const updates: any = { startDate: newStartDateStr };
-                                                                    if (currentTask.endDate && new Date(currentTask.endDate) < date) {
+                                                                    const endLocal = convertUTCToCalendarDate(currentTask.endDate);
+                                                                    if (endLocal && endLocal < date) {
                                                                         updates.endDate = undefined;
                                                                     }
                                                                     handleUpdateTask(updates);
@@ -1974,17 +1975,20 @@ export function TaskDetailView({
                                                                 !currentTask.endDate && "text-muted-foreground")}
                                                             data-testid="task-detail-due-date-trigger"
                                                         >
-                                                            {currentTask.endDate ? format(new Date(currentTask.endDate), "PP") : "—"}
+                                                            {formatLocalDate(currentTask.endDate)}
                                                         </Button>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="end">
                                                         <Calendar
                                                             mode="single"
-                                                            selected={currentTask.endDate ? new Date(currentTask.endDate) : undefined}
+                                                            selected={convertUTCToCalendarDate(currentTask.endDate)}
                                                             onSelect={(date) => {
-                                                                if (date) handleUpdateTask({ endDate: format(date, "yyyy-MM-dd") });
+                                                                if (date) handleUpdateTask({ endDate: convertSelectedDateToUTC(date) });
                                                             }}
-                                                            disabled={(date) => (currentTask.startDate ? date < new Date(new Date(currentTask.startDate).setHours(0, 0, 0, 0)) : false)}
+                                                            disabled={(date) => {
+                                                                const startLocal = convertUTCToCalendarDate(currentTask.startDate);
+                                                                return startLocal ? date < new Date(startLocal.setHours(0, 0, 0, 0)) : false;
+                                                            }}
                                                             initialFocus
                                                         />
                                                         {currentTask.endDate && (

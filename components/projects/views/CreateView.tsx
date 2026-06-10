@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { formatLocalDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 
 // Filter conditions mapping
 const filterConditions: any = {
@@ -383,14 +384,14 @@ export function CreateView({ projectId }: CreateViewProps) {
                             data-testid={`view-filter-value-date-btn-${index}`}
                         >
                             <Clock className="mr-2 h-4 w-4" />
-                            {filter.value ? format(new Date(filter.value), "PPP") : <span>Pick a date</span>}
+                            {filter.value ? formatLocalDate(new Date(filter.value)) : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
                             selected={filter.value ? new Date(filter.value) : undefined}
-                            onSelect={(date) => updateFilter(filter.id, { value: date ? date.toISOString() : "" })}
+                            onSelect={(date) => updateFilter(filter.id, { value: date ? convertSelectedDateToUTC(date) : "" })}
                             initialFocus
                         />
                     </PopoverContent>
