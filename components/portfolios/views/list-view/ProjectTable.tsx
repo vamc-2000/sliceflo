@@ -709,14 +709,14 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                       className="p-0 focus:bg-transparent"
                                     >
                                       <div className={cn(
-                                        "w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-transparent text-foreground",
-                                        isLeader && "bg-muted/50"
+                                        "w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-muted text-foreground",
+                                        isLeader && "bg-secondary"
                                       )}>
-                                        <div className="flex items-center gap-3 truncate">
-                                          <Avatar className="h-6 w-6 shrink-0">
+                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                          <Avatar className="h-5 w-5 border shrink-0">
                                             {member.profilePicture && <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />}
                                             <AvatarFallback
-                                              className="text-white text-[10px] font-semibold bg-muted-foreground"
+                                              className="text-white text-[9px] font-semibold bg-muted-foreground"
                                               style={{ backgroundColor: getAvatarColor(member.name || "?") }}
                                             >
                                               {getInitials(member.name)}
@@ -799,14 +799,14 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                       className="p-0 focus:bg-transparent"
                                     >
                                       <div className={cn(
-                                        "w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-transparent text-foreground",
-                                        isMember && "bg-muted/50"
+                                        "w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-muted text-foreground",
+                                        isMember && "bg-secondary"
                                       )}>
-                                        <div className="flex items-center gap-3 truncate">
-                                          <Avatar className="h-6 w-6 shrink-0">
+                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                          <Avatar className="h-5 w-5 border shrink-0">
                                             {member.profilePicture && <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />}
                                             <AvatarFallback
-                                              className="text-white text-[10px] font-semibold bg-muted-foreground"
+                                              className="text-white text-[9px] font-semibold bg-muted-foreground"
                                               style={{ backgroundColor: getAvatarColor(member.name || "?") }}
                                             >
                                               {getInitials(member.name)}
@@ -873,12 +873,12 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-1">
-                              {getFilteredViewerMembers(projectMembers).length === 0 ? (
+                              {getFilteredViewerMembers(projectViewers).length === 0 ? (
                                 <div className="text-center py-2 text-xs text-muted-foreground">
                                   No members found
                                 </div>
                               ) : (
-                                getFilteredViewerMembers(projectMembers).map(member => {
+                                getFilteredViewerMembers(projectViewers).map(member => {
                                   const isViewer = project.viewers?.includes(member.userId);
                                   return (
                                     <DropdownMenuItem
@@ -889,14 +889,14 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                       className="p-0 focus:bg-transparent"
                                     >
                                       <div className={cn(
-                                        "w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-transparent text-foreground",
-                                        isViewer && "bg-muted/50"
+                                        "w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-muted text-foreground",
+                                        isViewer && "bg-secondary"
                                       )}>
-                                        <div className="flex items-center gap-3 truncate">
-                                          <Avatar className="h-6 w-6 shrink-0">
+                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                          <Avatar className="h-5 w-5 border shrink-0">
                                             {member.profilePicture && <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />}
                                             <AvatarFallback
-                                              className="text-white text-[10px] font-semibold bg-muted-foreground"
+                                              className="text-white text-[9px] font-semibold bg-muted-foreground"
                                               style={{ backgroundColor: getAvatarColor(member.name || "?") }}
                                             >
                                               {getInitials(member.name)}
@@ -904,7 +904,6 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                                           </Avatar>
                                           <span className="truncate">{member.name}</span>
                                         </div>
-                                        {isViewer && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" />}
                                       </div>
                                     </DropdownMenuItem>
                                   );

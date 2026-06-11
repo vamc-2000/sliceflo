@@ -60,7 +60,7 @@ const AvatarGroup = ({
   max?: number;
   label?: string;
   projectId: string;
-  type: "leader" | "member";
+  type: "leader" | "member" | "viewer";
   project: Project;
   projectUsers: any[];
 }) => {
@@ -90,6 +90,7 @@ const AvatarGroup = ({
   }, [searchQuery, projectUsers]);
 
   const handleToggleUser = async (userId: string) => {
+    if (type === "viewer") return; // read-only
     if (type === "leader") {
       const isLeader = leaderIds.includes(userId);
       let newLeaders: string[];
@@ -126,7 +127,7 @@ const AvatarGroup = ({
         <div className="flex items-center -space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
           {visibleUsers.length > 0 ? (
             visibleUsers.map((u, i) => (
-              <Avatar key={u.userId || i} className="h-6 w-6 border-2 border-white relative" style={{ zIndex: max - i }}>
+              <Avatar key={u.userId || i} className="h-6 w-6 relative" style={{ zIndex: max - i }}>
                 {u.profilePicture && <AvatarImage src={getProfilePictureUrl(u.profilePicture)} className="object-cover" />}
                 <AvatarFallback
                   className="text-white text-[10px] font-semibold"
@@ -142,7 +143,7 @@ const AvatarGroup = ({
             </div>
           )}
           {overflowCount > 0 && (
-            <div className="h-6 min-w-[24px] rounded-full border-2 border-card bg-muted flex items-center justify-center relative z-0 px-1">
+            <div className="h-6 min-w-[24px] rounded-full bg-muted flex items-center justify-center relative z-0 px-1">
               <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">+{overflowCount}</span>
             </div>
           )}
@@ -172,7 +173,7 @@ const AvatarGroup = ({
             </div>
           ) : (
             filteredProjectUsers.map((member) => {
-              const isSelected = type === "leader" 
+              const isSelected = type === "leader"
                 ? leaderIds.includes(member.userId)
                 : memberIds.includes(member.userId);
 
@@ -190,7 +191,7 @@ const AvatarGroup = ({
                     isSelected && "bg-muted/50"
                   )}>
                     <div className="flex items-center gap-3 truncate">
-                      <Avatar className="h-6 w-6 shrink-0 border">
+                      <Avatar className="h-6 w-6 shrink-0">
                         {member.profilePicture && (
                           <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />
                         )}
@@ -240,17 +241,13 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       .filter(Boolean);
   }, [project.members, workspaceMembers]);
 
-  const projectUsers = useMemo(() => {
-    const users: typeof workspaceMembers = [];
-    const seenIds = new Set<string>();
-    [...leaders, ...projectMembers].forEach(u => {
-      if (u && !seenIds.has(u.userId)) {
-        seenIds.add(u.userId);
-        users.push(u);
-      }
-    });
-    return users;
-  }, [leaders, projectMembers, workspaceMembers]);
+  const projectViewers = useMemo(() => {
+    return (project.viewers || []).map((v: any) => {
+      const id = typeof v === "string" ? v : v.userId;
+      return workspaceMembers.find(m => m.userId === id);
+    }).filter((m): m is NonNullable<typeof m> => !!m);
+  }, [project.viewers, workspaceMembers]);
+
 
   const assignedPhase = useMemo(() => {
     return projectPhases
@@ -286,18 +283,14 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
             projectId={project.id!}
             type="leader"
             project={project}
-            projectUsers={projectUsers}
+            projectUsers={leaders}
           />
 
           {/* Slug Badge */}
           <Link href={`/project/${project.id}`} onClick={(e) => e.stopPropagation()}>
             <Badge
               variant="secondary"
-              className="text-xs px-2 py-0.5 rounded-sm hover:underline"
-              style={{
-                backgroundColor: `${groupColor}20`,
-                color: groupColor
-              }}
+              className="text-xs px-2 py-0.5 rounded-sm hover:underline bg-muted text-muted-foreground"
             >
               {project.slug || "PROJ"}
             </Badge>
@@ -323,15 +316,15 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
                       </Badge>
                     ) : (
                       <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
-                      <Flag className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
-                  <Flag className="h-4 w-4 text-muted-foreground" />
-                </div>
-              )}
+                        <Flag className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors">
+                    <Flag className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                )}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-36 p-2" align="start" onClick={(e) => e.stopPropagation()}>
@@ -426,7 +419,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
           projectId={project.id!}
           type="member"
           project={project}
-          projectUsers={projectUsers}
+          projectUsers={projectMembers}
         />
       </div>
       {/* </div> */}

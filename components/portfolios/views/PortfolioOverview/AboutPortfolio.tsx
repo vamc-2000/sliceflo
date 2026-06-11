@@ -5,6 +5,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -55,10 +56,9 @@ const statusColors: Record<string, string> = {
 };
 
 const PRIORITY_LEVELS = [
-  { value: "urgent", label: "Urgent", color: "#EF4444" },
-  { value: "high", label: "High", color: "#F97316" },
-  { value: "medium", label: "Medium", color: "#EAB308  " },
-  { value: "low", label: "Low", color: "#22C55E" },
+  { value: "high", label: "High", color: "#F59E0B" },
+  { value: "medium", label: "Medium", color: "#3B82F6" },
+  { value: "low", label: "Low", color: "#9CA3AF" },
 ] as const;
 
 function getAvatarColor(name: string): string {
@@ -105,6 +105,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
   const [showAll, setShowAll] = useState(false);
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
+  const [leaderSearchQuery, setLeaderSearchQuery] = useState("");
 
   // Collapsible sections state
   const [isPortfolioDetailsExpanded, setIsPortfolioDetailsExpanded] = useState(true);
@@ -122,6 +123,14 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
     name: m.name,
     avatar: m.avatar || m.profilePicture || ''
   })), [workspaceMembers]);
+
+  const filteredLeaders = React.useMemo(() => {
+    return workspaceMembers.filter((m) => {
+      if (!leaderSearchQuery) return true;
+      const q = leaderSearchQuery.startsWith("@") ? leaderSearchQuery.slice(1) : leaderSearchQuery;
+      return m.name.toLowerCase().includes(q.toLowerCase());
+    });
+  }, [workspaceMembers, leaderSearchQuery]);
 
   // Sync attachments from the store to component state
   useEffect(() => {
@@ -368,27 +377,27 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="sm"
-                  className="h-8 px-3 hover:bg-muted text-xs"
+                  className={cn(
+                    "h-8 px-3 transition-opacity hover:opacity-90 text-xs font-semibold rounded-xs w-[150px] flex items-center justify-center",
+                    statusColors[portfolio.status as string] || statusColors.open
+                  )}
                 >
-                  <Badge
-                    className={cn("h-6", statusColors[portfolio.status as string] || statusColors.open)}
-                  >
-                    {currentStatus.label}
-                  </Badge>
+                  {currentStatus.label}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
                 {STATUS_OPTIONS.map((s) => (
                   <DropdownMenuItem
                     key={s.value}
                     onClick={() => handleUpdateStatus(s.value)}
-                    className="text-xs"
+                    className={cn(
+                      "h-9 text-xs font-semibold rounded-xs justify-center cursor-pointer px-3 w-full flex items-center focus:opacity-80",
+                      statusColors[s.value as string] || statusColors.open
+                    )}
                   >
-                    <Badge variant="secondary" className={cn("mr-2 text-xs capitalize", s.cls)}>
-                      {s.label}
-                    </Badge>
+                    {s.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -407,38 +416,43 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 transition-all duration-200",
-                    portfolio.priority ? "w-8 p-0 rounded-full" : "px-3 bg-secondary hover:bg-muted text-xs",
-                    !portfolio.priority && "text-muted-foreground"
+                    "h-8 transition-opacity hover:opacity-90 overflow-hidden px-2 rounded-xs flex items-center justify-between gap-2 text-xs font-medium w-[150px]",
+                    !portfolio.priority && "text-muted-foreground bg-secondary"
                   )}
                   style={portfolio.priority ? {
-                    backgroundColor: (currentPriority?.color || "#6b7280") + "15",
+                    backgroundColor: `${currentPriority?.color || '#9CA3AF'}33`,
                   } : {}}
                 >
                   {portfolio.priority ? (
-                    <Flag
-                      className="h-4 w-4"
-                      style={{ color: currentPriority?.color || "#6b7280" }}
-                    />
+                    <>
+                      <span className="text-foreground">
+                        {portfolio.priority.charAt(0).toUpperCase() + portfolio.priority.slice(1)}
+                      </span>
+                      <Flag
+                        className="h-3.5 w-3.5 flex-shrink-0"
+                        style={{ color: currentPriority?.color || "#6b7280" }}
+                      />
+                    </>
                   ) : (
                     "—"
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
                 {PRIORITY_LEVELS.map((level) => (
                   <DropdownMenuItem
                     key={level.value}
                     onSelect={() => handleUpdatePriority(level.value)}
-                    className="text-xs"
+                    className="h-9 text-xs font-medium rounded-xs cursor-pointer px-2 flex items-center justify-between gap-2 w-full focus:opacity-80"
+                    style={{
+                      backgroundColor: `${level.color}33`,
+                    }}
                   >
-                    <div className="flex items-center gap-2">
-                      <Flag
-                        className="h-3.5 w-3.5"
-                        style={{ color: level.color }}
-                      />
-                      <span>{level.label}</span>
-                    </div>
+                    <span className="text-foreground">{level.label}</span>
+                    <Flag
+                      className="h-3.5 w-3.5 flex-shrink-0"
+                      style={{ color: level.color }}
+                    />
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -457,7 +471,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
                     !portfolio.startDate && "text-muted-foreground"
                   )}
                 >
@@ -491,7 +505,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
                     !portfolio.endDate && "text-muted-foreground"
                   )}
                 >
@@ -519,13 +533,15 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
               <User className="h-4 w-4" />
               Leaders
             </Label>
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => {
+              if (!open) setLeaderSearchQuery("");
+            }}>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-2 hover:bg-muted flex items-center gap-1 text-xs",
+                    "h-8 px-2 hover:bg-muted flex items-center justify-center gap-1 text-xs w-[150px] rounded-xs",
                     (!portfolio.leaders || portfolio.leaders.length === 0) && "text-muted-foreground"
                   )}
                 >
@@ -540,7 +556,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                           return (
                             <Avatar
                               key={id}
-                              className="h-6 w-6 border-2 border-white"
+                              className="h-6 w-6 border-0"
                               style={{ zIndex: 10 - i }}
                               title={m?.name}
                             >
@@ -559,32 +575,53 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   })()}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuSeparator />
-                {workspaceMembers.map((member) => {
-                  const isLeader = (portfolio.leaders || []).includes(member.userId);
-                  return (
-                    <DropdownMenuItem
-                      key={member.userId}
-                      onSelect={() => handleUpdateLeader(member.userId)}
-                      className="flex items-center justify-between pointer-events-auto text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6 border">
-                          {member.profilePicture && <AvatarImage src={member.profilePicture} />}
-                          <AvatarFallback
-                            className="text-white text-[10px] font-semibold"
-                            style={{ backgroundColor: getAvatarColor(member.name) }}
-                          >
-                            {member.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span >{member.name}</span>
-                      </div>
-                      {isLeader && <Check className="h-3.5 w-3.5 text-blue-600" />}
-                    </DropdownMenuItem>
-                  );
-                })}
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+                <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                  <Input
+                    placeholder="Type @ or name..."
+                    value={leaderSearchQuery}
+                    onChange={(e) => setLeaderSearchQuery(e.target.value)}
+                    className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-60 overflow-y-auto space-y-1">
+                  {filteredLeaders.length === 0 ? (
+                    <div className="text-center py-2 text-xs text-muted-foreground">
+                      No members found
+                    </div>
+                  ) : (
+                    filteredLeaders.map((member) => {
+                      const isLeader = (portfolio.leaders || []).includes(member.userId);
+                      return (
+                        <DropdownMenuItem
+                          key={member.userId}
+                          onSelect={() => handleUpdateLeader(member.userId)}
+                          className="p-0 focus:bg-transparent"
+                        >
+                          <div className={cn(
+                            "w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-muted text-foreground",
+                            isLeader && "bg-secondary"
+                          )}>
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                              <Avatar className="h-5 w-5 border shrink-0">
+                                {member.profilePicture && <AvatarImage src={member.profilePicture} />}
+                                <AvatarFallback
+                                  className="text-white text-[9px] font-semibold"
+                                  style={{ backgroundColor: getAvatarColor(member.name) }}
+                                >
+                                  {member.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="truncate">{member.name}</span>
+                            </div>
+                            {isLeader && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 ml-1" />}
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    })
+                  )}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

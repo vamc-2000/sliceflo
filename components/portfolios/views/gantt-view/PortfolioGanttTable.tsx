@@ -8,6 +8,7 @@ import {
   Plus,
   ChevronUp,
   Link as LinkIcon,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -15,11 +16,12 @@ import { formatLocalDate } from "@/utils/timezone-utils";
 import { Project } from "@/stores/projects-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { usePortfoliosStore } from "@/stores/portfolios-store";
-import { useProjectsStore } from "@/stores/projects-store";
+import { useProjectsStore, getProfilePictureUrl } from "@/stores/projects-store";
 import { PortfolioIconAvatar } from "../../PortfolioIconAvatar";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +47,13 @@ const getAvatarColor = (name: string): string => {
   return colors[Math.abs(hash) % colors.length];
 };
 
+const getInitials = (name?: string): string => {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  return parts.slice(0, 2).map(p => p[0]).join("").toUpperCase();
+};
+
 const AvatarGroup = ({
   users,
   max = 3,
@@ -54,32 +63,42 @@ const AvatarGroup = ({
   max?: number;
   label?: string;
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   if (!users || users.length === 0)
     return <span className="text-gray-400">—</span>;
   const visibleUsers = users.slice(0, max);
   const overflowCount = users.length - max;
 
+  const filteredUsers = users.filter((u) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.startsWith("@") ? searchQuery.slice(1) : searchQuery;
+    return u.name?.toLowerCase().includes(q.toLowerCase());
+  });
+
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={(open) => {
+      if (!open) setSearchQuery("");
+    }}>
       <DropdownMenuTrigger asChild>
         <div className="flex items-center justify-center -space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
           {visibleUsers.map((u, i) => (
             <Avatar
               key={u.userId || i}
-              className="h-6 w-6 border-2 border-white relative"
+              className="h-6 w-6 relative"
               style={{ zIndex: max - i }}
             >
-              {u.profilePicture && <AvatarImage src={u.profilePicture} />}
+              {u.profilePicture && <AvatarImage src={getProfilePictureUrl(u.profilePicture)} className="object-cover" />}
               <AvatarFallback
                 className="text-white text-[10px] font-semibold"
                 style={{ backgroundColor: getAvatarColor(u.name || "?") }}
               >
-                {u.name?.charAt(0).toUpperCase()}
+                {getInitials(u.name)}
               </AvatarFallback>
             </Avatar>
           ))}
           {overflowCount > 0 && (
-            <div className="h-6 min-w-[24px] rounded-full border-2 border-card bg-muted flex items-center justify-center relative z-0 px-1">
+            <div className="h-6 min-w-[24px] rounded-full bg-muted flex items-center justify-center relative z-0 px-1">
               <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
                 +{overflowCount}
               </span>
@@ -87,33 +106,47 @@ const AvatarGroup = ({
           )}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center">
-        {label && (
-          <>
-            <DropdownMenuLabel className="px-2 py-1.5 text-xs text-gray-500 font-normal outline-none">
-              {label}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-          </>
-        )}
-        <div className="max-h-60 overflow-y-auto">
-          {users.map((u, i) => (
-            <DropdownMenuItem
-              key={u.userId || i}
-              className="flex items-center gap-2 pointer-events-none"
-            >
-              <Avatar className="h-6 w-6 border">
-                {u.profilePicture && <AvatarImage src={u.profilePicture} />}
-                <AvatarFallback
-                  className="text-white text-[10px] font-semibold"
-                  style={{ backgroundColor: getAvatarColor(u.name || "?") }}
-                >
-                  {u.name?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm">{u.name}</span>
-            </DropdownMenuItem>
-          ))}
+      <DropdownMenuContent align="center" className="p-4 w-[200px] space-y-1">
+        <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+          <Input
+            placeholder="Type @ or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+            autoFocus
+          />
+        </div>
+        <div className="max-h-60 overflow-y-auto space-y-1">
+          {filteredUsers.length === 0 ? (
+            <div className="text-center py-2 text-xs text-muted-foreground">
+              No members found
+            </div>
+          ) : (
+            filteredUsers.map((u, i) => (
+              <DropdownMenuItem
+                key={u.userId || i}
+                onSelect={(e) => {
+                  e.preventDefault();
+                }}
+                className="p-0 focus:bg-transparent"
+              >
+                <div className="w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-secondary text-foreground">
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <Avatar className="h-5 w-5 shrink-0">
+                      {u.profilePicture && <AvatarImage src={getProfilePictureUrl(u.profilePicture)} className="object-cover" />}
+                      <AvatarFallback
+                        className="text-white text-[9px] font-semibold bg-muted-foreground"
+                        style={{ backgroundColor: getAvatarColor(u.name || "?") }}
+                      >
+                        {getInitials(u.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{u.name}</span>
+                  </div>
+                </div>
+              </DropdownMenuItem>
+            ))
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -127,21 +160,16 @@ const PriorityFlag = ({
   priority?: string;
   color?: string;
 }) => {
-  if (!priority) {
-    return (
-      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted mx-auto">
-        <Flag className="h-3.5 w-3.5 text-muted-foreground" />
-      </div>
-    );
-  }
   const bg = color || "#9CA3AF";
   return (
     <div
-      className="w-6 h-6 rounded-full flex items-center justify-center mx-auto"
-      style={{ backgroundColor: `${bg}22` }}
-      title={priority}
+      className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
+      style={{ backgroundColor: `${bg}33` }}
     >
-      <Flag className="h-3.5 w-3.5" style={{ color: bg }} />
+      <span className={cn("truncate text-xs font-medium", priority ? "text-foreground" : "text-muted-foreground")}>
+        {priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : "—"}
+      </span>
+      <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: bg }} />
     </div>
   );
 };
@@ -174,6 +202,28 @@ export const PortfolioGanttTable = forwardRef<
   const { workspaceMembers, projectPhases } = useWorkspaceStore();
   const { fieldVisibility } = usePortfoliosStore();
   const { archiveProject, deleteProject } = useProjectsStore();
+
+  const columnWidths: Record<string, number> = {
+    id: 80,
+    name: 260,
+    phase: 150,
+    update: 150,
+    leader: 150,
+    members: 150,
+    viewers: 150,
+    priority: 150,
+    startDate: 150,
+    endDate: 150,
+  };
+
+  const getColumnStyle = (columnId: string): React.CSSProperties => {
+    const w = columnWidths[columnId] ?? 150;
+    return {
+      minWidth: `${w}px`,
+      width: `${w}px`,
+      maxWidth: `${w}px`,
+    };
+  };
 
   const [isAddProjectRowHovered, setIsAddProjectRowHovered] = useState(false);
   const [showAddProjectMenu, setShowAddProjectMenu] = useState(false);
@@ -256,36 +306,36 @@ export const PortfolioGanttTable = forwardRef<
         <thead className="sticky top-0 z-20 bg-card shadow-sm">
           <tr className="h-9 border-b">
             {isVisible("id") && (
-              <th className={cn(headerCellCls, "min-w-[70px]")}>ID</th>
+              <th className={headerCellCls} style={getColumnStyle("id")}>ID</th>
             )}
             {isVisible("name") && (
-              <th className={cn(headerCellCls, "text-left min-w-[250px]")}>
+              <th className={cn(headerCellCls, "text-left")} style={getColumnStyle("name")}>
                 Project
               </th>
             )}
             {isVisible("phase") && (
-              <th className={cn(headerCellCls, "min-w-[140px]")}>Phase</th>
+              <th className={headerCellCls} style={getColumnStyle("phase")}>Phase</th>
             )}
             {isVisible("update") && (
-              <th className={cn(headerCellCls, "min-w-[120px]")}>Update</th>
+              <th className={headerCellCls} style={getColumnStyle("update")}>Update</th>
             )}
             {isVisible("leader") && (
-              <th className={cn(headerCellCls, "min-w-[100px]")}>Leader</th>
+              <th className={headerCellCls} style={getColumnStyle("leader")}>Leader</th>
             )}
             {isVisible("members") && (
-              <th className={cn(headerCellCls, "min-w-[120px]")}>Members</th>
+              <th className={headerCellCls} style={getColumnStyle("members")}>Members</th>
             )}
             {isVisible("viewers") && (
-              <th className={cn(headerCellCls, "min-w-[120px]")}>Viewers</th>
+              <th className={headerCellCls} style={getColumnStyle("viewers")}>Viewers</th>
             )}
             {isVisible("priority") && (
-              <th className={cn(headerCellCls, "min-w-[100px]")}>Priority</th>
+              <th className={headerCellCls} style={getColumnStyle("priority")}>Priority</th>
             )}
             {isVisible("startDate") && (
-              <th className={cn(headerCellCls, "min-w-[110px]")}>Start Date</th>
+              <th className={headerCellCls} style={getColumnStyle("startDate")}>Start Date</th>
             )}
             {isVisible("endDate") && (
-              <th className={cn(headerCellCls, "min-w-[110px]")}>Due Date</th>
+              <th className={headerCellCls} style={getColumnStyle("endDate")}>Due Date</th>
             )}
 
             <th
@@ -319,7 +369,7 @@ export const PortfolioGanttTable = forwardRef<
                 className="border-b hover:bg-muted/30 h-9 group transition-colors relative"
               >
                 {isVisible("id") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("id")}>
                     <Link
                       href={`/project/${project.id}`}
                       className="hover:underline font-medium text-gray-500"
@@ -332,7 +382,8 @@ export const PortfolioGanttTable = forwardRef<
 
                 {isVisible("name") && (
                   <td
-                    className={cn(bodyCellCls, "min-w-[250px] px-4 text-left")}
+                    className={cn(bodyCellCls, "px-4 text-left")}
+                    style={getColumnStyle("name")}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 shrink-0">
@@ -353,7 +404,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("phase") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("phase")}>
                     {assignedPhase ? (
                       <div className="flex items-center justify-center gap-2">
                         <span
@@ -383,7 +434,7 @@ export const PortfolioGanttTable = forwardRef<
                       (c: any) => c.value === displayUpdate,
                     );
                     return (
-                      <td className={cn(bodyCellCls, "text-center")}>
+                      <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("update")}>
                         <Badge
                           className={cn(
                             "px-2 py-0.5 text-[10px] font-medium h-5",
@@ -407,7 +458,7 @@ export const PortfolioGanttTable = forwardRef<
                   })()}
 
                 {isVisible("leader") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("leader")}>
                     <AvatarGroup
                       users={projectLeaders}
                       label="Project Leaders"
@@ -416,7 +467,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("members") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("members")}>
                     <AvatarGroup
                       users={projectMembers}
                       label="Project Members"
@@ -425,7 +476,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("viewers") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("viewers")}>
                     <AvatarGroup
                       users={projectViewers}
                       label="Project Viewers"
@@ -434,7 +485,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("priority") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "!p-0 text-center")} style={{ ...getColumnStyle("priority"), height: '1px' }}>
                     <PriorityFlag
                       priority={project.priority}
                       color={getPriorityColor(project)}
@@ -443,7 +494,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("startDate") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("startDate")}>
                     {project.startDate ? (
                       <span className="text-xs text-gray-700">
                         {formatLocalDate(project.startDate)}
@@ -455,7 +506,7 @@ export const PortfolioGanttTable = forwardRef<
                 )}
 
                 {isVisible("endDate") && (
-                  <td className={cn(bodyCellCls, "text-center")}>
+                  <td className={cn(bodyCellCls, "text-center")} style={getColumnStyle("endDate")}>
                     {project.endDate ? (
                       <span className="text-xs text-gray-700">
                         {formatLocalDate(project.endDate)}
@@ -516,9 +567,9 @@ export const PortfolioGanttTable = forwardRef<
               setShowAddProjectMenu(false);
             }}
           >
-            {isVisible("id") && <td className={bodyCellCls} />}
+            {isVisible("id") && <td className={bodyCellCls} style={getColumnStyle("id")} />}
             {isVisible("name") && (
-              <td className={cn(bodyCellCls, "min-w-[250px] px-4 text-left")}>
+              <td className={cn(bodyCellCls, "px-4 text-left")} style={getColumnStyle("name")}>
                 <div className="flex items-center gap-1">
                   <div
                     className={cn(
