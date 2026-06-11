@@ -57,7 +57,7 @@ const statusColors: Record<string, string> = {
 const PRIORITY_LEVELS = [
   { value: "urgent", label: "Urgent", color: "#EF4444" },
   { value: "high", label: "High", color: "#F97316" },
-  { value: "medium", label: "Medium", color: "#EAB308" },
+  { value: "medium", label: "Medium", color: "#EAB308  " },
   { value: "low", label: "Low", color: "#22C55E" },
 ] as const;
 

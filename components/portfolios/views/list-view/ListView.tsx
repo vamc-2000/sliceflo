@@ -72,6 +72,33 @@ export function ListView({ portfolioId }: ListViewProps) {
   const portfolio = portfolios.find((p) => p.id === portfolioId);
   const portfolioProjectIds = portfolio?.projects || [];
 
+  const portfolioProjects = useMemo(() => {
+    return projects.filter((p) => portfolioProjectIds.includes(p.id!));
+  }, [projects, portfolioProjectIds]);
+
+  const portfolioLeaders = useMemo(() => {
+    const leaderIds = new Set<string>();
+    portfolioProjects.forEach((p) => {
+      if (p.leaders) {
+        p.leaders.forEach((id) => leaderIds.add(id));
+      }
+      if (p.projectLeader) {
+        leaderIds.add(p.projectLeader);
+      }
+    });
+    return workspaceMembers.filter((m) => leaderIds.has(m.userId));
+  }, [portfolioProjects, workspaceMembers]);
+
+  const portfolioMembers = useMemo(() => {
+    const memberIds = new Set<string>();
+    portfolioProjects.forEach((p) => {
+      if (p.members) {
+        p.members.forEach((m) => memberIds.add(m.userId));
+      }
+    });
+    return workspaceMembers.filter((m) => memberIds.has(m.userId));
+  }, [portfolioProjects, workspaceMembers]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [groupBy, setGroupBy] = useState<"phase" | "update" | "none">("phase");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
@@ -739,7 +766,7 @@ export function ListView({ portfolioId }: ListViewProps) {
                             <span className="text-primary text-xs">Leader</span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-64 max-h-64 overflow-y-auto p-1">
-                            {workspaceMembers.map(member => (
+                            {portfolioLeaders.map(member => (
                               <DropdownMenuItem
                                 key={member.userId}
                                 onClick={() => {
@@ -774,7 +801,7 @@ export function ListView({ portfolioId }: ListViewProps) {
                             <span className="text-primary text-xs">Member</span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-64 max-h-64 overflow-y-auto p-1">
-                            {workspaceMembers.map(member => (
+                            {portfolioMembers.map(member => (
                               <DropdownMenuItem
                                 key={member.userId}
                                 onClick={() => {

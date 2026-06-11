@@ -24,11 +24,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Project, useProjectsStore } from "@/stores/projects-store";
+import { Project, useProjectsStore, getProfilePictureUrl } from "@/stores/projects-store";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { formatLocalDate } from "@/utils/timezone-utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import { Input } from "@/components/ui/input";
 
 const getAvatarColor = (name: string): string => {
   const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
@@ -39,26 +40,107 @@ const getAvatarColor = (name: string): string => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, label?: string }) => {
-  if (!users || users.length === 0) return <span className="text-gray-400">—</span>;
+const getInitials = (name?: string): string => {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  return parts.slice(0, 2).map(p => p[0]).join("").toUpperCase();
+};
+
+const AvatarGroup = ({
+  users,
+  max = 3,
+  label,
+  projectId,
+  type,
+  project,
+  projectUsers,
+}: {
+  users: any[];
+  max?: number;
+  label?: string;
+  projectId: string;
+  type: "leader" | "member";
+  project: Project;
+  projectUsers: any[];
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    updateProjectLeaders,
+    addMembersToProject,
+    removeMembersFromProject,
+  } = useProjectsStore();
+
+  const leaderIds = useMemo(() => {
+    return project.leaders?.length
+      ? project.leaders
+      : (project.projectLeader ? [project.projectLeader] : []);
+  }, [project.leaders, project.projectLeader]);
+
+  const memberIds = useMemo(() => {
+    return (project.members || []).map(m => m.userId);
+  }, [project.members]);
+
+  const filteredProjectUsers = useMemo(() => {
+    const query = searchQuery.startsWith("@") ? searchQuery.slice(1) : searchQuery;
+    if (!query) return projectUsers;
+    return projectUsers.filter(member =>
+      member && member.name && member.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [searchQuery, projectUsers]);
+
+  const handleToggleUser = async (userId: string) => {
+    if (type === "leader") {
+      const isLeader = leaderIds.includes(userId);
+      let newLeaders: string[];
+      if (isLeader) {
+        newLeaders = leaderIds.filter(id => id !== userId);
+      } else {
+        newLeaders = [...leaderIds, userId];
+      }
+      try {
+        await updateProjectLeaders(projectId, newLeaders);
+      } catch (err) {
+        console.error("Failed to update project leaders", err);
+      }
+    } else {
+      const isMember = memberIds.includes(userId);
+      try {
+        if (isMember) {
+          await removeMembersFromProject(projectId, [userId]);
+        } else {
+          await addMembersToProject(projectId, [{ userId, role: "member" }]);
+        }
+      } catch (err) {
+        console.error("Failed to update project members", err);
+      }
+    }
+  };
+
   const visibleUsers = users.slice(0, max);
   const overflowCount = users.length - max;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={(open) => { if (!open) setSearchQuery(""); }}>
       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center -space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
-          {visibleUsers.map((u, i) => (
-            <Avatar key={u.userId || i} className="h-6 w-6 border-2 border-white relative" style={{ zIndex: max - i }}>
-              {u.profilePicture && <AvatarImage src={u.profilePicture} />}
-              <AvatarFallback
-                className="text-white text-[10px] font-semibold"
-                style={{ backgroundColor: getAvatarColor(u.name || "?") }}
-              >
-                {u.name?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          ))}
+          {visibleUsers.length > 0 ? (
+            visibleUsers.map((u, i) => (
+              <Avatar key={u.userId || i} className="h-6 w-6 border-2 border-white relative" style={{ zIndex: max - i }}>
+                {u.profilePicture && <AvatarImage src={getProfilePictureUrl(u.profilePicture)} className="object-cover" />}
+                <AvatarFallback
+                  className="text-white text-[10px] font-semibold"
+                  style={{ backgroundColor: getAvatarColor(u.name || "?") }}
+                >
+                  {getInitials(u.name)}
+                </AvatarFallback>
+              </Avatar>
+            ))
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground">
+              <User className="h-3 w-3" />
+            </div>
+          )}
           {overflowCount > 0 && (
             <div className="h-6 min-w-[24px] rounded-full border-2 border-card bg-muted flex items-center justify-center relative z-0 px-1">
               <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">+{overflowCount}</span>
@@ -66,28 +148,66 @@ const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, la
           )}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" onClick={(e) => e.stopPropagation()}>
+      <DropdownMenuContent className="p-4 w-[200px] space-y-1" align="start" onClick={(e) => e.stopPropagation()}>
         {label && (
           <>
-            <DropdownMenuLabel className="px-2 py-1.5 text-xs text-muted-foreground font-normal outline-none">{label}</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs text-muted-foreground font-normal py-1 px-2.5">{label}</DropdownMenuLabel>
             <DropdownMenuSeparator />
           </>
         )}
-        <div className="max-h-60 overflow-y-auto">
-          {users.map((u, i) => (
-            <DropdownMenuItem key={u.userId || i} className="flex items-center gap-2 pointer-events-none">
-              <Avatar className="h-6 w-6 border">
-                {u.profilePicture && <AvatarImage src={u.profilePicture} />}
-                <AvatarFallback
-                  className="text-white text-[10px] font-semibold"
-                  style={{ backgroundColor: getAvatarColor(u.name || "?") }}
+        <div className="px-1 pb-2">
+          <Input
+            placeholder="Type @ or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+            autoFocus
+          />
+        </div>
+
+        <div className="max-h-60 overflow-y-auto space-y-1">
+          {filteredProjectUsers.length === 0 ? (
+            <div className="text-center py-2 text-xs text-muted-foreground">
+              No members found
+            </div>
+          ) : (
+            filteredProjectUsers.map((member) => {
+              const isSelected = type === "leader" 
+                ? leaderIds.includes(member.userId)
+                : memberIds.includes(member.userId);
+
+              return (
+                <DropdownMenuItem
+                  key={member.userId}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    handleToggleUser(member.userId);
+                  }}
+                  className="p-0 focus:bg-transparent"
                 >
-                  {u.name?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm">{u.name}</span>
-            </DropdownMenuItem>
-          ))}
+                  <div className={cn(
+                    "w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-transparent text-foreground cursor-pointer",
+                    isSelected && "bg-muted/50"
+                  )}>
+                    <div className="flex items-center gap-3 truncate">
+                      <Avatar className="h-6 w-6 shrink-0 border">
+                        {member.profilePicture && (
+                          <AvatarImage src={getProfilePictureUrl(member.profilePicture)} className="object-cover" />
+                        )}
+                        <AvatarFallback
+                          className="text-white text-[10px] font-semibold bg-muted-foreground"
+                          style={{ backgroundColor: getAvatarColor(member.name || "?") }}
+                        >
+                          {getInitials(member.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="truncate">{member.name}</span>
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+              );
+            })
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -120,6 +240,18 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       .filter(Boolean);
   }, [project.members, workspaceMembers]);
 
+  const projectUsers = useMemo(() => {
+    const users: typeof workspaceMembers = [];
+    const seenIds = new Set<string>();
+    [...leaders, ...projectMembers].forEach(u => {
+      if (u && !seenIds.has(u.userId)) {
+        seenIds.add(u.userId);
+        users.push(u);
+      }
+    });
+    return users;
+  }, [leaders, projectMembers, workspaceMembers]);
+
   const assignedPhase = useMemo(() => {
     return projectPhases
       .flatMap(p => [p, ...(p.children || [])])
@@ -148,7 +280,14 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {/* Leader Avatar */}
-          <AvatarGroup users={leaders} label="Project Leaders" />
+          <AvatarGroup
+            users={leaders}
+            label="Project Leaders"
+            projectId={project.id!}
+            type="leader"
+            project={project}
+            projectUsers={projectUsers}
+          />
 
           {/* Slug Badge */}
           <Link href={`/project/${project.id}`} onClick={(e) => e.stopPropagation()}>
@@ -254,7 +393,7 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
       {/* Project Name */}
       <Link
         href={`/project/${project.id}`}
-        className="text-xs font-semibold text-foreground hover:underline mb-2 line-clamp-2 transition-colors block"
+        className="text-xs  text-foreground hover:underline mb-2 line-clamp-2 transition-colors block"
         onClick={(e) => e.stopPropagation()}
       >
         {project.name}
@@ -281,7 +420,14 @@ export function PortfolioKanbanCard({ project, groupColor }: PortfolioKanbanCard
         </div>
 
         {/* Member Avatars */}
-        <AvatarGroup users={projectMembers} label="Project Members" />
+        <AvatarGroup
+          users={projectMembers}
+          label="Project Members"
+          projectId={project.id!}
+          type="member"
+          project={project}
+          projectUsers={projectUsers}
+        />
       </div>
       {/* </div> */}
     </div>
