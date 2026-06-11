@@ -268,7 +268,7 @@ export function AppSidebar() {
         await Promise.allSettled([
           fetchTeams(),
           fetchProjects(),
-          fetchPortfolios(),
+          fetchPortfolios(currentWorkspace?.id),
           fetchFavorites(),
           fetchWorkspaces(),
         ]);

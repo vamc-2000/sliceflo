@@ -792,6 +792,7 @@ import { useProjectsStore } from "@/stores/projects-store";
 import { ChevronDown, Plus, X, Loader2 } from "lucide-react";
 import { useTeamStore } from "@/stores/teams-store";
 import { usePortfoliosStore } from "@/stores/portfolios-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 // import { createChildDocument, createRootDocument } from "@/lib/api/documents-api";
 
 import {
@@ -804,6 +805,7 @@ import { toast } from "@/components/ui/sonner";
 
 export default function DocsCreatePage() {
     const { addDocument, loadDocuments, createDoc, updateDocument, fetchRootDocuments } = useDocStore();
+    const { currentWorkspace } = useWorkspaceStore();
     const { user } = useProfileStore()
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -837,7 +839,7 @@ export default function DocsCreatePage() {
     useEffect(() => {
         fetchProjects();
         fetchTeams();
-        fetchPortfolios();
+        fetchPortfolios(currentWorkspace?.id);
         if (!user) {
             console.log("Fetching user profile in DocsCreatePage...");
             useProfileStore.getState().fetchUserProfile();

@@ -32,6 +32,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import { useProfileStore } from "@/stores/profile-store";
 import { createRootDocument, createChildDocument, updateDocument as updateDocumentApi, deleteDocument as deleteDocumentApi, lockDocument, unlockDocument } from "@/lib/api/documents-api";
 import { iconLibrary } from "../ColorIconPicker";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 
 interface DocItem {
   id: string;
@@ -49,6 +50,7 @@ interface DocsClickUpSidebarProps {
 
 export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClickUpSidebarProps) {
   const router = useRouter();
+  const { currentWorkspace } = useWorkspaceStore();
   const { teams, fetchTeams } = useTeamStore();
   const { projects, fetchProjects } = useProjectsStore();
   const { portfolios, fetchPortfolios } = usePortfoliosStore();
@@ -117,8 +119,8 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
   const ensureLinkOptionsLoaded = useCallback(() => {
     fetchTeams();
     fetchProjects();
-    fetchPortfolios();
-  }, [fetchTeams, fetchProjects, fetchPortfolios]);
+    fetchPortfolios(currentWorkspace?.id!);
+  }, [fetchTeams, fetchProjects, fetchPortfolios, currentWorkspace?.id]);
 
   useEffect(() => {
     const buildChildTree = () => {

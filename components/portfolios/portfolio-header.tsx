@@ -116,7 +116,7 @@ export function PortfolioHeader({
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (portfolioId) fetchPortfolios();
+    if (portfolioId) fetchPortfolios(currentWorkspace?.id);
     if (currentWorkspace?.id) fetchWorkspaceMembers(currentWorkspace.id);
   }, [portfolioId, currentWorkspace?.id]);
 
