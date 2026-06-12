@@ -10,6 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { getLocalDateParts } from "@/utils/timezone-utils";
 
 interface Props {
     selectedWeek: { start: Date; end: Date };
@@ -66,10 +67,11 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
                                                     {days[index]},
                                                 </span>
                                                 <span className="text-xs font-medium text-muted-foreground">
-                                                    {date.toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                    })}
+                                                    {(() => {
+                                                        const parts = getLocalDateParts(date);
+                                                        if (!parts) return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                                                        return new Date(parts.year, parts.month, parts.day).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                                                    })()}
                                                 </span>
                                             </div>
                                             <span className="h-7 w-7 rounded-full text-foreground text-[12px] font-medium flex text-left">

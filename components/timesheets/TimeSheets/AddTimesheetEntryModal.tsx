@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { CreateTimesheetRequest, TimesheetWithUser } from "@/types/timesheet.types";
 import { toast } from "@/components/ui/sonner";
 import { formatTaskId } from "@/utils/task-utils";
+import { formatLocalDate } from "@/utils/timezone-utils";
 
 interface AddTimesheetEntryModalProps {
     open: boolean;
@@ -416,7 +417,7 @@ export function AddTimesheetEntryModal({
                                         `}
                                     >
                                         <Calendar className="h-4 w-4 shrink-0" />
-                                        {selectedDate && format(selectedDate, "EEE, MMM dd")}
+                                        {selectedDate && formatLocalDate(selectedDate)}
                                     </Button>
                                 </PopoverTrigger>
 

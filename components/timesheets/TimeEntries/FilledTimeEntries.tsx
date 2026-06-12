@@ -13,6 +13,7 @@ import { FaRegCirclePlay } from "react-icons/fa6";
 import { PiCaretUpDownBold } from "react-icons/pi";
 import { isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { useTimesheetSettingsStore } from "@/stores/timesheet-settings.store";
+import { getLocalDateParts } from "@/utils/timezone-utils";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -203,10 +204,11 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                         </span>
 
                         <span className="text-sm font-medium text-muted-foreground">
-                            {date.toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                            })}
+                            {(() => {
+                                const parts = getLocalDateParts(date);
+                                if (!parts) return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                                return new Date(parts.year, parts.month, parts.day).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                            })()}
                         </span>
                     </div>
 

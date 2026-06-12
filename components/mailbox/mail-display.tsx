@@ -1,4 +1,5 @@
 import { addDays, addHours, format, nextSaturday } from "date-fns";
+import { formatLocalDate, formatLocalTime } from "@/utils/timezone-utils";
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -157,7 +158,7 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
 
               {mail.createdAt && (
                 <div data-testid="mail-date" className="ml-auto text-xs text-muted-foreground">
-                  {format(new Date(mail.createdAt), "PPpp")}
+                  {formatLocalDate(mail.createdAt)}, {formatLocalTime(mail.createdAt)}
                 </div>
               )}
             </div>

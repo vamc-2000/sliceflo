@@ -10,6 +10,7 @@ import { ChevronDown } from "lucide-react";
 import { useTimesheetSettingsStore } from "@/stores/timesheet-settings.store";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useProjectsStore } from "@/stores/projects-store";
+import { formatLocalDate, getLocalDateParts } from "@/utils/timezone-utils";
 
 interface TimesheetBodyProps {
   onAddEntry: (date?: Date) => void;
@@ -125,10 +126,17 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
                 <div className="flex flex-col items-center justify-center">
                   <div className="flex flex-col items-center w-13">
                     <span className="text-xs font-semibold bg-muted text-muted-foreground rounded-t-md px-2 py-1 w-full text-center">
-                      {new Date(date + "T00:00:00").toLocaleDateString("en-US", { month: "short" })}
+                      {(() => {
+                        const parts = getLocalDateParts(date + "T00:00:00");
+                        if (!parts) return "";
+                        return new Date(parts.year, parts.month).toLocaleDateString("en-US", { month: "short" });
+                      })()}
                     </span>
                     <span className="mt-0 text-sm font-semibold bg-primary text-primary-foreground rounded-b-md px-2 py-1 w-full text-center">
-                      {new Date(date + "T00:00:00").getDate()}
+                      {(() => {
+                        const parts = getLocalDateParts(date + "T00:00:00");
+                        return parts?.day ?? new Date(date + "T00:00:00").getDate();
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -136,10 +144,7 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
                 {/* Date + tasks */}
                 <div>
                   <h2 className="text-sm font-semibold">
-                    {new Date(date + "T00:00:00").toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {formatLocalDate(date + "T00:00:00")}
                   </h2>
                   <p className="text-xs text-muted-foreground">
                     Total tasks: {dayEntries.length}

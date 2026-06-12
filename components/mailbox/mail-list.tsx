@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Email } from "@/types/mailbox.types";
 import ProfileModal from "./ProfileModal";
 import { useProfileStore } from "@/stores/profile-store";
+import { formatLocalDate, formatLocalTime } from "@/utils/timezone-utils";
 
 interface MailListProps {
   emails: Email[];
@@ -99,13 +100,12 @@ const MailList: React.FC<MailListProps> = ({
             key={email._id}
             data-testid={`mail-list-item-${email._id}`}
             onClick={() => onEmailSelect(email)}
-            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors border-r-2 border-b ${
-              selectedEmail?._id === email._id
-                ? "bg-muted border-r-brand-orange border-b-transparent text-foreground font-semibold"
-                : email.read
+            className={`flex items-start gap-3 px-4 py-2 cursor-pointer transition-colors border-r-2 border-b ${selectedEmail?._id === email._id
+              ? "bg-muted border-r-brand-orange border-b-transparent text-foreground font-semibold"
+              : email.read
                 ? "bg-background border-r-transparent border-border text-muted-foreground font-normal hover:bg-muted"
                 : "bg-background border-r-transparent border-border text-foreground font-semibold hover:bg-primary/10"
-            }`}
+              }`}
           >
             {/* Email content */}
             <div data-testid={`mail-list-item-content-${email._id}`} className="flex-1 min-w-0">
@@ -161,7 +161,8 @@ const MailList: React.FC<MailListProps> = ({
                 <div data-testid={`mail-list-item-date-${email._id}`} className="flex items-center gap-0 shrink-0">
                   {email.createdAt && (
                     <span className="text-xs text-muted-foreground">
-                      {dayjs(email.createdAt).format("DD MMM, hh:mm A")}
+                      {/* {dayjs(email.createdAt).format("DD MMM, hh:mm A")} */}
+                      {formatLocalDate(email.createdAt)},{formatLocalTime(email.createdAt)}
                     </span>
                   )}
                 </div>

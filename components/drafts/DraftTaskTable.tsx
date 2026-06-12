@@ -1033,7 +1033,7 @@ export function DraftTaskTable({
   const getColumnStyle = (columnId: string, isHeader: boolean = false, rowGroupColor?: string, isSubtask: boolean = false): React.CSSProperties => {
     const columnConfig = visibleColumnConfigs?.find(c => c.id === columnId);
     const alwaysFrozenColumns = {
-      'checkbox': { width: 48, order: -1 },
+      'checkbox': { width: 62, order: -1 },
       'projectSlug': { width: 100, order: 0 },
       'task': { width: columnWidths['task'] ?? 250, order: 1 },
       'project': { width: 140, order: 2 }
@@ -1041,15 +1041,15 @@ export function DraftTaskTable({
     if (alwaysFrozenColumns[columnId as keyof typeof alwaysFrozenColumns]) {
       const config = alwaysFrozenColumns[columnId as keyof typeof alwaysFrozenColumns];
       let leftOffset = 0;
-      if (columnId === 'projectSlug') leftOffset = 48;
-      if (columnId === 'task') leftOffset = 48 + 100;
-      if (columnId === 'project') leftOffset = 48 + 100 + (columnWidths['task'] ?? 250);
+      if (columnId === 'projectSlug') leftOffset = 62;
+      if (columnId === 'task') leftOffset = 62 + 100;
+      if (columnId === 'project') leftOffset = 62 + 100 + (columnWidths['task'] ?? 250);
 
       const baseStyle: React.CSSProperties = {
         position: 'sticky',
         left: `${leftOffset}px`,
         zIndex: isHeader ? 25 : 15,
-        backgroundColor: isHeader ? 'var(--card)' : 'var(--background)',
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--card-bg, var(--card))',
         minWidth: `${config.width}px`,
         width: `${config.width}px`,
         boxShadow: 'inset -1px 0 0 var(--border)',
@@ -1064,7 +1064,7 @@ export function DraftTaskTable({
       return baseStyle;
     }
     if (columnConfig && columnConfig.columnFreezed && !columnConfig.isSystemColumn) {
-      const baseOffset = 48 + 100 + (columnWidths['task'] ?? 250) + 140; // checkbox + slug + task + project
+      const baseOffset = 62 + 100 + (columnWidths['task'] ?? 250) + 140; // checkbox + slug + task + project
       const frozenBefore = visibleColumnConfigs
         .filter(c => c.columnFreezed && c.columnOrder < columnConfig.columnOrder && !c.isSystemColumn)
         .sort((a, b) => a.columnOrder - b.columnOrder);
@@ -1077,7 +1077,7 @@ export function DraftTaskTable({
         position: 'sticky',
         left: `${leftOffset}px`,
         zIndex: isHeader ? 20 : 10,
-        backgroundColor: isHeader ? 'var(--card)' : 'var(--background)',
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--card-bg, var(--card))',
         minWidth: `${w}px`,
         width: `${w}px`,
         boxShadow: 'inset -1px 0 0 var(--border), 2px 0 4px rgba(0,0,0,0.04)',
@@ -1128,32 +1128,54 @@ export function DraftTaskTable({
   const headerCellCls = "!h-9 font-semibold text-xs text-muted-foreground uppercase tracking-wide px-3 py-0 select-none border-r border-border bg-card";
   const bodyCellCls = "!h-9 px-3 py-0 text-xs border-r border-border";
 
+  const renderCheckboxColumnContent = (
+    checkbox: React.ReactNode,
+    expandToggle?: React.ReactNode,
+    isSubtask: boolean = false
+  ) => (
+    <div className={cn(
+      "relative flex h-9 w-full items-center",
+      isSubtask ? "pl-8" : "pl-6"
+    )}>
+      <div className="absolute left-2 top-1/2 z-[1] flex h-4 w-4 -translate-y-1/2 items-center justify-center">
+        {expandToggle ?? <div className="h-4 w-4" aria-hidden />}
+      </div>
+      <div className="flex h-4 w-4 items-center justify-center shrink-0">
+        {checkbox}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <div className="relative">
-        <div className="overflow-x-auto rounded-tl-sm">
-          <Table className="relative border-y border-border text-xs">
+        <div className="overflow-x-auto rounded-tl-sm w-full">
+          <Table className="relative border-y border-border text-xs min-w-full">
 
             {/*   Column Headers   */}
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
                 {/* Checkbox */}
-                <TableHead className={headerCellCls} style={getColumnStyle('checkbox', true, groupColor)}>
-                  <div className="flex items-center pl-1">
-                    <Checkbox
-                      checked={(() => {
-                        const totalSelectable = groupTasks.length + groupTasks.reduce((acc, t) => acc + (getSubtasksByTask(t.id)?.length || 0), 0);
-                        return totalSelectable > 0 && selectedTaskIds.size >= totalSelectable;
-                      })()}
-                      onCheckedChange={toggleSelectAll}
-                      className="rounded"
-                    />
+                <TableHead className={cn(headerCellCls, "!px-0")} style={getColumnStyle('checkbox', true, groupColor)}>
+                  <div className="flex h-9 w-full items-center pl-6">
+                    <div className="flex h-4 w-4 items-center justify-center shrink-0">
+                      <Checkbox
+                        checked={(() => {
+                          const totalSelectable = groupTasks.length + groupTasks.reduce((acc, t) => acc + (getSubtasksByTask(t.id)?.length || 0), 0);
+                          return totalSelectable > 0 && selectedTaskIds.size >= totalSelectable;
+                        })()}
+                        onCheckedChange={toggleSelectAll}
+                        className="rounded"
+                      />
+                    </div>
                   </div>
                 </TableHead>
 
                 {/* Slug */}
-                <TableHead className={`${headerCellCls} text-center relative group`} style={getColumnStyle('projectSlug', true)}>
-                  <span className="truncate">Project ID</span>
+                <TableHead className={cn(headerCellCls, "text-center relative group bg-card")} style={getColumnStyle('projectSlug', true)}>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="truncate">Project ID</span>
+                  </div>
                   <ResizeHandle
                     columnId="projectSlug"
                     onResize={handleColumnResize}
@@ -1162,8 +1184,8 @@ export function DraftTaskTable({
                 </TableHead>
 
                 {/* Task Name */}
-                <TableHead className={`${headerCellCls} text-center relative group`} style={getColumnStyle("task", true)}>
-                  <div className="flex items-center justify-center gap-2">
+                <TableHead className={cn(headerCellCls, "text-left relative group bg-card")} style={getColumnStyle("task", true)}>
+                  <div className="flex items-center justify-start gap-2">
                     <span>Task</span>
                     {getSortIcon('task', 'text')}
                   </div>
@@ -1175,8 +1197,10 @@ export function DraftTaskTable({
                 </TableHead>
 
                 {/* Project */}
-                <TableHead className={`${headerCellCls} text-center relative group`} style={getColumnStyle('project', true)}>
-                  <span className="truncate">Project</span>
+                <TableHead className={cn(headerCellCls, "text-left relative group bg-card")} style={getColumnStyle('project', true)}>
+                  <div className="flex items-center justify-start gap-2">
+                    <span className="truncate">Project</span>
+                  </div>
                   <ResizeHandle
                     columnId="project"
                     onResize={handleColumnResize}
@@ -1251,31 +1275,32 @@ export function DraftTaskTable({
                     {/*   Main Task Row   */}
                     <TableRow
                       key={task.id}
-                      className="group hover:bg-muted/50 dark:hover:bg-blue-950/20 border-b border-border transition-colors"
+                      className="group border-b border-border transition-colors hover:bg-muted dark:hover:bg-blue-950/20 [--card-bg:var(--card)] hover:[--card-bg:var(--muted)]"
                     // style={{ borderLeft: `4px solid ${groupColor}` }}
                     >
 
                       {/* Checkbox + expand */}
-                      <TableCell className={bodyCellCls} style={getColumnStyle('checkbox', false, groupColor)}>
-                        <div className="flex items-center gap-1">
+                      <TableCell className={cn(bodyCellCls, "!px-0")} style={getColumnStyle('checkbox', false, groupColor)}>
+                        {renderCheckboxColumnContent(
+                          <Checkbox
+                            checked={selectedTaskIds.has(task.id)}
+                            onCheckedChange={() => toggleTaskSelection(task.id)}
+                            className="rounded"
+                          />,
                           <button
+                            type="button"
                             className={cn(
-                              "flex items-center justify-center w-4 h-4 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                              "flex h-4 w-4 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground",
                               (!hasSubtasks || displayOptions.collapsedSubtasks) && "invisible"
                             )}
                             onClick={() => toggleTaskExpansion(task.id)}
                             disabled={!hasSubtasks || displayOptions.collapsedSubtasks}
                           >
                             {isExpanded
-                              ? <ChevronDown className="h-3 w-3" />
-                              : <ChevronRight className="h-3 w-3" />}
+                              ? <ChevronDown className="h-3.5 w-3.5" />
+                              : <ChevronRight className="h-3.5 w-3.5" />}
                           </button>
-                          <Checkbox
-                            checked={selectedTaskIds.has(task.id)}
-                            onCheckedChange={() => toggleTaskSelection(task.id)}
-                            className="rounded"
-                          />
-                        </div>
+                        )}
                       </TableCell>
 
                       {/* Slug Cell */}
@@ -1557,7 +1582,7 @@ export function DraftTaskTable({
                           position: 'sticky',
                           right: 0,
                           zIndex: 10,
-                          backgroundColor: 'var(--card)',
+                          backgroundColor: 'var(--card-bg)',
                           borderLeft: '1px solid var(--border)',
                           boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                           padding: 0,
@@ -1614,17 +1639,19 @@ export function DraftTaskTable({
                       return (
                         <TableRow
                           key={subtask.id}
-                          className="group hover:bg-blue-50/30 dark:hover:bg-blue-950/20 border-b border-border transition-colors"
+                          className="group border-b border-border transition-colors hover:bg-blue-50/30 dark:hover:bg-blue-950/20 [--card-bg:var(--card)] hover:[--card-bg:#f5f8ff] dark:hover:[--card-bg:#132247]"
                         >
                           {/* Subtask Checkbox */}
-                          <TableCell className={bodyCellCls} style={getColumnStyle('checkbox', false, groupColor, true)}>
-                            <div className="flex items-center pl-6">
+                          <TableCell className={cn(bodyCellCls, "!px-0")} style={getColumnStyle('checkbox', false, groupColor, true)}>
+                            {renderCheckboxColumnContent(
                               <Checkbox
                                 checked={selectedTaskIds.has(subtask.id)}
                                 onCheckedChange={() => toggleTaskSelection(subtask.id)}
                                 className="rounded"
-                              />
-                            </div>
+                              />,
+                              undefined,
+                              true
+                            )}
                           </TableCell>
 
                           {/* Subtask Slug */}
@@ -1911,17 +1938,18 @@ export function DraftTaskTable({
                     {isExpanded && (
                       addingSubtaskToTask === task.id && (
                         /* INPUT state   shown after clicking "Add Subtask" */
-                        <TableRow className="border-b border-border">
+                        <TableRow className="border-b border-border [--card-bg:var(--card)]">
                           {/* Add Subtask Checkbox Placeholder */}
-                          <TableCell className={bodyCellCls} style={getColumnStyle('checkbox', false, `${groupColor}44`)}>
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="w-4 h-4 invisible" /> {/* expand-toggle spacer */}
-                              <div className="w-4 h-4 rounded border-2 border-border flex-shrink-0" />
-                            </div>
+                          <TableCell className={cn(bodyCellCls, "!px-0")} style={getColumnStyle('checkbox', false, `${groupColor}44`)}>
+                            {renderCheckboxColumnContent(
+                              <div className="w-4 h-4 rounded border-2 border-border flex-shrink-0" />,
+                              undefined,
+                              true
+                            )}
                           </TableCell>
 
                           {/* Add Subtask Slug Placeholder */}
-                          <TableCell style={getColumnStyle('projectSlug', false)} />
+                          <TableCell className={bodyCellCls} style={getColumnStyle('projectSlug', false)} />
 
                           <TableCell className={bodyCellCls} style={getColumnStyle('task', false)}>
                             <div className="pl-2">
@@ -1943,7 +1971,7 @@ export function DraftTaskTable({
                           </TableCell>
 
                           {/* Add Subtask Project Placeholder */}
-                          <TableCell style={getColumnStyle('project', false)} />
+                          <TableCell className={bodyCellCls} style={getColumnStyle('project', false)} />
 
                           {/*   Inline field pickers for subtask add row */}
                           {headers.map(h => {
@@ -2194,21 +2222,24 @@ export function DraftTaskTable({
 
                           {/* Save / Cancel */}
                           <TableCell
-                            className={cn(bodyCellCls, "w-12")}
+                            className={bodyCellCls}
                             style={{
                               position: 'sticky',
                               right: 0,
                               zIndex: 10,
-                              backgroundColor: 'var(--card)',
+                              backgroundColor: 'var(--card-bg, var(--card))',
                               borderLeft: '1px solid var(--border)',
                               boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
                               padding: 0,
+                              minWidth: '140px',
+                              width: '140px',
+                              maxWidth: '140px',
                             }}
                           >
-                            <div className="flex gap-1">
+                            <div className="flex items-center justify-center gap-1.5 w-full h-full">
                               <button
                                 onClick={() => handleSaveSubtask(task.id)}
-                                className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                                className="px-2 py-0.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors text-xs"
                               >
                                 Save
                               </button>
@@ -2217,7 +2248,7 @@ export function DraftTaskTable({
                                   setAddingSubtaskToTask(null);
                                   setNewSubtaskData({ name: '', taskType: 'subtask', assignee: '', startDate: new Date(), endDate: undefined, priority: '', status: '', customFieldValues: {} });
                                 }}
-                                className="px-2 py-1 border border-border rounded hover:bg-muted transition-colors"
+                                className="px-2 py-0.5 border border-border rounded hover:bg-muted transition-colors text-xs"
                               >
                                 Cancel
                               </button>
@@ -2232,7 +2263,7 @@ export function DraftTaskTable({
 
               {/*   Add Task Button Row   */}
               <TableRow
-                className="bg-card hover:bg-card border-b border-border"
+                className="group border-b border-border transition-colors hover:bg-muted [--card-bg:var(--card)] hover:[--card-bg:var(--muted)]"
                 onMouseEnter={() => setIsAddTaskRowHovered(true)}
                 onMouseLeave={() => setIsAddTaskRowHovered(false)}
                 onClick={onDraftTask}
@@ -2242,7 +2273,6 @@ export function DraftTaskTable({
                 <TableCell
                   className={bodyCellCls}
                   style={getColumnStyle('task', false)}
-                  colSpan={headers.length + 3}
                 >
                   <div className="flex items-center gap-1 pl-4">
                     <div className={cn(
@@ -2261,6 +2291,21 @@ export function DraftTaskTable({
                     </div>
                   </div>
                 </TableCell>
+                <TableCell style={getColumnStyle('project', false)} className={bodyCellCls} />
+                <TableCell className={bodyCellCls} colSpan={headers.length} />
+                <TableCell
+                  style={{
+                    position: 'sticky',
+                    right: 0,
+                    zIndex: 10,
+                    backgroundColor: 'var(--card-bg, var(--card))',
+                    borderLeft: '1px solid var(--border)',
+                    boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
+                    padding: 0,
+                    margin: 0,
+                  }}
+                  className="w-[140px]"
+                />
               </TableRow>
             </TableBody>
           </Table>

@@ -12,8 +12,8 @@ import { useTasksStore } from "@/stores/tasks-store";
 import type { TimesheetStatus, TimesheetWithUser } from "@/types/timesheet.types";
 import { TimesheetReviewModal } from "./TimesheetReviewModal";
 import EmptyTeamsTimesheet from "./EmptyTeamsTimesheet";
-import { format } from "date-fns";
 import { Loader } from "@/components/Loader";
+import { formatLocalDate } from "@/utils/timezone-utils";
 
 // ─── UI-layer types ────────────────────────────────────────────────────────────
 type UITimesheetStatus = "Rejected" | "Pending" | "Approved" | "NotSent";
@@ -58,10 +58,10 @@ function minutesToHrsMin(minutes: number): string {
 
 function formatPeriod(weekStart: string | null, entries: TimesheetWithUser[]): string {
   if (weekStart) {
-    const start = new Date(weekStart);
-    const end = new Date(weekStart);
+    const start = new Date(weekStart + "T00:00:00");
+    const end = new Date(weekStart + "T00:00:00");
     end.setDate(end.getDate() + 6);
-    return `${start.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} through ${end.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
+    return `${formatLocalDate(start)} through ${formatLocalDate(end)}`;
   }
   if (entries.length > 0) return entries[0].weekStart;
   return "";
@@ -238,7 +238,7 @@ function EntryRow({ entry }: { entry: TimesheetEntry }) {
           Date
         </p>
         <p className="text-sm text-foreground">
-          {entry.date ? format(new Date(entry.date), "EEE, MMM dd") : "-"}
+          {entry.date ? formatLocalDate(entry.date + "T00:00:00") : "-"}
         </p>
       </div>
       <div>
