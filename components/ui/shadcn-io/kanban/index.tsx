@@ -15,6 +15,7 @@ import {
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
+  useDndContext,
   useDroppable,
   useSensor,
   useSensors,
@@ -72,18 +73,12 @@ export type KanbanBoardProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const KanbanBoard = ({ id, children, className, style, ...props }: KanbanBoardProps) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id,
-  });
-
   return (
     <div
       className={cn(
-        'flex flex-col h-full min-h-40 divide-y overflow-hidden rounded-md border bg-secondary text-xs shadow-sm ring-2 transition-all',
-        isOver ? 'ring-primary' : 'ring-transparent',
+        'flex flex-col h-full min-h-40 divide-y overflow-hidden rounded-md border bg-secondary text-xs shadow-sm transition-all',
         className
       )}
-      ref={setNodeRef}
       style={style}
       {...props}
     >
@@ -96,6 +91,7 @@ export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
   children?: ReactNode;
   className?: string;
   onCardClick?: () => void;
+  disabled?: boolean;
 };
 
 export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
@@ -104,6 +100,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   children,
   className,
   onCardClick,
+  disabled,
 }: KanbanCardProps<T>) => {
   const {
     attributes,
@@ -114,47 +111,13 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     isDragging,
   } = useSortable({
     id,
+    disabled,
   });
   const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-  };
-
-  // ✅ Track drag enabled state
-  const [dragEnabled, setDragEnabled] = React.useState(false);
-  const longPressTimer = React.useRef<NodeJS.Timeout | null>(null);
-  const clickCount = React.useRef(0);
-  const clickTimer = React.useRef<NodeJS.Timeout | null>(null);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    // Start long press timer
-    longPressTimer.current = setTimeout(() => {
-      setDragEnabled(true);
-    }, 500); // 500ms long press
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    // Clear long press timer
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-    }
-
-    // Reset drag after a delay
-    setTimeout(() => {
-      setDragEnabled(false);
-    }, 100);
-  };
-
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDragEnabled(true);
-
-    // Reset after drag opportunity
-    setTimeout(() => {
-      setDragEnabled(false);
-    }, 2000); // 2 seconds to start drag
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -164,7 +127,8 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
     if (
       target.closest('button') ||
       target.closest('input') ||
-      target.closest('[role="button"]')
+      target.closest('[role="button"]') ||
+      target.closest('a')
     ) {
       return;
     }
@@ -178,17 +142,14 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
         ref={setNodeRef}
         style={style}
         className="touch-none"
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
       >
         <Card
-          {...(dragEnabled ? listeners : {})} // ✅ Only apply listeners when drag enabled
-          {...(dragEnabled ? attributes : {})}
+          {...(!disabled ? listeners : {})}
+          {...(!disabled ? attributes : {})}
           onClick={handleClick}
-          onDoubleClick={handleDoubleClick}
           className={cn(
             'cursor-pointer gap-4 rounded-md p-3 shadow-sm transition-all',
-            dragEnabled && 'cursor-grab ring-2 ring-blue-400',
+            !disabled && 'cursor-grab',
             isDragging && 'cursor-grabbing opacity-30',
             className
           )}
@@ -216,29 +177,48 @@ export type KanbanCardsProps<T extends KanbanItemProps = KanbanItemProps> =
   Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'id'> & {
     children: (item: T) => ReactNode;
     id: string;
+    footer?: ReactNode;
   };
 
 export const KanbanCards = <T extends KanbanItemProps = KanbanItemProps>({
   children,
   className,
+  id,
+  footer,
   ...props
 }: KanbanCardsProps<T>) => {
   const { data } = useContext(KanbanContext) as KanbanContextProps<T>;
-  const filteredData = data.filter((item) => item.column === props.id);
+  const filteredData = data.filter((item) => item.column === id);
   const items = filteredData.map((item) => item.id);
 
+  const { isOver, setNodeRef } = useDroppable({
+    id,
+  });
+
+  const { over } = useDndContext();
+  const isOverThisColumn = isOver || (over && (over.id === id || items.includes(over.id as string)));
+
   return (
-    <ScrollArea className="overflow-hidden">
-      <SortableContext items={items}>
-        <div
-          className={cn('flex flex-grow flex-col gap-2 p-2', className)}
-          {...(props as any)}
-        >
-          {filteredData.map(children)}
-        </div>
-      </SortableContext>
-      <ScrollBar orientation="vertical" />
-    </ScrollArea>
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "flex-1 min-h-0 flex flex-col transition-all rounded-md",
+        isOverThisColumn && "ring-2 ring-primary bg-secondary/50"
+      )}
+    >
+      <ScrollArea className="flex-grow overflow-hidden">
+        <SortableContext items={items}>
+          <div
+            className={cn('flex flex-col gap-2 p-2', className)}
+            {...(props as any)}
+          >
+            {filteredData.map(children)}
+            {footer}
+          </div>
+        </SortableContext>
+        <ScrollBar orientation="vertical" />
+      </ScrollArea>
+    </div>
   );
 };
 
@@ -279,8 +259,17 @@ export const KanbanProvider = <
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor)
   );
 
@@ -315,9 +304,20 @@ export const KanbanProvider = <
     if (activeColumn !== overColumn) {
       let newData = [...data];
       const activeIndex = newData.findIndex((item) => item.id === active.id);
-      const overIndex = newData.findIndex((item) => item.id === over.id);
+      let overIndex = newData.findIndex((item) => item.id === over.id);
 
       newData[activeIndex].column = overColumn;
+
+      if (overIndex === -1) {
+        const columnTasks = newData.filter(item => item.column === overColumn && item.id !== active.id);
+        if (columnTasks.length > 0) {
+          const lastColumnTask = columnTasks[columnTasks.length - 1];
+          overIndex = newData.findIndex(item => item.id === lastColumnTask.id);
+        } else {
+          overIndex = newData.length;
+        }
+      }
+
       newData = arrayMove(newData, activeIndex, overIndex);
 
       onDataChange?.(newData);
@@ -340,7 +340,20 @@ export const KanbanProvider = <
     let newData = [...data];
 
     const oldIndex = newData.findIndex((item) => item.id === active.id);
-    const newIndex = newData.findIndex((item) => item.id === over.id);
+    let newIndex = newData.findIndex((item) => item.id === over.id);
+
+    if (newIndex === -1) {
+      const overColumn =
+        columns.find(col => col.id === over.id)?.id ||
+        columns[0]?.id;
+      const columnTasks = newData.filter(item => item.column === overColumn && item.id !== active.id);
+      if (columnTasks.length > 0) {
+        const lastColumnTask = columnTasks[columnTasks.length - 1];
+        newIndex = newData.findIndex(item => item.id === lastColumnTask.id);
+      } else {
+        newIndex = newData.length;
+      }
+    }
 
     newData = arrayMove(newData, oldIndex, newIndex);
 

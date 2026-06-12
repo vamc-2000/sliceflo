@@ -1028,14 +1028,19 @@ export const GanttFeatureDragHelper: FC<GanttFeatureDragHelperProps> = ({
 export type GanttFeatureItemCardProps = Pick<GanttFeature, "id" | "color"> & {
   children?: ReactNode
   hideLabels?: boolean
+  disabled?: boolean
 }
 
-export const GanttFeatureItemCard: FC<GanttFeatureItemCardProps> = ({ id, color, children, hideLabels }) => {
+export const GanttFeatureItemCard: FC<GanttFeatureItemCardProps> = ({ id, color, children, hideLabels, disabled }) => {
   const [, setDragging] = useGanttDragging()
-  const { attributes, listeners, setNodeRef } = useDraggable({ id })
+  const { attributes, listeners, setNodeRef } = useDraggable({ id, disabled })
   const isPressed = Boolean(attributes["aria-pressed"])
 
-  useEffect(() => setDragging(isPressed), [isPressed, setDragging])
+  useEffect(() => {
+    if (!disabled) {
+      setDragging(isPressed)
+    }
+  }, [isPressed, setDragging, disabled])
 
   return (
     <Card
@@ -1048,12 +1053,13 @@ export const GanttFeatureItemCard: FC<GanttFeatureItemCardProps> = ({ id, color,
       <div
         className={cn(
           "flex h-full w-full items-center justify-between gap-2 text-left font-medium",
-          isPressed && "cursor-grabbing",
+          isPressed && !disabled && "cursor-grabbing",
+          !disabled && "cursor-grab",
           hideLabels && "invisible"
         )}
-        {...attributes}
-        {...listeners}
-        ref={setNodeRef}
+        {...(!disabled ? attributes : {})}
+        {...(!disabled ? listeners : {})}
+        ref={!disabled ? setNodeRef : undefined}
       >
         {children}
       </div>
@@ -1066,6 +1072,7 @@ export type GanttFeatureItemProps = GanttFeature & {
   children?: ReactNode
   className?: string
   hideLabels?: boolean // Dynamic hide
+  disabled?: boolean
 }
 
 export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
@@ -1073,6 +1080,7 @@ export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
   children,
   className,
   hideLabels = false, // Default to false for backward compatibility
+  disabled,
   ...feature
 }) => {
   const [scrollX] = useGanttScrollX()
@@ -1163,7 +1171,7 @@ export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
           left: Math.round(offset),
         }}
       >
-        {onMove && (
+        {onMove && !disabled && (
           <DndContext
             modifiers={[restrictToHorizontalAxis]}
             onDragEnd={onDragEnd}
@@ -1184,11 +1192,12 @@ export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
             id={feature.id}
             hideLabels={hideLabels}
             color={feature.color}
+            disabled={disabled}
           >
             {children ?? <p className="flex-1 truncate text-xs">{feature.name}</p>}
           </GanttFeatureItemCard>
         </DndContext>
-        {onMove && (
+        {onMove && !disabled && (
           <DndContext
             modifiers={[restrictToHorizontalAxis]}
             onDragEnd={onDragEnd}

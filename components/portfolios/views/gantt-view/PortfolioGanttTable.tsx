@@ -227,11 +227,6 @@ export const PortfolioGanttTable = forwardRef<
 
   const [isAddProjectRowHovered, setIsAddProjectRowHovered] = useState(false);
   const [showAddProjectMenu, setShowAddProjectMenu] = useState(false);
-  const [addProjectMenuCoords, setAddProjectMenuCoords] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
-  const chevronButtonRef = useRef<HTMLButtonElement>(null);
 
   const key = `${portfolioId}-gantt`;
   const defaultVisible = ["id", "name", "phase"];
@@ -439,15 +434,15 @@ export const PortfolioGanttTable = forwardRef<
                           className={cn(
                             "px-2 py-0.5 text-[10px] font-medium h-5",
                             !updateConfig &&
-                              "bg-gray-100 text-gray-700 hover:bg-gray-200",
+                            "bg-gray-100 text-gray-700 hover:bg-gray-200",
                           )}
                           variant="secondary"
                           style={
                             updateConfig
                               ? {
-                                  backgroundColor: updateConfig.color + "15",
-                                  color: updateConfig.color,
-                                }
+                                backgroundColor: updateConfig.color + "15",
+                                color: updateConfig.color,
+                              }
                               : undefined
                           }
                         >
@@ -564,7 +559,6 @@ export const PortfolioGanttTable = forwardRef<
             onMouseEnter={() => setIsAddProjectRowHovered(true)}
             onMouseLeave={() => {
               setIsAddProjectRowHovered(false);
-              setShowAddProjectMenu(false);
             }}
           >
             {isVisible("id") && <td className={bodyCellCls} style={getColumnStyle("id")} />}
@@ -601,67 +595,51 @@ export const PortfolioGanttTable = forwardRef<
                       Add New Project
                     </button>
 
-                    {(isAddProjectRowHovered || showAddProjectMenu) && (
-                      <div className="relative">
+                    <DropdownMenu open={showAddProjectMenu} onOpenChange={setShowAddProjectMenu}>
+                      <DropdownMenuTrigger asChild>
                         <button
-                          ref={chevronButtonRef}
-                          className="px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (
-                              !showAddProjectMenu &&
-                              chevronButtonRef.current
-                            ) {
-                              const rect =
-                                chevronButtonRef.current.getBoundingClientRect();
-                              const dropdownHeight = 84; // Approx height for 2 items
-                              setAddProjectMenuCoords({
-                                top: rect.top - dropdownHeight - 4,
-                                left: rect.left,
-                              });
-                            }
-                            setShowAddProjectMenu((prev) => !prev);
-                          }}
+                          className={cn(
+                            "px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors outline-none",
+                            !(isAddProjectRowHovered || showAddProjectMenu) && "invisible"
+                          )}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <ChevronUp className="h-3 w-3 text-primary/60" />
                         </button>
-
-                        {showAddProjectMenu && addProjectMenuCoords && (
-                          <div
-                            style={{
-                              position: "fixed",
-                              top: addProjectMenuCoords.top,
-                              left: addProjectMenuCoords.left,
-                              zIndex: 9999,
+                      </DropdownMenuTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuContent
+                          align="start"
+                          side="top"
+                          className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[140px] z-[9999]"
+                        >
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setShowAddProjectMenu(false);
+                              router.push(`/portfolio/${portfolioId}/create-project`);
                             }}
-                            className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] overflow-hidden"
+                            className="text-xs cursor-pointer"
                           >
-                            <button
-                              onClick={() => {
-                                setShowAddProjectMenu(false);
-                                router.push(
-                                  `/portfolio/${portfolioId}/create-project`,
-                                );
-                              }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left"
-                            >
-                              <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                              <Plus className="w-3.5 h-3.5 text-muted-foreground" />
                               <span>Add new project</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                setShowAddProjectMenu(false);
-                                onAddProject?.();
-                              }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors text-left border-t border-border"
-                            >
-                              <LinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                            </div>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setShowAddProjectMenu(false);
+                              onAddProject?.();
+                            }}
+                            className="text-xs cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <LinkIcon className="w-3.5 h-3.5 text-muted-foreground" />
                               <span>Add existing project</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                            </div>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenu>
                   </div>
                 </div>
               </td>

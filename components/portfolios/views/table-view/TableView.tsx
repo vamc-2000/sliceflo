@@ -866,6 +866,7 @@ export function TableView({ portfolioId }: TableViewProps) {
                 projects={filteredProjects} 
                 onAddProject={() => setOpenLinkProjectDialog(true)} 
                 viewType="table"
+                groupColor="var(--primary)"
               />
             </div>
           )}

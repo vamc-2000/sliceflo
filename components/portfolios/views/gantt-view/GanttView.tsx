@@ -1074,6 +1074,7 @@ export function GanttView({ portfolioId }: GanttViewProps) {
                                                     {...feature}
                                                     onMove={handleMoveFeature}
                                                     hideLabels={false}
+                                                    disabled={true}
                                                 />
                                             ) : (   
                                                 <div key={project.id} style={{ height: 36 }} className="border-b border-gray-100/50" />

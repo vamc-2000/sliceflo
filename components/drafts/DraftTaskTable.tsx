@@ -1148,9 +1148,15 @@ export function DraftTaskTable({
 
   return (
     <>
+      <style>{`
+        .draft-table-separate td,
+        .draft-table-separate th {
+          border-bottom: 1px solid var(--border) !important;
+        }
+      `}</style>
       <div className="relative">
         <div className="overflow-x-auto rounded-tl-sm w-full">
-          <Table className="relative border-y border-border text-xs min-w-full">
+          <Table className="relative border-y border-border text-xs min-w-full draft-table-separate" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
 
             {/*   Column Headers   */}
             <TableHeader>

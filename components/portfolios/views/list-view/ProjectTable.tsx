@@ -45,6 +45,13 @@ const getInitials = (name?: string): string => {
   return parts.slice(0, 2).map(p => p[0]).join("").toUpperCase();
 };
 
+const getOpacityColor = (color: string, opacityHex: string, opacityPercent: number) => {
+  if (color.startsWith("var(")) {
+    return `color-mix(in srgb, ${color} ${opacityPercent}%, transparent)`;
+  }
+  return `${color}${opacityHex}`;
+};
+
 const AvatarGroup = ({ users, max = 3, label }: { users: any[], max?: number, label?: string }) => {
   if (!users || users.length === 0) return <span className="text-gray-400">—</span>;
   const visibleUsers = users.slice(0, max);
@@ -274,19 +281,23 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
       return {
         ...baseStyle,
         position: 'sticky',
-        left: '39px',
+        left: '0px',
         zIndex: isHeader ? 30 : 20,
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--card-bg, var(--card))',
+        borderLeft: '1px solid var(--border)',
         borderRight: '1px solid var(--border)',
       };
     }
 
     if (columnId === 'name') {
-      const leftOffset = isVisible("id") ? 39 + (columnWidths['id'] ?? 80) : 39;
+      const leftOffset = isVisible("id") ? (columnWidths['id'] ?? 80) : 0;
+      const finalLeft = isVisible("id") ? leftOffset - 1 : 0;
       return {
         ...baseStyle,
         position: 'sticky',
-        left: `${leftOffset - 1}px`,
+        left: `${finalLeft}px`,
         zIndex: isHeader ? 30 : 20,
+        backgroundColor: isHeader ? 'var(--card)' : 'var(--card-bg, var(--card))',
         boxShadow: 'inset -1px 0 0 var(--border), 2px 0 4px rgba(0,0,0,0.04)',
       };
     }
@@ -384,14 +395,25 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
   return (
     <>
+      <style>{`
+        .project-table-separate td,
+        .project-table-separate th {
+          border-bottom: 1px solid var(--border) !important;
+        }
+      `}</style>
       <div className="relative w-full">
         <div className="overflow-x-auto rounded-tl-sm w-full">
-          <Table className="relative border-y border-border text-xs min-w-full">
+          <Table className="relative border-y border-border text-xs min-w-full project-table-separate" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead className="!h-9 select-none border-r border-border bg-muted p-0" style={getDragColumnStyle(true)} />
                 {isVisible("id") && (
-                  <TableHead className={cn(headerCellCls, "text-center relative group bg-card")} style={getColumnStyle("id", true)}>
+                  <TableHead
+                    className={cn(headerCellCls, "text-center relative group bg-card")}
+                    style={{
+                      ...getColumnStyle("id", true),
+                      borderLeft: `4px solid ${groupColor}`,
+                    }}
+                  >
                     ID
                     <ResizeHandle
                       columnId="id"
@@ -528,9 +550,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     position: 'sticky',
                     right: 0,
                     zIndex: 30,
-                    borderLeft: '1px solid var(--border)',
-                    boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                    padding: 0,
+                    borderRight: '1px solid var(--border)',
+                    padding: '0 2px',
                     margin: 0,
                   }}
                 >
@@ -563,16 +584,15 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                 return (
                   <TableRow
                     key={project.id || index}
-                    className="group hover:bg-muted transition-colors border-b border-border last:border-0"
+                    className="group border-b border-border last:border-0 transition-colors hover:bg-muted [--card-bg:var(--card)] hover:[--card-bg:var(--muted)]"
                   >
-                    <TableCell className="p-0 bg-card group-hover:bg-muted" style={getDragColumnStyle(false)}>
-                      <GripVertical className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 cursor-grab mx-auto" />
-                    </TableCell>
-
                     {isVisible("id") && (
                       <TableCell
                         className={cn(bodyCellCls, "text-center bg-card group-hover:bg-muted")}
-                        style={getColumnStyle("id", false)}
+                        style={{
+                          ...getColumnStyle("id", false),
+                          borderLeft: `4px solid ${groupColor}`,
+                        }}
                       >
                         <Link
                           href={`/project/${project.id}`}
@@ -956,9 +976,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         position: 'sticky',
                         right: 0,
                         zIndex: 20,
-                        borderLeft: '1px solid var(--border)',
-                        boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                        padding: 0,
+                        borderRight: '1px solid var(--border)',
+                        padding: '0 2px',
                         margin: 0,
                       }}
                     >
@@ -1012,13 +1031,18 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
 
               {/* Add Project row */}
               <TableRow
-                className="group border-b border-border bg-card hover:bg-card"
+                className="group border-b border-border bg-card hover:bg-card [--card-bg:var(--card)]"
                 onMouseEnter={() => setIsAddProjectRowHovered(true)}
                 onMouseLeave={() => setIsAddProjectRowHovered(false)}
               >
-                <TableCell className="p-0 bg-card" style={getDragColumnStyle(false, `${groupColor}44`)} />
                 {isVisible("id") && (
-                  <TableCell className={cn(bodyCellCls, "text-transparent bg-card")} style={getColumnStyle("id", false)} />
+                  <TableCell
+                    className={cn(bodyCellCls, "text-transparent bg-card")}
+                    style={{
+                      ...getColumnStyle("id", false),
+                      borderLeft: `4px solid ${getOpacityColor(groupColor, "44", 25)}`,
+                    }}
+                  />
                 )}
                 <TableCell
                   className={cn(bodyCellCls, "bg-card")}
@@ -1120,9 +1144,8 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     position: 'sticky',
                     right: 0,
                     zIndex: 20,
-                    borderLeft: '1px solid var(--border)',
-                    boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                    padding: 0,
+                    borderRight: '1px solid var(--border)',
+                    padding: '0 2px',
                     margin: 0,
                   }}
                 />

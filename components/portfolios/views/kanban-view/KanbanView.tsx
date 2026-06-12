@@ -187,10 +187,10 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
       const updatedFields = prev.map((field) =>
         field.id === fieldId
           ? {
-              ...field,
-              isSelected: !field.isSelected,
-              direction: !field.isSelected ? ("asc" as const) : null,
-            }
+            ...field,
+            isSelected: !field.isSelected,
+            direction: !field.isSelected ? ("asc" as const) : null,
+          }
           : field
       );
 
@@ -212,9 +212,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
       prev.map((field) =>
         field.id === fieldId
           ? {
-              ...field,
-              direction,
-            }
+            ...field,
+            direction,
+          }
           : field
       )
     );
@@ -710,9 +710,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className={`p-0 transition-all duration-200 border-b-[5px] border-b-primary ${
-                      hasSelectedSortFields ? "w-155" : "w-105"
-                    }`}
+                    className={`p-0 transition-all duration-200 border-b-[5px] border-b-primary ${hasSelectedSortFields ? "w-155" : "w-105"
+                      }`}
                   >
                     <div className="flex items-center justify-between px-4 py-3">
                       <h3 className="text-sm font-semibold text-primary">Sort fields by</h3>
@@ -729,9 +728,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                               className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
                             >
                               <div
-                                className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${
-                                  field.isSelected ? "bg-primary border-primary" : "border-input"
-                                }`}
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${field.isSelected ? "bg-primary border-primary" : "border-input"
+                                  }`}
                               >
                                 {field.isSelected && (
                                   <svg
@@ -814,11 +812,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             <DropdownMenuItem
                               key={member.userId}
                               onClick={() => {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'leader');
-                                    if (existing) return prev.map(f => f.field === 'leader' ? { ...f, value: member.userId } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'leader', condition: 'contains', value: member.userId }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'leader');
+                                  if (existing) return prev.map(f => f.field === 'leader' ? { ...f, value: member.userId } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'leader', condition: 'contains', value: member.userId }];
+                                });
                               }}
                               className="flex items-center gap-2 p-2 cursor-pointer text-xs"
                             >
@@ -849,11 +847,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             <DropdownMenuItem
                               key={member.userId}
                               onClick={() => {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'members');
-                                    if (existing) return prev.map(f => f.field === 'members' ? { ...f, value: member.userId } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'members', condition: 'contains', value: member.userId }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'members');
+                                  if (existing) return prev.map(f => f.field === 'members' ? { ...f, value: member.userId } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'members', condition: 'contains', value: member.userId }];
+                                });
                               }}
                               className="flex items-center gap-2 p-2 cursor-pointer text-xs"
                             >
@@ -887,11 +885,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             <DropdownMenuItem
                               key={phase.value}
                               onClick={() => {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'phase');
-                                    if (existing) return prev.map(f => f.field === 'phase' ? { ...f, value: phase.value } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'phase', condition: 'is', value: phase.value }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'phase');
+                                  if (existing) return prev.map(f => f.field === 'phase' ? { ...f, value: phase.value } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'phase', condition: 'is', value: phase.value }];
+                                });
                               }}
                               className="flex items-center gap-2 cursor-pointer text-xs"
                             >
@@ -917,11 +915,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             <DropdownMenuItem
                               key={cfg.value}
                               onClick={() => {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'update');
-                                    if (existing) return prev.map(f => f.field === 'update' ? { ...f, value: cfg.value } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'update', condition: 'is', value: cfg.value }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'update');
+                                  if (existing) return prev.map(f => f.field === 'update' ? { ...f, value: cfg.value } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'update', condition: 'is', value: cfg.value }];
+                                });
                               }}
                               className="flex items-center gap-2 cursor-pointer text-xs"
                             >
@@ -947,11 +945,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             <DropdownMenuItem
                               key={cfg.value}
                               onClick={() => {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'priority');
-                                    if (existing) return prev.map(f => f.field === 'priority' ? { ...f, value: cfg.value } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'priority', condition: 'is', value: cfg.value }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'priority');
+                                  if (existing) return prev.map(f => f.field === 'priority' ? { ...f, value: cfg.value } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'priority', condition: 'is', value: cfg.value }];
+                                });
                               }}
                               className="flex items-center gap-2 cursor-pointer text-xs"
                             >
@@ -972,11 +970,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             mode="single"
                             onSelect={(date) => {
                               if (date) {
-                                  setFilterConfig(prev => {
-                                    const existing = prev.find(f => f.field === 'endDate');
-                                    if (existing) return prev.map(f => f.field === 'endDate' ? { ...f, value: date.toISOString() } : f);
-                                    return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'endDate', condition: 'date-equals', value: date.toISOString() }];
-                                  });
+                                setFilterConfig(prev => {
+                                  const existing = prev.find(f => f.field === 'endDate');
+                                  if (existing) return prev.map(f => f.field === 'endDate' ? { ...f, value: date.toISOString() } : f);
+                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'endDate', condition: 'date-equals', value: date.toISOString() }];
+                                });
                               }
                             }}
                             initialFocus
@@ -1103,11 +1101,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                           />
                         ) : (
                           <>
-                             <h3 className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
-                             <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold">
-                               {kanbanData.filter(item => item.column === column.id).length}
-                             </Badge>
-                            </>
+                            <h3 className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
+                            <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold">
+                              {kanbanData.filter(item => item.column === column.id).length}
+                            </Badge>
+                          </>
                         )}
                       </div>
                       <div className="flex items-center gap-0.5">
@@ -1116,7 +1114,57 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                     </div>
                   </KanbanHeader>
 
-                  <KanbanCards id={column.id} className="gap-2">
+                  <KanbanCards
+                    id={column.id}
+                    className="gap-2"
+                    footer={
+                      <div className="px-2 pb-2">
+                        <div
+                          className="flex items-center justify-between border border-border border-l-4 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all rounded-lg w-full h-10 overflow-hidden bg-card shadow-sm"
+                          style={{ borderLeftColor: column.color }}
+                        >
+                          <button
+                            className="flex-1 flex items-center justify-start gap-2 h-full px-3 text-left focus:outline-none hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer"
+                            onClick={() => handleAddProject(column.id)}
+                          >
+                            <Plus className="h-4 w-4 shrink-0" />
+                            <span>Add Project</span>
+                          </button>
+                          <div className="h-4 w-px bg-border shrink-0" />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className="h-full px-2 flex items-center justify-center hover:bg-black/[0.02] dark:hover:bg-white/[0.02] focus:outline-none shrink-0 cursor-pointer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ChevronUp className="h-3.5 w-3.5 opacity-60" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              side="top"
+                              className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] p-0"
+                            >
+                              <DropdownMenuItem
+                                onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
+                                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none focus:bg-muted"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                <span>Add new project</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setOpenLinkProjectDialog(true)}
+                                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none border-t border-border focus:bg-muted"
+                              >
+                                <LinkIcon className="h-3.5 w-3.5" />
+                                <span>Add existing project</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    }
+                  >
                     {(item) => (
                       <KanbanCard
                         key={item.id}
@@ -1125,57 +1173,12 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                         column={item.column}
                         onCardClick={() => router.push(`/project/${item.id}`)}
                         className="px-2 py-0 border-none bg-transparent shadow-none ring-0 h-auto"
+                        disabled={true}
                       >
                         <PortfolioKanbanCard project={item.project as any} groupColor={column.color} />
                       </KanbanCard>
                     )}
                   </KanbanCards>
-
-                  <div className="px-4 pb-4">
-                    <div
-                      className="flex items-center justify-between border border-input text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors rounded-md w-full h-8 overflow-hidden bg-card"
-                      style={{ borderLeft: `4px solid ${column.color}80` }}
-                    >
-                      <button
-                        className="flex-1 flex items-center justify-start gap-2 h-full px-3 text-left focus:outline-none hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer"
-                        onClick={() => handleAddProject(column.id)}
-                      >
-                        <Plus className="h-4 w-4 shrink-0" />
-                        <span>Add Project</span>
-                      </button>
-                      <div className="h-4 w-px bg-border shrink-0" />
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className="h-full px-2 flex items-center justify-center hover:bg-black/[0.02] dark:hover:bg-white/[0.02] focus:outline-none shrink-0 cursor-pointer"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <ChevronUp className="h-3.5 w-3.5 opacity-60" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          side="top"
-                          className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] p-0"
-                        >
-                          <DropdownMenuItem
-                            onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none focus:bg-muted"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                            <span>Add new project</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setOpenLinkProjectDialog(true)}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none border-t border-border focus:bg-muted"
-                          >
-                            <LinkIcon className="h-3.5 w-3.5" />
-                            <span>Add existing project</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
                 </KanbanBoard>
               )}
             </KanbanProvider>
