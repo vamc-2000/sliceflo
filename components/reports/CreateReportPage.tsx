@@ -100,16 +100,16 @@ export default function CreateReportPage({
   }
 
   return (
-    <div className="bg-white flex flex-col w-full min-h-full">
+    <div className="bg-background text-foreground flex flex-col w-full min-h-full">
       <div className="flex-1 flex flex-col ">
-        <div className="w-full px-0 py-3 bg-white">
+        <div className="w-full px-0 py-3 bg-background">
           <div className=" space-y-2">
 
             {/* Team Info Section */}
-            <div style={{ backgroundColor: '#F2F2F7' }} className="rounded-lg p-4">
+            <div className="bg-[#F2F2F7] dark:bg-muted/30 rounded-lg p-4">
               <div className="flex items-start gap-4">
                 <div className="w-80">
-                  <label className="text-sm font-medium text-[#8E8E93] mb-4 h-4">Report name</label>
+                  <label className="text-sm font-medium text-[#8E8E93] dark:text-muted-foreground mb-4 h-4">Report name</label>
                   <Input
                     type="text"
                     value={name}
@@ -126,52 +126,52 @@ export default function CreateReportPage({
                       setIdentifier(autoIdentifier);
                     }}
                     placeholder="e.g. Marketing"
-                    className="h-10 bg-white"
+                    className="h-10 bg-background text-foreground border-border"
                   />
                 </div>
 
                 <div className="w-80">
-                  <label className="text-sm font-medium text-[#8E8E93] mb-4 h-4">Report identifier</label>
+                  <label className="text-sm font-medium text-[#8E8E93] dark:text-muted-foreground mb-4 h-4">Report identifier</label>
                   <Input
                     type="text"
                     value={identifier}
                     readOnly
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="e.g. MAR"
-                    className="h-10 bg-[#F2F2F7] cursor-not-allowed text-[#8E8E93] select-none placeholder:text-[#C7C7CC]"
+                    className="h-10 bg-[#F2F2F7] dark:bg-muted/50 cursor-not-allowed text-[#8E8E93] dark:text-muted-foreground/60 border-border select-none placeholder:text-[#C7C7CC] dark:placeholder:text-muted-foreground/30"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-8E8E93 mb-2 block text-[#001F3F]">Report description</label>
+              <label className="text-sm font-semibold mb-2 block text-[#001F3F] dark:text-foreground">Report description</label>
               <div className="w-full">
                 <RichTextEditor
                   value={description}
                   onChange={setDescription}
                   placeholder="Describe the purpose of this report"
-                  className="min-h-25!"
+                  className="min-h-25! bg-background text-foreground border-border"
                 />
               </div>
             </div>
 
             {/* Location of Data source */}
-            <div className="border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white">
+            <div className="border border-border border-l-4 border-l-[#001F3F] dark:border-l-primary rounded-lg p-4 bg-card">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h3 className="font-semibold text-sm text-[#001F3F] mb-0">Location of Data source</h3>
-                  <p className="text-xs text-[#8E8E93] leading-snug w-xl">
+                  <h3 className="font-semibold text-sm text-[#001F3F] dark:text-foreground mb-0">Location of Data source</h3>
+                  <p className="text-xs text-[#8E8E93] dark:text-muted-foreground leading-snug w-xl">
                     SliceFlo Dashboards help you visualize data from your tasks.
                     Select locations to source your data from.
                   </p>
                 </div>
                 <div className="w-87.5">
                   <Select value={projectId} onValueChange={setProjectId}>
-                    <SelectTrigger className="w-full border-[#8E8E93] rounded">
+                    <SelectTrigger className="w-full border-border bg-background text-foreground rounded">
                       <SelectValue placeholder="Select project" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-popover border-border text-popover-foreground">
                       <div className="max-h-60 overflow-auto px-2 py-0 space-y-1">
                         {projects
                           .filter((project): project is typeof project & { id: string } => Boolean(project.id))
@@ -198,11 +198,11 @@ export default function CreateReportPage({
             />
 
             {/* Select privacy */}
-            <div className="border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white">
+            <div className="border border-border border-l-4 border-l-[#001F3F] dark:border-l-primary rounded-lg p-4 bg-card">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div className="flex-1 pr-6">
-                  <h3 className="font-semibold text-sm text-[#001F3F] mb-1">Select report&apos;s privacy</h3>
-                  <p className="text-xs text-[#8E8E93] leading-snug w-xl">
+                  <h3 className="font-semibold text-sm text-[#001F3F] dark:text-foreground mb-1">Select report&apos;s privacy</h3>
+                  <p className="text-xs text-[#8E8E93] dark:text-muted-foreground leading-snug w-xl">
                     Private reports and their issues are visible only to members and admins. Only admins and
                     owners can invite new users to a private team.
                   </p>
@@ -212,9 +212,9 @@ export default function CreateReportPage({
                     data-testid="report-privacy-btn"
                     variant="ghost"
                     onClick={() => setPrivacy('private')}
-                    className={`flex-1 rounded border border-[#C7C7CC] transition-all duration-200 ${privacy === 'private'
-                      ? 'border-b-2 border-b-[#001F3F] text-[#8E8E93]'
-                      : 'text-[#8E8E93]'
+                    className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${privacy === 'private'
+                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                      : 'text-[#8E8E93] dark:text-muted-foreground'
                       }`}
                   >
                     Private
@@ -223,9 +223,9 @@ export default function CreateReportPage({
                     data-testid="report-public-btn"
                     variant="ghost"
                     onClick={() => setPrivacy('public')}
-                    className={`flex-1 rounded border border-[#C7C7CC] transition-all duration-200 ${privacy === 'public'
-                      ? 'border-b-2 border-b-[#001F3F] text-[#8E8E93]'
-                      : 'text-[#8E8E93]'
+                    className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${privacy === 'public'
+                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                      : 'text-[#8E8E93] dark:text-muted-foreground'
                       }`}
                   >
                     Public
@@ -235,11 +235,11 @@ export default function CreateReportPage({
             </div>
 
             {/* Team accessibility & permissions */}
-            <div className="border border-gray-200 border-l-4 border-l-[#001F3F] rounded-lg p-4 bg-white">
+            <div className="border border-border border-l-4 border-l-[#001F3F] dark:border-l-primary rounded-lg p-4 bg-card">
               <div className="flex justify-between items-center cursor-pointer" onClick={() => setMembershipDropdownOpen(!membershipDropdownOpen)}>
                 <div className="flex-1 pr-6">
-                  <h3 className="font-semibold text-sm text-[#001F3F] mb-1">Report accessibility & permission settings</h3>
-                  <p className="text-xs font-medium text-[#8E8E93] leading-relaxed">
+                  <h3 className="font-semibold text-sm text-[#001F3F] dark:text-foreground mb-1">Report accessibility & permission settings</h3>
+                  <p className="text-xs font-medium text-[#8E8E93] dark:text-muted-foreground leading-relaxed">
                     Manage your report&apos;s accessibility and membership controls. This includes whoc can edit report details, manage privacy, and approve or restrict member requests.
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default function CreateReportPage({
                 >
                   <ChevronDown
                     size={20}
-                    className={`text-[#8E8E93] transition-transform duration-200 ${membershipDropdownOpen ? 'rotate-180' : ''}`}
+                    className={`text-[#8E8E93] dark:text-muted-foreground transition-transform duration-200 ${membershipDropdownOpen ? 'rotate-180' : ''}`}
                     strokeWidth={2.5}
                   />
                 </Button>
@@ -261,18 +261,18 @@ export default function CreateReportPage({
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${membershipDropdownOpen ? "max-h-250 opacity-100 mt-2 pt-2" : "max-h-0 opacity-0"
                   }`}
               >
-                <div className="pt-3 border-t border-[#C7C7CC] space-y-4">
+                <div className="pt-3 border-t border-border space-y-4">
                   {/* Who can approve requests */}
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#8E8E93]">Who can approve requests to join this team?</span>
+                    <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">Who can approve requests to join this team?</span>
                     <div className="flex gap-4 w-87.5">
                       <Button
                         data-testid="approve-requests-me-btn"
                         variant="ghost"
                         onClick={() => setApproveRequests('Me')}
-                        className={`flex-1 rounded border border-[#C7C7CC] transition-all duration-200 ${approveRequests === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#8E8E93]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${approveRequests === 'Me'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         Me
@@ -281,9 +281,9 @@ export default function CreateReportPage({
                         data-testid="approve-requests-all-btn"
                         variant="ghost"
                         onClick={() => setApproveRequests('All team members')}
-                        className={`flex-1 rounded border border-[#C7C7CC] transition-all duration-200 ${approveRequests === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#8E8E93]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${approveRequests === 'All team members'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         All team members
@@ -293,15 +293,15 @@ export default function CreateReportPage({
 
                   {/* Who can edit team page */}
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#8E8E93]">Who can edit the team page?</span>
+                    <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">Who can edit the team page?</span>
                     <div className="flex gap-4 w-87.5">
                       <Button
                         data-testid="edit-team-page-me-btn"
                         variant="ghost"
                         onClick={() => setEditTeamPage('Me')}
-                        className={`flex-1 rounded border border-[#8E8E93] transition-all duration-200 ${editTeamPage === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#001F3F]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editTeamPage === 'Me'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         Me
@@ -310,9 +310,9 @@ export default function CreateReportPage({
                         data-testid="edit-team-page-all-btn"
                         variant="ghost"
                         onClick={() => setEditTeamPage('All team members')}
-                        className={`flex-1 rounded border border-[#8E8E93] transition-all duration-200 ${editTeamPage === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#001F3F]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editTeamPage === 'All team members'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         All team members
@@ -322,15 +322,15 @@ export default function CreateReportPage({
 
                   {/* Who can edit privacy level */}
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-[#8E8E93]">Who can edit the team privacy level and delete the team?</span>
+                    <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">Who can edit the team privacy level and delete the team?</span>
                     <div className="flex gap-4 w-[350px]">
                       <Button
                         data-testid="edit-privacy-me-btn"
                         variant="ghost"
                         onClick={() => setEditPrivacy('Me')}
-                        className={`flex-1 rounded border border-[#8E8E93] transition-all duration-200 ${editPrivacy === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#001F3F]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editPrivacy === 'Me'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         Me
@@ -339,9 +339,9 @@ export default function CreateReportPage({
                         data-testid="edit-privacy-all-btn"
                         variant="ghost"
                         onClick={() => setEditPrivacy('All team members')}
-                        className={`flex-1 rounded-sm border border-[#8E8E93] transition-all duration-200 ${editPrivacy === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] text-[#001F3F]'
-                          : 'text-[#8E8E93]'
+                        className={`flex-1 rounded-sm border border-[#8E8E93] dark:border-border transition-all duration-200 ${editPrivacy === 'All team members'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
                         All team members
@@ -349,13 +349,13 @@ export default function CreateReportPage({
                     </div>
                   </div>
 
-                  <div className="border-t border-[#C7C7CC]"></div>
+                  <div className="border-t border-border"></div>
 
                   {/* Invitations section */}
                   <div className="space-y-0">
-                    <h4 className="font-medium text-sm text-[#8E8E93] pb-0">Invitations</h4>
+                    <h4 className="font-medium text-sm text-[#8E8E93] dark:text-muted-foreground pb-0">Invitations</h4>
                     <div className="flex justify-between items-center space-y-1">
-                      <span className="text-xs text-[#8E8E93]">New members invited to this team must be approved by a team admin</span>
+                      <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">New members invited to this team must be approved by a team admin</span>
                       <Switch
                         checked={inviteMembersApproval}
                         onCheckedChange={setInviteMembersApproval}
@@ -363,7 +363,7 @@ export default function CreateReportPage({
                       />
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#8E8E93]">New guests invited to this team must be approved by a team admin</span>
+                      <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">New guests invited to this team must be approved by a team admin</span>
                       <Switch
                         checked={inviteGuestsApproval}
                         onCheckedChange={setInviteGuestsApproval}
@@ -374,9 +374,9 @@ export default function CreateReportPage({
 
                   {/* Removals section */}
                   <div className="space-y-0">
-                    <h4 className="font-medium text-sm text-[#8E8E93] pb-0">Removals</h4>
+                    <h4 className="font-medium text-sm text-[#8E8E93] dark:text-muted-foreground pb-0">Removals</h4>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#8E8E93]">Only team admins can remove members or guests from this team</span>
+                      <span className="text-xs text-[#8E8E93] dark:text-muted-foreground">Only team admins can remove members or guests from this team</span>
                       <Switch
                         checked={adminsOnlyRemoval}
                         onCheckedChange={setAdminsOnlyRemoval}
@@ -391,19 +391,19 @@ export default function CreateReportPage({
 
             {/* Delete Team Section */}
             <div
-              className={`border border-gray-200 border-l-4 rounded-lg p-4 transition-all duration-200 ${isDeleteActive
+              className={`border border-border border-l-4 rounded-lg p-4 transition-all duration-200 ${isDeleteActive
                 ? 'border-l-red-500'
-                : 'border-l-gray-400 bg-[#F2F2F7]'
+                : 'border-l-gray-400 bg-muted/30'
                 }`}
               style={isDeleteActive ? { backgroundColor: '#FF383C1A' } : {}}
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className={`font-semibold text-sm mb-0 transition-colors duration-200 ${isDeleteActive ? 'text-red-600' : 'text-[#AEAEB2]'
+                  <h3 className={`font-semibold text-sm mb-0 transition-colors duration-200 ${isDeleteActive ? 'text-red-600' : 'text-[#AEAEB2] dark:text-muted-foreground/60'
                     }`}>
                     Delete Report
                   </h3>
-                  <p className={`text-xs transition-colors duration-200 ${isDeleteActive ? 'text-red-500' : 'text-[#AEAEB2]'
+                  <p className={`text-xs transition-colors duration-200 ${isDeleteActive ? 'text-red-500' : 'text-[#AEAEB2] dark:text-muted-foreground/60'
                     }`}>
                     Delete this report
                   </p>
@@ -413,7 +413,7 @@ export default function CreateReportPage({
                   onClick={handleDeleteReport}
                   disabled={!isDeleteActive}
                   variant={isDeleteActive ? 'destructive' : 'ghost'}
-                  className={!isDeleteActive ? 'cursor-not-allowed' : 'text-[#AEAEB2]'}
+                  className={!isDeleteActive ? 'cursor-not-allowed' : 'text-[#AEAEB2] dark:text-muted-foreground/60'}
                 >
                   Delete
                 </Button>
@@ -425,8 +425,8 @@ export default function CreateReportPage({
               <Button
                 data-testid="cancel-team-btn"
                 variant="outline"
-                // onClick={onBack}
-                className='w-32 border-[#8E8E93] text-[#8E8E93]'
+                onClick={handleCancel}
+                className='w-32 border-border text-foreground'
               >
                 Cancel
               </Button>
@@ -434,8 +434,8 @@ export default function CreateReportPage({
                 onClick={handleCreate}
                 disabled={isSubmitting || !name.trim() || !projectId}
                 className={`w-32 text-white ${isSubmitting || !name.trim() || !projectId
-                  ? "bg-[#F2F2F7] text-[#8E8E93]"
-                  : "bg-[#001F3F] hover:bg-[#001530]"
+                  ? "bg-muted dark:bg-neutral-800 text-[#8E8E93] dark:text-neutral-500"
+                  : "bg-[#001F3F] dark:bg-primary dark:text-primary-foreground hover:bg-[#001530] dark:hover:bg-primary/90"
                   }`}
               >
                 {isSubmitting && (

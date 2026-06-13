@@ -595,7 +595,7 @@ export default function AboutProject({
                 >
                   Clear
                 </DropdownMenuItem>
-                
+                <DropdownMenuSeparator />
                 {projectPhases.map((phase) => (
                   <React.Fragment key={phase._id}>
                     <DropdownMenuItem

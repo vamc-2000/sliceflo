@@ -15,6 +15,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import {
+    formatLocalDate,
+    convertSelectedDateToUTC,
+    convertUTCToCalendarDate,
+} from "@/utils/timezone-utils";
 import { useProfileStore } from "@/stores/profile-store";
 import { useSearchParams } from "next/navigation";
 import { useTeamStore } from "@/stores/teams-store";
@@ -218,7 +223,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                 setSelectedMembers(cachedGoal.assignedTo || []);
             }
 
-            if (cachedGoal.endDate) setEndDate(new Date(cachedGoal.endDate));
+            if (cachedGoal.endDate) setEndDate(convertUTCToCalendarDate(cachedGoal.endDate));
             return;
         }
 
@@ -245,7 +250,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                     setSelectedMembers(goal.assignedTo || []);
                 }
 
-                if (goal.endDate) setEndDate(new Date(goal.endDate));
+                if (goal.endDate) setEndDate(convertUTCToCalendarDate(goal.endDate));
             }
         });
     }, [previewGoalId, goals, getGoalById, workspaceMembers, currentUser]);
@@ -339,7 +344,12 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
         if (date) {
             setFormData({
                 ...formData,
-                endDate: format(date, "yyyy-MM-dd")
+                endDate: convertSelectedDateToUTC(date)
+            });
+        } else {
+            setFormData({
+                ...formData,
+                endDate: ''
             });
         }
     };
@@ -739,7 +749,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                             data-testid="goal-end-date-picker-button"
                                         >
                                             <span className="text-sm truncate text-foreground" data-testid="goal-end-date-display">
-                                                {endDate ? format(endDate, "dd/MM/yyyy") : "Set a Goal date"}
+                                                {endDate ? formatLocalDate(endDate) : "Set a Goal date"}
                                             </span>
                                             <CalendarIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                         </Button>

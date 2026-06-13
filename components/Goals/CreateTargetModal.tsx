@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import {
+    formatLocalDate,
+    convertSelectedDateToUTC,
+    convertUTCToCalendarDate,
+} from "@/utils/timezone-utils";
 import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
 import { cn } from "@/lib/utils";
 import { useGoalsStore } from "@/stores/goals-store";
@@ -304,12 +309,12 @@ export default function CreateTargetModal({
         setTargetCurrency(String(targetToEdit.value?.end ?? 0));
         setSelectedCurrency((targetToEdit as any).currencyType || targetToEdit.value?.currencyType || "USD");
         if (targetToEdit.startDate) {
-            setStartDate(new Date(targetToEdit.startDate));
+            setStartDate(convertUTCToCalendarDate(targetToEdit.startDate as any));
         } else {
             setStartDate(undefined);
         }
         if (targetToEdit.endDate) {
-            setTargetDate(new Date(targetToEdit.endDate));
+            setTargetDate(convertUTCToCalendarDate(targetToEdit.endDate as any));
         } else {
             setTargetDate(undefined);
         }
@@ -367,9 +372,9 @@ export default function CreateTargetModal({
                     status: "not started",
                     color: selectedColor || "#6366F1",
                     assignedTo: selectedOwner ? selectedOwner.userId : null,
-                    startDate: (startDate && !isNaN(startDate.getTime())) ? startDate.toISOString() : null,
-                    endDate: (targetDate && !isNaN(targetDate.getTime())) ? targetDate.toISOString() : null,
-                    targetDate: (targetDate && !isNaN(targetDate.getTime())) ? targetDate.toISOString() : null,
+                    startDate: (startDate && !isNaN(startDate.getTime())) ? convertSelectedDateToUTC(startDate) : null,
+                    endDate: (targetDate && !isNaN(targetDate.getTime())) ? convertSelectedDateToUTC(targetDate) : null,
+                    targetDate: (targetDate && !isNaN(targetDate.getTime())) ? convertSelectedDateToUTC(targetDate) : null,
                 };
 
                 if (selectedType === "number") {
@@ -401,9 +406,9 @@ export default function CreateTargetModal({
                 let updates: any = {
                     label: targetName.trim(),
                     description: description.trim(),
-                    startDate: (startDate && !isNaN(startDate.getTime())) ? startDate.toISOString() : null,
-                    endDate: (targetDate && !isNaN(targetDate.getTime())) ? targetDate.toISOString() : null,
-                    targetDate: (targetDate && !isNaN(targetDate.getTime())) ? targetDate.toISOString() : null,
+                    startDate: (startDate && !isNaN(startDate.getTime())) ? convertSelectedDateToUTC(startDate) : null,
+                    endDate: (targetDate && !isNaN(targetDate.getTime())) ? convertSelectedDateToUTC(targetDate) : null,
+                    targetDate: (targetDate && !isNaN(targetDate.getTime())) ? convertSelectedDateToUTC(targetDate) : null,
                     assignedTo: selectedOwner ? selectedOwner.userId : null,
                 };
 
@@ -522,7 +527,7 @@ export default function CreateTargetModal({
                                         >
                                             <Calendar className="mr-1.5 h-3.5 w-3.5" />
                                             {targetDate
-                                                ? format(targetDate, "dd/MM/yyyy")
+                                                ? formatLocalDate(targetDate)
                                                 : "Set a Target Date"}
                                         </Button>
                                     </PopoverTrigger>

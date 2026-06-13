@@ -136,13 +136,3 @@ export default function EmptyTimeEntries({ selectedWeek }: Props) {
         </div>
     );
 }
-
-
-
-
-
-
-
-
-
-

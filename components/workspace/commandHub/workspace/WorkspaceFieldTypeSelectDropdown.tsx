@@ -31,10 +31,10 @@ import { DateField } from "@/components/projects/views/list-view/customFields/Da
 
 // ✅ Only fields supported by API: text, date, dropdown, number
 const workspaceFields = [
-    { type: "text", label: "Text", icon: Type, color: "text-gray-700" },
-    { type: "number", label: "Number", icon: Hash, color: "text-gray-700" },
-    { type: "dropdown", label: "Dropdown", icon: CheckCircle2, color: "text-gray-700" },
-    { type: "date", label: "Date", icon: CalendarCheck, color: "text-gray-700" },
+    { type: "text", label: "Text", icon: Type, color: "text-muted-foreground" },
+    { type: "number", label: "Number", icon: Hash, color: "text-muted-foreground" },
+    { type: "dropdown", label: "Dropdown", icon: CheckCircle2, color: "text-muted-foreground" },
+    { type: "date", label: "Date", icon: CalendarCheck, color: "text-muted-foreground" },
 ];
 
 interface WorkspaceFieldTypeSelectDropdownProps {
@@ -119,7 +119,7 @@ export function WorkspaceFieldTypeSelectDropdown({ workspaceId }: WorkspaceField
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-                <Button className="bg-[#001F3F] text-white font-medium px-3 h-8 rounded-md">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-3 h-8 rounded-md cursor-pointer">
                     <Plus className="w-4 h-4 mr-1" />
                     Create field
                 </Button>
@@ -127,20 +127,17 @@ export function WorkspaceFieldTypeSelectDropdown({ workspaceId }: WorkspaceField
 
             <DropdownMenuContent
                 align="end"
-                
-            className="w-[320px] p-0 flex flex-col h-[450px] border-b-5 border-b-[#001F3F]"
-                // className="w-80 p-0 border-b-5 border-b-[#001F3F]"
-                // style={{ maxHeight: '500px', display: 'flex', flexDirection: 'column' }}
+                className="w-[320px] p-0 flex flex-col h-[450px] border border-border bg-popover text-popover-foreground border-b-5 border-b-primary"
             >
                 {selectedFieldType ? (
                     // SHOW FIELD CONFIGURATION FORM
                     <>
-                        <div className="flex-shrink-0 flex items-center gap-1 px-2 py-2 border-b">
+                        <div className="flex-shrink-0 flex items-center gap-1 px-2 py-2 border-b border-border">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleBackToList}
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
@@ -185,18 +182,18 @@ export function WorkspaceFieldTypeSelectDropdown({ workspaceId }: WorkspaceField
                 ) : (
                     // SHOW FIELD TYPE LIST
                     <>
-                        <div className="px-4 py-3 border-b flex items-center justify-between">
+                        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                             <h3 className="font-semibold text-sm">Create field</h3>
                         </div>
 
-                        <div className="px-4 py-2 border-b">
+                        <div className="px-4 py-2 border-b border-border">
                             <div className="relative">
-                                <Search className="absolute left-2 top-2 h-4 w-4 text-gray-400" />
+                                <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search fields..."
-                                    className="pl-8 h-8 text-sm border-gray-300 bg-gray-100"
+                                    className="pl-8 h-8 text-sm border-input bg-secondary text-foreground"
                                 />
                             </div>
                         </div>
@@ -211,7 +208,7 @@ export function WorkspaceFieldTypeSelectDropdown({ workspaceId }: WorkspaceField
                                             event.preventDefault();
                                             handleSelectType(field.type);
                                         }}
-                                        className="flex items-center gap-2.5 px-3 py-2 cursor-pointer focus:bg-gray-100"
+                                        className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-popover-foreground hover:bg-accent hover:text-accent-foreground"
                                     >
                                         <Icon className={cn("h-4 w-4", field.color)} />
                                         <span className="text-sm">{field.label}</span>

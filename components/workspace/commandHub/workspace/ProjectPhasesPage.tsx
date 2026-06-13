@@ -20,6 +20,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import AddProjectPhaseModal from "../AddProjectPhaseModal";
 import { Loader } from "@/components/Loader";
 import { toast } from "sonner";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface ProjectPhasesPageProps {
     workspaceId: string;
@@ -65,6 +66,10 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
         | { mode: "edit-parent"; phaseId: string; name: string; color: string }
         | { mode: "edit-child"; phaseId: string; parentId: string; name: string; color: string }
     >(null);
+
+    const [deletePhaseId, setDeletePhaseId] = useState<string | null>(null);
+    const [deleteSubPhaseContext, setDeleteSubPhaseContext] = useState<{ childId: string; parentId: string } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const openAddParent = () => {
         setModalContext({ mode: "add-parent" });
@@ -126,52 +131,67 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
         closeModal();
     };
 
-    // Delete handlers
-    const handleDeleteParent = async (phaseId: string) => {
-        if (!window.confirm("Are you sure you want to delete this phase?")) return;
+    const handleDeleteParentClick = (phaseId: string) => {
+        setDeletePhaseId(phaseId);
+    };
+
+    const handleDeleteParentConfirm = async () => {
+        if (!deletePhaseId) return;
+        setIsDeleting(true);
         try {
-            await deleteProjectPhase(workspaceId, phaseId);
+            await deleteProjectPhase(workspaceId, deletePhaseId);
             toast.success("Phase deleted");
+            setDeletePhaseId(null);
         } catch {
             toast.error("Cannot delete — projects may be using this phase.");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
-    const handleDeleteChild = async (childId: string, parentId: string) => {
-        if (!window.confirm("Are you sure you want to delete this sub-phase?")) return;
+    const handleDeleteChildClick = (childId: string, parentId: string) => {
+        setDeleteSubPhaseContext({ childId, parentId });
+    };
+
+    const handleDeleteChildConfirm = async () => {
+        if (!deleteSubPhaseContext) return;
+        setIsDeleting(true);
         try {
-            await deleteChildPhase(workspaceId, childId, parentId);
+            await deleteChildPhase(workspaceId, deleteSubPhaseContext.childId, deleteSubPhaseContext.parentId);
             toast.success("Sub-phase deleted");
+            setDeleteSubPhaseContext(null);
         } catch {
             toast.error("Cannot delete — projects may be using this sub-phase.");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     if (isLoadingPhases) {
         return (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full bg-background">
                 <Loader message="Loading phases..." size="md" />
             </div>
         );
     }
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col bg-background text-foreground">
 
             {/* Header - same as original */}
             <div className="flex items-center justify-between pr-2">
                 <div>
-                    <h2 className="text-[15px] font-semibold text-gray-900 dark:text-white">
+                    <h2 className="text-[15px] font-semibold text-foreground">
                         Project phases
                     </h2>
-                    <p className="text-[12px] text-gray-500 dark:text-gray-400">
+                    <p className="text-[12px] text-muted-foreground">
                         Create and customize the phases used to capture project-level information.
                     </p>
                 </div>
                 {/* Header Add phase button → creates a parent phase */}
                 <Button
                     onClick={openAddParent}
-                    className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 cursor-pointer"
                 >
                     <Plus className="w-3.5 h-3.5" />
                     Add phase
@@ -179,9 +199,9 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
             </div>
 
             {/* Phases list - same DOM structure as original groups */}
-            <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+            <div className="flex-1 overflow-y-auto pr-1 space-y-2 py-4">
                 {projectPhases.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center py-12">
+                    <p className="text-sm text-muted-foreground text-center py-12">
                         No phases yet. Add one to get started.
                     </p>
                 ) : (
@@ -191,27 +211,27 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                         return (
                             <div
                                 key={phase._id}
-                                className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+                                className="border border-border rounded-lg overflow-hidden bg-card"
                             >
                                 {/* Phase header - same as original group header */}
-                                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between p-3 bg-secondary border-b border-border">
                                     <div className="flex items-center gap-2.5">
                                         <button
                                             onClick={() => toggleCollapse(phase._id)}
-                                            className="hover:bg-gray-200 dark:hover:bg-gray-700 rounded p-0.5 transition-colors"
+                                            className="hover:bg-accent hover:text-accent-foreground rounded p-0.5 transition-colors cursor-pointer"
                                         >
                                             {isCollapsed ? (
-                                                <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                             ) : (
-                                                <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                             )}
                                         </button>
-
+ 
                                         <div
                                             className="w-3.5 h-3.5 rounded-full"
                                             style={{ backgroundColor: phase.color }}
                                         />
-                                        <span className="text-[14px] font-medium text-gray-900 dark:text-white">
+                                        <span className="text-[14px] font-medium text-foreground">
                                             {phase.label}
                                         </span>
                                     </div>
@@ -220,29 +240,29 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                                         {/* Plus inside phase header → creates a child sub-phase */}
                                         <button
                                             onClick={() => openAddChild(phase._id, phase.label)}
-                                            className="hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full p-1 transition-colors"
+                                            className="hover:bg-accent hover:text-accent-foreground rounded-full p-1 transition-colors cursor-pointer"
                                         >
-                                            <Plus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                            <Plus className="w-4 h-4 text-muted-foreground" />
                                         </button>
 
                                         {/* Edit / Delete dropdown for parent phase */}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full p-1 transition-colors">
-                                                    <Ellipsis className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                                <button className="hover:bg-accent hover:text-accent-foreground rounded-full p-1 transition-colors cursor-pointer">
+                                                    <Ellipsis className="w-4 h-4 text-muted-foreground" />
                                                 </button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-32 border-b-5 border-b-[#001F3F]">
+                                            <DropdownMenuContent align="end" className="w-32 bg-popover border border-border text-popover-foreground border-b-5 border-b-primary">
                                                 <DropdownMenuItem
                                                     onClick={() => openEditParent(phase._id, phase.label, phase.color)}
-                                                    className="text-[12px] gap-2"
+                                                    className="text-[12px] gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                                                 >
                                                     <Pencil className="w-3.5 h-3.5" />
                                                     Edit
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    onClick={() => handleDeleteParent(phase._id)}
-                                                    className="text-red-600 focus:text-red-600 text-[12px] gap-2"
+                                                    onClick={() => handleDeleteParentClick(phase._id)}
+                                                    className="text-red-600 focus:text-red-600 text-[12px] gap-2 cursor-pointer"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                     Delete
@@ -259,14 +279,14 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                                             phase.children.map((child) => (
                                                 <div
                                                     key={child._id}
-                                                    className="flex items-center justify-between p-2.5 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                    className="flex items-center justify-between p-2.5 rounded hover:bg-accent/45 transition-colors"
                                                 >
                                                     <div className="flex items-center gap-2.5">
                                                         <div
                                                             className="w-3 h-3 rounded-full flex-shrink-0"
                                                             style={{ backgroundColor: child.color }}
                                                         />
-                                                        <span className="text-[13px] text-gray-700 dark:text-gray-300">
+                                                        <span className="text-[13px] text-foreground/90">
                                                             {child.label}
                                                         </span>
                                                     </div>
@@ -275,14 +295,14 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                                                     <div className="flex items-center gap-2 transition-all">
                                                         <button
                                                             onClick={() => openEditChild(child._id, phase._id, child.label, child.color)}
-                                                            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                                                            className="p-1 hover:bg-accent hover:text-accent-foreground rounded transition-colors cursor-pointer"
                                                             title="Edit"
                                                         >
-                                                            <Pencil className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                                                            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteChild(child._id, phase._id)}
-                                                            className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                                                            onClick={() => handleDeleteChildClick(child._id, phase._id)}
+                                                            className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors cursor-pointer"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5 text-red-500" />
@@ -291,7 +311,7 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                                                 </div>
                                             ))
                                         ) : (
-                                            <p className="text-[12px] text-gray-400 px-2 py-1">
+                                            <p className="text-[12px] text-muted-foreground px-2 py-1">
                                                 No sub-phases. Click + to add one.
                                             </p>
                                         )}
@@ -313,6 +333,28 @@ const ProjectPhasesPage: React.FC<ProjectPhasesPageProps> = ({ workspaceId }) =>
                         : undefined
                 }
                 editingPhase={editingStateForModal}
+            />
+
+            <ConfirmationModal
+                open={!!deletePhaseId}
+                onClose={() => setDeletePhaseId(null)}
+                onConfirm={handleDeleteParentConfirm}
+                title="Are you sure want to delete this phase?"
+                description="This action is permanent and cannot be undone."
+                confirmLabel="Delete Phase"
+                loadingLabel="Deleting..."
+                loading={isDeleting}
+            />
+
+            <ConfirmationModal
+                open={!!deleteSubPhaseContext}
+                onClose={() => setDeleteSubPhaseContext(null)}
+                onConfirm={handleDeleteChildConfirm}
+                title="Are you sure want to delete this sub-phase?"
+                description="This action is permanent and cannot be undone."
+                confirmLabel="Delete Sub-phase"
+                loadingLabel="Deleting..."
+                loading={isDeleting}
             />
         </div>
     );

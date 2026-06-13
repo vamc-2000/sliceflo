@@ -56,18 +56,18 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
 
     return (
         <Dialog open={open} onOpenChange={handleCancel}>
-            <DialogContent className="sm:max-w-lg border-b-4 border-b-[#001F3F] ">
+            <DialogContent className="sm:max-w-lg border-b-4 border-b-[#001F3F] dark:border-b-primary bg-background text-foreground border-border">
                 <DialogHeader>
-                    <DialogTitle>Invite Members</DialogTitle>
+                    <DialogTitle className="text-foreground">Invite Members</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-3 mt-2">
-                    <span className="text-[#8E8E93] font-medium">Invite with email</span>
+                    <span className="text-[#8E8E93] dark:text-muted-foreground font-medium">Invite with email</span>
 
                     {rows.map((row, index) => (
                         <div key={index} className="flex items-center gap-2 w-full">
 
-                            <div className="flex items-center flex-1 p-1 border border-[#8E8E93] rounded-md bg-white">
+                            <div className="flex items-center flex-1 p-1 border border-[#8E8E93] dark:border-border rounded-md bg-white dark:bg-neutral-900">
                                 <Input
                                     placeholder="Enter email address"
                                     value={row.email}
@@ -76,7 +76,7 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
                                         updated[index].email = e.target.value;
                                         setRows(updated);
                                     }}
-                                    className="border-0 shadow-none focus-visible:ring-0 flex-1"
+                                    className="border-0 shadow-none focus-visible:ring-0 flex-1 bg-transparent text-foreground placeholder:text-muted-foreground"
                                 />
 
                                 <Select
@@ -87,11 +87,11 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
                                         setRows(updated);
                                     }}
                                 >
-                                    <SelectTrigger className="w-[120px] border-0 rounded-md bg-[#E5E5EA]">
+                                    <SelectTrigger className="w-[120px] border-0 rounded-md bg-[#E5E5EA] dark:bg-muted text-foreground">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
 
-                                    <SelectContent>
+                                    <SelectContent className="bg-popover border-border text-popover-foreground">
                                         <SelectItem value="admin">Admin</SelectItem>
                                         <SelectItem value="member">Member</SelectItem>
                                         <SelectItem value="viewer">Viewer</SelectItem>
@@ -102,9 +102,9 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
                             {rows.length > 1 && (
                                 <button
                                     onClick={() => setRows(rows.filter((_, i) => i !== index))}
-                                    className="p-1 hover:bg-gray-200 rounded"
+                                    className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-850 rounded"
                                 >
-                                    <X size={18} className="text-gray-600" />
+                                    <X size={18} className="text-gray-600 dark:text-neutral-400" />
                                 </button>
                             )}
                         </div>
@@ -112,28 +112,28 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
 
                     <div className="flex justify-end">
                         <div
-                            className="text-sm text-[#001F3F] cursor-pointer hover:underline"
+                            className="text-sm text-[#001F3F] dark:text-primary cursor-pointer hover:underline"
                             onClick={() => setRows([...rows, { email: "", role: "" }])}
                         >
                             + Add more
                         </div>
                     </div>
 
-                    <span className="text-[#8E8E93] font-medium">Write a message (optional)</span>
+                    <span className="text-[#8E8E93] dark:text-muted-foreground font-medium">Write a message (optional)</span>
                     <Textarea
                         placeholder="Add a message for the people you're inviting..."
-                        className="w-full resize-none"
+                        className="w-full resize-none bg-background text-foreground border-border"
                         rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                     />
                 </div>
 
-                <DialogFooter className="flex justify-end gap-3">
+                <DialogFooter className="flex justify-end gap-3 border-t border-border pt-4">
                     <Button
                         variant="outline"
                         onClick={handleCancel}
-                        className="w-[120px] h-10 text-sm font-normal border border-[#8E8E93] bg-[#FFFFFF] text-[#8E8E93]"
+                        className="w-[120px] h-10 text-sm font-normal border border-[#8E8E93] dark:border-border bg-[#FFFFFF] dark:bg-transparent text-[#8E8E93] dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
                         Cancel
                     </Button>
@@ -150,8 +150,8 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
                                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                 return emailRegex.test(r.email) && r.role !== "";
                             })
-                                ? "bg-[#001F3F] text-white hover:bg-[#001530]"
-                                : "bg-[#F2F2F7] text-[#8E8E93] cursor-not-allowed"
+                                ? "bg-[#001F3F] text-white hover:bg-[#001530] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+                                : "bg-[#F2F2F7] dark:bg-neutral-800 text-[#8E8E93] dark:text-neutral-500 cursor-not-allowed border-border"
                         )}
                     >
                         {isLoading ? (

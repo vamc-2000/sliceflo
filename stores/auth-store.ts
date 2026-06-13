@@ -252,10 +252,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        const response = await axiosInstance.post(
-          `/auth/logout`,
-          {}
-        );
+        const response = await axiosInstance.post(`/auth/logout`);
         return response;
       },
 

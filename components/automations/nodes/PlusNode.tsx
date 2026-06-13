@@ -34,7 +34,8 @@ const PlusNode = ({ data, id }: NodeProps & { data: PlusNodeData }) => {
                 type="target"
                 position={Position.Top}
                 id="target"
-                style={{ width: 10, height: 10, background: '#CBD5E1', border: '2px solid white', top: -5 }}
+                className="border-2 border-background"
+                style={{ width: 10, height: 10, background: '#CBD5E1', top: -5 }}
             />
 
             {/* ── Wide rectangle button ── */}
@@ -50,11 +51,11 @@ const PlusNode = ({ data, id }: NodeProps & { data: PlusNodeData }) => {
             >
                 <div
                     className={`
-                        w-full flex items-center gap-3 px-3 py-3 bg-white rounded-xl
+                        w-full flex items-center gap-3 px-3 py-3 bg-card rounded-xl
                         border-2 border-dashed cursor-pointer transition-all
                         ${menuOpen
                             ? 'border-blue-400 shadow-md ring-2 ring-blue-400/10'
-                            : 'border-gray-200 hover:border-blue-400 hover:shadow-sm'
+                            : 'border-border hover:border-blue-400 hover:shadow-sm'
                         }
                     `}
                     style={activeCat && !menuOpen ? {
@@ -65,7 +66,7 @@ const PlusNode = ({ data, id }: NodeProps & { data: PlusNodeData }) => {
                 >
                     {/* Icon box (Square with +) */}
                     <div
-                        className="w-4 h-4 rounded-lg flex-shrink-0 flex items-center justify-center transition-all bg-white border border-gray-100 shadow-sm"
+                        className="w-4 h-4 rounded-lg flex-shrink-0 flex items-center justify-center transition-all bg-card border border-border shadow-sm"
                         style={{
                             color: activeCat ? activeCat.color : '#94A3B8'
                         }}
@@ -75,7 +76,7 @@ const PlusNode = ({ data, id }: NodeProps & { data: PlusNodeData }) => {
 
                     {/* Label */}
                     <span
-                        className="flex-1 text-left text-[12px] font-semibold truncate transition-all text-gray-700"
+                        className="flex-1 text-left text-[12px] font-semibold truncate transition-all text-muted-foreground"
                         style={{ color: activeCat ? activeCat.color : undefined }}
                     >
                         {activeCat ? activeCat.hoverText : 'What happens next?'}
@@ -88,7 +89,8 @@ const PlusNode = ({ data, id }: NodeProps & { data: PlusNodeData }) => {
                 type="source"
                 position={Position.Bottom}
                 id="source"
-                style={{ width: 10, height: 10, background: '#CBD5E1', border: '2px solid white', bottom: -5, opacity: 0 }}
+                className="border-2 border-background"
+                style={{ width: 10, height: 10, background: '#CBD5E1', bottom: -5, opacity: 0 }}
             />
         </div>
     );

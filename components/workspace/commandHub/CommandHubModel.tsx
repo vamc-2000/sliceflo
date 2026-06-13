@@ -182,7 +182,7 @@ const CommandHubModal = ({ isOpen, onClose }: CommandHubModalProps) => {
   const renderContent = () => {
     if (activeTab === "projects" && (isLoadingProjects || isLoadingDetail)) {
       return (
-        <div className="flex items-center justify-center h-full bg-white">
+        <div className="flex items-center justify-center h-full bg-background text-foreground">
           <Loader message="Loading projects..." size="md" />
         </div>
       );
@@ -207,7 +207,7 @@ const CommandHubModal = ({ isOpen, onClose }: CommandHubModalProps) => {
       // Guard: no project available
       if (!projectId) {
         return (
-          <div className="flex items-center justify-center h-full text-sm text-gray-500">
+          <div className="flex items-center justify-center h-full text-sm text-muted-foreground bg-background">
             No projects found
           </div>
         );
@@ -237,7 +237,7 @@ const CommandHubModal = ({ isOpen, onClose }: CommandHubModalProps) => {
         case "automations":
           return <Automation projectId={projectId} />;
         case "templates":
-          return <div className="p-6 text-gray-600">Templates Section</div>;
+          return <div className="p-6 text-muted-foreground bg-background">Templates Section</div>;
         default:
           return <ProjectLabelsPage projectId={projectId} />;
       }
@@ -247,7 +247,7 @@ const CommandHubModal = ({ isOpen, onClose }: CommandHubModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!max-w-[75vw] !w-[75vw] h-[75vh] p-0 overflow-hidden">
+      <DialogContent className="!max-w-[85vw] !w-[85vw] h-[85vh] p-0 overflow-hidden border border-border bg-background">
         <VisuallyHidden>
           <DialogTitle>Command Hub</DialogTitle>
         </VisuallyHidden>

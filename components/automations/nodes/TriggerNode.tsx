@@ -76,14 +76,14 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
             />
 
             {/* Step badge — top-left pill */}
-            <div className="absolute -top-2 -left-2 z-20 flex items-center gap-1 bg-white border border-gray-100 rounded-full px-1.5 py-0.5 shadow-sm">
+            <div className="absolute -top-2 -left-2 z-20 flex items-center gap-1 bg-card border border-border rounded-full px-1.5 py-0.5 shadow-sm">
                 <div
                     className="w-3.5 h-3.5 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: accentColor }}
                 >
                     {getIcon(triggerId, "w-2 h-2 text-white fill-white")}
                 </div>
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide leading-none">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide leading-none">
                     Trigger
                 </span>
             </div>
@@ -94,11 +94,11 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
                         className={`
-                            w-full flex items-center gap-2 px-3 py-2.5 bg-white rounded-xl
-                            border-2 border-dashed transition-all
+                            w-full flex items-center gap-2 px-3 py-2.5 bg-card rounded-xl
+                            border-2 border-dashed transition-all cursor-pointer
                             ${menuOpen
                                 ? 'border-[#00CA72] ring-2 ring-[#00CA72]/10 shadow-md'
-                                : 'border-gray-200 hover:border-[#00CA72] hover:shadow-sm'
+                                : 'border-border hover:border-[#00CA72] hover:shadow-sm'
                             }
                         `}
                     >
@@ -108,11 +108,11 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
                             <Zap className="w-3.5 h-3.5 text-white fill-white" />
                         </div>
                         {/* Label */}
-                        <span className="flex-1 text-left text-[12px] font-semibold text-gray-500 truncate">
+                        <span className="flex-1 text-left text-[12px] font-semibold text-muted-foreground truncate">
                             {data.triggerId ? data.label : "Choose a trigger"}
                         </span>
                         <ChevronDown
-                            className={`w-3.5 h-3.5 flex-shrink-0 text-gray-300 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
+                            className={`w-3.5 h-3.5 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
                         />
                     </button>
 
@@ -142,11 +142,11 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
                         onConfigClick?.({ data, id, type, ...props });
                     }}
                     className={`
-                        relative w-full bg-white rounded-xl border cursor-pointer
+                        relative w-full bg-card rounded-xl border border-border cursor-pointer
                         transition-all duration-200 overflow-hidden
                         ${selected
-                            ? 'border-blue-400 shadow-md ring-2 ring-blue-400/20'
-                            : 'border-gray-150 shadow-sm hover:shadow-md hover:border-gray-200'
+                            ? 'border-primary shadow-md ring-2 ring-primary/20'
+                            : 'border-border shadow-sm hover:shadow-md hover:border-muted-foreground'
                         }
                     `}
                     style={{ borderColor: selected ? undefined : `${accentColor}30` }}
@@ -168,7 +168,7 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
 
                         {/* Text */}
                         <div className="flex-1 min-w-0">
-                            <p className="text-[12px] font-bold text-gray-800 leading-tight truncate">
+                            <p className="text-[12px] font-bold text-foreground leading-tight truncate">
                                 {label}
                             </p>
                             <p className="text-[9px] font-semibold uppercase tracking-wide mt-0.5"
@@ -182,23 +182,23 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                 <Button
                                     variant="ghost" size="icon"
-                                    className="w-6 h-6 rounded-md flex-shrink-0 text-gray-300 hover:text-gray-500 hover:bg-gray-50"
+                                    className="w-6 h-6 rounded-md flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer"
                                 >
                                     <MoreVertical className="w-3 h-3" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border-gray-100 text-[12px]">
-                                <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer">
-                                    <Copy className="w-3.5 h-3.5 text-gray-400" /> Copy
+                            <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-xl border border-border bg-popover text-popover-foreground p-1 text-[12px]">
+                                <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                                    <Copy className="w-3.5 h-3.5 text-muted-foreground" /> Copy
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer"
+                                    className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer hover:bg-accent hover:text-accent-foreground"
                                     onClick={(e) => { e.stopPropagation(); onChangeTriggerType?.(); }}
                                 >
-                                    <CornerDownRight className="w-3.5 h-3.5 text-gray-400" /> Change trigger type
+                                    <CornerDownRight className="w-3.5 h-3.5 text-muted-foreground" /> Change trigger type
                                 </DropdownMenuItem>
-                                <div className="h-px bg-gray-100 my-1" />
-                                <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium text-red-500 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                <div className="h-px bg-border my-1" />
+                                <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium text-red-500 focus:text-red-600 focus:bg-red-50 cursor-pointer hover:bg-accent">
                                     <Trash2 className="w-3.5 h-3.5" /> Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -212,10 +212,10 @@ const TriggerNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Trig
                 type="source"
                 position={Position.Bottom}
                 id="output"
+                className="border-2 border-background"
                 style={{
                     width: 10, height: 10,
                     background: accentColor,
-                    border: '2px solid white',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
                     bottom: -5,
                 }}

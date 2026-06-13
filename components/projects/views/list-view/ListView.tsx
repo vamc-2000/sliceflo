@@ -2368,7 +2368,7 @@ export function ListView({
                 </div>
 
                 {/* Groups and Tables */}
-                <div className="flex-1 overflow-auto p-4 space-y-4">
+                <div className="flex-1 overflow-auto p-4 space-y-4 drag-scroll-container">
                     {dynamicGroups
                         // FIX: manual per-group hide (via "Hide Group" context menu)
                         .filter(group => !hiddenGroups.has(group.id))

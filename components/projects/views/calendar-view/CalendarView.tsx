@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { format, parseISO, startOfWeek, endOfWeek, addDays, startOfDay, endOfDay } from "date-fns";
-import { convertSelectedDateToUTC } from "@/utils/timezone-utils";
+import { convertSelectedDateToUTC, isWeekend, getWeekendDaysIndices } from "@/utils/timezone-utils";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar';
 // ✅ Import the DnD HOC
@@ -575,24 +575,37 @@ const UnscheduledTasksPanel = ({
 const CustomHeader = ({
     date,
     label,
-    weekendDays
+    shouldColorBg = false,
 }: {
     date: Date;
     label: string;
-    weekendDays: number[]
+    shouldColorBg?: boolean;
 }) => {
-    const dayOfWeek = date.getDay();
-    const isWeekend = weekendDays.includes(dayOfWeek);
+    const isWeekendDay = isWeekend(date);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            const parentHeader = containerRef.current.closest('.rbc-header');
+            if (parentHeader) {
+                if (isWeekendDay && shouldColorBg) {
+                    parentHeader.classList.add('rbc-weekend-bg');
+                } else {
+                    parentHeader.classList.remove('rbc-weekend-bg');
+                }
+            }
+        }
+    }, [isWeekendDay, shouldColorBg]);
 
     return (
-        <div className="flex flex-col items-center py-1">
+        <div ref={containerRef} className="flex flex-col items-center py-1 w-full h-full justify-center">
             <span className={cn(
                 "font-medium text-xs",
-                isWeekend && "text-primary"
+                isWeekendDay && "text-primary"
             )}>
                 {label}
             </span>
-            {isWeekend && (
+            {isWeekendDay && (
                 <span className="text-xs text-muted-foreground font-normal mt-0.5">
                     Weekend
                 </span>
@@ -827,17 +840,17 @@ const SprintView = ({
             {/* Column Headers */}
             <div className="grid border-b border-border bg-card" style={{ gridTemplateColumns: `repeat(14, 1fr)` }}>
                 {sprintDates.map((currentDate) => {
-                    const isWeekend = weekendDays.includes(currentDate.getDay());
+                    const isWeekendDay = isWeekend(currentDate);
                     const isToday = format(currentDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
                     return (
                         <div
                             key={format(currentDate, 'yyyy-MM-dd')}
-                            className={cn("text-center py-3 border-r border-border last:border-r-0 px-1", isWeekend && "bg-muted/50")}
+                            className={cn("text-center py-3 border-r border-border last:border-r-0 px-1", isWeekendDay && "rbc-weekend-bg")}
                         >
                             <div className={cn("text-xs font-medium whitespace-nowrap", isToday && "text-primary font-bold")}>
                                 {format(currentDate, 'dd EEE')}
                             </div>
-                            {isWeekend && <div className="text-xs text-muted-foreground mt-0.5">Weekend</div>}
+                            {isWeekendDay && <div className="text-xs text-muted-foreground mt-0.5">Weekend</div>}
                         </div>
                     );
                 })}
@@ -852,14 +865,14 @@ const SprintView = ({
                     style={{ gridTemplateColumns: `repeat(14, 1fr)` }}
                 >
                     {sprintDates.map((d) => {
-                        const isWeekend = weekendDays.includes(d.getDay());
+                        const isWeekendDay = isWeekend(d);
                         const dateKey = format(d, 'yyyy-MM-dd');
                         return (
                             <div
                                 key={dateKey}
                                 className={cn(
                                     "border-r border-border last:border-r-0 h-full",
-                                    isWeekend && "bg-muted/50",
+                                    isWeekendDay && "rbc-weekend-bg",
                                     dragOverDate === dateKey && "bg-primary/10"
                                 )}
                             />
@@ -874,7 +887,7 @@ const SprintView = ({
                 >
                     {sprintDates.map((currentDate) => {
                         const dateKey = format(currentDate, 'yyyy-MM-dd');
-                        const isWeekend = weekendDays.includes(currentDate.getDay());
+                        const isWeekendDay = isWeekend(currentDate);
                         return (
                             <div
                                 key={dateKey}
@@ -929,7 +942,7 @@ const SprintView = ({
                                 }}
                             >
                                 {/* Quick task + button */}
-                                {!isWeekend && (
+                                {!isWeekendDay && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -1190,24 +1203,26 @@ export function CalendarView({ projectId }: CalendarViewProps) {
         };
     }, []);
 
-    // Add weekend configuration (0 = Sunday, 6 = Saturday)
-    // Convert string array from backend to number array for calendar
     const weekendDays = useMemo(() => {
-        if (!profile?.preferences?.weekendDays) {
-            return [0, 6]; // Default: Sunday and Saturday
+        return getWeekendDaysIndices();
+    }, [profile?.preferences?.weekendDays]);
+
+    const dayPropGetter = useCallback((date: Date) => {
+        if (isWeekend(date)) {
+            return {
+                className: "rbc-weekend-bg"
+            };
         }
+        return {};
+    }, [profile?.preferences?.weekendDays]);
 
-        const dayMap: Record<string, number> = {
-            'Sunday': 0,
-            'Monday': 1,
-            'Tuesday': 2,
-            'Wednesday': 3,
-            'Thursday': 4,
-            'Friday': 5,
-            'Saturday': 6
-        };
-
-        return profile.preferences.weekendDays.map(day => dayMap[day] ?? 0);
+    const slotPropGetter = useCallback((date: Date) => {
+        if (isWeekend(date)) {
+            return {
+                className: "rbc-weekend-bg"
+            };
+        }
+        return {};
     }, [profile?.preferences?.weekendDays]);
 
     const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
@@ -1531,6 +1546,8 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                             view={view as View}
                             onView={(newView: View) => setView(newView as View | 'sprint')}
                             date={date}
+                            dayPropGetter={dayPropGetter}
+                            slotPropGetter={slotPropGetter}
                             onNavigate={(newDate, newView) => {
                                 setDate(newDate);
                             }}
@@ -1605,7 +1622,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                                         <CustomHeader
                                             date={props.date}
                                             label={props.label}
-                                            weekendDays={weekendDays}
+                                            shouldColorBg={true}
                                         />
                                     ),
                                 },
@@ -1614,7 +1631,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                                         <CustomHeader
                                             date={props.date}
                                             label={props.label}
-                                            weekendDays={weekendDays}
+                                            shouldColorBg={true}
                                         />
                                     ),
                                 },
@@ -1623,7 +1640,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                                         <CustomHeader
                                             date={props.date}
                                             label={props.label}
-                                            weekendDays={weekendDays}
+                                            shouldColorBg={true}
                                         />
                                     ),
                                 },
@@ -1685,6 +1702,10 @@ export function CalendarView({ projectId }: CalendarViewProps) {
 
             {/* Custom Styles */}
             <style jsx global>{`
+  .rbc-weekend-bg {
+    background-color: color-mix(in oklch, var(--muted-foreground) 10%, var(--card)) !important;
+  }
+
   /* Base calendar container */
   .rbc-month-view {
     padding: 0.5rem 1rem;

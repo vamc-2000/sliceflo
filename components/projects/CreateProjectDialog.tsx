@@ -12,15 +12,22 @@ import { Button } from "@/components/ui/button"
 import { useProjectsStore } from "@/stores/projects-store"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useImpler } from "@impler/react"
+import { useImportStore } from "@/stores/import-store"
+import { toast } from "../ui/sonner"
 
 interface CreateProjectDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
+const formatImportDate = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })
+
 
 export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogProps) {
   const { addProject } = useProjectsStore()
   const router = useRouter()
+  const { addImportRecord } = useImportStore()
   const [importRows, setImportRows] = React.useState<any[]>([])
 
 
@@ -67,6 +74,100 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("Use templates")
     onOpenChange(false)
   }
+    // ── Impler callback ─────────────────────────────────────────────────────────
+  const onDataImported = React.useCallback(async (uploadData: any) => {
+    const uploadId = uploadData?._id ?? uploadData?.id
+    const validRecords = uploadData?.validRecords ?? 0
+    const totalRecords = uploadData?.totalRecords ?? 0
+
+    if (!uploadId || validRecords === 0) {
+      toast("error", { title: "No valid records found in the imported file." })
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.impler.io/v1/upload/${uploadId}/rows?limit=1000&page=1`,
+        {
+          headers: {
+            "x-access-token": process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
+          },
+        }
+      )
+      const result = await response.json()
+      const rows: Record<string, any>[] = result?.data ?? result?.records ?? result ?? []
+
+      if (!rows.length) {
+        addImportRecord({
+          type: "Spreadsheet",
+          status: "Completed",
+          statusColor: "success",
+          importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
+          expiryDate: formatImportDate(new Date()),
+          projectIds: [],
+        })
+        toast("success", { title: `${validRecords} records uploaded!` })
+        return
+      }
+
+      const now = new Date()
+      const importedProjectIds: string[] = []
+      let successCount = 0
+
+      for (const row of rows) {
+        try {
+          const rawName = row.name || row.Name || row["Project Name"] || `Imported-${Date.now()}`
+          const projectPayload = {
+            name: rawName,
+            description: row.description || row.Description || "",
+            status: (row.status || "active").toLowerCase(),
+            priority: (row.priority || "medium").toLowerCase(),
+            slug: rawName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 50),
+          }
+          const pid = await addProject(projectPayload as any)
+          importedProjectIds.push(pid)
+          successCount++
+        } catch (err) {
+          console.error("Failed row:", row, err)
+        }
+      }
+
+      addImportRecord({
+        type: "Spreadsheet",
+        status: successCount === rows.length ? "Completed" : successCount > 0 ? "Ongoing" : "Failed",
+        statusColor: successCount === rows.length ? "success" : successCount > 0 ? "warning" : "error",
+        importedNumber: `${successCount} of ${rows.length} projects imported`,
+        expiryDate: formatImportDate(now),
+        projectIds: importedProjectIds,
+      })
+
+      if (successCount > 0) {
+        toast("success", { title: `${successCount} project${successCount > 1 ? "s" : ""} imported successfully!` })
+      } else {
+        toast("error", { title: "No projects created. Check column names in your file." })
+      }
+    } catch (err) {
+      console.error("Failed to fetch rows from Impler:", err)
+      addImportRecord({
+        type: "Spreadsheet",
+        status: "Completed",
+        statusColor: "success",
+        importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
+        expiryDate: formatImportDate(new Date()),
+        projectIds: [],
+      })
+      toast("success", { title: `${validRecords} records uploaded successfully!` })
+    }
+  }, [addProject, addImportRecord])
+
+  // ── Impler hook ──────────────────────────────────────────────────────────────
+  const { showWidget, isImplerInitiated } = useImpler({
+    projectId:        process.env.NEXT_PUBLIC_IMPLER_PROJECT_ID!,
+    templateId:       process.env.NEXT_PUBLIC_IMPLER_TEMPLATE_ID!,
+    accessToken:      process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
+    onUploadComplete: onDataImported,
+    onWidgetClose:    () => console.log("Impler widget closed"),
+  })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

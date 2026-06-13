@@ -67,6 +67,7 @@ import {
   StatusHistoryEntry,
   getProjectStatusHistoryApi,
   postProjectStatusHistoryApi,
+  restoreProjectApi,
 } from "@/lib/api/projects-api";
 
 export type { Cycle, CycleConfig, ParallelCycleConfig };
@@ -531,6 +532,7 @@ interface ProjectsState {
   removeUploadsFromProject: (projectId: string, uploadIds: string[]) => Promise<void>;
   archiveProject: (projectId: string) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
+  restoreProject: (projectId: string) => Promise<void>;
   updateProjectPhase: (projectId: string, state: string) => Promise<void>;
   updateProjectLabels: (projectId: string, labelIds: string[]) => Promise<void>;
   attachPortfoliosToProject: (projectId: string, portfolioIds: string[]) => Promise<void>;
@@ -1840,6 +1842,24 @@ export const useProjectsStore = create<ProjectsState>()(
             error: null,
           }));
 
+          // ✅ Update sidebar immediately
+          try {
+            const { useSidebarStore } = require("./sidebar-store");
+            const allProjects = get().projects;
+            useSidebarStore.getState().updateMenuItemSubmenu(
+              'project',
+              allProjects.map((p) => ({
+                key: `project-${p.id}`,
+                label: p.name,
+                href: `/project/${p.id}`,
+              }))
+            );
+            // Re-initialize dynamic data to clean up pinned items and refresh sidebars
+            useSidebarStore.getState().initializeDynamicData();
+          } catch (error) {
+            console.error('Failed to update sidebar immediately on delete:', error);
+          }
+
           toast("success", {
             title: 'Project deleted successfully!',
           })
@@ -1856,6 +1876,92 @@ export const useProjectsStore = create<ProjectsState>()(
           });
           toast("error", {
             title: "Failed to delete project",
+          })
+          throw error;
+        }
+      },
+
+      restoreProject: async (projectId: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          console.log('🎯 Restoring project:', projectId);
+          const restoredProject = await restoreProjectApi(projectId);
+
+          // Map the response to the frontend Project schema
+          const mappedProject: Project = {
+            id: restoredProject.id,
+            name: restoredProject.name,
+            description: restoredProject.description,
+            slug: restoredProject.slug,
+            status: restoredProject.status,
+            startDate: restoredProject.startDate,
+            endDate: restoredProject.endDate,
+            linkedPortfolios: restoredProject.linkedPortfolios || [],
+            phase: restoredProject.state,
+            leaders: restoredProject.leaders || [],
+            viewers: restoredProject.viewers || [],
+            members: restoredProject.members || [],
+            priority: restoredProject.priority,
+            privacy: restoredProject.privacy as any,
+            customFieldsConfig: restoredProject.customFieldsConfig ?? [],
+            customFieldValues: restoredProject.customFieldValues ?? {},
+            customFields: (restoredProject.customFields ?? []).map(f => mapAPIToStore(f, restoredProject.id)),
+            projectStatusConfig: restoredProject.projectStatusConfig || [],
+            projectPriorityConfig: restoredProject.projectPriorityConfig || [],
+            taskTypeConfig: enrichTaskTypeConfigs(restoredProject.taskTypeConfig ?? []),
+            taskStatusConfig: restoredProject.taskStatusConfig || [],
+            taskPriorityConfig: restoredProject.taskPriorityConfig || [],
+            labels: restoredProject.labels || [],
+            createdAt: restoredProject.createdAt,
+            updatedAt: restoredProject.updatedAt,
+            attachments: Array.isArray(restoredProject.attachments)
+              ? restoredProject.attachments.map(mapAttachment).filter((att): att is NonNullable<typeof att> => att !== null)
+              : [],
+            iconId: restoredProject.iconId || restoredProject.icon?.iconId || null,
+            icon: restoredProject.icon,
+            color: restoredProject.icon?.color || "#3B82F6",
+            projectLeader: restoredProject.leaders?.[0],
+            linkedPortfolio: restoredProject.portfolioId,
+            cycleConfig: restoredProject.cycleConfigs?.find(c => c && c.id !== null),
+            parallelCycleConfigs: restoredProject.cycleConfigs || [],
+            usesParallelCycleConfigs: restoredProject.usesParallelCycleConfigs,
+          };
+
+          set((state) => ({
+            projects: [...state.projects, mappedProject],
+            isLoading: false,
+            error: null,
+          }));
+
+          // ✅ Update sidebar immediately
+          try {
+            const { useSidebarStore } = require("./sidebar-store");
+            const allProjects = get().projects;
+            useSidebarStore.getState().updateMenuItemSubmenu(
+              'project',
+              allProjects.map((p) => ({
+                key: `project-${p.id}`,
+                label: p.name,
+                href: `/project/${p.id}`,
+              }))
+            );
+            // Re-initialize dynamic data to clean up pinned items and refresh sidebars
+            useSidebarStore.getState().initializeDynamicData();
+          } catch (error) {
+            console.error('Failed to update sidebar immediately on restore:', error);
+          }
+
+          toast("success", {
+            title: 'Project restored successfully!',
+          })
+        } catch (error: any) {
+          console.error('Restore Project Error:', error);
+          set({
+            error: error.response?.data?.message || 'Failed to restore project',
+            isLoading: false,
+          });
+          toast("error", {
+            title: "Failed to restore project",
           })
           throw error;
         }

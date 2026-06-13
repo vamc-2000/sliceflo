@@ -19,6 +19,7 @@ import DocMembersSection from "./DocMembersSection";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProjectsStore } from "@/stores/projects-store";
+import { iconLibrary } from "@/components/ColorIconPicker";
 import { useTeamStore } from "@/stores/teams-store";
 import { usePortfoliosStore } from "@/stores/portfolios-store";
 import {
@@ -44,6 +45,7 @@ import { useTheme } from "next-themes";
 import { MdOutlineModeEdit } from "react-icons/md";
 import Image from "next/image";
 import * as Y from "yjs";
+import { formatLocalDateTime } from "@/utils/timezone-utils";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Spinner } from "@/components/ui/spinner";
 import { PDFExporter, pdfDefaultSchemaMappings } from "@blocknote/xl-pdf-exporter";
@@ -325,7 +327,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
         const { PDFExporter, pdfDefaultSchemaMappings } = await import("@blocknote/xl-pdf-exporter");
         const ReactPDF = await import("@react-pdf/renderer");
 
-      
+
         const blocks = editor.document;
 
         const exporter = new PDFExporter(editor.schema, pdfDefaultSchemaMappings);
@@ -555,24 +557,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
   };
 
   const formatTime = (date: Date) => {
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    const timeString = date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-    if (isToday) {
-      return `Today at ${timeString.toLowerCase()}`;
-    } else {
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    }
+    return formatLocalDateTime(date);
   };
 
   const getUserInitials = (name?: string | null) => {
@@ -595,6 +580,13 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
     updateDocumentApi(docId, payload)
       .then((updated) => { if (updated) updateDocument(docId, updated as any); })
       .catch((err) => console.error("Failed to save page", err));
+  };
+
+  const getProjectAvatar = (project: any) => {
+    if (!project?.icon) return null;
+    if (project.icon.type === "file") return { type: "image", src: project.icon.presignedUrl };
+    if (project.icon.type === "icon") return { type: "icon", name: project.icon.name, color: project.icon.color ?? "#6B7280" };
+    return null;
   };
 
   // Relationship handlers
@@ -1053,17 +1045,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                   >
                                     Project
                                   </Button>
-                                  <Button
-                                    variant="ghost"
-                                    onClick={() => setActiveTab("team")}
-                                    className={`px-2 py-2 text-sm font-medium transition-colors rounded-none h-auto ${activeTab === "team"
-                                      ? "text-foreground border-b-2 border-primary -mb-[2px]"
-                                      : "text-muted-foreground hover:text-foreground"
-                                      }`}
-                                    data-testid="relationship-tab-team"
-                                  >
-                                    Teams
-                                  </Button>
+
                                   <Button
                                     variant="ghost"
                                     onClick={() => setActiveTab("portfolio")}
@@ -1123,6 +1105,31 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 data-testid={`checkbox-link-project-${project.id}`}
                                               />
 
+                                              {(() => {
+                                                const avatar = getProjectAvatar(project);
+                                                return (
+                                                  <div
+                                                    className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                                    style={{ backgroundColor: avatar?.type === "icon" ? (avatar.color + "20") : (project?.color ? project.color + "20" : "#3B82F620") }}
+                                                  >
+                                                    {avatar?.type === "image" ? (
+                                                      <img src={avatar.src} alt={project?.name} className="w-full h-full object-cover rounded" />
+                                                    ) : avatar?.type === "icon" ? (
+                                                      (() => {
+                                                        const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                                        if (iconObj) {
+                                                          const IconComponent = iconObj.icon;
+                                                          return <IconComponent size={10} color={avatar.color} />;
+                                                        }
+                                                        return <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>{project?.name?.charAt(0).toUpperCase()}</span>;
+                                                      })()
+                                                    ) : (
+                                                      <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>{project?.name?.charAt(0).toUpperCase()}</span>
+                                                    )}
+                                                  </div>
+                                                );
+                                              })()}
+
                                               <span className="text-sm text-foreground flex-1">
                                                 {project.name}
                                               </span>
@@ -1133,49 +1140,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                     </div>
                                   )}
 
-                                  {activeTab === "team" && (
-                                    <div>
-                                      <p className="text-xs text-muted-foreground mb-3">Recent Teams</p>
-                                      <div className="space-y-1 max-h-60 overflow-y-auto">
-                                        {teams.map((team) => {
-                                          const isSelected = currentDoc?.pageLinkedTeams?.includes(team.id!);
 
-                                          return (
-                                            <div
-                                              key={team.id}
-                                              className={`flex items-center gap-3 py-2 px-2 rounded cursor-pointer transition-colors ${isSelected ? "bg-muted" : "hover:bg-muted/50"
-                                                }`}
-                                              onClick={() => {
-                                                if (isSelected) {
-                                                  removePageLinkTeam(activeDocId!, team.id!);
-                                                } else {
-                                                  addPageLinkTeam(activeDocId!, team.id!);
-                                                }
-                                              }}
-                                            >
-                                              <Checkbox
-                                                checked={isSelected}
-                                                onCheckedChange={(checked) => {
-                                                  if (checked) {
-                                                    addPageLinkTeam(activeDocId!, team.id!);
-                                                  } else {
-                                                    removePageLinkTeam(activeDocId!, team.id!);
-                                                  }
-                                                }}
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                                data-testid={`checkbox-link-team-${team.id}`}
-                                              />
-
-                                              <span className="text-sm text-foreground flex-1">
-                                                {team.name}
-                                              </span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  )}
 
                                   {activeTab === "portfolio" && (
                                     <div>
@@ -1197,6 +1162,33 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                   }
                                                 }}
                                               >
+                                                {(() => {
+                                                  const avatar = getProjectAvatar(portfolio);
+                                                  return (
+                                                    <div
+                                                      className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                                      style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : portfolio?.color ? `${portfolio.color}20` : "#3B82F620" }}
+                                                    >
+                                                      {avatar?.type === "image" ? (
+                                                        <img src={avatar.src} alt={portfolio?.name} className="w-full h-full object-cover rounded" />
+                                                      ) : avatar?.type === "icon" ? (
+                                                        (() => {
+                                                          const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                                          if (iconObj) {
+                                                            const IconComponent = iconObj.icon;
+                                                            return <IconComponent size={10} color={avatar.color} />;
+                                                          }
+                                                          return <span className="text-[9px] font-bold" style={{ color: portfolio?.color ?? "#3B82F6" }}>{portfolio?.name?.charAt(0).toUpperCase()}</span>;
+                                                        })()
+                                                      ) : (
+                                                        <span className="text-[9px] font-bold" style={{ color: portfolio?.color ?? "#3B82F6" }}>{portfolio?.name?.charAt(0).toUpperCase()}</span>
+                                                      )}
+                                                    </div>
+                                                  );
+                                                })()}
+                                                <span className="text-sm text-foreground flex-1">
+                                                  {portfolio.name}
+                                                </span>
                                                 <Checkbox
                                                   checked={isSelected}
                                                   onCheckedChange={(checked) => {
@@ -1210,9 +1202,6 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                   className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                                   data-testid={`checkbox-link-portfolio-${portfolio.id}`}
                                                 />
-                                                <span className="text-sm text-foreground flex-1">
-                                                  {portfolio.name}
-                                                </span>
                                               </div>
                                             );
                                           })
@@ -1244,6 +1233,10 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 }
                                               }}
                                             >
+                                              <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
+                                              <span className="text-sm text-foreground flex-1">
+                                                {docItem.title}
+                                              </span>
                                               <Checkbox
                                                 checked={isSelected}
                                                 onCheckedChange={(checked) => {
@@ -1257,9 +1250,6 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                                 data-testid={`checkbox-link-document-${docItem.id}`}
                                               />
-                                              <span className="text-sm text-foreground flex-1">
-                                                {docItem.title}
-                                              </span>
                                             </div>
                                           );
                                         })}
@@ -1271,23 +1261,55 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                             ) : (
                               // Show list of linked
                               <div className="space-y-1 bg-muted/30 rounded-lg p-2">
-                                {linkedProjectsList.map((project, idx) => (
-                                  <div
-                                    key={`project-${idx}`}
-                                    className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted/50 group"
-                                  >
-                                    <span className="text-base">📦</span>
-                                    <span className="text-sm text-foreground flex-1">{project.name}</span>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => removeProjectFromDocument(rootId, project.id!)}
+                                {linkedProjectsList.map((project, idx) => {
+                                  const avatar = getProjectAvatar(project);
+                                  return (
+                                    <div
+                                      key={`project-${idx}`}
+                                      className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted/50 group"
                                     >
-                                      <X className="w-3 h-3 text-muted-foreground" />
-                                    </Button>
-                                  </div>
-                                ))}
+                                      {/* Project Icon */}
+                                      <div
+                                        className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                        style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : project?.color ? `${project.color}20` : "#3B82F620" }}
+                                      >
+                                        {avatar?.type === "image" ? (
+                                          <img src={avatar.src} alt={project?.name} className="w-full h-full object-cover rounded" />
+                                        ) : avatar?.type === "icon" ? (
+                                          (() => {
+                                            const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                            if (iconObj) {
+                                              const IconComponent = iconObj.icon;
+                                              return (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                  <IconComponent size={10} color={avatar.color} />
+                                                </div>
+                                              );
+                                            }
+                                            return (
+                                              <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>
+                                                {project?.name?.charAt(0)?.toUpperCase()}
+                                              </span>
+                                            );
+                                          })()
+                                        ) : (
+                                          <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>
+                                            {project?.name?.charAt(0)?.toUpperCase()}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <span className="text-sm text-foreground flex-1">{project.name}</span>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={() => removeProjectFromDocument(rootId, project.id!)}
+                                      >
+                                        <X className="w-3 h-3 text-muted-foreground" />
+                                      </Button>
+                                    </div>
+                                  );
+                                })}
 
                                 {linkedTeamsList.map((team, idx) => (
                                   <div
@@ -1307,30 +1329,26 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                   </div>
                                 ))}
 
-                                {linkedPortfoliosList.map((portfolio, idx) => (
-                                  <div
-                                    key={`portfolio-${idx}`}
-                                    className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted/50 group"
-                                  >
-                                    <span className="text-base">📂</span>
-                                    <span className="text-sm text-foreground flex-1">{portfolio.name}</span>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => removePortfolioFromDocument(rootId, portfolio.id)}
+                                {linkedPortfoliosList.map(p => (
+                                  <div key={p?.id} className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted group">
+                                    <div
+                                      className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
+                                      style={{ backgroundColor: p?.color || "#9333ea" }}
                                     >
+                                      {p?.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span className="text-sm text-foreground flex-1 truncate">{p?.name}</span>
+                                    <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(item.id, p?.id!); }}>
                                       <X className="w-3 h-3 text-muted-foreground" />
                                     </Button>
                                   </div>
                                 ))}
-
                                 {linkedDocumentsList.map((doc, idx) => (
                                   <div
                                     key={`doc-${idx}`}
                                     className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted/50 group"
                                   >
-                                    <span className="text-base">📄</span>
+                                    <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                                     <span className="text-sm text-foreground flex-1">{doc.title}</span>
                                     <Button
                                       variant="ghost"
@@ -1381,17 +1399,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                             >
                               Project
                             </Button>
-                            <Button
-                              variant="ghost"
-                              onClick={() => setActiveTab("team")}
-                              className={`px-2 py-2 text-sm font-medium transition-colors rounded-none h-auto ${activeTab === "team"
-                                ? "text-foreground border-b-2 border-primary -mb-[2px]"
-                                : "text-muted-foreground hover:text-foreground"
-                                }`}
-                              data-testid="relationship-tab-team"
-                            >
-                              Teams
-                            </Button>
+
                             <Button
                               variant="ghost"
                               onClick={() => setActiveTab("portfolio")}
@@ -1421,7 +1429,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                           {/* Empty State Image Logic */}
                           {(() => {
                             const isEmpty = (activeTab === "project" && projects.length === 0) ||
-                              (activeTab === "team" && teams.length === 0) ||
+
                               (activeTab === "portfolio" && portfolios.length === 0) ||
                               (activeTab === "document" && docList.length === 0);
 
@@ -1487,6 +1495,35 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }
                                       }}
                                     >
+
+                                      {(() => {
+                                        const avatar = getProjectAvatar(project);
+                                        return (
+                                          <div
+                                            className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                            style={{ backgroundColor: avatar?.type === "icon" ? (avatar.color + "20") : (project?.color ? project.color + "20" : "#3B82F620") }}
+                                          >
+                                            {avatar?.type === "image" ? (
+                                              <img src={avatar.src} alt={project?.name} className="w-full h-full object-cover rounded" />
+                                            ) : avatar?.type === "icon" ? (
+                                              (() => {
+                                                const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                                if (iconObj) {
+                                                  const IconComponent = iconObj.icon;
+                                                  return <IconComponent size={10} color={avatar.color} />;
+                                                }
+                                                return <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>{project?.name?.charAt(0).toUpperCase()}</span>;
+                                              })()
+                                            ) : (
+                                              <span className="text-[9px] font-bold" style={{ color: project?.color ?? "#3B82F6" }}>{project?.name?.charAt(0).toUpperCase()}</span>
+                                            )}
+                                          </div>
+                                        );
+                                      })()}
+
+                                      <span className="text-sm text-foreground flex-1">
+                                        {project.name}
+                                      </span>
                                       <Checkbox
                                         checked={isSelected}
                                         onCheckedChange={(checked) => {
@@ -1501,104 +1538,33 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         data-testid={`checkbox-link-project-${project.id}`}
                                       />
 
-                                      <span className="text-sm text-foreground flex-1">
-                                        {project.name}
-                                      </span>
                                     </div>
                                   );
                                 })}
                               </div>
                             </div>
                           )}
-
-                          {activeTab === "team" && teams.length > 0 && (
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-3">Recent Teams</p>
-                              <div className="space-y-1 max-h-60 overflow-y-auto">
-                                {teams.map((team) => {
-                                  const isSelected = selectedTeams.includes(team.id!);
-
-                                  return (
-                                    <div
-                                      key={team.id}
-                                      className={`flex items-center gap-3 py-2 px-2 rounded cursor-pointer transition-colors ${isSelected ? "bg-muted" : "hover:bg-muted/50"
-                                        }`}
-                                      onClick={() => {
-                                        if (isSelected) {
-                                          handleRemoveTeam(team.id!);
-                                        } else {
-                                          handleAddTeam(team.id!);
-                                        }
-                                      }}
-                                    >
-                                      <Checkbox
-                                        checked={isSelected}
-                                        onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            handleAddTeam(team.id!);
-                                          } else {
-                                            handleRemoveTeam(team.id!);
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                        data-testid={`checkbox-link-team-${team.id}`}
-                                      />
-
-                                      <span className="text-sm text-foreground flex-1">
-                                        {team.name}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-
                           {activeTab === "portfolio" && portfolios.length > 0 && (
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-3">Recent Portfolios</p>
-                              <div className="space-y-1 max-h-60 overflow-y-auto">
-                                {portfolios.map((portfolio) => {
-                                  const isSelected = selectedPortfolios.includes(portfolio.id);
-
-                                  return (
-                                    <div
-                                      key={portfolio.id}
-                                      className={`flex items-center gap-3 py-2 px-2 rounded cursor-pointer transition-colors ${isSelected ? "bg-muted" : "hover:bg-muted/50"
-                                        }`}
-                                      onClick={() => {
-                                        if (isSelected) {
-                                          handleRemovePortfolio(portfolio.id);
-                                        } else {
-                                          handleAddPortfolio(portfolio.id);
-                                        }
-                                      }}
-                                    >
-                                      <Checkbox
-                                        checked={isSelected}
-                                        onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            handleAddPortfolio(portfolio.id);
-                                          } else {
-                                            handleRemovePortfolio(portfolio.id);
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                        data-testid={`checkbox-link-portfolio-${portfolio.id}`}
-                                      />
-
-                                      <span className="text-sm text-foreground flex-1">
-                                        {portfolio.name}
-                                      </span>
+                            <div className="max-h-40 overflow-y-auto space-y-1">
+                              {portfolios.map((p) => {
+                                const isSelected = currentDoc?.pageLinkedPortfolios?.includes(p.id!);
+                                return (
+                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(item.id, p.id!) : handleAddPortfolio(item.id, p.id!)}>
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <div
+                                        className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
+                                        style={{ backgroundColor: p.color || "#9333ea" }}
+                                      >
+                                        {p.name?.charAt(0).toUpperCase()}
+                                      </div>
+                                      <span className="text-xs text-foreground truncate">{p.name}</span>
                                     </div>
-                                  );
-                                })}
-                              </div>
+                                    <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-portfolio-${p.id}`} />
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
-
                           {activeTab === "document" && docList.length > 0 && (
                             <div>
                               <p className="text-xs text-muted-foreground mb-3">Recent Documents</p>
@@ -1619,6 +1585,10 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }
                                       }}
                                     >
+
+                                      <span className="text-sm text-foreground flex-1">
+                                        {doc.title}
+                                      </span>
                                       <Checkbox
                                         checked={isSelected}
                                         onCheckedChange={(checked) => {
@@ -1632,9 +1602,6 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                         data-testid={`checkbox-link-document-${doc.id}`}
                                       />
-                                      <span className="text-sm text-foreground flex-1">
-                                        {doc.title}
-                                      </span>
                                     </div>
                                   );
                                 })}

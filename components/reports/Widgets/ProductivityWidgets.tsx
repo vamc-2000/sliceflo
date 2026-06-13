@@ -39,17 +39,17 @@ export default function ProductivityWidgets({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-6">Productivity</h2>
+      <h2 className="text-lg font-semibold mb-6 text-foreground">Productivity</h2>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
         {widgets.map((widget) => (
           <button
             key={widget.id}
             onClick={() => handleSelect(widget.id)}
-            className={`group border rounded-2xl bg-white transition-all duration-200 overflow-hidden text-left
+            className={`group border border-border rounded-2xl bg-card transition-all duration-200 overflow-hidden text-left
             ${selected === widget.id
-                ? "border-[#001F3F] shadow-lg"
-                : "hover:shadow-lg hover:border-[#001F3F]"
+                ? "border-[#001F3F] dark:border-brand shadow-lg"
+                : "hover:shadow-lg hover:border-[#001F3F] dark:hover:border-brand"
               }`}
           >
             {/* Image */}
@@ -64,8 +64,8 @@ export default function ProductivityWidgets({
 
             {/* Text */}
             <div className="p-4">
-              <div className="font-medium text-[#001F3F]">{widget.title}</div>
-              <p className="text-sm text-gray-500 mt-1">
+              <div className="font-medium text-[#001F3F] dark:text-foreground">{widget.title}</div>
+              <p className="text-sm text-muted-foreground mt-1">
                 Click to add this widget
               </p>
             </div>

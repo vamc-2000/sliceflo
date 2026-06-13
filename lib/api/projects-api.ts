@@ -187,6 +187,37 @@ export const deleteProjectApi = async (
   return response as any;
 };
 
+export interface DeletedProjectResponse {
+  projects: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    workspaceId: string;
+    ownerId: string;
+    deleted: boolean;
+    deletedAt: string;
+    deletedBy: string;
+    updatedAt: string;
+  }>;
+}
+
+export const getDeletedProjectsApi = async (
+  workspaceId?: string
+): Promise<DeletedProjectResponse> => {
+  const response = await axiosInstance.get(`/project/deleted`, {
+    params: workspaceId ? { workspaceId } : undefined,
+  });
+  return response as any;
+};
+
+export const restoreProjectApi = async (
+  projectId: string
+): Promise<ProjectResponse> => {
+  const response = await axiosInstance.post(`/project/${projectId}/restore`);
+  return response;
+};
+
 // 1️⃣ Rename Project
 export const renameProjectPatchApi = async (
   projectId: string,

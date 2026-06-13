@@ -33,22 +33,23 @@ const ConditionNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Co
 
             {/* Input handle */}
             <Handle type="target" position={Position.Top} id="input"
-                style={{ width: 10, height: 10, background: accentColor, border: '2px solid white', top: -5 }}
+                className="border-2 border-background"
+                style={{ width: 10, height: 10, background: accentColor, top: -5 }}
             />
 
             {/* Step badge */}
-            <div className="absolute -top-2 -left-2 z-20 flex items-center gap-1 bg-white border border-gray-100 rounded-full px-1.5 py-0.5 shadow-sm">
+            <div className="absolute -top-2 -left-2 z-20 flex items-center gap-1 bg-card border border-border rounded-full px-1.5 py-0.5 shadow-sm">
                 <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: accentColor }}>
                     <GitBranch className="w-2 h-2 text-white" />
                 </div>
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide leading-none">Condition</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide leading-none">Condition</span>
             </div>
 
             {/* Card */}
             <div
                 onClick={() => onConfigClick?.({ data, id, type, ...props })}
                 className={`
-                    relative w-full bg-white rounded-xl border cursor-pointer
+                    relative w-full bg-card rounded-xl border border-border cursor-pointer
                     transition-all duration-200 overflow-hidden
                     ${selected ? 'border-orange-400 shadow-md ring-2 ring-orange-400/20' : 'shadow-sm hover:shadow-md'}
                 `}
@@ -66,7 +67,7 @@ const ConditionNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Co
 
                     {/* Text */}
                     <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-bold text-gray-800 leading-tight truncate">{label}</p>
+                        <p className="text-[12px] font-bold text-foreground leading-tight truncate">{label}</p>
                         <p className="text-[9px] font-semibold uppercase tracking-wide mt-0.5" style={{ color: accentColor }}>
                             If condition met
                         </p>
@@ -75,16 +76,16 @@ const ConditionNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Co
                     {/* 3-dot menu */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="w-6 h-6 rounded-md flex-shrink-0 text-gray-300 hover:text-gray-500 hover:bg-gray-50">
+                            <Button variant="ghost" size="icon" className="w-6 h-6 rounded-md flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer">
                                 <MoreVertical className="w-3 h-3" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-xl border-gray-100">
-                            <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer">
-                                <Copy className="w-3.5 h-3.5 text-gray-400" /> Copy
+                        <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-xl border border-border bg-popover text-popover-foreground p-1">
+                            <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                                <Copy className="w-3.5 h-3.5 text-muted-foreground" /> Copy
                             </DropdownMenuItem>
-                            <div className="h-px bg-gray-100 my-1" />
-                            <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium text-red-500 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                            <div className="h-px bg-border my-1" />
+                            <DropdownMenuItem className="gap-2 py-1.5 text-[12px] font-medium text-red-500 focus:text-red-600 focus:bg-red-50 cursor-pointer hover:bg-accent">
                                 <Trash2 className="w-3.5 h-3.5" /> Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -92,11 +93,11 @@ const ConditionNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Co
                 </div>
 
                 {/* Yes / No branch labels */}
-                <div className="flex border-t border-gray-50 divide-x divide-gray-50">
-                    <div className="flex-1 py-1 text-center">
+                <div className="flex border-t border-border divide-x divide-border">
+                    <div className="flex-1 py-1 text-center bg-card">
                         <span className="text-[9px] font-bold text-green-500 uppercase tracking-wide">✓ Yes path</span>
                     </div>
-                    <div className="flex-1 py-1 text-center">
+                    <div className="flex-1 py-1 text-center bg-card">
                         <span className="text-[9px] font-bold text-red-400 uppercase tracking-wide">✕ No path</span>
                     </div>
                 </div>
@@ -104,11 +105,13 @@ const ConditionNode = ({ data, selected, id, type, ...props }: NodeProps<Node<Co
 
             {/* Yes handle (left) */}
             <Handle type="source" position={Position.Bottom} id="yes"
-                style={{ width: 10, height: 10, background: '#22C55E', border: '2px solid white', bottom: -5, left: '30%' }}
+                className="border-2 border-background"
+                style={{ width: 10, height: 10, background: '#22C55E', bottom: -5, left: '30%' }}
             />
             {/* No handle (right) */}
             <Handle type="source" position={Position.Bottom} id="no"
-                style={{ width: 10, height: 10, background: '#EF4444', border: '2px solid white', bottom: -5, left: '70%' }}
+                className="border-2 border-background"
+                style={{ width: 10, height: 10, background: '#EF4444', bottom: -5, left: '70%' }}
             />
         </div>
     );

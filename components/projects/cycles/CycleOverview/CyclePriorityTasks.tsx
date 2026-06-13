@@ -9,6 +9,8 @@ import { convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { Button } from "@/components/ui/button";
 import LinkCycleTasksDialog from "../LinkCycleTasksDialog";
 import { QuickTaskCreation } from "../../QuickTaskCreation";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface CyclePriorityTasksProps {
     isEmpty: boolean;
@@ -87,23 +89,25 @@ export function CyclePriorityTasks({ isEmpty, projectId, tasks, cycleId }: Cycle
                     </div>
                 </div>
             ) : (
-                <div className="flex-1 overflow-auto max-h-[500px] custom-scrollbar">
-                    <TaskTable
-                        groupId="priority-tasks"
-                        projectId={projectId}
-                        filteredTasks={priorityTasks}
-                        hideFields={[]}
-                        columnConfigs={columnConfigs}
-                        displayOptions={{
-                            collapsedSubtasks: false,
-                            closedTasks: false,
-                            wrapText: false,
-                            subtaskParentId: false
-                        }}
-                        groupName="Priority Tasks"
-                        groupColor="#3B82F6"
-                        defaultCycleId={cycleId}
-                    />
+                <div className="flex-1 overflow-auto max-h-[500px] custom-scrollbar drag-scroll-container">
+                    <DndProvider backend={HTML5Backend}>
+                        <TaskTable
+                            groupId="priority-tasks"
+                            projectId={projectId}
+                            filteredTasks={priorityTasks}
+                            hideFields={[]}
+                            columnConfigs={columnConfigs}
+                            displayOptions={{
+                                collapsedSubtasks: false,
+                                closedTasks: false,
+                                wrapText: false,
+                                subtaskParentId: false
+                            }}
+                            groupName="Priority Tasks"
+                            groupColor="#3B82F6"
+                            defaultCycleId={cycleId}
+                        />
+                    </DndProvider>
                 </div>
             )}
 

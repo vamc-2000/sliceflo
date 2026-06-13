@@ -29,14 +29,14 @@ export default function WidgetModal({
 
     return (
         <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-            <DialogContent className="w-full max-w-5xl! p-0 overflow-hidden">
+            <DialogContent className="w-full max-w-5xl! p-0 overflow-hidden bg-background text-foreground border-border">
                 <DialogHeader className="px-6 pt-6 mb-1">  {/* Add mb-0 */}
-                    <DialogTitle>Create New Widget</DialogTitle>
+                    <DialogTitle className="text-foreground">Create New Widget</DialogTitle>
                 </DialogHeader>
 
                 <div className="flex h-125">
                     {/* LEFT SIDE MENU */}
-                    <div className="w-64 border-r bg-muted/40 p-4 space-y-2">
+                    <div className="w-64 border-r border-border bg-muted/40 p-4 space-y-2">
                         {[
                             { id: "productivity", label: "Productivity" },
                             { id: "analytics", label: "Analytics" },
@@ -47,8 +47,8 @@ export default function WidgetModal({
                                 onClick={() => setActiveTab(item.id)}
                                 className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors
                                     ${activeTab === item.id
-                                        ? "bg-background shadow font-medium"
-                                        : "hover:bg-muted"
+                                        ? "bg-background text-foreground shadow border border-border font-medium"
+                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                     }`}
                             >
                                 {item.label}
@@ -73,15 +73,15 @@ export default function WidgetModal({
 
                         {activeTab === "analytics" && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-4">Analytics</h2>
-                                <p>Your analytics content here.</p>
+                                <h2 className="text-lg font-semibold mb-4 text-foreground">Analytics</h2>
+                                <p className="text-muted-foreground">Your analytics content here.</p>
                             </div>
                         )}
 
                         {activeTab === "finance" && (
                             <div>
-                                <h2 className="text-lg font-semibold mb-4">Finance</h2>
-                                <p>Your finance content here.</p>
+                                <h2 className="text-lg font-semibold mb-4 text-foreground">Finance</h2>
+                                <p className="text-muted-foreground">Your finance content here.</p>
                             </div>
                         )}
                     </div>
@@ -96,9 +96,9 @@ export default function WidgetModal({
 
 function WidgetCard({ title }: { title: string }) {
     return (
-        <button className="border rounded-xl p-4 text-left hover:shadow-md hover:border-[#001F3F] transition-all duration-200 bg-white">
-            <div className="font-medium text-[#001F3F]">{title}</div>
-            <p className="text-sm text-gray-500 mt-1">
+        <button className="border border-border rounded-xl p-4 text-left hover:shadow-md hover:border-[#001F3F] dark:hover:border-brand transition-all duration-200 bg-card">
+            <div className="font-medium text-[#001F3F] dark:text-foreground">{title}</div>
+            <p className="text-sm text-muted-foreground mt-1">
                 Click to add this widget
             </p>
         </button>

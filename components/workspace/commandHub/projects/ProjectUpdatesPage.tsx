@@ -12,6 +12,7 @@ import {
 import { useProjectsStore } from "@/stores/projects-store";
 import AddStatusUpdateModal from "../AddStatusUpdateModal";
 import { toast } from "react-hot-toast";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface ProjectUpdatesPageProps {
   projectId: string;
@@ -33,6 +34,8 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
+  const [deleteStatusId, setDeleteStatusId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
 
   const handleCreateNew = () => {
@@ -71,14 +74,21 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
     setIsModalOpen(true);
   };
   
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this status?")) {
-      try {
-        await deleteProjectStatusConfig(projectId, id);
-        toast.success("Status deleted");
-      } catch (error) {
-        toast.error("Failed to delete status");
-      }
+  const handleDelete = (id: string) => {
+    setDeleteStatusId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteStatusId) return;
+    setIsDeleting(true);
+    try {
+      await deleteProjectStatusConfig(projectId, deleteStatusId);
+      toast.success("Status deleted");
+    } catch (error) {
+      toast.error("Failed to delete status");
+    } finally {
+      setIsDeleting(false);
+      setDeleteStatusId(null);
     }
   };
 
@@ -87,20 +97,20 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
     : null;
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 bg-background text-foreground">
       {/* Header - Same style as Labels page */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-[16px] font-semibold text-foreground">
             Project updates
           </h2>
-          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-[12px] text-muted-foreground mt-0.5">
             Create, edit, or organize status updates used across this project.
           </p>
         </div>
         <Button
           onClick={handleCreateNew}
-          className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           Create new
@@ -113,26 +123,26 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
         {statuses.map((status) => (
           <div
             key={status._id}
-            className="flex items-center justify-between p-3 rounded-md hover:shadow-sm transition-shadow"
+            className="flex items-center justify-between p-3 rounded-md hover:shadow-sm transition-shadow border border-border"
             style={{ backgroundColor: status.color + '15' }}
           >
             <div className="flex items-center gap-2.5">
               <div className="w-4 h-4 rounded-full" style={{ backgroundColor: status.color }} />
-              <span className="text-[13px] font-medium text-gray-900">{status.label}</span>
+              <span className="text-[13px] font-medium text-foreground">{status.label}</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-                  <Ellipsis className="w-4 h-4 text-gray-500" />
+                <button className="p-1 hover:bg-accent hover:text-accent-foreground rounded transition-colors cursor-pointer">
+                  <Ellipsis className="w-4 h-4 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={() => handleEdit(status._id)} className="text-[12px]">
+              <DropdownMenuContent align="end" className="w-32 bg-popover border border-border text-popover-foreground">
+                <DropdownMenuItem onClick={() => handleEdit(status._id)} className="text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground">
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleDelete(status._id)}
-                  className="text-red-600 focus:text-red-600 text-[12px]"
+                  className="text-red-600 focus:text-red-600 text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 >
                   Delete
                 </DropdownMenuItem>
@@ -156,6 +166,17 @@ const ProjectUpdatesPage: React.FC<ProjectUpdatesPageProps> = ({
               }
             : null
         }
+      />
+
+      <ConfirmationModal
+        open={!!deleteStatusId}
+        onClose={() => setDeleteStatusId(null)}
+        onConfirm={handleDeleteConfirm}
+        title="Are you sure want to delete this status update?"
+        description="This action is permanent and cannot be undone."
+        confirmLabel="Delete Status"
+        loadingLabel="Deleting..."
+        loading={isDeleting}
       />
     </div>
   );

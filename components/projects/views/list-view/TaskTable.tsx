@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar as UIAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -265,6 +266,130 @@ export function TaskTable({
 
   // ✅ ADD THIS LINE — makes TaskTable re-render when any field is toggled
   const systemFieldVisibility = useTasksStore(state => state.systemFieldVisibility);
+
+  React.useEffect(() => {
+    let lastDragEvent: DragEvent | null = null;
+    let animationFrameId: number | null = null;
+
+    const handleDragOver = (e: DragEvent) => {
+      lastDragEvent = e;
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(scrollLoop);
+      }
+    };
+
+    const handleDragEndOrDrop = () => {
+      lastDragEvent = null;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    };
+
+    const scrollLoop = () => {
+      if (!lastDragEvent) {
+        animationFrameId = null;
+        return;
+      }
+
+      const clientY = lastDragEvent.clientY;
+      const clientX = lastDragEvent.clientX;
+
+      const containers = document.querySelectorAll(".drag-scroll-container");
+      containers.forEach((container) => {
+        const rect = container.getBoundingClientRect();
+
+        if (clientX >= rect.left && clientX <= rect.right) {
+          const threshold = 60;
+          const maxSpeed = 15;
+
+          if (clientY >= rect.top && clientY <= rect.bottom) {
+            if (clientY - rect.top < threshold) {
+              const intensity = (threshold - (clientY - rect.top)) / threshold;
+              container.scrollTop -= intensity * maxSpeed;
+            } else if (rect.bottom - clientY < threshold) {
+              const intensity = (threshold - (rect.bottom - clientY)) / threshold;
+              container.scrollTop += intensity * maxSpeed;
+            }
+          }
+        }
+      });
+
+      animationFrameId = requestAnimationFrame(scrollLoop);
+    };
+
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("dragend", handleDragEndOrDrop);
+    window.addEventListener("drop", handleDragEndOrDrop);
+
+    return () => {
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("dragend", handleDragEndOrDrop);
+      window.removeEventListener("drop", handleDragEndOrDrop);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, []);
+
+  const handleMoveTaskToGroup = async (taskId: string) => {
+    const originalTask = tasks.find(t => t.id === taskId);
+    if (!originalTask) return;
+
+    const updates: Partial<Task> = {};
+
+    if (groupBy === 'status' && groupName && groupName !== 'Untitled') {
+      const config = taskStatusConfigs.find(c => c.label === groupName);
+      const newStatus = config?.value ?? groupName;
+      if (originalTask.status !== newStatus) {
+        updates.status = newStatus;
+      }
+    } else if (groupBy === 'priority' && groupName && groupName !== 'Untitled') {
+      if (originalTask.priority !== groupName) {
+        updates.priority = groupName;
+      }
+    } else if (groupBy === 'assignee') {
+      const newAssignee = groupName === 'Unassigned' ? "" : (members.find(m => m.name === groupName)?.userId || "");
+      if (originalTask.assignee !== newAssignee) {
+        updates.assignee = newAssignee;
+      }
+    } else if (groupBy === 'dueDate') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (groupId === 'date-today') {
+        const todayStr = today.toISOString();
+        if (originalTask.endDate !== todayStr) updates.endDate = todayStr;
+      } else if (groupId === 'date-no-date') {
+        if (originalTask.endDate) updates.endDate = "";
+      }
+    } else if (groupBy?.startsWith('custom-') && groupFieldId) {
+      const newValue = (groupName === 'No Value' || !groupName) ? "" : groupName;
+      const customFieldValues = { ...(originalTask.customFieldValues || {}) };
+      if (customFieldValues[groupFieldId] !== newValue) {
+        customFieldValues[groupFieldId] = newValue;
+        updates.customFieldValues = customFieldValues;
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await updateTask(taskId, updates);
+      toast('success', { title: `Task moved to group: ${groupName}` });
+    }
+  };
+
+  const [{ isOverTable }, tableDropRef] = useDrop({
+    accept: "TASK_ROW",
+    drop: (item: { taskId: string; sourceGroupId: string }, monitor) => {
+      const didDrop = monitor.didDrop();
+      if (didDrop) return;
+      if (item.sourceGroupId !== groupId) {
+        handleMoveTaskToGroup(item.taskId);
+      }
+    },
+    collect: (monitor) => ({
+      isOverTable: !!monitor.isOver({ shallow: true }),
+    }),
+  });
 
   const project = projects.find((p) => p.id === projectId);
   const allCycles = project?.cycles || [];
@@ -1124,7 +1249,13 @@ export function TaskTable({
 
   return (
     <>
-      <div className="relative">
+      <div
+        ref={tableDropRef as any}
+        className={cn(
+          "relative rounded-sm transition-all duration-200",
+          isOverTable && "bg-primary/5 border-2 border-dashed border-primary/50"
+        )}
+      >
         <div className="overflow-x-auto rounded-tl-sm w-full">
           <Table className="relative border-y border-border text-xs min-w-full">
 
@@ -1224,755 +1355,78 @@ export function TaskTable({
                 return (
                   <React.Fragment key={task.id}>
                     {/* ── Main Task Row ───────────────────────────────────── */}
-                    <TableRow
-                      key={task.id}
-                      className="group bg-card hover:bg-card border-b border-border transition-colors"
-                    // style={{ borderLeft: `4px solid ${groupColor}` }}
-                    >
-                      {/* Drag */}
-                      <TableCell className={cn(bodyCellCls, "w-10")} style={getColumnStyle('drag', false, groupColor)}>
-                        <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 cursor-grab" />
-                      </TableCell>
-
-                      {/* Checkbox + expand */}
-                      <TableCell className={cn(bodyCellCls, "!px-0")} style={getColumnStyle('checkbox', false)}>
-                        {renderCheckboxColumnContent(
-                          <Checkbox
-                            checked={selectedTaskIds.has(task.id)}
-                            onCheckedChange={() => toggleTaskSelection(task.id)}
-                            className={taskCheckboxClass}
-                          />,
-                          <button
-                            type="button"
-                            className={cn(
-                              "flex h-4 w-4 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground",
-                              !hasSubtasks && "invisible"
-                            )}
-                            onClick={() => toggleTaskExpansion(task.id)}
-                            disabled={!hasSubtasks}
-                          >
-                            {isExpanded
-                              ? <ChevronDown className="h-3.5 w-3.5" />
-                              : <ChevronRight className="h-3.5 w-3.5" />}
-                          </button>
-                        )}
-                      </TableCell>
-
-                      {/* ✅ ID Column (frozen, always visible) */}
-                      {shouldShowField('id', 'ID') && (
-                        <TableCell
-                          className={cn(bodyCellCls, "text-center")}
-                          style={getColumnStyle('id', false)}
-                        >
-                          <span className="text-muted-foreground">
-                            {formatTaskId(projectSlug, task.taskNumber)}
-                          </span>
-                        </TableCell>
-                      )}
-
-                      {/* Task Name */}
-                      {shouldShowField('task', 'Task') && (
-                        <TableCell
-                          className={cn(bodyCellCls, "overflow-hidden")}
-                          style={getColumnStyle('task', false)}
-                        >
-                          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                            {/* Subtask count badge */}
-                            {/* {hasSubtasks && (
-                            <button
-                              onClick={() => toggleTaskExpansion(task.id)}
-                              className="flex items-center gap-0.5 px-1 py-0.5 rounded bg-muted hover:bg-muted text-muted-foreground flex-shrink-0"
-                            >
-                              <ChevronDown className="h-2.5 w-2.5" />
-                              {taskSubtasks.length}
-                            </button>
-                          )} */}
-                            {renamingId === task.id ? (
-                              <Input
-                                value={renamingName}
-                                onChange={(e) => setRenamingName(e.target.value)}
-                                onBlur={() => handleRenameSave(task.id)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleRenameSave(task.id);
-                                  if (e.key === 'Escape') handleRenameCancel();
-                                }}
-                                className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400 min-w-0"
-                                autoFocus
-                              />
-                            ) : (
-                              displayOptions.wrapText ? (
-                                /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
-                                <div className="flex items-center justify-between w-full min-w-0 gap-1.5">
-                                  <span
-                                    className={cn(
-                                      "text-xs text-foreground min-w-0 flex-1 truncate",
-                                      task.completed && "line-through text-muted-foreground"
-                                    )}
-                                    onDoubleClick={() => handleRenameStart(task.id, task.name || '')}
-                                    title={task.name}
-                                  >
-                                    {task.name}
-                                  </span>
-
-                                  {/* Actions & Icons container pushed to the right */}
-                                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    {/* Hover actions */}
-                                    {renamingId !== task.id && (
-                                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                          className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-0.5"
-                                          onClick={() => {
-                                            setNewSubtaskData(prev => ({
-                                              ...prev,
-                                              status: task.status || '',
-                                              startDate: new Date(),
-                                              endDate: task.endDate ? new Date(task.endDate) : undefined,
-                                              cycleId: task.cycleId ?? undefined,
-                                            }));
-                                            setAddingSubtaskToTask(task.id);
-                                            if (!isExpanded) toggleTaskExpansion(task.id);
-                                          }}
-                                        >
-                                          <Plus className="h-2.5 w-2.5" />
-                                          Sub Task
-                                        </button>
-                                        <button
-                                          className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground"
-                                          onClick={async () => {
-                                            setSelectedTaskForDetail(task);
-                                            setShowTaskDetail(true);
-                                            setIsDetailLoading(true);
-                                            const fresh = await fetchTaskById(task.id);
-                                            if (fresh) setSelectedTaskForDetail(fresh);
-                                            setIsDetailLoading(false);
-                                          }}
-                                        >
-                                          <ChevronsLeftRight className="h-4 w-4 rotate-135" />
-                                        </button>
-                                      </div>
-                                    )}
-
-                                    {/* Relationship Icons */}
-                                    {renderRelationshipIcons(task, false)}
-                                  </div>
-                                </div>
-                              ) : (
-                                /* ── MULTI-LINE (WRAP) MODE: inline flow with icons at sentence end ── */
-                                <div
-                                  className={cn(
-                                    "text-xs text-foreground whitespace-normal break-words w-full overflow-hidden",
-                                    task.completed && "line-through text-muted-foreground"
-                                  )}
-                                  onDoubleClick={() => handleRenameStart(task.id, task.name || '')}
-                                >
-                                  <span>{task.name}</span>
-
-                                  {/* Hover actions inline */}
-                                  {renamingId !== task.id && (
-                                    <span className="inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5 align-middle">
-                                      <button
-                                        className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded inline-flex items-center gap-0.5"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setNewSubtaskData(prev => ({
-                                            ...prev,
-                                            status: task.status || '',
-                                            startDate: new Date(),
-                                            endDate: task.endDate ? new Date(task.endDate) : undefined,
-                                            cycleId: task.cycleId ?? undefined,
-                                          }));
-                                          setAddingSubtaskToTask(task.id);
-                                          if (!isExpanded) toggleTaskExpansion(task.id);
-                                        }}
-                                      >
-                                        <Plus className="h-2.5 w-2.5" />
-                                        Sub Task
-                                      </button>
-                                      <button
-                                        className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground inline-flex"
-                                        onClick={async (e) => {
-                                          e.stopPropagation();
-                                          setSelectedTaskForDetail(task);
-                                          setShowTaskDetail(true);
-                                          setIsDetailLoading(true);
-                                          const fresh = await fetchTaskById(task.id);
-                                          if (fresh) setSelectedTaskForDetail(fresh);
-                                          setIsDetailLoading(false);
-                                        }}
-                                      >
-                                        <ChevronsLeftRight className="h-4 w-4 rotate-135" />
-                                      </button>
-                                    </span>
-                                  )}
-
-                                  {/* Relationship Icons inline */}
-                                  <span className="inline-flex items-center gap-1 ml-1.5 align-middle">
-                                    {renderRelationshipIcons(task, false)}
-                                  </span>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        </TableCell>
-                      )}
-
-                      {/* ── Dynamic data cells ─────────────────────────────── */}
-
-
-                      {/* Task Type Cell */}
-                      {shouldShowField('taskType', 'Type') && (
-                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('taskType', false), height: '1px' }}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden px-3 gap-2">
-                                {(() => {
-                                  const selectedType =
-                                    taskTypes.find((t) => t.value === (task.taskType || "task")) || null;
-
-                                  if (!selectedType) return <span>—</span>;
-
-                                  return (
-                                    <>
-                                      {renderTaskTypeVisual(selectedType, "w-3 h-3")}
-                                      <span className="truncate">{selectedType.label}</span>
-                                    </>
-                                  );
-                                })()}
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {taskTypes.map((type) => (
-                                <DropdownMenuItem
-                                  key={type._id}
-                                  onSelect={() => updateTask(task.id, { taskType: type.value })}
-                                  className="p-0 focus:bg-transparent"
-                                >
-                                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
-                                    {renderTaskTypeVisual(type, "w-3 h-3")}
-                                    <span className="truncate">{type.label}</span>
-                                  </div>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      )}
-
-                      {/* Status */}
-                      {shouldShowField('status', 'Status') && (
-                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('status', false), height: '1px' }}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3"
-                                style={{ backgroundColor: taskStatusConfigs.find(c => c.value === task.status)?.color || '#c4c4c4' }}>
-                                <span className="truncate w-full text-center">
-                                  {taskStatusConfigs.find(c => c.value === task.status)?.label || '—'}
-                                </span>
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {taskStatusConfigs.map(config => (
-                                <DropdownMenuItem
-                                  key={config._id}
-                                  onSelect={() => updateTask(task.id, { status: config.value })}
-                                  className="p-0 focus:bg-transparent"
-                                >
-                                  <div
-                                    className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3"
-                                    style={{ backgroundColor: config.color || '#c4c4c4' }}
-                                  >
-                                    <span className="truncate w-full text-center">
-                                      {config.label}
-                                    </span>
-                                  </div>
-                                </DropdownMenuItem>
-                              ))}
-                              {taskStatusConfigs.length > 0 && <DropdownMenuSeparator />}
-                              {isAddingStatus ? (
-                                <div className="flex gap-1 p-0 h-9 focus:bg-transparent items-center justify-center bg-muted rounded-xs">
-                                  <Input value={newStatusName} onChange={(e) => setNewStatusName(e.target.value)} placeholder="Status name" className="h-9 rounded-xs" autoFocus
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddStatus(newStatusName, task.id); if (e.key === 'Escape') { setIsAddingStatus(false); setNewStatusName(''); } }} />
-                                  <Button size="sm" className="h-9 rounded-xs" onClick={() => handleAddStatus(newStatusName, task.id)}>Add</Button>
-                                </div>
-                              ) : (
-                                <DropdownMenuItem onSelect={() => setIsAddingStatus(true)}
-                                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                                >
-                                  <Plus className="h-3 w-3" />Add Status
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onSelect={() => updateTask(task.id, { status: undefined })}
-                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                              >
-                                Clear
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      )}
-
-                      {/* Cycle */}
-                      {shouldShowField('cycle', 'Cycle') && (
-                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('cycle', false), height: '1px' }}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
-                                <span className="truncate w-full text-center flex items-center justify-center">
-                                  {task.cycle ? formatCycleName(task.cycle.name, task.cycle.cycleNumber) : (() => { const c = project?.cycles?.find(c => c.id === task.cycleId); return c ? formatCycleName(c.name, c.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />; })()}
-                                </span>
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {activeOrUpcomingCycles.map(c => (
-                                <DropdownMenuItem
-                                  key={c.id}
-                                  onSelect={() => updateTask(task.id, { cycleId: c.id })}
-                                  className="p-0 focus:bg-transparent"
-                                >
-                                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
-                                    <span className="truncate w-full text-center">
-                                      {formatCycleName(c.name, c.cycleNumber)}
-                                    </span>
-                                  </div>
-                                </DropdownMenuItem>
-                              ))}
-                              {activeOrUpcomingCycles.length === 0 && (
-                                <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
-                              )}
-                              {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
-                              <DropdownMenuItem onSelect={() => updateTask(task.id, { cycleId: null })}
-                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                              >
-                                Clear
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      )}
-
-                      {/* Assignee */}
-                      {shouldShowField('assignee', 'Assignee') && (
-                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('assignee', false), height: '1px' }}>
-                          <DropdownMenu onOpenChange={(open) => {
-                            if (!open) setAssigneeSearchQuery('');
-                          }}>
-                            <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
-                                {(() => {
-                                  const m = members.find(m => m.userId === task.assignee);
-                                  return <MemberAvatar size="md" name={m?.name} src={m?.profilePicture} />;
-                                })()}
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
-                                <Input
-                                  placeholder="Type @ or name..."
-                                  value={assigneeSearchQuery}
-                                  onChange={(e) => setAssigneeSearchQuery(e.target.value)}
-                                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
-                                  autoFocus
-                                />
-                              </div>
-                              {getFilteredMembers().length === 0 ? (
-                                <div className="text-center py-2 text-xs text-muted-foreground">
-                                  No members found
-                                </div>
-                              ) : (
-                                getFilteredMembers().map(member => (
-                                  <DropdownMenuItem
-                                    key={member.userId}
-                                    onSelect={() => updateTask(task.id, { assignee: member.userId })}
-                                    className="p-0 focus:bg-transparent"
-                                  >
-                                    <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
-                                      <MemberAvatar size="sm" name={member.name} src={member.profilePicture} />
-                                      <span className="truncate">{member.name}</span>
-                                    </div>
-                                  </DropdownMenuItem>
-                                ))
-                              )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onSelect={() => updateTask(task.id, { assignee: undefined })}
-                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                              >
-                                Clear
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      )}
-
-                      {/* ✅ Start Date (separate from Due Date) */}
-                      {shouldShowField('startDate', 'Start Date') && (
-                        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
-                                {task.startDate ? (
-                                  <span className="font-medium">{formatDate(task.startDate)}</span>
-                                ) : (
-                                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
-                                )}
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="center">
-                              <Calendar
-                                mode="single"
-                                selected={task.startDate ? new Date(task.startDate) : undefined}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    const updates: any = { startDate: convertSelectedDateToUTC(date) };
-                                    if (task.endDate && new Date(task.endDate) < date) {
-                                      updates.endDate = undefined;
-                                    }
-                                    updateTask(task.id, updates);
-                                    document.getElementById(`close-start-${task.id}`)?.click();
-                                  }
-                                }}
-                                initialFocus
-                              />
-                              <PopoverClose id={`close-start-${task.id}`} className="hidden" />
-                            </PopoverContent>
-                          </Popover>
-                        </TableCell>
-                      )}
-
-                      {/* ✅ Due Date (End Date) */}
-                      {shouldShowField('endDate', 'Due Date') && (
-                        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
-                                {task.endDate ? (
-                                  <span className="font-medium">{formatDate(task.endDate)}</span>
-                                ) : (
-                                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
-                                )}
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="center">
-                              <Calendar
-                                mode="single"
-                                selected={task.endDate ? new Date(task.endDate) : undefined}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    updateTask(task.id, { endDate: convertSelectedDateToUTC(date) });
-                                    document.getElementById(`close-end-${task.id}`)?.click();
-                                  }
-                                }}
-                                disabled={(date) => (task.startDate ? date < new Date(new Date(task.startDate).setHours(0, 0, 0, 0)) : false)}
-                                initialFocus
-                              />
-                              <PopoverClose id={`close-end-${task.id}`} className="hidden" />
-                            </PopoverContent>
-                          </Popover>
-                        </TableCell>
-                      )}
-
-                      {/* Priority */}
-                      {shouldShowField('priority', 'Priority') && (
-                        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild className="w-full h-full">
-                              <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
-                                style={{ backgroundColor: `${getPriorityColor(task.priority) || '#9CA3AF'}33` }}>
-                                <span className={cn("truncate text-xs font-medium", task.priority ? "text-foreground" : "text-muted-foreground")}>
-                                  {taskPriorityConfigs.find(p => p.value === task.priority)?.label || '—'}
-                                </span>
-                                <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(task.priority) || '#9CA3AF' }} />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                              {taskPriorityConfigs.map(option => (
-                                <DropdownMenuItem
-                                  key={option._id}
-                                  onSelect={() => updateTask(task.id, { priority: option.value })}
-                                  className="p-0 focus:bg-transparent"
-                                >
-                                  <div
-                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
-                                    style={{
-                                      backgroundColor: `${option.color || '#9CA3AF'}33`,
-                                    }}
-                                  >
-                                    <span className="truncate">
-                                      {option.label}
-                                    </span>
-                                    <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: option.color || '#9CA3AF' }} />
-                                  </div>
-                                </DropdownMenuItem>
-                              ))}
-                              {taskPriorityConfigs.length > 0 && <DropdownMenuSeparator />}
-                              {isAddingPriority ? (
-                                <div className="flex gap-1 p-0 h-9 focus:bg-transparent items-center justify-center bg-muted rounded-xs">
-                                  <Input value={newPriorityName} onChange={(e) => setNewPriorityName(e.target.value)} placeholder="Priority name" className="h-9 rounded-xs" autoFocus
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddPriority(newPriorityName, task.id); if (e.key === 'Escape') { setIsAddingPriority(false); setNewPriorityName(''); } }} />
-                                  <Button size="sm" className="h-9 rounded-xs" onClick={() => handleAddPriority(newPriorityName, task.id)}>Add</Button>
-                                </div>
-                              ) : (
-                                <DropdownMenuItem onSelect={() => setIsAddingPriority(true)}
-                                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                                >
-                                  <Plus className="h-3 w-3" />Add Priority
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onSelect={() => updateTask(task.id, { priority: undefined })}
-                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
-                              >
-                                Clear
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      )}
-
-                      {/* Custom Fields */}
-                      {customFields.map(field => {
-                        const fieldData = getTaskCustomFieldById(projectId, field.id);
-                        if (!shouldShowField(field.id, field.name)) return <React.Fragment key={field.id} />;
-                        return fieldData ? (
-                          <TableCell
-                            key={field.id}
-                            className={cn(bodyCellCls, (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people' || field.type === 'rating') && "overflow-hidden", "text-center")}
-                            style={{
-                              ...getColumnStyle(field.id, false),
-                              height: (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people') ? '1px' : undefined,
-                              padding: (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people') ? '0px' : undefined
-                            }}
-                          >
-                            <CustomFieldDropdown
-                              field={fieldData}
-                              value={task.customFieldValues?.[field.id] || (field.type === 'select-many' ? [] : '')}
-                              onUpdate={(value) => updateTaskCustomField(task.id, field.id, value)}
-                              task={task}
-                            />
-                          </TableCell>
-                        ) : <React.Fragment key={field.id} />;
-                      })}
-
-                      {/* Row actions */}
-                      <TableCell
-                        className={cn("w-12 text-center")}
-                        style={{
-                          position: 'sticky',
-                          right: 0,
-                          zIndex: 10,
-                          backgroundColor: 'var(--background)',
-                          borderLeft: '1px solid var(--border)',
-                          boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
-                          padding: 0,
-                          margin: 0,
-                        }}
-                      >
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-all">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary p-1.5 min-w-[210px]">
-
-                            {/* Sharing & Permissions — dark header row */}
-                            <DropdownMenuItem className="px-2 py-1.5 justify-center text-xs font-semibold bg-primary text-primary-foreground rounded-md mb-1 cursor-pointer">
-                              Sharing &amp; Permissions
-                            </DropdownMenuItem>
-
-                            {/* Rename Task */}
-                            <DropdownMenuItem
-                              className="gap-2 cursor-pointer text-xs"
-                              onSelect={() => handleRenameStart(task.id, task.name || '')}
-                            >
-                              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                              Rename Task
-                            </DropdownMenuItem>
-
-                            {/* Duplicate */}
-                            <DropdownMenuItem
-                              className="gap-2 cursor-pointer text-xs"
-                              onSelect={() => {
-                                setDuplicateSubtaskId(null);
-                                setDuplicateTaskId(task.id);
-                              }}
-                            >
-                              <Copy className="h-3.5 w-3.5" />
-                              Duplicate Task
-                            </DropdownMenuItem>
-
-                            {/* Open in new tab */}
-                            <DropdownMenuItem
-                              className="gap-2 cursor-pointer text-xs"
-                              onSelect={() => window.open(`/task/${task.id}`, '_blank')}
-                            >
-                              <ExternalLink className="h-3.5 w-3.5" />
-                              Open in new tab
-                            </DropdownMenuItem>
-
-                            {/* Copy Task Info submenu */}
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-2 text-xs">
-                                <Link className="h-3.5 w-3.5" />
-                                Copy Task Info
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
-
-                                {/* Task Link */}
-                                <DropdownMenuItem
-                                  onClick={handleCopyTaskLink.bind(null, task.id)}
-                                  className="cursor-pointer text-xs"
-                                >
-                                  Task Link
-                                </DropdownMenuItem>
-
-                                {/* Task ID */}
-                                <DropdownMenuItem
-                                  onClick={handleCopyTaskId.bind(null, task.id)}
-                                  className="cursor-pointer text-xs"
-                                >
-                                  Task ID
-                                </DropdownMenuItem>
-
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-
-                            <DropdownMenuSeparator className="px-2 py-0" />
-
-                            {/* Move to other group submenu */}
-                            {/* <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-2">
-                                <MoveRight className="h-3.5 w-3.5" />
-                                Move to other group
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
-                                <DropdownMenuItem>Move to top</DropdownMenuItem>
-                                <DropdownMenuItem>Move to bottom</DropdownMenuItem>
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub> */}
-
-                            {/* Tie to Goal submenu */}
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-2 text-xs">
-                                <Target className="h-3.5 w-3.5" />
-                                Tie to Goal
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="border-b-[5px] border-b-primary w-52 max-h-64 overflow-y-auto">
-                                {goals.length === 0 ? (
-                                  <DropdownMenuItem disabled className="text-xs">No goals found</DropdownMenuItem>
-                                ) : (
-                                  goals.map((goal) => (
-                                    <DropdownMenuItem
-                                      key={goal.id}
-                                      className="cursor-pointer gap-2 text-xs"
-                                      onSelect={() => {
-                                        console.log("Tied task to goal:", {
-                                          taskId: task.id,
-                                          taskName: task.name,
-                                          goalId: goal.id,
-                                          goalTitle: goal.title,
-                                        });
-                                      }}
-                                    >
-                                      <span
-                                        className="h-5 w-5 rounded-md shrink-0 flex items-center justify-center text-foreground text-xs"
-                                        style={{ backgroundColor: goal.color ?? "#6366f1" }}
-                                      >
-                                        {goal.title?.charAt(0)?.toUpperCase()}
-                                      </span>
-                                      <span className="truncate">{goal.title}</span>
-                                    </DropdownMenuItem>
-                                  ))
-                                )}
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-
-                            <DropdownMenuSeparator className="px-2 py-0" />
-
-                            {/* Convert to submenu */}
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-2 text-xs">
-                                <Repeat className="h-3.5 w-3.5" />
-                                Convert to
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
-                                {taskTypes.map((type) => (
-                                  <DropdownMenuItem
-                                    key={type._id}
-                                    className="gap-2 cursor-pointer text-xs text-muted-foreground"
-                                    onSelect={() => handleConvertTaskType(task.id, type.value)}
-                                  >
-                                    {renderTaskTypeVisual(type, "h-3.5 w-3.5")}
-                                    {type.label}
-                                  </DropdownMenuItem>
-                                ))}
-                                {/* ── Hardcoded Subtask option — only when task has NO subtasks ── */}
-                                {taskSubtasks.length === 0 && (
-                                  <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      className="gap-2 cursor-pointer text-xs"
-                                      onSelect={() => setConvertToSubtaskTaskId(task.id)}
-                                    >
-                                      <LayoutTemplate className="h-3.5 w-3.5 text-muted-foreground" />
-                                      Subtask
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-
-                            {/* Set task relationships submenu */}
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-2 text-xs">
-                                <GitMerge className="h-3.5 w-3.5" />
-                                Set task relationships
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
-                                {RELATIONSHIP_TYPES.map(({ value, label, icon: Icon, color }) => (
-                                  <DropdownMenuItem
-                                    key={value}
-                                    className="gap-2 cursor-pointer text-xs"
-                                    onSelect={() => openRelDialog(task.id, value, false)}
-                                  >
-                                    <Icon className={cn("h-3.5 w-3.5", color)} />
-                                    {label}
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-
-                            {/* Merge duplicate tasks */}
-                            {/* <DropdownMenuItem className="gap-2 cursor-pointer">
-                              <Merge className="h-3.5 w-3.5" />
-                              Merge duplicate tasks
-                            </DropdownMenuItem> */}
-
-                            {/* Add reminder */}
-                            {/* <DropdownMenuItem className="gap-2 cursor-pointer">
-                              <Bell className="h-3.5 w-3.5" />
-                              Add reminder
-                            </DropdownMenuItem> */}
-
-                            {/* Log time */}
-                            {/* <DropdownMenuItem className="gap-2 cursor-pointer">
-                              <Clock className="h-3.5 w-3.5" />
-                              Log time
-                            </DropdownMenuItem> */}
-
-                            <DropdownMenuSeparator className="px-2 py-0" />
-
-                            {/* Delete Task — opens confirmation modal */}
-                            <DropdownMenuItem
-                              className="gap-2 text-red-600 focus:text-red-600 cursor-pointer text-xs"
-                              onSelect={() => setDeleteTaskConfirmId(task.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Delete Task
-                            </DropdownMenuItem>
-
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    <DraggableTaskRow
+                      task={task}
+                      groupId={groupId}
+                      groupColor={groupColor}
+                      projectId={projectId}
+                      projectSlug={projectSlug}
+                      taskSubtasks={taskSubtasks}
+                      isExpanded={isExpanded}
+                      hasSubtasks={hasSubtasks}
+                      toggleTaskExpansion={toggleTaskExpansion}
+                      selectedTaskIds={selectedTaskIds}
+                      toggleTaskSelection={toggleTaskSelection}
+                      renamingId={renamingId}
+                      renamingName={renamingName}
+                      setRenamingName={setRenamingName}
+                      handleRenameStart={handleRenameStart}
+                      handleRenameSave={handleRenameSave}
+                      handleRenameCancel={handleRenameCancel}
+                      displayOptions={displayOptions}
+                      setNewSubtaskData={setNewSubtaskData}
+                      setAddingSubtaskToTask={setAddingSubtaskToTask}
+                      setSelectedTaskForDetail={setSelectedTaskForDetail}
+                      setShowTaskDetail={setShowTaskDetail}
+                      setIsDetailLoading={setIsDetailLoading}
+                      fetchTaskById={fetchTaskById}
+                      renderRelationshipIcons={renderRelationshipIcons}
+                      shouldShowField={shouldShowField}
+                      getColumnStyle={getColumnStyle}
+                      taskTypes={taskTypes}
+                      renderTaskTypeVisual={renderTaskTypeVisual}
+                      updateTask={updateTask}
+                      taskStatusConfigs={taskStatusConfigs}
+                      isAddingStatus={isAddingStatus}
+                      newStatusName={newStatusName}
+                      setNewStatusName={setNewStatusName}
+                      setIsAddingStatus={setIsAddingStatus}
+                      handleAddStatus={handleAddStatus}
+                      activeOrUpcomingCycles={activeOrUpcomingCycles}
+                      formatCycleName={formatCycleName}
+                      project={project}
+                      members={members}
+                      assigneeSearchQuery={assigneeSearchQuery}
+                      setAssigneeSearchQuery={setAssigneeSearchQuery}
+                      getFilteredMembers={getFilteredMembers}
+                      formatDate={formatDate}
+                      convertSelectedDateToUTC={convertSelectedDateToUTC}
+                      taskPriorityConfigs={taskPriorityConfigs}
+                      getPriorityColor={getPriorityColor}
+                      isAddingPriority={isAddingPriority}
+                      newPriorityName={newPriorityName}
+                      setNewPriorityName={setNewPriorityName}
+                      setIsAddingPriority={setIsAddingPriority}
+                      handleAddPriority={handleAddPriority}
+                      customFields={customFields}
+                      getTaskCustomFieldById={getTaskCustomFieldById}
+                      updateTaskCustomField={updateTaskCustomField}
+                      setDuplicateSubtaskId={setDuplicateSubtaskId}
+                      setDuplicateTaskId={setDuplicateTaskId}
+                      setConvertToSubtaskTaskId={setConvertToSubtaskTaskId}
+                      openRelDialog={openRelDialog}
+                      RELATIONSHIP_TYPES={RELATIONSHIP_TYPES}
+                      setDeleteTaskConfirmId={setDeleteTaskConfirmId}
+                      goals={goals}
+                      taskCheckboxClass={taskCheckboxClass}
+                      bodyCellCls={bodyCellCls}
+                      onMoveTask={(draggedTaskId) => handleMoveTaskToGroup(draggedTaskId)}
+                      renderCheckboxColumnContent={renderCheckboxColumnContent}
+                      formatTaskId={formatTaskId}
+                      handleCopyTaskLink={handleCopyTaskLink}
+                      handleCopyTaskId={handleCopyTaskId}
+                      handleConvertTaskType={handleConvertTaskType}
+                    />
 
                     {/* ── Subtask Rows ────────────────────────────────────── */}
                     {isExpanded && taskSubtasks.map((subtask) => (
@@ -3818,3 +3272,893 @@ export function TaskTable({
     </>
   );
 }
+
+// ── DraggableTaskRow Component ──
+interface DraggableTaskRowProps {
+  task: Task;
+  groupId: string;
+  groupColor: string;
+  projectId: string;
+  projectSlug: string;
+  taskSubtasks: any[];
+  isExpanded: boolean;
+  hasSubtasks: boolean;
+  toggleTaskExpansion: (taskId: string) => void;
+  selectedTaskIds: Set<string>;
+  toggleTaskSelection: (taskId: string) => void;
+  renamingId: string | null;
+  renamingName: string;
+  setRenamingName: React.Dispatch<React.SetStateAction<string>>;
+  handleRenameStart: (id: string, currentName: string) => void;
+  handleRenameSave: (id: string, isSubtask?: boolean) => Promise<void>;
+  handleRenameCancel: () => void;
+  displayOptions: any;
+  setNewSubtaskData: React.Dispatch<React.SetStateAction<any>>;
+  setAddingSubtaskToTask: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedTaskForDetail: React.Dispatch<React.SetStateAction<Task | null>>;
+  setShowTaskDetail: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsDetailLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchTaskById: (id: string) => Promise<Task | null>;
+  renderRelationshipIcons: (item: any, isSubtask: boolean) => React.ReactNode;
+  shouldShowField: (fieldKey: string, fieldLabel: string) => boolean;
+  getColumnStyle: (columnId: string, isHeader?: boolean, rowGroupColor?: string, isSubtask?: boolean) => React.CSSProperties;
+  taskTypes: any[];
+  renderTaskTypeVisual: (type: any, className?: string) => React.ReactNode;
+  updateTask: (id: string, updates: Partial<Task>) => void | Promise<any>;
+  taskStatusConfigs: any[];
+  isAddingStatus: boolean;
+  newStatusName: string;
+  setNewStatusName: React.Dispatch<React.SetStateAction<string>>;
+  setIsAddingStatus: React.Dispatch<React.SetStateAction<boolean>>;
+  handleAddStatus: (name: string, taskId?: string, isSubtask?: boolean, subtaskId?: string) => Promise<void>;
+  activeOrUpcomingCycles: any[];
+  formatCycleName: (name: string, num?: number) => string;
+  project: any;
+  members: any[];
+  assigneeSearchQuery: string;
+  setAssigneeSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  getFilteredMembers: () => any[];
+  formatDate: (dateStr?: string) => string | null;
+  convertSelectedDateToUTC: (date: Date) => string;
+  taskPriorityConfigs: any[];
+  getPriorityColor: (priorityValue?: string) => string | undefined;
+  isAddingPriority: boolean;
+  newPriorityName: string;
+  setNewPriorityName: React.Dispatch<React.SetStateAction<string>>;
+  setIsAddingPriority: React.Dispatch<React.SetStateAction<boolean>>;
+  handleAddPriority: (name: string, taskId?: string, isSubtask?: boolean, subtaskId?: string) => Promise<void>;
+  customFields: any[];
+  getTaskCustomFieldById: (projectId: string, fieldId: string) => any;
+  updateTaskCustomField: (taskId: string, fieldId: string, value: any) => Promise<void>;
+  setDuplicateSubtaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  setDuplicateTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  setConvertToSubtaskTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  openRelDialog: (taskId: string, type: string, isSubtask: boolean) => void;
+  RELATIONSHIP_TYPES: any[];
+  setDeleteTaskConfirmId: React.Dispatch<React.SetStateAction<string | null>>;
+  goals: any[];
+  taskCheckboxClass: string;
+  bodyCellCls: string;
+  onMoveTask: (taskId: string) => void;
+  renderCheckboxColumnContent: (checkbox: React.ReactNode, expandToggle?: React.ReactNode, isSubtask?: boolean) => React.ReactNode;
+  formatTaskId: (projectSlug: string, taskNumber?: number) => string;
+  handleCopyTaskLink: (taskId: string) => void;
+  handleCopyTaskId: (taskId: string) => void;
+  handleConvertTaskType: (taskId: string, type: string) => void | Promise<void>;
+}
+
+const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
+  task,
+  groupId,
+  groupColor,
+  projectId,
+  projectSlug,
+  taskSubtasks,
+  isExpanded,
+  hasSubtasks,
+  toggleTaskExpansion,
+  selectedTaskIds,
+  toggleTaskSelection,
+  renamingId,
+  renamingName,
+  setRenamingName,
+  handleRenameStart,
+  handleRenameSave,
+  handleRenameCancel,
+  displayOptions,
+  setNewSubtaskData,
+  setAddingSubtaskToTask,
+  setSelectedTaskForDetail,
+  setShowTaskDetail,
+  setIsDetailLoading,
+  fetchTaskById,
+  renderRelationshipIcons,
+  shouldShowField,
+  getColumnStyle,
+  taskTypes,
+  renderTaskTypeVisual,
+  updateTask,
+  taskStatusConfigs,
+  isAddingStatus,
+  newStatusName,
+  setNewStatusName,
+  setIsAddingStatus,
+  handleAddStatus,
+  activeOrUpcomingCycles,
+  formatCycleName,
+  project,
+  members,
+  assigneeSearchQuery,
+  setAssigneeSearchQuery,
+  getFilteredMembers,
+  formatDate,
+  convertSelectedDateToUTC,
+  taskPriorityConfigs,
+  getPriorityColor,
+  isAddingPriority,
+  newPriorityName,
+  setNewPriorityName,
+  setIsAddingPriority,
+  handleAddPriority,
+  customFields,
+  getTaskCustomFieldById,
+  updateTaskCustomField,
+  setDuplicateSubtaskId,
+  setDuplicateTaskId,
+  setConvertToSubtaskTaskId,
+  openRelDialog,
+  RELATIONSHIP_TYPES,
+  setDeleteTaskConfirmId,
+  goals,
+  taskCheckboxClass,
+  bodyCellCls,
+  onMoveTask,
+  renderCheckboxColumnContent,
+  formatTaskId,
+  handleCopyTaskLink,
+  handleCopyTaskId,
+  handleConvertTaskType,
+}) => {
+  const rowRef = useRef<HTMLTableRowElement>(null);
+
+  const [{ isDragging }, dragRef, dragPreview] = useDrag({
+    type: "TASK_ROW",
+    item: { taskId: task.id, sourceGroupId: groupId },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isOver }, dropRef] = useDrop({
+    accept: "TASK_ROW",
+    drop: (item: { taskId: string; sourceGroupId: string }) => {
+      if (item.taskId !== task.id) {
+        onMoveTask(item.taskId);
+      }
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  });
+
+  dragPreview(dropRef(rowRef));
+
+  return (
+    <TableRow
+      ref={rowRef}
+      key={task.id}
+      className={cn(
+        "group bg-card hover:bg-card border-b border-border transition-colors",
+        isDragging && "opacity-40",
+        isOver && "bg-primary/10 border-t border-b border-dashed border-primary"
+      )}
+    >
+      {/* Drag handle */}
+      <TableCell
+        ref={dragRef as any}
+        className={cn(bodyCellCls, "w-10 cursor-grab active:cursor-grabbing")}
+        style={getColumnStyle('drag', false, groupColor)}
+      >
+        <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
+      </TableCell>
+
+      {/* Checkbox + expand */}
+      <TableCell className={cn(bodyCellCls, "!px-0")} style={getColumnStyle('checkbox', false)}>
+        {renderCheckboxColumnContent(
+          <Checkbox
+            checked={selectedTaskIds.has(task.id)}
+            onCheckedChange={() => toggleTaskSelection(task.id)}
+            className={taskCheckboxClass}
+          />,
+          <button
+            type="button"
+            className={cn(
+              "flex h-4 w-4 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground",
+              !hasSubtasks && "invisible"
+            )}
+            onClick={() => toggleTaskExpansion(task.id)}
+            disabled={!hasSubtasks}
+          >
+            {isExpanded
+              ? <ChevronDown className="h-3.5 w-3.5" />
+              : <ChevronRight className="h-3.5 w-3.5" />}
+          </button>
+        )}
+      </TableCell>
+
+      {/* ✅ ID Column (frozen, always visible) */}
+      {shouldShowField('id', 'ID') && (
+        <TableCell
+          className={cn(bodyCellCls, "text-center")}
+          style={getColumnStyle('id', false)}
+        >
+          <span className="text-muted-foreground">
+            {formatTaskId(projectSlug, task.taskNumber)}
+          </span>
+        </TableCell>
+      )}
+
+      {/* Task Name */}
+      {shouldShowField('task', 'Task') && (
+        <TableCell
+          className={cn(bodyCellCls, "overflow-hidden")}
+          style={getColumnStyle('task', false)}
+        >
+          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
+            {renamingId === task.id ? (
+              <Input
+                value={renamingName}
+                onChange={(e) => setRenamingName(e.target.value)}
+                onBlur={() => handleRenameSave(task.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleRenameSave(task.id);
+                  if (e.key === 'Escape') handleRenameCancel();
+                }}
+                className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400 min-w-0"
+                autoFocus
+              />
+            ) : (
+              displayOptions.wrapText ? (
+                /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
+                <div className="flex items-center justify-between w-full min-w-0 gap-1.5">
+                  <span
+                    className={cn(
+                      "text-xs text-foreground min-w-0 flex-1 truncate",
+                      task.completed && "line-through text-muted-foreground"
+                    )}
+                    onDoubleClick={() => handleRenameStart(task.id, task.name || '')}
+                    title={task.name}
+                  >
+                    {task.name}
+                  </span>
+
+                  {/* Actions & Icons container pushed to the right */}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {/* Hover actions */}
+                    {renamingId !== task.id && (
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-0.5"
+                          onClick={() => {
+                            setNewSubtaskData((prev: any) => ({
+                              ...prev,
+                              status: task.status || '',
+                              startDate: new Date(),
+                              endDate: task.endDate ? new Date(task.endDate) : undefined,
+                              cycleId: task.cycleId ?? undefined,
+                            }));
+                            setAddingSubtaskToTask(task.id);
+                            if (!isExpanded) toggleTaskExpansion(task.id);
+                          }}
+                        >
+                          <Plus className="h-2.5 w-2.5" />
+                          Sub Task
+                        </button>
+                        <button
+                          className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground"
+                          onClick={async () => {
+                            setSelectedTaskForDetail(task);
+                            setShowTaskDetail(true);
+                            setIsDetailLoading(true);
+                            const fresh = await fetchTaskById(task.id);
+                            if (fresh) setSelectedTaskForDetail(fresh);
+                            setIsDetailLoading(false);
+                          }}
+                        >
+                          <ChevronsLeftRight className="h-4 w-4 rotate-135" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Relationship Icons */}
+                    {renderRelationshipIcons(task, false)}
+                  </div>
+                </div>
+              ) : (
+                /* ── MULTI-LINE (WRAP) MODE: inline flow with icons at sentence end ── */
+                <div
+                  className={cn(
+                    "text-xs text-foreground whitespace-normal break-words w-full overflow-hidden",
+                    task.completed && "line-through text-muted-foreground"
+                  )}
+                  onDoubleClick={() => handleRenameStart(task.id, task.name || '')}
+                >
+                  <span>{task.name}</span>
+
+                  {/* Hover actions inline */}
+                  {renamingId !== task.id && (
+                    <span className="inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5 align-middle">
+                      <button
+                        className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded inline-flex items-center gap-0.5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setNewSubtaskData((prev: any) => ({
+                            ...prev,
+                            status: task.status || '',
+                            startDate: new Date(),
+                            endDate: task.endDate ? new Date(task.endDate) : undefined,
+                            cycleId: task.cycleId ?? undefined,
+                          }));
+                          setAddingSubtaskToTask(task.id);
+                          if (!isExpanded) toggleTaskExpansion(task.id);
+                        }}
+                      >
+                        <Plus className="h-2.5 w-2.5" />
+                        Sub Task
+                      </button>
+                      <button
+                        className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground inline-flex"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setSelectedTaskForDetail(task);
+                          setShowTaskDetail(true);
+                          setIsDetailLoading(true);
+                          const fresh = await fetchTaskById(task.id);
+                          if (fresh) setSelectedTaskForDetail(fresh);
+                          setIsDetailLoading(false);
+                        }}
+                      >
+                        <ChevronsLeftRight className="h-4 w-4 rotate-135" />
+                      </button>
+                    </span>
+                  )}
+
+                  {/* Relationship Icons inline */}
+                  <span className="inline-flex items-center gap-1 ml-1.5 align-middle">
+                    {renderRelationshipIcons(task, false)}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        </TableCell>
+      )}
+
+      {/* ── Dynamic data cells ─────────────────────────────── */}
+
+      {/* Task Type Cell */}
+      {shouldShowField('taskType', 'Type') && (
+        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('taskType', false), height: '1px' }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden px-3 gap-2">
+                {(() => {
+                  const selectedType =
+                    taskTypes.find((t) => t.value === (task.taskType || "task")) || null;
+
+                  if (!selectedType) return <span>—</span>;
+
+                  return (
+                    <>
+                      {renderTaskTypeVisual(selectedType, "w-3 h-3")}
+                      <span className="truncate">{selectedType.label}</span>
+                    </>
+                  );
+                })()}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+              {taskTypes.map((type) => (
+                <DropdownMenuItem
+                  key={type._id}
+                  onSelect={() => updateTask(task.id, { taskType: type.value })}
+                  className="p-0 focus:bg-transparent"
+                >
+                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                    {renderTaskTypeVisual(type, "w-3 h-3")}
+                    <span className="truncate">{type.label}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
+
+      {/* Status */}
+      {shouldShowField('status', 'Status') && (
+        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('status', false), height: '1px' }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3"
+                style={{ backgroundColor: taskStatusConfigs.find(c => c.value === task.status)?.color || '#c4c4c4' }}>
+                <span className="truncate w-full text-center">
+                  {taskStatusConfigs.find(c => c.value === task.status)?.label || '—'}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+              {taskStatusConfigs.map(config => (
+                <DropdownMenuItem
+                  key={config._id}
+                  onSelect={() => updateTask(task.id, { status: config.value })}
+                  className="p-0 focus:bg-transparent"
+                >
+                  <div
+                    className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                    style={{ backgroundColor: config.color || '#c4c4c4' }}
+                  >
+                    <span className="truncate w-full text-center">
+                      {config.label}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {taskStatusConfigs.length > 0 && <DropdownMenuSeparator />}
+              {isAddingStatus ? (
+                <div className="flex gap-1 p-0 h-9 focus:bg-transparent items-center justify-center bg-muted rounded-xs">
+                  <Input value={newStatusName} onChange={(e) => setNewStatusName(e.target.value)} placeholder="Status name" className="h-9 rounded-xs" autoFocus
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddStatus(newStatusName, task.id); if (e.key === 'Escape') { setIsAddingStatus(false); setNewStatusName(''); } }} />
+                  <Button size="sm" className="h-9 rounded-xs" onClick={() => handleAddStatus(newStatusName, task.id)}>Add</Button>
+                </div>
+              ) : (
+                <DropdownMenuItem onSelect={() => setIsAddingStatus(true)}
+                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                >
+                  <Plus className="h-3 w-3" />Add Status
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={() => updateTask(task.id, { status: undefined })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+              >
+                Clear
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
+
+      {/* Cycle */}
+      {shouldShowField('cycle', 'Cycle') && (
+        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('cycle', false), height: '1px' }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
+                <span className="truncate w-full text-center flex items-center justify-center">
+                  {task.cycle ? formatCycleName(task.cycle.name, task.cycle.cycleNumber) : (() => { const c = project?.cycles?.find((c: any) => c.id === task.cycleId); return c ? formatCycleName(c.name, c.cycleNumber) : <RefreshCw className="h-3.5 w-3.5 mx-auto text-muted-foreground" />; })()}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+              {activeOrUpcomingCycles.map(c => (
+                <DropdownMenuItem
+                  key={c.id}
+                  onSelect={() => updateTask(task.id, { cycleId: c.id })}
+                  className="p-0 focus:bg-transparent"
+                >
+                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                    <span className="truncate w-full text-center">
+                      {formatCycleName(c.name, c.cycleNumber)}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {activeOrUpcomingCycles.length === 0 && (
+                <div className="p-2 text-xs text-muted-foreground text-center">No cycles available</div>
+              )}
+              {activeOrUpcomingCycles.length > 0 && <DropdownMenuSeparator />}
+              <DropdownMenuItem onSelect={() => updateTask(task.id, { cycleId: null })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+              >
+                Clear
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
+
+      {/* Assignee */}
+      {shouldShowField('assignee', 'Assignee') && (
+        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('assignee', false), height: '1px' }}>
+          <DropdownMenu onOpenChange={(open) => {
+            if (!open) setAssigneeSearchQuery('');
+          }}>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
+                {(() => {
+                  const m = members.find(m => m.userId === task.assignee);
+                  return <MemberAvatar size="md" name={m?.name} src={m?.profilePicture} />;
+                })()}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+              <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                  placeholder="Type @ or name..."
+                  value={assigneeSearchQuery}
+                  onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                  autoFocus
+                />
+              </div>
+              {getFilteredMembers().length === 0 ? (
+                <div className="text-center py-2 text-xs text-muted-foreground">
+                  No members found
+                </div>
+              ) : (
+                getFilteredMembers().map(member => (
+                  <DropdownMenuItem
+                    key={member.userId}
+                    onSelect={() => updateTask(task.id, { assignee: member.userId })}
+                    className="p-0 focus:bg-transparent"
+                  >
+                    <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                      <MemberAvatar size="sm" name={member.name} src={member.profilePicture} />
+                      <span className="truncate">{member.name}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => updateTask(task.id, { assignee: undefined })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+              >
+                Clear
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
+
+      {/* ✅ Start Date (separate from Due Date) */}
+      {shouldShowField('startDate', 'Start Date') && (
+        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('startDate', false)}>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
+                {task.startDate ? (
+                  <span className="font-medium">{formatDate(task.startDate)}</span>
+                ) : (
+                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={task.startDate ? new Date(task.startDate) : undefined}
+                onSelect={(date) => {
+                  if (date) {
+                    const updates: any = { startDate: convertSelectedDateToUTC(date) };
+                    if (task.endDate && new Date(task.endDate) < date) {
+                      updates.endDate = undefined;
+                    }
+                    updateTask(task.id, updates);
+                    document.getElementById(`close-start-${task.id}`)?.click();
+                  }
+                }}
+                initialFocus
+              />
+              <PopoverClose id={`close-start-${task.id}`} className="hidden" />
+            </PopoverContent>
+          </Popover>
+        </TableCell>
+      )}
+
+      {/* ✅ Due Date (End Date) */}
+      {shouldShowField('endDate', 'Due Date') && (
+        <TableCell className={cn(bodyCellCls, "text-center")} style={getColumnStyle('endDate', false)}>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="text-muted-foreground hover:text-foreground hover:bg-muted px-2 py-1 rounded cursor-pointer transition-colors">
+                {task.endDate ? (
+                  <span className="font-medium">{formatDate(task.endDate)}</span>
+                ) : (
+                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground mx-auto" />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={task.endDate ? new Date(task.endDate) : undefined}
+                onSelect={(date) => {
+                  if (date) {
+                    updateTask(task.id, { endDate: convertSelectedDateToUTC(date) });
+                    document.getElementById(`close-end-${task.id}`)?.click();
+                  }
+                }}
+                disabled={(date) => (task.startDate ? date < new Date(new Date(task.startDate).setHours(0, 0, 0, 0)) : false)}
+                initialFocus
+              />
+              <PopoverClose id={`close-end-${task.id}`} className="hidden" />
+            </PopoverContent>
+          </Popover>
+        </TableCell>
+      )}
+
+      {/* Priority */}
+      {shouldShowField('priority', 'Priority') && (
+        <TableCell className="!p-0 text-center" style={{ ...getColumnStyle('priority', false), height: '1px' }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
+                style={{ backgroundColor: `${getPriorityColor(task.priority) || '#9CA3AF'}33` }}>
+                <span className={cn("truncate text-xs font-medium", task.priority ? "text-foreground" : "text-muted-foreground")}>
+                  {taskPriorityConfigs.find(p => p.value === task.priority)?.label || '—'}
+                </span>
+                <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: getPriorityColor(task.priority) || '#9CA3AF' }} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+              {taskPriorityConfigs.map(option => (
+                <DropdownMenuItem
+                  key={option._id}
+                  onSelect={() => updateTask(task.id, { priority: option.value })}
+                  className="p-0 focus:bg-transparent"
+                >
+                  <div
+                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                    style={{
+                      backgroundColor: `${option.color || '#9CA3AF'}33`,
+                    }}
+                  >
+                    <span className="truncate">
+                      {option.label}
+                    </span>
+                    <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: option.color || '#9CA3AF' }} />
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {taskPriorityConfigs.length > 0 && <DropdownMenuSeparator />}
+              {isAddingPriority ? (
+                <div className="flex gap-1 p-0 h-9 focus:bg-transparent items-center justify-center bg-muted rounded-xs">
+                  <Input value={newPriorityName} onChange={(e) => setNewPriorityName(e.target.value)} placeholder="Priority name" className="h-9 rounded-xs" autoFocus
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddPriority(newPriorityName, task.id); if (e.key === 'Escape') { setIsAddingPriority(false); setNewPriorityName(''); } }} />
+                  <Button size="sm" className="h-9 rounded-xs" onClick={() => handleAddPriority(newPriorityName, task.id)}>Add</Button>
+                </div>
+              ) : (
+                <DropdownMenuItem onSelect={() => setIsAddingPriority(true)}
+                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                >
+                  <Plus className="h-3 w-3" />Add Priority
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={() => updateTask(task.id, { priority: undefined })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+              >
+                Clear
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
+
+      {/* Custom Fields */}
+      {customFields.map(field => {
+        const fieldData = getTaskCustomFieldById(projectId, field.id);
+        if (!shouldShowField(field.id, field.name)) return <React.Fragment key={field.id} />;
+        return fieldData ? (
+          <TableCell
+            key={field.id}
+            className={cn(bodyCellCls, (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people' || field.type === 'rating') && "overflow-hidden", "text-center")}
+            style={{
+              ...getColumnStyle(field.id, false),
+              height: (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people') ? '1px' : undefined,
+              padding: (field.type === 'select-one' || field.type === 'select-many' || field.type === 'label' || field.type === 'people') ? '0px' : undefined
+            }}
+          >
+            <CustomFieldDropdown
+              field={fieldData}
+              value={task.customFieldValues?.[field.id] || (field.type === 'select-many' ? [] : '')}
+              onUpdate={(value) => updateTaskCustomField(task.id, field.id, value)}
+              task={task}
+            />
+          </TableCell>
+        ) : <React.Fragment key={field.id} />;
+      })}
+
+      {/* Row actions */}
+      <TableCell
+        className={cn("w-12 text-center")}
+        style={{
+          position: 'sticky',
+          right: 0,
+          zIndex: 10,
+          backgroundColor: 'var(--background)',
+          borderLeft: '1px solid var(--border)',
+          boxShadow: '-2px 0 4px rgba(0,0,0,0.04)',
+          padding: 0,
+          margin: 0,
+        }}
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-all">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="border-b-[5px] border-b-primary p-1.5 min-w-[210px]">
+
+            {/* Sharing & Permissions — dark header row */}
+            <DropdownMenuItem className="px-2 py-1.5 justify-center text-xs font-semibold bg-primary text-primary-foreground rounded-md mb-1 cursor-pointer">
+              Sharing &amp; Permissions
+            </DropdownMenuItem>
+
+            {/* Rename Task */}
+            <DropdownMenuItem
+              className="gap-2 cursor-pointer text-xs"
+              onSelect={() => handleRenameStart(task.id, task.name || '')}
+            >
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              Rename Task
+            </DropdownMenuItem>
+
+            {/* Duplicate */}
+            <DropdownMenuItem
+              className="gap-2 cursor-pointer text-xs"
+              onSelect={() => {
+                setDuplicateSubtaskId(null);
+                setDuplicateTaskId(task.id);
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Duplicate Task
+            </DropdownMenuItem>
+
+            {/* Open in new tab */}
+            <DropdownMenuItem
+              className="gap-2 cursor-pointer text-xs"
+              onSelect={() => window.open(`/task/${task.id}`, '_blank')}
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Open in new tab
+            </DropdownMenuItem>
+
+            {/* Copy Task Info submenu */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-2 text-xs">
+                <Link className="h-3.5 w-3.5" />
+                Copy Task Info
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
+
+                {/* Task Link */}
+                <DropdownMenuItem
+                  onClick={handleCopyTaskLink.bind(null, task.id)}
+                  className="cursor-pointer text-xs"
+                >
+                  Task Link
+                </DropdownMenuItem>
+
+                {/* Task ID */}
+                <DropdownMenuItem
+                  onClick={handleCopyTaskId.bind(null, task.id)}
+                  className="cursor-pointer text-xs"
+                >
+                  Task ID
+                </DropdownMenuItem>
+
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSeparator className="px-2 py-0" />
+
+            {/* Tie to Goal submenu */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-2 text-xs">
+                <Target className="h-3.5 w-3.5" />
+                Tie to Goal
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="border-b-[5px] border-b-primary w-52 max-h-64 overflow-y-auto">
+                {goals.length === 0 ? (
+                  <DropdownMenuItem disabled className="text-xs">No goals found</DropdownMenuItem>
+                ) : (
+                  goals.map((goal) => (
+                    <DropdownMenuItem
+                      key={goal.id}
+                      className="cursor-pointer gap-2 text-xs"
+                      onSelect={() => {
+                        console.log("Tied task to goal:", {
+                          taskId: task.id,
+                          taskName: task.name,
+                          goalId: goal.id,
+                          goalTitle: goal.title,
+                        });
+                      }}
+                    >
+                      <span
+                        className="h-5 w-5 rounded-md shrink-0 flex items-center justify-center text-foreground text-xs"
+                        style={{ backgroundColor: goal.color ?? "#6366f1" }}
+                      >
+                        {goal.title?.charAt(0)?.toUpperCase()}
+                      </span>
+                      <span className="truncate">{goal.title}</span>
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSeparator className="px-2 py-0" />
+
+            {/* Convert to submenu */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-2 text-xs">
+                <Repeat className="h-3.5 w-3.5" />
+                Convert to
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
+                {taskTypes.map((type) => (
+                  <DropdownMenuItem
+                    key={type._id}
+                    className="gap-2 cursor-pointer text-xs text-muted-foreground"
+                    onSelect={() => handleConvertTaskType(task.id, type.value)}
+                  >
+                    {renderTaskTypeVisual(type, "h-3.5 w-3.5")}
+                    {type.label}
+                  </DropdownMenuItem>
+                ))}
+                {/* ── Hardcoded Subtask option — only when task has NO subtasks ── */}
+                {taskSubtasks.length === 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="gap-2 cursor-pointer text-xs"
+                      onSelect={() => setConvertToSubtaskTaskId(task.id)}
+                    >
+                      <LayoutTemplate className="h-3.5 w-3.5 text-muted-foreground" />
+                      Subtask
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            {/* Set task relationships submenu */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-2 text-xs">
+                <GitMerge className="h-3.5 w-3.5" />
+                Set task relationships
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="border-b-[5px] border-b-primary">
+                {RELATIONSHIP_TYPES.map(({ value, label, icon: Icon, color }) => (
+                  <DropdownMenuItem
+                    key={value}
+                    className="gap-2 cursor-pointer text-xs"
+                    onSelect={() => openRelDialog(task.id, value, false)}
+                  >
+                    <Icon className={cn("h-3.5 w-3.5", color)} />
+                    {label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSeparator className="px-2 py-0" />
+
+            {/* Delete Task — opens confirmation modal */}
+            <DropdownMenuItem
+              className="gap-2 text-red-600 focus:text-red-600 cursor-pointer text-xs"
+              onSelect={() => setDeleteTaskConfirmId(task.id)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete Task
+            </DropdownMenuItem>
+
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+};

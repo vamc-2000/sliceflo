@@ -11,7 +11,7 @@ import { useProfileStore } from "@/stores/profile-store";
 import { DashboardSection } from "@/components/Goals/DashboardSection";
 import { DashboardItemCard } from "@/components/Goals/DashboardItemCard";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { WorkloadPieChart } from "@/components/Dashboard/mywork/WorkloadPieChart";
@@ -91,8 +91,7 @@ export default function ProjectDashboardPage() {
             {myWork?.period && (
               <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Showing work from <span className="text-foreground">{format(new Date(myWork.period.since), "MMM d, yyyy")}</span> to <span className="text-foreground">{format(new Date(myWork.period.until), "MMM d, yyyy")}</span> ({myWork.period.days} Days)
-              </span>
+                Showing work from <span className="text-foreground">{formatLocalDate(myWork.period.since)}</span> to <span className="text-foreground">{formatLocalDate(myWork.period.until)}</span> ({myWork.period.days} Days)          </span>
             )}
           </div>
           <div className="flex items-center gap-2">

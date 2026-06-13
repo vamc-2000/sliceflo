@@ -270,7 +270,7 @@ export default function ActivityLog({ entityType, entityId }: ActivityLogProps) 
           label={group.label}
           items={group.items}
           // Open the two most recent groups by default, rest collapsed
-          defaultOpen={idx < 2}
+          defaultOpen={idx < 1}
         />
       ))}
     </div>

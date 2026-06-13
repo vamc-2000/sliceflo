@@ -30,23 +30,23 @@ export default function ReportsCreatePage() {
     };
 
     return (
-        <>
+        <div className="bg-background text-foreground min-h-screen">
             {viewMode === "templates" ? (
                 <div className="flex flex-col items-center justify-center max-w-4xl mx-auto text-center py-10 px-4">
-                    <h1 className="text-2xl 2xl:text-3xl font-bold text-primary">
+                    <h1 className="text-2xl 2xl:text-3xl font-bold text-foreground">
                         Choose a Report Template
                     </h1>
 
-                    <p className="text-base 2xl:text-lg mt-4 2xl:mt-6 text-center text-[#6E6E6E] font-normal">
+                    <p className="text-base 2xl:text-lg mt-4 2xl:mt-6 text-center text-muted-foreground font-normal">
                         Get started with a Report template or create a custom Report to fit
                         your exact needs.
                     </p>
 
                     <div className="flex flex-col md:flex-row items-stretch gap-12 mt-8 2xl:mt-12 w-full">
-                        <Templates className="w-full md:w-1/2 min-h-100" />
+                        <Templates className="w-full md:w-1/2 min-h-100 bg-card border-border" />
 
                         <div
-                            className="flex flex-col items-center justify-center shadow-[0px_0px_10px_0px_#D9D9D9] p-6 rounded-xl w-full md:w-1/2 min-h-100 cursor-pointer hover:scale-[1.001] transition-transform"
+                            className="flex flex-col items-center justify-center bg-card border border-border shadow-sm dark:shadow-none p-6 rounded-xl w-full md:w-1/2 min-h-100 cursor-pointer hover:scale-[1.001] transition-transform"
                             onClick={handleStartFromScratch}
                         >
                             <Image
@@ -57,15 +57,15 @@ export default function ReportsCreatePage() {
                                 className="w-52 h-52"
                             />
 
-                            <span className="text-base 2xl:text-xl font-semibold text-[#001F3F] mt-6">
+                            <span className="text-base 2xl:text-xl font-semibold text-foreground mt-6">
                                 Build on your own
                             </span>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="overflow-hidden h-full flex flex-col">
-                    <div className="border-b shrink-0">
+                <div className="overflow-hidden h-full flex flex-col bg-background text-foreground">
+                    <div className="border-b border-border shrink-0">
                         <Breadcrumbs />
                     </div>
                     <div className="px-6 overflow-y-auto flex-1">
@@ -73,6 +73,6 @@ export default function ReportsCreatePage() {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

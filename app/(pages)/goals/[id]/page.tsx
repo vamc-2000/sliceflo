@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
 import { Goal, GoalTarget, TARGET_TYPE_COLORS } from "@/types/goal.types";
 import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { useProfileStore } from "@/stores/profile-store";
 import { Profile } from "@/types/profile.types";
 import CreateTargetModal from "@/components/Goals/CreateTargetModal";
@@ -357,25 +358,13 @@ export default function GoalDetailPage() {
     };
     const formatDate = (dateString: string | undefined | null, p0: string) => {
         if (!dateString || dateString.trim() === "") return "Not set";
-        try {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) {
-                console.warn("Invalid date string:", dateString);
-                return "Not set";
-            }
-            return format(date, "dd MMM yyyy");
-        } catch (error) {
-            console.error("Error formatting date:", dateString, error);
-            return "Not set";
-        }
+        const formatted = formatLocalDate(dateString);
+        return formatted === "—" ? "Not set" : formatted;
     };
 
     const formatCreatedDate = (dateString: string) => {
-        try {
-            return format(new Date(dateString), "MMM dd,yyyy");
-        } catch {
-            return "Recently";
-        }
+        const formatted = formatLocalDate(dateString);
+        return formatted === "—" ? "Recently" : formatted;
     };
 
     // const handleOpenUpdateTarget = (target: GoalTarget) => {

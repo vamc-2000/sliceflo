@@ -68,15 +68,15 @@ const ProjectLabelsPage = ({ projectId }: ProjectLabelsPageProps) => {
   }
 
   return (
-    <div className="w-full h-full space-y-4">
+    <div className="w-full h-full space-y-4 bg-background text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div>
-            <h2 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-[16px] font-semibold text-foreground">
               Labels
             </h2>
-            <p className="text-[12px] text-gray-500 dark:text-gray-400">
+            <p className="text-[12px] text-muted-foreground">
               Manage labels specifically for this project context.
             </p>
           </div>
@@ -88,7 +88,7 @@ const ProjectLabelsPage = ({ projectId }: ProjectLabelsPageProps) => {
           onRemove={handleRemoveLabel}
         >
           <Button
-            className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 shadow-sm"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 shadow-sm cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Label
@@ -102,28 +102,28 @@ const ProjectLabelsPage = ({ projectId }: ProjectLabelsPageProps) => {
           assignedLabels.map((label) => (
             <div
               key={label.id}
-              className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md hover:shadow-sm transition-shadow"
+              className="flex items-center justify-between p-3 bg-card border border-border rounded-md hover:shadow-sm transition-shadow"
             >
               <div className="flex items-center gap-2.5">
                 <div
                   className="w-4 h-4 rounded-full flex-shrink-0"
                   style={{ backgroundColor: label.color }}
                 />
-                <span className="text-[13px] font-medium text-gray-900 dark:text-white">
+                <span className="text-[13px] font-medium text-foreground">
                   {label.name}
                 </span>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
-                    <Ellipsis className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <button className="p-1 hover:bg-accent hover:text-accent-foreground rounded transition-colors cursor-pointer">
+                    <Ellipsis className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuContent align="end" className="w-32 bg-popover border border-border text-popover-foreground">
                   <DropdownMenuItem
                     onClick={() => handleRemoveLabel(label.id)}
-                    className="text-red-600 focus:text-red-600 text-[12px]"
+                    className="text-red-600 focus:text-red-600 text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                   >
                     Remove
                   </DropdownMenuItem>
@@ -132,12 +132,12 @@ const ProjectLabelsPage = ({ projectId }: ProjectLabelsPageProps) => {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-gray-50/50 border border-dashed rounded-lg">
-            <Tag className="w-8 h-8 text-gray-300 mb-2" />
-            <p className="text-gray-500 dark:text-gray-400 text-[13px]">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-secondary border border-border border-dashed rounded-lg">
+            <Tag className="w-8 h-8 text-muted-foreground mb-2 opacity-50" />
+            <p className="text-muted-foreground text-[13px]">
               No labels assigned to this project yet.
             </p>
-            <p className="text-gray-400 text-[11px] mt-1">
+            <p className="text-muted-foreground/60 text-[11px] mt-1">
               Click "Add Label" to categorize your project.
             </p>
           </div>
@@ -145,7 +145,7 @@ const ProjectLabelsPage = ({ projectId }: ProjectLabelsPageProps) => {
       </div>
 
       {/* Footer Info */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-md text-blue-800">
+      <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 rounded-md text-primary dark:text-foreground">
         <Plus className="w-3.5 h-3.5" />
         <p className="text-[11px] font-medium">
           Note: Labels added here are available workspace-wide for other projects.

@@ -162,8 +162,8 @@ const WorkflowDetailPage = () => {
     // ── 1. Loading ─────────────────────────────────────────
     if (!hydrated) {
         return (
-            <div className="flex items-center justify-center h-screen bg-white">
-                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+            <div className="flex items-center justify-center h-screen bg-background text-foreground">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
     }
@@ -171,13 +171,13 @@ const WorkflowDetailPage = () => {
     // ── 2. Not found (only for existing automations) ───────
     if (!isNew && !automation) {
         return (
-            <div className="flex items-center justify-center h-screen bg-white">
+            <div className="flex items-center justify-center h-screen bg-background text-foreground">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Workflow not found</h2>
-                    <p className="text-gray-500 mb-6">This workflow doesn&apos;t exist or was deleted.</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Workflow not found</h2>
+                    <p className="text-muted-foreground mb-6">This workflow doesn&apos;t exist or was deleted.</p>
                     <Button
                         onClick={() => router.back()}
-                        className="bg-[#001F3F] text-white hover:bg-[#002F5F]"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Go Back
@@ -189,7 +189,7 @@ const WorkflowDetailPage = () => {
 
     // ── 3. Builder ─────────────────────────────────────────
     return (
-        <div className="flex flex-col h-screen bg-white">
+        <div className="flex flex-col h-screen bg-background text-foreground">
             <div className="flex-1 overflow-hidden min-h-0">
                 {/* <WorkflowBuilder
                     automationId={automationId}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import {
-  X, Calendar as CalendarIcon, Flag, User
+  X, Calendar as CalendarIcon, Flag, User, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Calendar } from "@/components/ui/calendar";
 import { Avatar as UIAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProjectsStore, getProfilePictureUrl } from "@/stores/projects-store";
@@ -73,7 +80,7 @@ interface QuickDraftCreationProps {
     assignee?: string;
     priority?: string;
     status?: string;
-  }) => void;
+  }) => Promise<void> | void;
 }
 
 export function QuickDraftCreation({
@@ -103,6 +110,7 @@ export function QuickDraftCreation({
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [isProjectOpen, setIsProjectOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const project = projects.find((p) => p.id === selectedProjectId);
   const taskStatusConfigs = getTaskStatusConfigs(selectedProjectId || "");
@@ -151,26 +159,32 @@ export function QuickDraftCreation({
     setStartDate(selectedDate);
   }, [selectedDate]);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (draftName.trim() && selectedProjectId) {
-      onCreateDraft({
-        projectId: selectedProjectId,
-        name: draftName,
-        description: draftDescription.trim() || undefined,
-        startDate: startDate,
-        endDate: endDate,
-        assignee: selectedAssignee,
-        priority: selectedPriority,
-        status: selectedStatus,
-      });
-      setDraftName(initialDraftName);
-      setDraftDescription("");
-      setSelectedAssignee(undefined);
-      setSelectedPriority(undefined);
-      setSelectedStatus(undefined);
-      setStartDate(selectedDate);
-      setEndDate(undefined);
-      onClose();
+      setIsCreating(true);
+      try {
+        await onCreateDraft({
+          projectId: selectedProjectId,
+          name: draftName,
+          description: draftDescription.trim() || undefined,
+          startDate: startDate,
+          endDate: endDate,
+          assignee: selectedAssignee,
+          priority: selectedPriority,
+          status: selectedStatus,
+        });
+        // Reset state only after successful API call
+        setDraftName(initialDraftName);
+        setDraftDescription("");
+        setSelectedAssignee(undefined);
+        setSelectedPriority(undefined);
+        setSelectedStatus(undefined);
+        setStartDate(selectedDate);
+        setEndDate(undefined);
+        onClose();
+      } finally {
+        setIsCreating(false);
+      }
     }
   };
 
@@ -241,43 +255,41 @@ export function QuickDraftCreation({
 
             <div className="w-[200px] p-4 space-y-2.5 ">
               {!projectId && (
-                <Popover open={isProjectOpen} onOpenChange={setIsProjectOpen}>
-                  <PopoverTrigger asChild>
+                <DropdownMenu open={isProjectOpen} onOpenChange={setIsProjectOpen}>
+                  <DropdownMenuTrigger asChild>
                     <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
                       {project ? (
-                        <span className="truncate">{project.name}</span>
+                        <span className="flex items-center gap-2">
+                          <span className="truncate text-gray-700">{project.name}</span>
+                        </span>
                       ) : (
                         <span className="text-red-500">Select Project</span>
                       )}
                     </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-48 p-2" align="start">
-                    <div className="max-h-60 overflow-y-auto">
-                      {projects.map((p) => (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            setSelectedProjectId(p.id);
-                            setIsProjectOpen(false);
-                            setSelectedStatus(undefined);
-                            setSelectedPriority(undefined);
-                            setSelectedAssignee(undefined);
-                          }}
-                          className={cn(
-                            "w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm",
-                            selectedProjectId === p.id && "bg-blue-50 text-blue-600 font-medium"
-                          )}
-                        >
-                          {p.name}
-                        </button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 max-h-60 overflow-y-auto border-0 border-b-[5px] border-primary" align="start">
+                    {projects.map((p) => (
+                      <DropdownMenuItem
+                        key={p.id}
+                        onSelect={() => {
+                          setSelectedProjectId(p.id);
+                          setSelectedStatus(undefined);
+                          setSelectedPriority(undefined);
+                          setSelectedAssignee(undefined);
+                        }}
+                        className="p-0 focus:bg-transparent"
+                      >
+                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted px-3 bg-muted text-foreground">
+                          <span className="truncate">{p.name}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
 
-              <Popover open={isStatusOpen} onOpenChange={setIsStatusOpen}>
-                <PopoverTrigger asChild>
+              <DropdownMenu open={isStatusOpen} onOpenChange={setIsStatusOpen}>
+                <DropdownMenuTrigger asChild>
                   <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
                     {selectedStatusOption ? (
                       <span className="flex items-center gap-2">
@@ -291,33 +303,33 @@ export function QuickDraftCreation({
                       "Status"
                     )}
                   </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2" align="start">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedStatus(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                    Clear
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   {taskStatusConfigs.length === 0 ? (
                     <p className="text-xs text-gray-400 px-3 py-2">Loading statuses...</p>
                   ) : (
                     taskStatusConfigs.map((config) => (
-                      <button
+                      <DropdownMenuItem
                         key={config._id}
-                        onClick={() => {
-                          setSelectedStatus(config.value);
-                          setIsStatusOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-sm"
+                        onSelect={() => setSelectedStatus(config.value)}
+                        className="p-0 focus:bg-transparent"
                       >
-                        <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: config.color }}
-                        />
-                        {config.label}
-                      </button>
+                        <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                          style={{ backgroundColor: config.color || '#c4c4c4' }}>
+                          <span className="truncate w-full text-center">{config.label}</span>
+                        </div>
+                      </DropdownMenuItem>
                     ))
                   )}
-                </PopoverContent>
-              </Popover>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
-                <PopoverTrigger asChild>
+              <DropdownMenu open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
+                <DropdownMenuTrigger asChild>
                   <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
                     {selectedPriorityOption ? (
                       <span className="flex items-center gap-2">
@@ -328,30 +340,34 @@ export function QuickDraftCreation({
                       "Priority"
                     )}
                   </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2" align="start">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedPriority(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                    Clear
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   {taskPriorityConfigs.length === 0 ? (
                     <p className="px-2 py-2 text-xs text-gray-400 italic">No priorities configured</p>
                   ) : (
                     taskPriorityConfigs.map((priority) => (
-                      <button
+                      <DropdownMenuItem
                         key={priority._id}
-                        onClick={() => {
-                          setSelectedPriority(priority.value);
-                          setIsPriorityOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-100 text-sm"
+                        onSelect={() => setSelectedPriority(priority.value)}
+                        className="p-0 focus:bg-transparent"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: priority.color }} />
-                        <span style={{ color: priority.color }}>{priority.label}</span>
-                      </button>
+                        <div className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                          style={{ backgroundColor: `${priority.color || '#9CA3AF'}33` }}>
+                          <span className="truncate">{priority.label}</span>
+                          <Flag className="h-3.5 w-3.5 flex-shrink-0" style={{ color: priority.color || '#9CA3AF' }} />
+                        </div>
+                      </DropdownMenuItem>
                     ))
                   )}
-                </PopoverContent>
-              </Popover>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
-                <PopoverTrigger asChild>
+              <DropdownMenu open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
+                <DropdownMenuTrigger asChild>
                   <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
                     {assignedMember ? (
                       <span className="flex items-center gap-2">
@@ -367,26 +383,26 @@ export function QuickDraftCreation({
                       </span>
                     )}
                   </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2" align="start">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedAssignee(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                    Clear
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   {members.map((member) => (
-                    <button
+                    <DropdownMenuItem
                       key={member.userId}
-                      onClick={() => {
-                        setSelectedAssignee(member.userId);
-                        setIsAssigneeOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-sm"
+                      onSelect={() => setSelectedAssignee(member.userId)}
+                      className="p-0 focus:bg-transparent"
                     >
-                      <Avatar
-                        name={member.name}
-                        src={getProfilePictureUrl(member.avatar)}
-                      />
-                      {member.name}
-                    </button>
+                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                        <Avatar name={member.name} src={getProfilePictureUrl(member.avatar)} size="sm" />
+                        <span className="truncate">{member.name}</span>
+                      </div>
+                    </DropdownMenuItem>
                   ))}
-                </PopoverContent>
-              </Popover>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Popover open={isStartCalendarOpen} onOpenChange={setIsStartCalendarOpen}>
                 <PopoverTrigger asChild>
@@ -439,10 +455,22 @@ export function QuickDraftCreation({
           <div className="px-5 py-3 border-t border-gray-200 flex justify-end bg-white">
             <Button
               onClick={handleCreate}
-              disabled={!draftName.trim() || !selectedProjectId}
-              className="bg-gray-300 text-gray-700 hover:bg-gray-400 px-8 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!draftName.trim() || !selectedProjectId || isCreating}
+              className={cn(
+                "px-8 rounded-lg text-white transition-colors",
+                draftName.trim() && selectedProjectId
+                  ? "bg-[#001F3F] hover:bg-[#001933]"
+                  : "bg-gray-300 text-gray-700"
+              )}
             >
-              Done
+              {isCreating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Draft...
+                </>
+              ) : (
+                "Create Draft"
+              )}
             </Button>
           </div>
         </DialogPrimitive.Content>

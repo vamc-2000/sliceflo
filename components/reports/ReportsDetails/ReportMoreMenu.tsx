@@ -37,7 +37,7 @@ export default function ReportMoreMenu({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
-                            <button className="text-[#001F3F] hover:text-gray-800">
+                            <button className="text-[#001F3F] dark:text-foreground hover:text-gray-800 dark:hover:text-muted-foreground">
                                 <MoreHorizontal className="w-5 h-5" strokeWidth={2.5} />
                             </button>
                         </DropdownMenuTrigger>
@@ -54,54 +54,54 @@ export default function ReportMoreMenu({
                 side="bottom"
                 sideOffset={6}
                 onCloseAutoFocus={(e) => e.preventDefault()}
-                className="w-50 border-0 border-b-[5px] border-[#001F3F] text-[#001F3F]"
+                className="w-50 border-0 border-b-[5px] border-[#001F3F] dark:border-b-brand text-[#001F3F] dark:text-foreground bg-popover"
             >
-                <div className="px-2 py-1.5 text-sm text-center text-white bg-[#001F3F] rounded-sm">
+                <div className="px-2 py-1.5 text-sm text-center text-white dark:text-brand-foreground bg-[#001F3F] dark:bg-brand rounded-sm">
                     Sharing & Permissions
                 </div>
 
                 <DropdownMenuItem onClick={onRename}>
-                    <Pen className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <Pen className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Rename
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onDuplicate}>
-                    <Copy className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <Copy className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Duplicate
                 </DropdownMenuItem>
 
-                <Separator className="text-[#D1D1D6]" />
+                <Separator className="bg-[#D1D1D6] dark:bg-border" />
 
                 <DropdownMenuItem onClick={onToggleFavorite}>
-                    <Star className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <Star className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     {isFavorite ? "Remove from favourites" : "Add To favourites"}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onRename}>
-                    <Save className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <Save className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Save as Template
                 </DropdownMenuItem>
 
-                <Separator className="text-[#D1D1D6]" />
+                <Separator className="bg-[#D1D1D6] dark:bg-border" />
 
                 <DropdownMenuItem onClick={onRename}>
-                    <SlidersVertical className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <SlidersVertical className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Auto layout
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onRename}>
-                    <RotateCcw className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <RotateCcw className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Auto refresh
                 </DropdownMenuItem>
 
-                <Separator className="text-[#D1D1D6]" />
+                <Separator className="bg-[#D1D1D6] dark:bg-border" />
 
                 <DropdownMenuItem onClick={onRename}>
-                    <Download className="w-4 h-4 mr-2 text-[#001F3F]" />
+                    <Download className="w-4 h-4 mr-2 text-[#001F3F] dark:text-foreground" />
                     Download PDF
                 </DropdownMenuItem>
 
-                <Separator className="text-[#D1D1D6]" />
+                <Separator className="bg-[#D1D1D6] dark:bg-border" />
 
                 <DropdownMenuItem
                     onClick={onDelete}

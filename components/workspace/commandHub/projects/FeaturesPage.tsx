@@ -17,14 +17,14 @@ const FeaturesPage: React.FC<FeaturesPageProps> = ({
   const projectFeatures = getFeaturesByProject(projectId);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 bg-background text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-[16px] font-semibold text-foreground">
             Features
           </h2>
-          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-[12px] text-muted-foreground mt-0.5">
             Subtext
           </p>
         </div>
@@ -35,20 +35,20 @@ const FeaturesPage: React.FC<FeaturesPageProps> = ({
         {projectFeatures.map((feature) => (
           <div
             key={feature.id}
-            className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-sm transition-shadow border-l-4 border-l-[#001F3F]"
+            className="flex items-center justify-between p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-shadow border-l-4 border-l-primary"
           >
             <div className="flex items-start gap-3 flex-1">
               {/* Icon */}
-              <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 text-muted-foreground" />
               </div>
 
               {/* Content */}
               <div className="flex-1">
-                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-[14px] font-semibold text-foreground">
                   {feature.name}
                 </h3>
-                <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-[12px] text-muted-foreground mt-0.5">
                   {feature.description}
                 </p>
               </div>
@@ -58,7 +58,7 @@ const FeaturesPage: React.FC<FeaturesPageProps> = ({
             <Switch
               checked={feature.isEnabled}
               onCheckedChange={() => toggleFeature(feature.id)}
-              className="ml-4"
+              className="ml-4 cursor-pointer"
             />
           </div>
         ))}
@@ -67,7 +67,7 @@ const FeaturesPage: React.FC<FeaturesPageProps> = ({
       {/* Empty State */}
       {projectFeatures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-[13px]">
+          <p className="text-muted-foreground text-[13px]">
             No features available for this project.
           </p>
         </div>

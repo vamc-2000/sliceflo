@@ -67,17 +67,38 @@ const fallbackMembers = [
   { userId: "fallback-3", name: "John Doe", email: "john@example.com", avatar: null },
 ];
 
+const getAvatarColors = (name: string) => {
+  const colors = [
+    { bg: "bg-red-100 dark:bg-red-950/40", text: "text-red-700 dark:text-red-300" },
+    { bg: "bg-blue-100 dark:bg-blue-950/40", text: "text-blue-700 dark:text-blue-300" },
+    { bg: "bg-green-100 dark:bg-green-950/40", text: "text-green-700 dark:text-green-300" },
+    { bg: "bg-yellow-100 dark:bg-yellow-950/40", text: "text-yellow-700 dark:text-yellow-300" },
+    { bg: "bg-purple-100 dark:bg-purple-950/40", text: "text-purple-700 dark:text-purple-300" },
+    { bg: "bg-pink-100 dark:bg-pink-950/40", text: "text-pink-700 dark:text-pink-300" },
+    { bg: "bg-indigo-100 dark:bg-indigo-950/40", text: "text-indigo-700 dark:text-indigo-300" },
+    { bg: "bg-teal-100 dark:bg-teal-950/40", text: "text-teal-700 dark:text-teal-300" },
+  ];
+  if (!name) return colors[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
+
 const durationOptions = ["1 month", "3 months", "6 months", "9 months", "12 months"];
 
 const Automation: React.FC<AutomationProps> = ({ projectId }) => {
   const { getMembersByProject, projects, getTaskCustomFields, getTaskTypesByProject } = useProjectsStore();
   const currentProject = projects.find((p) => p.id === projectId);
-  const { workspaceMembers } = useWorkspaceStore();
+  const { workspaceMembers, currentWorkspace, fetchWorkspaceMembers } = useWorkspaceStore();
   const {
     automations,
     fetchAutomations,
     createAutomation,
     updateAutomation,
+    deleteAutomation,
   } = useAutomationStore();
 
   const syncTimeoutRef = React.useRef<Record<string, NodeJS.Timeout>>({});
@@ -115,6 +136,13 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
   const [showCustomRangeInput, setShowCustomRangeInput] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyFilter, setHistoryFilter] = useState<"all" | "active" | "inactive">("all");
+  const [memberSearchQuery, setMemberSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (activeDropdown !== "assignee") {
+      setMemberSearchQuery("");
+    }
+  }, [activeDropdown]);
 
   const members = React.useMemo(() => {
     const projectMembers = getMembersByProject(projectId);
@@ -122,9 +150,13 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
     const enriched = list.map((pm) => {
       const wm = workspaceMembers.find((m) => m.userId === pm.userId);
       const rawAvatar = pm.avatar || wm?.profilePicture || null;
+      let displayName = pm.name || wm?.name || "Member";
+      if (/^[0-9a-fA-F]{24}$/.test(displayName)) {
+        displayName = "Member";
+      }
       return {
         userId: pm.userId,
-        name: pm.name || wm?.name || "Member",
+        name: displayName,
         email: pm.email || wm?.email || "",
         avatar: rawAvatar ? getProfilePictureUrl(rawAvatar) : null,
       };
@@ -133,12 +165,18 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
     if (enriched.length > 0) return enriched;
 
     if (workspaceMembers.length > 0) {
-      return workspaceMembers.map((m) => ({
-        userId: m.userId,
-        name: m.name || "Member",
-        email: m.email || "",
-        avatar: m.profilePicture ? getProfilePictureUrl(m.profilePicture) : null,
-      }));
+      return workspaceMembers.map((m) => {
+        let displayName = m.name || "Member";
+        if (/^[0-9a-fA-F]{24}$/.test(displayName)) {
+          displayName = "Member";
+        }
+        return {
+          userId: m.userId,
+          name: displayName,
+          email: m.email || "",
+          avatar: m.profilePicture ? getProfilePictureUrl(m.profilePicture) : null,
+        };
+      });
     }
 
     return fallbackMembers.map((m) => ({
@@ -193,7 +231,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         // Build the actions array from the enabled fields
         const actions: any[] = [];
         Object.entries(config.fields).forEach(([fieldId, fieldConfig]) => {
-          if (fieldConfig.enabled && fieldConfig.value !== "Select") {
+          if (fieldConfig.enabled) {
             let actionType = "UPDATE_FIELD";
             let actionValue: any = fieldConfig.value;
 
@@ -231,7 +269,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           trigger: "TASK_CREATED",
           isActive: config.enabled && config.triggerTask,
           conditions: [],
-          actions: actions.length > 0 ? actions : (existingTask?.actions || []),
+          actions: actions,
         };
 
         // 2. Sync Subtask Creation trigger automation
@@ -244,34 +282,57 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           trigger: "SUBTASK_CREATED",
           isActive: config.enabled && config.triggerSubtask,
           conditions: [],
-          actions: actions.length > 0 ? actions : (existingSubtask?.actions || []),
+          actions: actions,
         };
 
         try {
-          if (!config.enabled) {
-            if (existingTask?.id && taskPayload.actions.length > 0) {
-              await updateAutomation(projectId, existingTask.id, { ...taskPayload, isActive: false });
+          if (actions.length === 0) {
+            if (existingTask?.id) {
+              await deleteAutomation(projectId, existingTask.id);
             }
-            if (existingSubtask?.id && subtaskPayload.actions.length > 0) {
-              await updateAutomation(projectId, existingSubtask.id, { ...subtaskPayload, isActive: false });
+            if (existingSubtask?.id) {
+              await deleteAutomation(projectId, existingSubtask.id);
             }
           } else {
+            const isTaskActive = config.enabled && config.triggerTask;
+            const isSubtaskActive = config.enabled && config.triggerSubtask;
+
             // Task trigger
             if (existingTask?.id) {
-              if (taskPayload.actions.length > 0) {
-                await updateAutomation(projectId, existingTask.id, taskPayload);
-              }
-            } else if (config.triggerTask && actions.length > 0) {
-              await createAutomation(projectId, taskPayload);
+              await updateAutomation(projectId, existingTask.id, {
+                ...taskPayload,
+                isActive: isTaskActive,
+              });
+            } else if (isTaskActive) {
+              await createAutomation(projectId, {
+                ...taskPayload,
+                isActive: true,
+              });
+            } else if (existingTask?.id) {
+              // If it's disabled but exists, make sure to update its active state to false
+              await updateAutomation(projectId, existingTask.id, {
+                ...taskPayload,
+                isActive: false,
+              });
             }
 
             // Subtask trigger
             if (existingSubtask?.id) {
-              if (subtaskPayload.actions.length > 0) {
-                await updateAutomation(projectId, existingSubtask.id, subtaskPayload);
-              }
-            } else if (config.triggerSubtask && actions.length > 0) {
-              await createAutomation(projectId, subtaskPayload);
+              await updateAutomation(projectId, existingSubtask.id, {
+                ...subtaskPayload,
+                isActive: isSubtaskActive,
+              });
+            } else if (isSubtaskActive) {
+              await createAutomation(projectId, {
+                ...subtaskPayload,
+                isActive: true,
+              });
+            } else if (existingSubtask?.id) {
+              // If it's disabled but exists, make sure to update its active state to false
+              await updateAutomation(projectId, existingSubtask.id, {
+                ...subtaskPayload,
+                isActive: false,
+              });
             }
           }
         } catch (err) {
@@ -410,6 +471,13 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
       }
     }, 500);
   };
+
+  // Fetch workspace members on mount/change
+  useEffect(() => {
+    if (currentWorkspace?.id) {
+      fetchWorkspaceMembers(currentWorkspace.id);
+    }
+  }, [currentWorkspace?.id, fetchWorkspaceMembers]);
 
   // Load settings from database automations
   useEffect(() => {
@@ -637,6 +705,14 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
   const handleToggleFieldEnabled = (fieldId: string) => {
     const fieldSettings = settings.autoFillFields.fields[fieldId] || { enabled: false, value: "Select" };
+    const nextEnabled = !fieldSettings.enabled;
+    let nextValue = fieldSettings.value;
+    if (nextEnabled && nextValue === "Select") {
+      const options = getFieldOptions(fieldId);
+      if (options.length > 0) {
+        nextValue = options[0].value;
+      }
+    }
     const updated = {
       ...settings,
       autoFillFields: {
@@ -644,8 +720,8 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         fields: {
           ...settings.autoFillFields.fields,
           [fieldId]: {
-            ...fieldSettings,
-            enabled: !fieldSettings.enabled,
+            enabled: nextEnabled,
+            value: nextValue,
           },
         },
       },
@@ -858,10 +934,10 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-[20px] font-semibold text-[#0F172A] dark:text-white">
+            <h2 className="text-[20px] font-semibold text-foreground">
               Run history
             </h2>
-            <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-[12px] text-muted-foreground mt-0.5">
               Subtext
             </p>
           </div>
@@ -871,7 +947,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="w-9 h-9 rounded-xl bg-[#F1F5F9] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-[#64748B] dark:text-slate-350 transition-colors cursor-pointer border border-transparent focus:outline-none"
+                  className="w-9 h-9 rounded-xl bg-secondary hover:bg-accent hover:text-accent-foreground flex items-center justify-center text-muted-foreground transition-colors cursor-pointer border border-transparent focus:outline-none"
                   title="Filter runs"
                 >
                   <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -887,12 +963,12 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                   </svg>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-1 space-y-0.5">
+              <DropdownMenuContent align="end" className="w-36 bg-popover border border-border rounded-xl shadow-lg p-1 space-y-0.5 text-popover-foreground">
                 <DropdownMenuItem
                   onClick={() => setHistoryFilter("all")}
                   className={cn(
-                    "w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
-                    historyFilter === "all" ? "border-l-[3px] border-l-[#001F3F] dark:border-l-sky-400 font-bold bg-slate-50 dark:bg-slate-800 text-[#001F3F] dark:text-sky-400" : "text-slate-700 dark:text-slate-350"
+                    "w-full text-left px-3.5 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
+                    historyFilter === "all" ? "border-l-[3px] border-l-primary font-bold bg-accent text-primary dark:text-foreground" : "text-muted-foreground"
                   )}
                 >
                   All
@@ -900,8 +976,8 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                 <DropdownMenuItem
                   onClick={() => setHistoryFilter("active")}
                   className={cn(
-                    "w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
-                    historyFilter === "active" ? "border-l-[3px] border-l-[#001F3F] dark:border-l-sky-400 font-bold bg-slate-50 dark:bg-slate-800 text-[#001F3F] dark:text-sky-400" : "text-slate-700 dark:text-slate-350"
+                    "w-full text-left px-3.5 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
+                    historyFilter === "active" ? "border-l-[3px] border-l-primary font-bold bg-accent text-primary dark:text-foreground" : "text-muted-foreground"
                   )}
                 >
                   Active
@@ -909,8 +985,8 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                 <DropdownMenuItem
                   onClick={() => setHistoryFilter("inactive")}
                   className={cn(
-                    "w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
-                    historyFilter === "inactive" ? "border-l-[3px] border-l-[#001F3F] dark:border-l-sky-400 font-bold bg-slate-50 dark:bg-slate-800 text-[#001F3F] dark:text-sky-400" : "text-slate-700 dark:text-slate-350"
+                    "w-full text-left px-3.5 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] transition-colors cursor-pointer rounded-lg font-medium",
+                    historyFilter === "inactive" ? "border-l-[3px] border-l-primary font-bold bg-accent text-primary dark:text-foreground" : "text-muted-foreground"
                   )}
                 >
                   Inactive
@@ -921,7 +997,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
             {/* Back button */}
             <button
               onClick={() => setIsHistoryOpen(false)}
-              className="px-4 h-9 rounded-lg bg-[#FFF3EB] hover:bg-[#FFE3D1] border border-[#FFDEC9] flex items-center gap-2 text-[#FF7020] text-[12px] font-semibold transition-colors shadow-sm cursor-pointer"
+              className="px-4 h-9 rounded-lg bg-orange-50 dark:bg-orange-950/20 hover:bg-orange-100/80 border border-orange-200 dark:border-orange-900/30 flex items-center gap-2 text-orange-600 dark:text-orange-400 text-[12px] font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <svg className="w-4 h-4 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -938,7 +1014,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           {filteredHistory.map((run, idx) => (
             <div
               key={`${run.id}-${idx}`}
-              className={`group flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-xl hover:shadow-sm transition-all duration-200 border-l-[6px] ${run.status === "success"
+              className={`group flex items-center justify-between p-3 bg-card border border-border rounded-xl hover:shadow-sm transition-all duration-200 border-l-[6px] ${run.status === "success"
                   ? "border-l-[#22C55E]"
                   : "border-l-[#EF4444]"
                 }`}
@@ -952,12 +1028,12 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                 )}
 
                 {/* Date & Time */}
-                <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
-                  {run.date} <span className="text-gray-300 dark:text-gray-700 mx-1.5">|</span> {run.time}
+                <span className="text-[12px] text-muted-foreground font-medium whitespace-nowrap">
+                  {run.date} <span className="text-muted-foreground/30 mx-1.5">|</span> {run.time}
                 </span>
 
                 {/* Description */}
-                <span className="text-[12px] text-[#0F172A] dark:text-slate-200 font-normal leading-none flex items-center gap-1">
+                <span className="text-[12px] text-foreground font-normal leading-none flex items-center gap-1">
                   When an item is created set <strong className="font-bold">Due date</strong> to
                 </span>
               </div>
@@ -965,28 +1041,28 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
               {/* Action menu icon */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer">
+                  <button className="p-1 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors text-muted-foreground focus:outline-none cursor-pointer">
                     <MoreHorizontal className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-1.5 space-y-0.5">
-                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer transition-colors font-medium">
-                    <Pencil className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                <DropdownMenuContent align="end" className="w-48 bg-popover border border-border text-popover-foreground rounded-xl shadow-lg p-1.5 space-y-0.5">
+                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
+                    <Pencil className="w-4 h-4 text-muted-foreground" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer transition-colors font-medium">
-                    <Copy className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
+                    <Copy className="w-4 h-4 text-muted-foreground" />
                     Duplicate
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer transition-colors font-medium">
-                    <FileDown className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
+                    <FileDown className="w-4 h-4 text-muted-foreground" />
                     Save as template
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer transition-colors font-medium">
-                    <History className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
+                    <History className="w-4 h-4 text-muted-foreground" />
                     Run history
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-red-50 dark:hover:bg-red-950/30 text-[13px] text-red-500 dark:text-red-400 hover:text-red-650 dark:hover:text-red-300 rounded-lg cursor-pointer transition-colors font-semibold">
+                  <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 hover:bg-red-50 dark:hover:bg-red-950/30 text-[13px] text-red-500 dark:text-red-400 rounded-lg cursor-pointer transition-colors font-semibold">
                     <Trash2 className="w-4 h-4" />
                     Delete
                   </DropdownMenuItem>
@@ -1000,14 +1076,14 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
   }
 
   return (
-    <div className="w-full space-y-2 select-none relative pb-10">
+    <div className="w-full space-y-2 select-none relative pb-10 bg-background text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-[#0F172A] dark:text-white">
+          <h2 className="text-[16px] font-semibold text-foreground">
             Automations
           </h2>
-          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-[12px] text-muted-foreground mt-0.5">
             Subtext
           </p>
         </div>
@@ -1015,16 +1091,16 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
           {/* Create automation Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="px-3.5 h-9 rounded-xl bg-[#001F3F] hover:bg-[#002d5c] text-white flex items-center gap-2 text-[12px] font-semibold transition-colors shadow-sm cursor-pointer focus:outline-none">
+              <button className="px-3.5 h-9 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2 text-[12px] font-semibold transition-colors shadow-sm cursor-pointer focus:outline-none">
                 <span>Create automation</span>
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-1.5 space-y-0.5">
-              <DropdownMenuItem className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-350 rounded-lg cursor-pointer transition-colors font-medium">
+            <DropdownMenuContent align="end" className="w-52 bg-popover border border-border text-popover-foreground rounded-xl shadow-lg p-1.5 space-y-0.5">
+              <DropdownMenuItem className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
                 Create from scratch
               </DropdownMenuItem>
-              <DropdownMenuItem className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-[13px] text-slate-700 dark:text-slate-350 rounded-lg cursor-pointer transition-colors font-medium">
+              <DropdownMenuItem className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-[13px] rounded-lg cursor-pointer transition-colors font-medium">
                 Create from templates
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -1032,7 +1108,7 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
 
           <button
             onClick={() => setIsHistoryOpen(true)}
-            className="w-9 h-9 rounded-xl bg-[#FFF3EB] hover:bg-[#FFE3D1] border border-[#FFDEC9] flex items-center justify-center text-[#FF7020] transition-colors shadow-sm cursor-pointer focus:outline-none"
+            className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/20 hover:bg-orange-100/80 border border-orange-200 dark:border-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 transition-colors shadow-sm cursor-pointer focus:outline-none"
             title="View history logs"
           >
             <History className="w-4.5 h-4.5" />
@@ -1052,80 +1128,114 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
       )}
 
       {/* Automation Cards List */}
-      <div className="space-y-4">
+      <div className="space-y-4 py-4">
         {/* Card 1: Assign Creator */}
-        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-lg p-5 shadow-sm transition-all">
+        <div className="bg-card border border-border rounded-lg p-5 shadow-sm transition-all">
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
-              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Assign creator as assignee when task is assigned
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+              <p className="text-[13px] text-muted-foreground font-normal leading-relaxed">
                 When someone assigns a task, automatically reassign it to the task's creator (reporter).
               </p>
             </div>
             <Switch
               checked={settings.assignCreator.enabled}
               onCheckedChange={() => toggleAutomation("assignCreator")}
-              className="data-[state=checked]:bg-[#001F3F]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
 
           {settings.assignCreator.enabled && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="mt-4 p-4 bg-[#F5F6F8] dark:bg-slate-800/40 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-800 transition-all"
+              className="mt-3.5 p-3 bg-secondary rounded-lg flex items-center justify-between border border-border transition-all"
             >
-              <span className="text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+              <span className="text-[12px] text-muted-foreground font-medium">
                 Select default assignee.
               </span>
               <div className="relative">
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "assignee" ? null : "assignee")}
-                  className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[13px] text-slate-700 dark:text-slate-300 flex items-center gap-2.5 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors min-w-[160px] justify-between cursor-pointer"
+                  className="px-2.5 py-1.5 bg-background border border-input rounded-lg text-[12px] text-foreground flex items-center gap-2 shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors min-w-[130px] justify-between cursor-pointer"
                 >
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-5 h-5 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <Avatar className="w-4.5 h-4.5 shrink-0">
                       <AvatarImage src={selectedAssignee?.avatar || undefined} />
-                      <AvatarFallback className="bg-slate-100 text-slate-700 text-[10px] font-bold">
+                      <AvatarFallback className={cn("text-[9px] font-bold", getAvatarColors(selectedAssignee?.name || "U").bg, getAvatarColors(selectedAssignee?.name || "U").text)}>
                         {selectedAssignee?.name ? selectedAssignee.name[0].toUpperCase() : "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-medium truncate max-w-[100px]">
+                    <span className="font-medium truncate max-w-[80px]">
                       {selectedAssignee?.name}
                     </span>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
+                  <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </button>
 
                 {activeDropdown === "assignee" && (
-                  <div className="absolute right-0 mt-1.5 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden py-1">
-                    <div className="max-h-48 overflow-y-auto">
-                      {members.map((member) => (
-                        <button
-                          key={member.userId}
-                          onClick={() => handleSelectAssignee(member.userId)}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2.5 text-[13px] transition-colors cursor-pointer"
-                        >
-                          <Avatar className="w-5.5 h-5.5 shrink-0">
-                            <AvatarImage src={member.avatar || undefined} />
-                            <AvatarFallback className="bg-slate-100 text-slate-700 text-[10px] font-bold">
-                              {member.name ? member.name[0].toUpperCase() : "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-                              {member.name}
-                            </p>
-                            <p className="text-[10px] text-gray-400 truncate">
-                              {member.email}
-                            </p>
-                          </div>
-                          {settings.assignCreator.assigneeId === member.userId && (
-                            <Check className="w-4 h-4 text-[#001F3F] dark:text-[#E9F2FF] shrink-0" />
-                          )}
-                        </button>
-                      ))}
+                  <div className="absolute right-0 mt-1.5 w-56 bg-popover border border-border rounded-xl shadow-xl z-50 p-2.5 space-y-2 text-popover-foreground">
+                    <div className="text-[12px] font-semibold px-1">
+                      Members
+                    </div>
+                    <div className="relative flex items-center">
+                      <svg className="w-3 h-3 text-muted-foreground absolute left-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <input
+                        type="text"
+                        placeholder="Search current members"
+                        value={memberSearchQuery}
+                        onChange={(e) => setMemberSearchQuery(e.target.value)}
+                        className="w-full pl-6.5 pr-2 h-6.5 border border-input rounded-md text-[10px] bg-transparent focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+                      />
+                    </div>
+                    <div className="max-h-40 overflow-y-auto pr-1 space-y-0.5 scrollbar-thin scrollbar-thumb-muted/30">
+                      {members.filter((member) =>
+                        member.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) ||
+                        member.email.toLowerCase().includes(memberSearchQuery.toLowerCase())
+                      ).length === 0 ? (
+                        <div className="text-center py-4 text-[11px] text-muted-foreground font-semibold">
+                          No members added yet
+                        </div>
+                      ) : (
+                        members
+                          .filter((member) =>
+                            member.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) ||
+                            member.email.toLowerCase().includes(memberSearchQuery.toLowerCase())
+                          )
+                          .map((member) => (
+                            <button
+                               key={member.userId}
+                               onClick={() => handleSelectAssignee(member.userId)}
+                               className="w-full text-left px-2 py-1 hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center gap-2 text-[11px] transition-colors cursor-pointer"
+                            >
+                              <Avatar className="w-5 h-5 shrink-0">
+                                <AvatarImage src={member.avatar || undefined} />
+                                <AvatarFallback className={cn("text-[9px] font-bold", getAvatarColors(member.name || "U").bg, getAvatarColors(member.name || "U").text)}>
+                                  {member.name ? member.name[0].toUpperCase() : "U"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-foreground truncate leading-tight">
+                                  {member.name}
+                                </p>
+                                <p className="text-[9px] text-muted-foreground truncate leading-none">
+                                  {member.email}
+                                </p>
+                              </div>
+                              {settings.assignCreator.assigneeId === member.userId && (
+                                <Check className="w-3 h-3 text-primary dark:text-foreground shrink-0" />
+                              )}
+                            </button>
+                          ))
+                      )}
+                    </div>
+                    <div className="border-t border-border pt-2">
+                      <button className="w-full py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                        <span>+ Add</span>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -1135,27 +1245,27 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         </div>
 
         {/* Card 2: Auto Fill Fields */}
-        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-5 shadow-sm transition-all">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm transition-all">
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
-              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Automatically fill fields on task/sub task creation
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+              <p className="text-[13px] text-muted-foreground font-normal leading-relaxed">
                 Pre-fill selected fields like priority, status, due date, or assignee when a task or subtask is created.
               </p>
             </div>
             <Switch
               checked={settings.autoFillFields.enabled}
               onCheckedChange={() => toggleAutomation("autoFillFields")}
-              className="data-[state=checked]:bg-[#001F3F]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
 
           {settings.autoFillFields.enabled && (
-            <div className="mt-4 p-4 bg-[#F5F6F8] dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-800 space-y-4 transition-all">
+            <div className="mt-4 p-4 bg-secondary rounded-lg border border-border space-y-4 transition-all">
               <div className="space-y-2.5">
-                <span className="text-[13px] font-semibold text-gray-600 dark:text-gray-300 block">
+                <span className="text-[13px] font-semibold text-foreground block">
                   This automation triggers when:
                 </span>
                 <div className="flex flex-col gap-2">
@@ -1163,9 +1273,9 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                     <Checkbox
                       checked={settings.autoFillFields.triggerTask}
                       onCheckedChange={() => handleToggleTrigger("triggerTask")}
-                      className="h-4 w-4 rounded border-gray-300 text-[#001F3F] focus:ring-[#001F3F] data-[state=checked]:bg-[#001F3F]"
+                      className="h-4 w-4 rounded border-input text-primary focus:ring-primary data-[state=checked]:bg-primary cursor-pointer"
                     />
-                    <span className="text-[13px] text-gray-600 dark:text-gray-450 font-normal">
+                    <span className="text-[13px] text-muted-foreground font-normal">
                       A new task is created
                     </span>
                   </label>
@@ -1173,86 +1283,88 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                     <Checkbox
                       checked={settings.autoFillFields.triggerSubtask}
                       onCheckedChange={() => handleToggleTrigger("triggerSubtask")}
-                      className="h-4 w-4 rounded border-gray-300 text-[#001F3F] focus:ring-[#001F3F] data-[state=checked]:bg-[#001F3F]"
+                      className="h-4 w-4 rounded border-input text-primary focus:ring-primary data-[state=checked]:bg-primary cursor-pointer"
                     />
-                    <span className="text-[13px] text-gray-600 dark:text-gray-450 font-normal">
+                    <span className="text-[13px] text-muted-foreground font-normal">
                       A new sub task is created
                     </span>
                   </label>
                 </div>
               </div>
 
-              <div className="border-t border-slate-200/60 dark:border-slate-700/60 my-2" />
+              <div className="border-t border-border my-2" />
 
               <div className="flex items-center justify-between">
-                <span className="text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+                <span className="text-[13px] text-muted-foreground font-medium">
                   Select fields to auto-fill:
                 </span>
                 <div className="relative">
                   <button
                     onClick={() => setActiveDropdown(activeDropdown === "fields" ? null : "fields")}
-                    className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[13px] text-slate-700 dark:text-slate-300 flex items-center gap-2.5 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors min-w-[160px] justify-between cursor-pointer font-medium"
+                    className="px-2.5 py-1.5 bg-background border border-input rounded-lg text-[12px] text-foreground flex items-center gap-2 shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors min-w-[130px] justify-between cursor-pointer font-medium"
                   >
                     <span>
                       {Object.values(settings.autoFillFields.fields).filter((f) => f.enabled).length === 0
                         ? "Select fields"
                         : `${Object.values(settings.autoFillFields.fields).filter((f) => f.enabled).length} selected`}
                     </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
+                    <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                   </button>
 
                   {activeDropdown === "fields" && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 mt-1.5 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 p-3 space-y-2"
+                      className="absolute right-0 mt-1.5 w-56 bg-popover border border-border rounded-xl shadow-lg z-50 p-2.5 text-popover-foreground"
                     >
-                      {availableFields.map((field) => {
-                        const fieldSetting = settings.autoFillFields.fields[field.id] || { enabled: false, value: "Select" };
-                        return (
-                          <div key={field.id} className="space-y-1">
-                            <div className="flex items-center justify-between py-1">
-                              <label className="flex items-center gap-2.5 cursor-pointer">
-                                <Checkbox
-                                  checked={fieldSetting.enabled}
-                                  onCheckedChange={() => handleToggleFieldEnabled(field.id)}
-                                  className="h-4 w-4 rounded border-gray-300 text-[#001F3F] focus:ring-[#001F3F] data-[state=checked]:bg-[#001F3F]"
-                                />
-                                <span className="text-[12px] font-semibold text-slate-750 dark:text-slate-200">
-                                  {field.label}
-                                </span>
-                              </label>
+                      <div className="max-h-56 overflow-y-auto pr-1 space-y-1.5 scrollbar-thin scrollbar-thumb-muted/35">
+                        {availableFields.map((field) => {
+                          const fieldSetting = settings.autoFillFields.fields[field.id] || { enabled: false, value: "Select" };
+                          return (
+                            <div key={field.id} className="space-y-1">
+                              <div className="flex items-center justify-between py-1">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <Checkbox
+                                    checked={fieldSetting.enabled}
+                                    onCheckedChange={() => handleToggleFieldEnabled(field.id)}
+                                    className="h-3.5 w-3.5 rounded border-input text-primary focus:ring-primary data-[state=checked]:bg-primary cursor-pointer"
+                                  />
+                                  <span className="text-[11px] font-semibold text-foreground">
+                                    {field.label}
+                                  </span>
+                                </label>
 
-                              <button
-                                onClick={() => setActiveSubDropdown(activeSubDropdown === field.id ? null : field.id)}
-                                className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-[11px] text-slate-600 dark:text-slate-350 flex items-center justify-between gap-1 min-w-[85px] cursor-pointer"
-                                disabled={!fieldSetting.enabled}
-                              >
-                                <span className="truncate max-w-[55px]">
-                                  {getFieldLabel(field.id, fieldSetting.value)}
-                                </span>
-                                <ChevronDown className="w-3 h-3 text-gray-400 shrink-0" />
-                              </button>
-                            </div>
-
-                            {activeSubDropdown === field.id && fieldSetting.enabled && (
-                              <div className="ml-6 p-1.5 bg-slate-50 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 rounded-lg space-y-0.5 mt-1 max-h-32 overflow-y-auto">
-                                {getFieldOptions(field.id).map((opt, index) => (
-                                  <button
-                                    key={`${opt.value}-${index}`}
-                                    onClick={() => handleSelectFieldValue(field.id, opt.value)}
-                                    className="w-full text-left px-2 py-1 hover:bg-slate-200/50 dark:hover:bg-slate-700 rounded text-[11px] font-semibold text-slate-750 dark:text-slate-305 flex items-center justify-between cursor-pointer"
-                                  >
-                                    <span>{opt.label}</span>
-                                    {fieldSetting.value === opt.value && (
-                                      <Check className="w-3.5 h-3.5 text-[#001F3F] dark:text-[#E9F2FF] shrink-0" />
-                                    )}
-                                  </button>
-                                ))}
+                                <button
+                                  onClick={() => setActiveSubDropdown(activeSubDropdown === field.id ? null : field.id)}
+                                  className="px-1.5 py-0.5 bg-secondary border border-border rounded text-[10px] text-foreground flex items-center justify-between gap-0.5 min-w-[70px] max-w-[90px] cursor-pointer"
+                                  disabled={!fieldSetting.enabled}
+                                >
+                                  <span className="truncate max-w-[45px]">
+                                    {getFieldLabel(field.id, fieldSetting.value)}
+                                  </span>
+                                  <ChevronDown className="w-2.5 h-2.5 text-muted-foreground shrink-0" />
+                                </button>
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
+
+                              {activeSubDropdown === field.id && fieldSetting.enabled && (
+                                <div className="ml-5 p-1 bg-secondary border border-border rounded-lg space-y-0.5 mt-1 max-h-28 overflow-y-auto">
+                                  {getFieldOptions(field.id).map((opt, index) => (
+                                    <button
+                                      key={`${opt.value}-${index}`}
+                                      onClick={() => handleSelectFieldValue(field.id, opt.value)}
+                                      className="w-full text-left px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground rounded text-[10px] font-semibold text-foreground flex items-center justify-between cursor-pointer"
+                                    >
+                                      <span>{opt.label}</span>
+                                      {fieldSetting.value === opt.value && (
+                                        <Check className="w-3 h-3 text-primary dark:text-foreground shrink-0" />
+                                      )}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1262,71 +1374,71 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         </div>
 
         {/* Card 3: Auto Close Inactive */}
-        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-5 shadow-sm transition-all">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm transition-all">
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
-              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Auto-close tasks that are inactive
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+              <p className="text-[13px] text-muted-foreground font-normal leading-relaxed">
                 Automatically close tasks or work items that remain inactive for a specified period of time.
               </p>
             </div>
             <Switch
               checked={settings.autoCloseInactive.enabled}
               onCheckedChange={() => toggleAutomation("autoCloseInactive")}
-              className="data-[state=checked]:bg-[#001F3F]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
 
           <div
-            className={`mt-4 p-4 bg-[#F5F6F8] dark:bg-slate-800/40 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-800 transition-all ${!settings.autoCloseInactive.enabled ? "opacity-70 pointer-events-none" : ""
+            className={`mt-4 p-4 bg-secondary rounded-lg flex items-center justify-between border border-border transition-all ${!settings.autoCloseInactive.enabled ? "opacity-70 pointer-events-none" : ""
               }`}
           >
-            <span className="text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+            <span className="text-[13px] text-muted-foreground font-medium">
               Auto-close tasks that are inactive for
             </span>
             <div className="relative">
               <button
                 onClick={() => setActiveDropdown(activeDropdown === "duration" ? null : "duration")}
-                className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[13px] text-slate-700 dark:text-slate-300 flex items-center gap-2.5 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors min-w-[130px] justify-between cursor-pointer font-medium"
+                className="px-3.5 py-2 bg-background border border-input rounded-lg text-[13px] text-foreground flex items-center gap-2.5 shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors min-w-[130px] justify-between cursor-pointer font-medium"
               >
                 <span>{settings.autoCloseInactive.duration}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
               </button>
 
               {activeDropdown === "duration" && (
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="absolute right-0 mt-1.5 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden py-1 space-y-0.5"
+                  className="absolute right-0 mt-1.5 w-44 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden py-1 space-y-0.5 text-popover-foreground"
                 >
                   {durationOptions.map((option) => (
                     <button
                       key={option}
                       onClick={() => handleSelectDuration(option)}
-                      className="w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-[13px] transition-colors cursor-pointer"
+                      className="w-full text-left px-3.5 py-2 hover:bg-accent hover:text-accent-foreground flex items-center justify-between text-[13px] transition-colors cursor-pointer"
                     >
-                      <span className="font-semibold text-slate-700 dark:text-slate-250">
+                      <span className="font-semibold text-foreground">
                         {option}
                       </span>
                       {settings.autoCloseInactive.duration === option && !showCustomRangeInput && (
-                        <Check className="w-4 h-4 text-[#001F3F] dark:text-[#E9F2FF] shrink-0" />
+                        <Check className="w-4 h-4 text-primary dark:text-foreground shrink-0" />
                       )}
                     </button>
                   ))}
 
-                  <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                  <div className="border-t border-border my-1" />
 
                   <div>
                     <button
                       onClick={handleCustomRangeToggle}
-                      className="w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-[13px] transition-colors cursor-pointer font-semibold text-slate-700 dark:text-slate-250"
+                      className="w-full text-left px-3.5 py-2 hover:bg-accent hover:text-accent-foreground flex items-center justify-between text-[13px] transition-colors cursor-pointer font-semibold text-foreground"
                     >
                       <span>Custom range</span>
                       {showCustomRangeInput ? (
-                        <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
+                        <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
                       ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                       )}
                     </button>
 
@@ -1338,10 +1450,10 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
                             min="1"
                             value={settings.autoCloseInactive.customValue}
                             onChange={(e) => handleCustomMonthsChange(e.target.value)}
-                            className="w-full h-8 pl-2.5 pr-14 border border-slate-200 dark:border-slate-750 rounded-lg text-[12px] bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-[#001F3F] text-slate-700 dark:text-slate-250"
+                            className="w-full h-8 pl-2.5 pr-14 border border-input rounded-lg text-[12px] bg-secondary focus:outline-none focus:border-primary text-foreground"
                             placeholder="Number"
                           />
-                          <span className="absolute right-2.5 text-[11px] text-gray-400 font-semibold pointer-events-none">
+                          <span className="absolute right-2.5 text-[11px] text-muted-foreground font-semibold pointer-events-none">
                             months
                           </span>
                         </div>
@@ -1355,39 +1467,39 @@ const Automation: React.FC<AutomationProps> = ({ projectId }) => {
         </div>
 
         {/* Card 4: Set Due Date Today when status is Done */}
-        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-5 shadow-sm transition-all">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm transition-all">
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
-              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Set Due date is today, when status is Done for task/sub task
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+              <p className="text-[13px] text-muted-foreground font-normal leading-relaxed">
                 Automatically updates the due date to today when a task status is marked as Done.
               </p>
             </div>
             <Switch
               checked={settings.setDueDateToday.enabled}
               onCheckedChange={() => toggleAutomation("setDueDateToday")}
-              className="data-[state=checked]:bg-[#001F3F]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
         </div>
 
         {/* Card 5: Mark parent task as done when all subtasks are done */}
-        <div className="bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-5 shadow-sm transition-all">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm transition-all">
           <div className="flex items-start justify-between">
             <div className="space-y-1 pr-6">
-              <h3 className="text-[15px] font-semibold text-[#0F172A] dark:text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Mark parent task as done when all subtasks are done
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+              <p className="text-[13px] text-muted-foreground font-normal leading-relaxed">
                 When a subtask is completed, check whether every other subtask under the same parent is also done. If so, automatically mark the parent task as done.
               </p>
             </div>
             <Switch
               checked={settings.markParentDone?.enabled || false}
               onCheckedChange={() => toggleAutomation("markParentDone")}
-              className="data-[state=checked]:bg-[#001F3F]"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
         </div>

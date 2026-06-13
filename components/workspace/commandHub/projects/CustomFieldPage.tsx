@@ -215,14 +215,14 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
   // Check if project exists
   if (!projectId || !selectedProject) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-background text-foreground">
+        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
           <span className="text-2xl">📁</span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           No Project Selected
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Please select a project to manage custom fields
         </p>
       </div>
@@ -230,14 +230,14 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-background text-foreground">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-foreground">
             Custom fields
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Manage system and custom fields for your project
           </p>
         </div>
@@ -247,14 +247,14 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
             <Button
               variant="secondary"
               size="sm"
-              className="bg-[#001F3F] text-white hover:text-[#001F3F] font-medium px-3 h-8"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-3 h-8 cursor-pointer"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create field
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[320px] p-0 flex flex-col h-[450px] border-b-5 border-b-[#001F3F]"
+            className="w-[320px] p-0 flex flex-col h-[450px] border border-border bg-popover text-popover-foreground border-b-5 border-b-primary"
             align="end"
             side="bottom"
           >
@@ -271,12 +271,11 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
         {/* ✅ System Fields Section */}
         {systemFieldsList.length > 0 && (
           <div className="mt-6">
-            {/* <h3 className="text-sm font-medium text-gray-700 mb-3">System Fields</h3> */}
             <div className="space-y-2">
               {systemFieldsList.map((field) => (
                 <div
                   key={field.id}
-                  className="flex items-center justify-between p-3 rounded-md border border-gray-200 bg-gray-50"
+                  className="flex items-center justify-between p-3 rounded-md border border-border bg-secondary"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* ✅ Checkbox toggles visibility */}
@@ -288,11 +287,11 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
                           toggleSystemFieldVisibility(projectId, field.id);
                         }
                       }}
-                      className="h-5 w-5"
+                      className="h-5 w-5 cursor-pointer"
                     />
 
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <div className="text-sm font-medium text-foreground flex items-center gap-2">
                         {field.name}
                         {field.required && (
                           <span className="text-xs text-red-500" title="Required field">
@@ -303,7 +302,7 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
 
                       {/* ✅ Type and Values inline */}
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="bg-gray-200 px-1.5 py-0.5 rounded-sm inline-block text-xs text-gray-600">
+                        <span className="bg-muted px-1.5 py-0.5 rounded-sm inline-block text-xs text-muted-foreground">
                           {field.type}
                         </span>
 
@@ -314,7 +313,7 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
                   </div>
 
                   {/* System badge */}
-                  <span className="px-2.5 py-1 text-xs font-medium text-gray-600 bg-gray-200 rounded flex-shrink-0">
+                  <span className="px-2.5 py-1 text-xs font-medium text-muted-foreground bg-muted rounded flex-shrink-0">
                     System
                   </span>
                 </div>
@@ -326,29 +325,28 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
         {/* ✅ Custom Fields Section */}
         {customFieldsList.length > 0 && (
           <div className="mt-2">
-            {/* <h3 className="text-sm font-medium text-gray-700 mb-3">Custom Fields</h3> */}
             <div className="space-y-2">
               {customFieldsList.map((field) => {
                 const originalField = customFields.find((cf) => cf.id === field.id);
                 return (
                   <div
                     key={field.id}
-                    className="group flex items-center justify-between p-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="group flex items-center justify-between p-3 rounded-md border border-border bg-card hover:bg-accent/40 transition-colors"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <Checkbox
                         checked={field.checked}
-                        className="h-5 w-5"
+                        className="h-5 w-5 cursor-pointer"
                       />
 
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground">
                           {field.name}
                         </div>
 
                         {/* ✅ Type and Values inline */}
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-sm inline-block text-xs">
+                          <span className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground px-1.5 py-0.5 rounded-sm inline-block text-xs">
                             {field.type}
                           </span>
 
@@ -378,23 +376,24 @@ const CustomFieldPage = ({ projectId }: CustomFieldPageProps) => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 flex-shrink-0"
+                            className="h-8 w-8 p-0 flex-shrink-0 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="border-b-5 border-b-[#001F3F]">
+                        <DropdownMenuContent align="end" className="bg-popover border border-border text-popover-foreground border-b-5 border-b-primary">
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
                               setEditingFieldId(field.id);
                             }}
+                            className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
                             Edit field
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDeleteField(field.id)}
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
                           >
                             Delete field
                           </DropdownMenuItem>

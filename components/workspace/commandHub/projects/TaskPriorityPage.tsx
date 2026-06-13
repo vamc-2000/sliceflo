@@ -9,6 +9,7 @@ import {
 import { useProjectsStore } from "@/stores/projects-store";
 import { toast } from "react-hot-toast";
 import AddPriorityModal from "../AddPriorityModal";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 interface TaskPriorityPageProps {
     projectId: string;
@@ -25,6 +26,8 @@ const TaskPriorityPage: React.FC<TaskPriorityPageProps> = ({ projectId }) => {
     const priorities = getTaskPriorityConfigs(projectId);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPriorityId, setEditingPriorityId] = useState<string | null>(null);
+    const [deletePriorityId, setDeletePriorityId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleSave = async (data: {
         label: string;
@@ -60,14 +63,21 @@ const TaskPriorityPage: React.FC<TaskPriorityPageProps> = ({ projectId }) => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm("Delete this task priority?")) {
-            try {
-                await deleteTaskPriorityConfig(projectId, id);
-                toast.success("Task priority deleted");
-            } catch {
-                toast.error("Failed to delete task priority");
-            }
+    const handleDeleteClick = (id: string) => {
+        setDeletePriorityId(id);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deletePriorityId) return;
+        setIsDeleting(true);
+        try {
+            await deleteTaskPriorityConfig(projectId, deletePriorityId);
+            toast.success("Task priority deleted");
+            setDeletePriorityId(null);
+        } catch {
+            toast.error("Failed to delete task priority");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -76,20 +86,20 @@ const TaskPriorityPage: React.FC<TaskPriorityPageProps> = ({ projectId }) => {
         : null;
 
     return (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-4 bg-background text-foreground">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+                    <h2 className="text-[16px] font-semibold text-foreground">
                         Task priority
                     </h2>
-                    <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="text-[12px] text-muted-foreground mt-0.5">
                         Create, edit, or organize task priority levels used across this project.
                     </p>
                 </div>
                 <Button
                     onClick={() => { setEditingPriorityId(null); setIsModalOpen(true); }}
-                    className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 cursor-pointer"
                 >
                     <Plus className="w-3.5 h-3.5" /> Create new
                 </Button>
@@ -98,45 +108,45 @@ const TaskPriorityPage: React.FC<TaskPriorityPageProps> = ({ projectId }) => {
             {/* List */}
             <div className="space-y-2">
                 {priorities.length === 0 && (
-                    <p className="text-[13px] text-gray-400 py-4 text-center">
+                    <p className="text-[13px] text-muted-foreground py-4 text-center">
                         No task priorities yet. Create one to get started.
                     </p>
                 )}
                 {priorities.map(priority => (
                     <div
                         key={priority._id}
-                        className="flex items-center justify-between p-3 rounded-md bg-gray-50 hover:shadow-sm transition-shadow"
+                        className="flex items-center justify-between p-3 rounded-md bg-card border border-border hover:shadow-sm transition-shadow"
                     >
                         <div className="flex items-center gap-2.5">
                             <div
                                 className="w-4 h-4 rounded-full flex-shrink-0"
                                 style={{ backgroundColor: priority.color }}
                             />
-                            <span className="text-[13px] font-medium text-gray-900">
+                            <span className="text-[13px] font-medium text-foreground">
                                 {priority.label}
                             </span>
                             {priority.description && (
-                                <span className="text-[11px] text-gray-400">
+                                <span className="text-[11px] text-muted-foreground">
                                     {priority.description}
                                 </span>
                             )}
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-                                    <Ellipsis className="w-4 h-4 text-gray-500" />
+                                <button className="p-1 hover:bg-accent hover:text-accent-foreground rounded transition-colors cursor-pointer">
+                                    <Ellipsis className="w-4 h-4 text-muted-foreground" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32">
+                            <DropdownMenuContent align="end" className="w-32 bg-popover border border-border text-popover-foreground">
                                 <DropdownMenuItem
                                     onClick={() => { setEditingPriorityId(priority._id); setIsModalOpen(true); }}
-                                    className="text-[12px]"
+                                    className="text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                                 >
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => handleDelete(priority._id)}
-                                    className="text-red-600 focus:text-red-600 text-[12px]"
+                                    onClick={() => handleDeleteClick(priority._id)}
+                                    className="text-red-600 focus:text-red-600 text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                                 >
                                     Delete
                                 </DropdownMenuItem>
@@ -163,6 +173,17 @@ const TaskPriorityPage: React.FC<TaskPriorityPageProps> = ({ projectId }) => {
                         : null
                 }
                 nextOrder={priorities.length + 1}
+            />
+
+            <ConfirmationModal
+                open={!!deletePriorityId}
+                onClose={() => setDeletePriorityId(null)}
+                onConfirm={handleDeleteConfirm}
+                title="Are you sure want to delete this task priority?"
+                description="This action is permanent and cannot be undone."
+                confirmLabel="Delete Priority"
+                loadingLabel="Deleting..."
+                loading={isDeleting}
             />
         </div>
     );

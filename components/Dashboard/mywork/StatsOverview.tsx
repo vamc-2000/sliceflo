@@ -15,6 +15,7 @@ import { useMailStore } from "@/stores/mailbox-store";
 import { useProfileStore } from "@/stores/profile-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import dayjs from "dayjs";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const AchievementChart = dynamic(() => import("@/components/charts").then(m => ({ default: m.AchievementChart })), { ssr: false });
@@ -221,7 +222,7 @@ export function StatsOverview({ projects, tasks, teams = [], goals = [], user, c
                       </span>
                     </div>
                     <span className="text-[10px] text-muted-foreground">
-                      {dayjs(m.createdAt).format("DD MMM")}
+                      {formatLocalDate(m.createdAt)}
                     </span>
                   </div>
                   <p className="text-xs font-medium line-clamp-2">{m.subject}</p>

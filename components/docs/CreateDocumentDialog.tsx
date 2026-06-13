@@ -170,13 +170,13 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
       <div key={doc.id} className="w-full" data-testid={`doc-tree-node-${doc.id}`}>
         <div
           className={cn(
-            "flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 transition-colors group cursor-pointer",
-            level === 0 ? "text-[13px] font-semibold text-gray-800" : "text-[12px] text-gray-500"
+            "flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-accent/40 dark:hover:bg-neutral-800 transition-colors group cursor-pointer",
+            level === 0 ? "text-[13px] font-semibold text-foreground" : "text-[12px] text-muted-foreground"
           )}
           onClick={() => level === 0 && toggleExpand(doc.id)}
         >
           {level === 0 && (
-            <div className="p-0.5 rounded text-gray-400" data-testid={`doc-tree-expand-${doc.id}`}>
+            <div className="p-0.5 rounded text-muted-foreground" data-testid={`doc-tree-expand-${doc.id}`}>
               {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
             </div>
           )}
@@ -184,18 +184,18 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
             {!doc.parentId ? (
               <img src="/images/docsidebar.svg" alt="doc" className="w-3.5 h-3.5 shrink-0" />
             ) : (
-              <FileText className="w-3.5 h-3.5 shrink-0 text-gray-400" />
+              <FileText className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
             )}
-            <span className={cn("truncate", isLinked && "text-gray-400 font-normal")}>
+            <span className={cn("truncate text-foreground", isLinked && "text-muted-foreground font-normal")}>
               {doc.title}
             </span>
             {!doc.parentId && (
-              <span className="text-[10px] text-gray-400 font-normal shrink-0 ml-1">
+              <span className="text-[10px] text-muted-foreground font-normal shrink-0 ml-1">
                 ({getSubPageCount(doc.id)} Pages)
               </span>
             )}
             {isLinked && (
-              <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-medium shrink-0 ml-1">
+              <span className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium shrink-0 ml-1">
                 Linked
               </span>
             )}
@@ -208,7 +208,7 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
             }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "border-gray-300 data-[state=checked]:bg-[#0b213e] data-[state=checked]:border-[#0b213e] h-5 w-5 rounded",
+              "border-border data-[state=checked]:bg-[#0b213e] data-[state=checked]:border-[#0b213e] dark:data-[state=checked]:bg-primary dark:data-[state=checked]:border-primary h-5 w-5 rounded",
               isLinked && "opacity-50 cursor-not-allowed data-[state=checked]:bg-gray-300 data-[state=checked]:border-gray-300"
             )}
             data-testid={`doc-tree-checkbox-${doc.id}`}
@@ -238,9 +238,9 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl p-8 gap-0 bg-gray-50" data-testid="create-document-dialog">
+      <DialogContent className="sm:max-w-3xl p-8 gap-0 bg-background text-foreground border-border" data-testid="create-document-dialog">
         <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="text-2xl font-semibold text-center">
+          <DialogTitle className="text-2xl font-semibold text-center text-foreground">
             Create a new Document?
           </DialogTitle>
           <p className="text-center text-muted-foreground">
@@ -250,10 +250,10 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
 
         <div className="grid grid-cols-2 gap-4 px-6 mb-6 mt-2">
           {/* Use Templates Card */}
-          <div className="p-3 bg-white border border-gray-100 rounded-[24px] shadow-sm aspect-square overflow-hidden hover:shadow-md hover:border-blue-100 transition-all group">
+          <div className="p-3 bg-card border border-border rounded-[24px] shadow-sm aspect-square overflow-hidden hover:shadow-md hover:border-primary/50 transition-all group">
             <button
               onClick={handleUseTemplates}
-              className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-[#eef5ff] hover:bg-[#e5f1ff] transition-all cursor-pointer gap-6"
+              className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-[#eef5ff] dark:bg-neutral-800 hover:bg-[#e5f1ff] dark:hover:bg-neutral-700 transition-all cursor-pointer gap-6"
               data-testid="use-templates-btn"
             >
               <div className="w-28 h-28 rounded-full bg-[#ffcd3c] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
@@ -262,28 +262,28 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
                   <FileText className="w-10 h-10 text-white fill-white absolute -top-1.5 -right-1.5 border-2 border-[#ffcd3c] rounded" />
                 </div>
               </div>
-              <span className="text-[15px] font-bold text-[#0b213e]">
+              <span className="text-[15px] font-bold text-[#0b213e] dark:text-foreground">
                 Use templates
               </span>
             </button>
           </div>
 
           {/* Create Empty Document Card */}
-          <div className="p-3 bg-white border border-gray-100 rounded-[24px] shadow-sm aspect-square overflow-hidden hover:shadow-lg hover:border-blue-100 transition-all group">
+          <div className="p-3 bg-card border border-border rounded-[24px] shadow-sm aspect-square overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all group">
             <button
               onClick={handleCreateEmptyDocument}
-              className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-white transition-all cursor-pointer gap-6"
+              className="w-full h-full flex flex-col items-center justify-center p-6 rounded-[20px] bg-white dark:bg-neutral-900 transition-all cursor-pointer gap-6"
               data-testid="create-empty-document-btn"
             >
-              <div className="w-28 h-28 rounded-full bg-[#f1f4f9] flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative shadow-inner">
-                <FileText className="w-12 h-12 text-gray-400" />
-                <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full flex items-center justify-center border-4 border-white shadow-sm -mr-3 -mt-3">
-                  <div className="w-full h-full rounded-full bg-[#eef5ff] flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-[#0b213e] stroke-[3px]" />
+              <div className="w-28 h-28 rounded-full bg-[#f1f4f9] dark:bg-neutral-800 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative shadow-inner">
+                <FileText className="w-12 h-12 text-muted-foreground" />
+                <div className="absolute top-0 right-0 w-10 h-10 bg-white dark:bg-neutral-900 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-sm -mr-3 -mt-3">
+                  <div className="w-full h-full rounded-full bg-[#eef5ff] dark:bg-neutral-800 flex items-center justify-center">
+                    <Plus className="w-5 h-5 text-[#0b213e] dark:text-foreground stroke-[3px]" />
                   </div>
                 </div>
               </div>
-              <span className="text-[15px] font-bold text-[#0b213e]">
+              <span className="text-[15px] font-bold text-[#0b213e] dark:text-foreground">
                 Create empty document
               </span>
             </button>
@@ -293,12 +293,12 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
         {/* Add from existing section */}
         {(projectId || portfolioId) && (
           <div className="px-6 pb-8 mt-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Add from existing Doc</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">Add from existing Doc</h3>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="flex h-10 w-fit min-w-[140px] items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-2 text-sm text-gray-400 shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all hover:border-gray-200 outline-none gap-2"
+                  className="flex h-10 w-fit min-w-[140px] items-center justify-between rounded-lg border border-border bg-background px-4 py-2 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-border transition-all hover:border-border/80 outline-none gap-2"
                   data-testid="select-existing-doc-trigger"
                 >
                   <span>Select Doc</span>
@@ -306,12 +306,12 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-80 p-0 bg-white border border-gray-100 shadow-xl rounded-xl"
+                className="w-80 p-0 bg-popover border border-border shadow-xl rounded-xl text-popover-foreground"
                 align="start"
                 onCloseAutoFocus={(e) => e.preventDefault()} // Prevent closing on selection if desired, or handle appropriately
                 data-testid="select-existing-doc-menu"
               >
-                <div className="p-4 border-b">
+                <div className="p-4 border-b border-border">
                   <h3 className="text-sm font-semibold">Select Document</h3>
                 </div>
                 <ScrollArea className="h-[300px] p-4">
@@ -319,20 +319,20 @@ export function CreateDocumentDialog({ open, onOpenChange, projectId, portfolioI
                     {rootDocs.length > 0 ? (
                       rootDocs.map(doc => renderDocTree(doc))
                     ) : (
-                      <div className="text-center py-8 text-gray-400 text-sm italic">
+                      <div className="text-center py-8 text-muted-foreground text-sm italic">
                         No documents found
                       </div>
                     )}
                   </div>
                 </ScrollArea>
-                <div className="p-4 border-t">
+                <div className="p-4 border-t border-border">
                   <Button
                     onClick={() => {
                       // Call handleAddSelected for each rootDoc that has selections in its hierarchy
                       rootDocs.forEach(root => handleAddSelected(root.id));
                     }}
                     disabled={selectedDocs.size === 0}
-                    className="w-full h-8 bg-[#0b213e] text-white rounded-lg text-sm font-semibold hover:bg-[#162e4d] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-center"
+                    className="w-full h-8 bg-[#0b213e] dark:bg-primary text-white dark:text-primary-foreground rounded-lg text-sm font-semibold hover:bg-[#162e4d] dark:hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-center"
                     data-testid="add-selected-docs-btn"
                   >
                     Add Selected
