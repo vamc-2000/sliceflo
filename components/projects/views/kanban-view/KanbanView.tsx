@@ -89,11 +89,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
   formatLocalDate,
   convertSelectedDateToUTC,
 } from "@/utils/timezone-utils";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
   getTaskTypeIcon,
@@ -1671,19 +1671,17 @@ const KanbanView = ({
                   </div>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0"
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <CalendarPicker
-                    mode="single"
-                    selected={newTaskData.startDate}
-                    onSelect={(date) =>
+                    selectedDate={newTaskData.startDate}
+                    onDateSelect={(date) =>
                       setNewTaskData((prev) => ({
                         ...prev,
-                        startDate: date ?? undefined,
+                        startDate: date,
                       }))
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -1718,16 +1716,15 @@ const KanbanView = ({
                   </div>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0"
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <CalendarPicker
-                    mode="single"
-                    selected={newTaskData.endDate}
-                    onSelect={(date) =>
+                    selectedDate={newTaskData.endDate}
+                    onDateSelect={(date) =>
                       setNewTaskData((prev) => ({
                         ...prev,
-                        endDate: date ?? undefined,
+                        endDate: date,
                       }))
                     }
                     disabled={(dt) =>
@@ -1743,7 +1740,6 @@ const KanbanView = ({
                           )
                         : false
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -1982,19 +1978,17 @@ const KanbanView = ({
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0"
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <CalendarPicker
-                  mode="single"
-                  selected={newSubtaskData.startDate}
-                  onSelect={(date) =>
+                  selectedDate={newSubtaskData.startDate}
+                  onDateSelect={(date) =>
                     setNewSubtaskData((prev) => ({
                       ...prev,
-                      startDate: date ?? undefined,
+                      startDate: date,
                     }))
                   }
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -2027,16 +2021,15 @@ const KanbanView = ({
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0"
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <CalendarPicker
-                  mode="single"
-                  selected={newSubtaskData.endDate}
-                  onSelect={(date) =>
+                  selectedDate={newSubtaskData.endDate}
+                  onDateSelect={(date) =>
                     setNewSubtaskData((prev) => ({
                       ...prev,
-                      endDate: date ?? undefined,
+                      endDate: date,
                     }))
                   }
                   disabled={(dt) =>
@@ -2052,7 +2045,6 @@ const KanbanView = ({
                         )
                       : false
                   }
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -2700,10 +2692,9 @@ const KanbanView = ({
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-auto p-0">
+                          <DropdownMenuSubContent className="w-auto p-2 border-0 border-b-[5px] border-primary">
                             <CalendarPicker
-                              mode="single"
-                              onSelect={(date) => {
+                              onDateSelect={(date) => {
                                 if (date) {
                                   setFilterConfig((prev) => {
                                     const existing = prev.find(
@@ -2733,7 +2724,6 @@ const KanbanView = ({
                                   });
                                 }
                               }}
-                              initialFocus
                             />
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>

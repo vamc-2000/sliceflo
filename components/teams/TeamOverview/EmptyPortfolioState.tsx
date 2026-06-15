@@ -23,7 +23,7 @@ const EmptyPortfolioState = ({ teamId, onAddExistingPortfolio, onCreateNewPortfo
         height={120}
         className="object-contain"
       />
-      <div className="flex flex-row gap-46 items-center">
+      <div className="flex flex-col gap-2">
         <button
           data-testid="teamoverview-create-portfolio-btn"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
@@ -35,7 +35,7 @@ const EmptyPortfolioState = ({ teamId, onAddExistingPortfolio, onCreateNewPortfo
             }
           }}
         >
-          <span className="flex items-center justify-center w-10 h-10  rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+          <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
             <Plus size={18} />
           </span>
           <span className='text-xs'>Create new Portfolio</span>

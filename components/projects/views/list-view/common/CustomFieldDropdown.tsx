@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatLocalDateTime, convertSelectedDateToUTC } from "@/utils/timezone-utils";
-import { Calendar } from '@/components/ui/calendar';
+import { formatLocalDateTime, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -743,11 +743,10 @@ export function CustomFieldDropdown({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent data-testid={`custom-field-date-content-${field.id}`} className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={dateValue ? new Date(dateValue) : undefined}
-              onSelect={(date) => {
+          <PopoverContent data-testid={`custom-field-date-content-${field.id}`} className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+            <CalendarPicker
+              selectedDate={dateValue ? convertUTCToCalendarDate(dateValue) : undefined}
+              onDateSelect={(date) => {
                 if (date) {
                   // Use current time from time picker
                   const [hours, minutes] = customTime.split(':');
@@ -758,7 +757,6 @@ export function CustomFieldDropdown({
                   }
                 }
               }}
-              initialFocus
             />
             {/* Clock Icon and Clear in a row */}
             <div className="px-3 py-2 border-t bg-card flex items-center justify-between">
@@ -771,7 +769,7 @@ export function CustomFieldDropdown({
                     setCustomTime(e.target.value);
                     if (dateValue) {
                       const [hours, minutes] = e.target.value.split(':');
-                      const date = new Date(dateValue);
+                      const date = convertUTCToCalendarDate(dateValue) || new Date();
                       date.setHours(parseInt(hours), parseInt(minutes));
                       onUpdate(convertSelectedDateToUTC(date));
                     }

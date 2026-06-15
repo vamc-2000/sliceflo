@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -245,11 +245,13 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                     <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(d) => {
+                <PopoverContent
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                  align="start"
+                >
+                  <CalendarPicker
+                    selectedDate={startDate}
+                    onDateSelect={(d) => {
                       if (d) {
                         setStartDate(d);
                         setStartDateOpen(false);
@@ -261,7 +263,6 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                     disabled={(d) =>
                       d < new Date(new Date().setHours(0, 0, 0, 0))
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -561,11 +562,13 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                         </span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={endDate}
-                        onSelect={(d) => {
+                    <PopoverContent
+                      className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                      align="start"
+                    >
+                      <CalendarPicker
+                        selectedDate={endDate}
+                        onDateSelect={(d) => {
                           if (d) {
                             setEndDate(d);
                             setEndDateOpen(false);
@@ -577,7 +580,6 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
                               new Date(new Date(startDate).setHours(0, 0, 0, 0))
                             : d < new Date(new Date().setHours(0, 0, 0, 0))
                         }
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>

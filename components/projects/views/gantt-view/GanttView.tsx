@@ -16,7 +16,6 @@ import { useProfileStore } from "@/stores/profile-store";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import {
   GanttProvider,
@@ -100,7 +99,7 @@ import {
   getWeekendDaysIndices,
 } from "@/utils/timezone-utils";
 import { GanttFieldVisibilityPopup } from "@/components/projects/views/gantt-view/GanttFieldVisibilityPopup";
-import { CustomGanttCalendarPicker } from "./CustomGanttCalendarPicker";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import AssigneeDropdown from "../list-view/filters/AssigneeDropdown";
@@ -1625,10 +1624,17 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              onSelect={(date) => {
+                          <DropdownMenuSubContent className="w-auto p-2 border-0 border-b-[5px] border-primary">
+                            <CalendarPicker
+                              selectedDate={(() => {
+                                const existing = filterConfig.find(
+                                  (f) => f.field === "dueDate",
+                                );
+                                return existing
+                                  ? new Date(existing.value)
+                                  : undefined;
+                              })()}
+                              onDateSelect={(date) => {
                                 if (date) {
                                   setFilterConfig((prev) => {
                                     const existing = prev.find(
@@ -1658,7 +1664,6 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                   });
                                 }
                               }}
-                              initialFocus
                             />
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
@@ -1865,14 +1870,12 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                 "flex items-center gap-1.5 h-8 px-2 rounded border transition-colors duration-150 cursor-pointer select-none",
                 showConnectors
                   ? "border-primary bg-primary/10 text-primary dark:border-primary-foreground/30 dark:bg-primary-foreground/10 dark:text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border",
               )}
               data-testid="gantt-connectors-toggle"
             >
               <Cable className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium">
-                Connectors
-              </span>
+              <span className="text-xs font-medium">Connectors</span>
               <Switch
                 id="connectors-toggle"
                 checked={showConnectors}
@@ -1911,8 +1914,11 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                     {getDateLabel()}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-3" align="center">
-                  <CustomGanttCalendarPicker
+                <PopoverContent
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                  align="center"
+                >
+                  <CalendarPicker
                     selectedDate={currentDate}
                     onDateSelect={(newDate) => setCurrentDate(newDate)}
                     range={range}
