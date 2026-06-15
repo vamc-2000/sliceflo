@@ -258,7 +258,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                       }
                     />
                   ) : (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-25">
                       <Image
                         src="/images/projects/portfolios-illustration.svg"
                         alt="projects illustration"
@@ -266,28 +266,26 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                         height={120}
                         className="object-contain"
                       />
-                      <div className="flex flex-col gap-2">
-                        <button
-                          data-testid="portfoliooverview-add-new-project-btn"
-                          onClick={() => setOpenAddProjectDialog(true)}
-                          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-                            <Plus size={18} />
-                          </span>
-                          <span>Add new Project</span>
-                        </button>
-                        <button
-                          data-testid="portfoliooverview-add-existing-project-btn"
-                          onClick={() => setOpenAddProjectDialog(true)}
-                          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-                            <FolderClosed size={18} />
-                          </span>
-                          <span>Add from existing Projects</span>
-                        </button>
-                      </div>
+                      <button
+                        data-testid="portfoliooverview-add-new-project-btn"
+                        onClick={() => setOpenAddProjectDialog(true)}
+                        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                          <Plus size={18} />
+                        </span>
+                        <span>Add new Project</span>
+                      </button>
+                      <button
+                        data-testid="portfoliooverview-add-existing-project-btn"
+                        onClick={() => setOpenAddProjectDialog(true)}
+                        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                          <FolderClosed size={18} />
+                        </span>
+                        <span>Add from existing Projects</span>
+                      </button>
                     </div>
                   )}
                 </CardContent>
@@ -304,7 +302,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
               </div>
               <Card>
                 <CardContent className="px-4 py-2">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-25">
                     <Image
                       src="/images/projects/goals-illustration.svg"
                       alt="goals illustration"
