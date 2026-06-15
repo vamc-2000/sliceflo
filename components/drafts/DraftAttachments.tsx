@@ -119,10 +119,9 @@ export const DraftAttachments: React.FC<DraftAttachmentsProps> = ({
     };
 
     return (
-        <div className="space-y-3 pt-4">
+        <div className="space-y-3">
             <div className="flex items-center justify-between">
                 <div className="flex gap-2">
-                    <Label className="font-semibold text-sm">Attachments</Label>
                     {displayAttachments.length > 0 && (
                         <span className="text-xs text-[#AEAEB2]">
                             {displayAttachments.length} items

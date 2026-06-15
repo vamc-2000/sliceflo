@@ -24,7 +24,7 @@ export default function DraftSharePage({
 
     const { getDraftById } = useDraftsStore();
     const { fetchProjectById } = useProjectsStore();
-    const { fetchWorkspaceMembers, currentWorkspace } = useWorkspaceStore();
+    const { fetchWorkspaces, fetchWorkspaceMembers, currentWorkspace, setCurrentWorkspace } = useWorkspaceStore();
 
     const [draft, setDraft] = useState<DraftResponse | null>(null);
     const [status, setStatus] = useState<Status>("loading");
@@ -33,25 +33,49 @@ export default function DraftSharePage({
         const load = async () => {
             setStatus("loading");
             try {
-                const workspaceId = currentWorkspace?.id;
-                if (!workspaceId) {
+                // Always fetch/refresh workspaces first
+                await fetchWorkspaces();
+                const allWorkspaces = useWorkspaceStore.getState().workspaces;
+                if (allWorkspaces.length === 0) {
                     setStatus("error");
                     return;
                 }
 
-                // 1. Fetch the draft
-                const fetched = await getDraftById(id, workspaceId);
-                if (!fetched) {
+                let fetchedDraft: DraftResponse | null = null;
+                let activeWorkspace = useWorkspaceStore.getState().currentWorkspace || allWorkspaces[0];
+
+                // 1. Try with the currently active workspace
+                if (activeWorkspace?.id) {
+                    fetchedDraft = await getDraftById(id, activeWorkspace.id);
+                }
+
+                // 2. If not found, try all other workspaces of the user
+                if (!fetchedDraft) {
+                    for (const ws of allWorkspaces) {
+                        if (!ws.id) continue;
+                        if (ws.id === activeWorkspace?.id) continue;
+                        const result = await getDraftById(id, ws.id);
+                        if (result) {
+                            fetchedDraft = result;
+                            activeWorkspace = ws;
+                            setCurrentWorkspace(ws);
+                            break;
+                        }
+                    }
+                }
+
+                if (!fetchedDraft) {
                     setStatus("not-found");
                     return;
                 }
-                setDraft(fetched);
 
-                // 2. Load project + workspace members
-                if (fetched.projectId) {
-                    await fetchProjectById(fetched.projectId);
+                setDraft(fetchedDraft);
+
+                // 3. Load project + workspace members for the correct workspace
+                if (fetchedDraft.projectId) {
+                    await fetchProjectById(fetchedDraft.projectId);
                 }
-                await fetchWorkspaceMembers(workspaceId);
+                await fetchWorkspaceMembers(activeWorkspace.id || "");
 
                 setStatus("ready");
             } catch (error) {
@@ -60,7 +84,7 @@ export default function DraftSharePage({
             }
         };
         load();
-    }, [id, currentWorkspace?.id]);
+    }, [id, currentWorkspace?.id, fetchWorkspaces, setCurrentWorkspace]);
 
     if (status === "loading") {
         return (

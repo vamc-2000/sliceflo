@@ -2,13 +2,13 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { 
-  listRootDocuments, 
-  getDocument as getDocumentApi, 
-  listChildren, 
-  createRootDocument, 
-  createChildDocument, 
-  updateDocument as updateDocumentApi, 
+import {
+  listRootDocuments,
+  getDocument as getDocumentApi,
+  listChildren,
+  createRootDocument,
+  createChildDocument,
+  updateDocument as updateDocumentApi,
   deleteDocument as deleteDocumentApi,
   lockDocument as lockDocumentApi,
   unlockDocument as unlockDocumentApi,
@@ -76,7 +76,7 @@ interface DocStore {
   updateDocument: (id: string, updates: Partial<Document>) => Promise<void>;
   deleteDocument: (id: string) => Promise<void>;
   createDoc: (title?: string, parentId?: string | null) => Promise<string | undefined>;
-  
+
   getDocument: (id: string) => Document | undefined;
   setActiveDoc: (id: string) => void;
   triggerTitleEdit: (id: string) => void;
@@ -110,7 +110,7 @@ interface DocStore {
   removeTeamFromDocument: (docId: string, teamId: string) => Promise<void>;
   addDocumentToDocument: (docId: string, linkedDocId: string) => Promise<void>;
   removeDocumentFromDocument: (docId: string, linkedDocId: string) => Promise<void>;
-  
+
   // Page links methods
   addPageLinkProject: (docId: string, projectId: string) => Promise<void>;
   removePageLinkProject: (docId: string, projectId: string) => Promise<void>;
@@ -255,10 +255,10 @@ export const useDocStore = create<DocStore>()(
 
       createDoc: async (title, parentId) => {
         try {
-          const newDoc = parentId 
+          const newDoc = parentId
             ? await createChildDocument(parentId, title)
             : await createRootDocument(title);
-          
+
           if (newDoc) {
             get().loadDocuments([newDoc]);
             get().setActiveDoc(newDoc.id);
@@ -289,7 +289,7 @@ export const useDocStore = create<DocStore>()(
           if (updates.coverImage !== undefined) payload.coverImage = updates.coverImage;
           if (updates.isFavorite !== undefined) payload.isFavorite = updates.isFavorite;
           if (updates.members !== undefined) payload.members = updates.members;
-          
+
           const arrayFields = [
             "linkedProjects", "linkedTeams", "linkedPortfolios", "linkedDocuments",
             "pageLinkedProjects", "pageLinkedTeams", "pageLinkedPortfolios", "pageLinkedDocuments"
@@ -434,7 +434,6 @@ export const useDocStore = create<DocStore>()(
         set({ activeDetailsTab: tab }),
 
       reset: () => {
-        localStorage.removeItem('doc-storage');
         set({
           documents: new Map(),
           activeDocId: null,
@@ -446,6 +445,7 @@ export const useDocStore = create<DocStore>()(
           activeDetailsTab: "settings",
           exportRequest: null,
         });
+        localStorage.removeItem('doc-storage');
       },
 
       toggleFavorite: async (id) => {

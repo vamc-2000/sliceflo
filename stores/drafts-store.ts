@@ -24,6 +24,7 @@ interface DraftsState {
   getDraftById: (id: string, workspaceId: string) => Promise<DraftResponse | null>;
   getSubtasksByDraft: (draftId: string) => DraftResponse[];
   clearDrafts: () => void;
+  reset: () => void;
 }
 
 export const useDraftsStore = create<DraftsState>()(
@@ -139,6 +140,15 @@ export const useDraftsStore = create<DraftsState>()(
         getSubtasksByDraft: (draftId: string) => {
           return get().drafts.filter(d => d.parentTaskId === draftId);
         },
+
+        reset: () => {
+          set({
+            drafts: [],
+            isLoading: false,
+            error: null,
+          });
+          localStorage.removeItem('drafts-storage');
+        }
       }),
       {
         name: 'drafts-storage',

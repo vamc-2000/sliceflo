@@ -368,6 +368,7 @@ export const useProfileStore = create<ProfileState>()(
         },
 
         resetProfile: () => {
+          set({ user: null, myWork: null, profilesById: {}, isLoading: false, error: null });
           localStorage.removeItem('profile-storage');
         },
       }),

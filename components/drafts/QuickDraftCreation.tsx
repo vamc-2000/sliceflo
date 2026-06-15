@@ -44,7 +44,7 @@ function Avatar({ name, size = 'sm', src }: { name?: string; size?: 'sm' | 'md';
   const dim = size === 'sm' ? 'w-5 h-5' : 'w-8 h-8 text-sm';
   if (!name && !src) {
     return (
-      <div className={`${dim} rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400`}>
+      <div className={`${dim} rounded-full bg-gray-100 dark:bg-neutral-800 border border-dashed border-gray-300 dark:border-neutral-700 flex items-center justify-center text-gray-400 dark:text-neutral-500`}>
         <User className="h-3 w-3" />
       </div>
     );
@@ -204,7 +204,7 @@ export function QuickDraftCreation({
             "fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]",
             "w-[80vw] max-w-[750px]",
             "max-h-[75vh] overflow-hidden",
-            "bg-white shadow-lg border-2 border-gray-300",
+            "bg-white dark:bg-neutral-900 shadow-lg border-2 border-gray-300 dark:border-neutral-800",
             "rounded-lg",
             "border-b-5 border-b-[#001F3F]"
           )}
@@ -213,14 +213,14 @@ export function QuickDraftCreation({
             <DialogPrimitive.Title>Create New Draft</DialogPrimitive.Title>
           </VisuallyHidden.Root>
 
-          <div className="px-5 py-3 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-gray-500">
+          <div className="px-5 py-3 border-b border-gray-200 dark:border-neutral-800 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-gray-500 dark:text-neutral-400">
               Drafts / {draftName || "New draft"} {project ? `(${project.name})` : ""}
             </h2>
             <DialogPrimitive.Close asChild>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -238,10 +238,10 @@ export function QuickDraftCreation({
                   if (e.key === "Escape") onClose();
                 }}
                 autoFocus
-                className="border-0 border-b border-gray-200 rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-gray-400 text-base"
+                className="border-0 border-b border-gray-200 dark:border-neutral-800 dark:bg-transparent dark:text-neutral-100 rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-neutral-700 text-base"
               />
 
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden">
                 <ProseMirrorEditor
                   initialContent={draftDescription}
                   mentionableMembers={mentionableMembers}
@@ -257,17 +257,17 @@ export function QuickDraftCreation({
               {!projectId && (
                 <DropdownMenu open={isProjectOpen} onOpenChange={setIsProjectOpen}>
                   <DropdownMenuTrigger asChild>
-                    <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
+                    <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
                       {project ? (
                         <span className="flex items-center gap-2">
-                          <span className="truncate text-gray-700">{project.name}</span>
+                          <span className="truncate text-gray-700 dark:text-neutral-300">{project.name}</span>
                         </span>
                       ) : (
                         <span className="text-red-500">Select Project</span>
                       )}
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 max-h-60 overflow-y-auto border-0 border-b-[5px] border-primary" align="start">
+                  <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 max-h-60 overflow-y-auto border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 border-0 border-b-[5px] border-primary shadow-lg" align="start">
                     {projects.map((p) => (
                       <DropdownMenuItem
                         key={p.id}
@@ -279,7 +279,7 @@ export function QuickDraftCreation({
                         }}
                         className="p-0 focus:bg-transparent"
                       >
-                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted px-3 bg-muted text-foreground">
+                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium transition-colors hover:bg-muted dark:hover:bg-neutral-800 px-3 bg-muted dark:bg-neutral-800/50 text-foreground dark:text-neutral-300">
                           <span className="truncate">{p.name}</span>
                         </div>
                       </DropdownMenuItem>
@@ -290,7 +290,7 @@ export function QuickDraftCreation({
 
               <DropdownMenu open={isStatusOpen} onOpenChange={setIsStatusOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
+                  <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
                     {selectedStatusOption ? (
                       <span className="flex items-center gap-2">
                         <span
@@ -304,8 +304,8 @@ export function QuickDraftCreation({
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
-                  <DropdownMenuItem onSelect={() => setSelectedStatus(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 border-0 border-b-[5px] border-primary shadow-lg" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedStatus(undefined)} className="p-0 h-9 text-xs justify-center bg-muted dark:bg-neutral-800 focus:bg-muted dark:focus:bg-neutral-700 rounded-xs text-foreground dark:text-neutral-300">
                     Clear
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -330,7 +330,7 @@ export function QuickDraftCreation({
 
               <DropdownMenu open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
+                  <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
                     {selectedPriorityOption ? (
                       <span className="flex items-center gap-2">
                         <Flag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: selectedPriorityOption.color }} />
@@ -341,8 +341,8 @@ export function QuickDraftCreation({
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
-                  <DropdownMenuItem onSelect={() => setSelectedPriority(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 border-0 border-b-[5px] border-primary shadow-lg" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedPriority(undefined)} className="p-0 h-9 text-xs justify-center bg-muted dark:bg-neutral-800 focus:bg-muted dark:focus:bg-neutral-700 rounded-xs text-foreground dark:text-neutral-300">
                     Clear
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -368,7 +368,7 @@ export function QuickDraftCreation({
 
               <DropdownMenu open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors">
+                  <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
                     {assignedMember ? (
                       <span className="flex items-center gap-2">
                         <Avatar
@@ -384,8 +384,8 @@ export function QuickDraftCreation({
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border-0 border-b-[5px] border-primary" align="start">
-                  <DropdownMenuItem onSelect={() => setSelectedAssignee(undefined)} className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs">
+                <DropdownMenuContent className="p-4 w-[var(--radix-dropdown-menu-trigger-width)] space-y-1 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 border-0 border-b-[5px] border-primary shadow-lg" align="start">
+                  <DropdownMenuItem onSelect={() => setSelectedAssignee(undefined)} className="p-0 h-9 text-xs justify-center bg-muted dark:bg-neutral-800 focus:bg-muted dark:focus:bg-neutral-700 rounded-xs text-foreground dark:text-neutral-300">
                     Clear
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -395,7 +395,7 @@ export function QuickDraftCreation({
                       onSelect={() => setSelectedAssignee(member.userId)}
                       className="p-0 focus:bg-transparent"
                     >
-                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted dark:hover:bg-neutral-800 transition-colors px-3 bg-muted dark:bg-neutral-800/50 text-foreground dark:text-neutral-300">
                         <Avatar name={member.name} src={getProfilePictureUrl(member.avatar)} size="sm" />
                         <span className="truncate">{member.name}</span>
                       </div>
@@ -406,7 +406,7 @@ export function QuickDraftCreation({
 
               <Popover open={isStartCalendarOpen} onOpenChange={setIsStartCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors flex items-center gap-2">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{startDate ? formatLocalDate(startDate) : "Start Date"}</span>
                   </button>
@@ -431,7 +431,7 @@ export function QuickDraftCreation({
 
               <Popover open={isEndCalendarOpen} onOpenChange={setIsEndCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-left text-sm text-gray-500 hover:border-gray-300 transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-left text-sm text-gray-500 dark:text-neutral-400 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors flex items-center gap-2">
                     <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{endDate ? formatLocalDate(endDate) : "Due Date"}</span>
                   </button>
@@ -452,7 +452,7 @@ export function QuickDraftCreation({
             </div>
           </div>
 
-          <div className="px-5 py-3 border-t border-gray-200 flex justify-end bg-white">
+          <div className="px-5 py-3 border-t border-gray-200 dark:border-neutral-800 flex justify-end bg-white dark:bg-neutral-900">
             <Button
               onClick={handleCreate}
               disabled={!draftName.trim() || !selectedProjectId || isCreating}
@@ -460,7 +460,7 @@ export function QuickDraftCreation({
                 "px-8 rounded-lg text-white transition-colors",
                 draftName.trim() && selectedProjectId
                   ? "bg-[#001F3F] hover:bg-[#001933]"
-                  : "bg-gray-300 text-gray-700"
+                  : "bg-gray-300 dark:bg-neutral-800 text-gray-700 dark:text-neutral-400"
               )}
             >
               {isCreating ? (
