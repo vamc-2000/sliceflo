@@ -100,14 +100,14 @@ export const getApprovalColumns = (
             maxSize: MID_COL_WIDTH,
             cell: ({ getValue }) => <span className="text-center block">{getValue() as string}</span>,
         },
-        {
-            accessorKey: "billable",
-            header: () => <div className="text-center text-foreground">Billable</div>,
-            size: MID_COL_WIDTH,
-            minSize: MID_COL_WIDTH,
-            maxSize: MID_COL_WIDTH,
-            cell: ({ getValue }) => <span className="text-center block">{getValue() as string}</span>,
-        },
+        // {
+        //     accessorKey: "billable",
+        //     header: () => <div className="text-center text-foreground">Billable</div>,
+        //     size: MID_COL_WIDTH,
+        //     minSize: MID_COL_WIDTH,
+        //     maxSize: MID_COL_WIDTH,
+        //     cell: ({ getValue }) => <span className="text-center block">{getValue() as string}</span>,
+        // },
         {
             accessorKey: "overcapacity",
             header: () => <div className="text-center text-foreground">Overcapacity</div>,

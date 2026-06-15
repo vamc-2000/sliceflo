@@ -76,31 +76,31 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
     },
   },
 
-  {
-    accessorKey: "billable",
-    header: () => <Center>Billable</Center>,
-    cell: ({ row }) => {
-      const isBillable = row.getValue("billable") as boolean;
+  // {
+  //   accessorKey: "billable",
+  //   header: () => <Center>Billable</Center>,
+  //   cell: ({ row }) => {
+  //     const isBillable = row.getValue("billable") as boolean;
 
-      return (
-        <Center>
-          <Button
-            data-testid="cell-billable-icon"
-            variant="outline"
-            size="icon"
-            className={`h-7 w-7 rounded-full transition-colors
-            ${isBillable
-                ? "text-white bg-green-600 dark:bg-green-500"
-                : "bg-muted text-muted-foreground"
-              }
-          `}
-          >
-            $
-          </Button>
-        </Center>
-      );
-    },
-  },
+  //     return (
+  //       <Center>
+  //         <Button
+  //           data-testid="cell-billable-icon"
+  //           variant="outline"
+  //           size="icon"
+  //           className={`h-7 w-7 rounded-full transition-colors
+  //           ${isBillable
+  //               ? "text-white bg-green-600 dark:bg-green-500"
+  //               : "bg-muted text-muted-foreground"
+  //             }
+  //         `}
+  //         >
+  //           $
+  //         </Button>
+  //       </Center>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "tags",
     header: () => <Center>Tags</Center>,

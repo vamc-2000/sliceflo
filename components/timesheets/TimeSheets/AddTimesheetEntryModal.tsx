@@ -557,7 +557,7 @@ export function AddTimesheetEntryModal({
 
                 <div className="flex items-center justify-between">
                     {/* Left side */}
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <Checkbox
                             data-testid="checkbox-billable"
                             checked={billable}
@@ -567,7 +567,7 @@ export function AddTimesheetEntryModal({
                         <Label className="text-sm text-foreground">
                             Billable
                         </Label>
-                    </div>
+                    </div> */}
 
                     {/* Right side */}
                     <Button

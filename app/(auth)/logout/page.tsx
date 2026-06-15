@@ -8,15 +8,18 @@ import AuthPageLayout from "@/components/layout/AuthPageLayout";
 import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { resetAllStores } from "@/stores/reset-stores";
+import { useRouter } from "next/navigation";
 
 export default function LogoutPage() {
     const clearCredentials = useAuthStore((state) => state.clearCredentials);
+    const router = useRouter();
 
     useEffect(() => {
         clearCredentials();
         localStorage.removeItem("authToken");
         resetAllStores();
-    }, []);
+        router.replace("/login");
+    }, [clearCredentials, router]);
 
     return (
         <AuthPageLayout showTopRightCTA={false}>
@@ -42,11 +45,11 @@ export default function LogoutPage() {
                         <Link href="/login">Log back in</Link>
                     </Button>
 
-                    <div className="text-center">
+                    {/* <div className="text-center">
                         <Link href="/" className="text-xs text-[#6B7280] hover:text-[#001F3F] transition-colors underline">
                             Back to login options
                         </Link>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </AuthPageLayout>

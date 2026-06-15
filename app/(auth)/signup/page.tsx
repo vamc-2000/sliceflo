@@ -125,9 +125,9 @@ export default function SignupPage() {
         sessionStorage.setItem("signupEmail", data.email);
         setSubmittedEmail(data.email);
       }
-      toast("success", {
-        title: "Email registered successfully!",
-      });
+      // toast("success", {
+      //   title: "Email registered successfully!",
+      // });
       setEmailSent(true);
       setIsExistingUser(res.isExistingUser ?? false);
     } catch (error: any) {
@@ -158,10 +158,10 @@ export default function SignupPage() {
       const result = await verifyOtp(data);
 
       // Only show success and navigate if API call succeeds
-      toast("success", {
-        title: "OTP verified successfully!",
-        description: "Redirecting you to your workspace...",
-      });
+      // toast("success", {
+      //   title: "OTP verified successfully!",
+      //   description: "Redirecting you to your workspace...",
+      // });
 
       if (isExistingUser) {
         const { isQuestionnaireCompleted } = await checkUserAuth(result.token);
@@ -226,10 +226,10 @@ export default function SignupPage() {
           },
         });
 
-        toast("success", {
-          title: "Signed up with Google!",
-          description: `Welcome, ${decodedToken.name}!`,
-        });
+        // toast("success", {
+        //   title: "Signed up with Google!",
+        //   description: `Welcome, ${decodedToken.name}!`,
+        // });
 
         console.log("Before check user auth:", result.token);
         console.log("isExistingUser: ", result.isExistingUser);
@@ -292,10 +292,10 @@ export default function SignupPage() {
       console.log("Is questions completed", isQuestionnaireCompleted);
 
       localStorage.setItem("authToken", result?.token ?? "");
-      toast("success", {
-        title: "Signed up with Microsoft!",
-        description: `Welcome, ${response.account?.name ?? response.account?.username}!`,
-      });
+      // toast("success", {
+      //   title: "Signed up with Microsoft!",
+      //   description: `Welcome, ${response.account?.name ?? response.account?.username}!`,
+      // });
 
       if (result.isExistingUser) {
         const { isQuestionnaireCompleted } = await checkUserAuth(result.token);
@@ -355,13 +355,13 @@ export default function SignupPage() {
               Continue to enter code
             </Button>
 
-            <Link
+            {/* <Link
               href="/signup"
               onClick={handleBackToSignup}
               className="block mt-4 text-xs underline text-gray-500 hover:text-[#001F3F] transition-colors"
             >
               Back to Login Options
-            </Link>
+            </Link> */}
           </div>
         </div>
       </Layout>
@@ -455,13 +455,13 @@ export default function SignupPage() {
                   </Button>
                 </form>
 
-                <Link
+                {/* <Link
                   href="/signup"
                   onClick={handleBackToSignup}
                   className="block mt-4 text-xs underline text-[#7A869A] hover:text-[#001F3F] transition-colors"
                 >
                   Back to login options
-                </Link>
+                </Link> */}
               </div>
             </div>
           ) : emailSent ? (
@@ -530,7 +530,7 @@ export default function SignupPage() {
               >
                 {isLoading ? "Logging in..." : "Next"}
               </button>
-              <div className="text-center text-xs font-normal mt-4">
+              {/* <div className="text-center text-xs font-normal mt-4">
                 <Link
                   href="/signup"
                   onClick={handleBackToSignup}
@@ -538,7 +538,7 @@ export default function SignupPage() {
                 >
                   Back to login options
                 </Link>
-              </div>
+              </div> */}
 
             </form>
 
