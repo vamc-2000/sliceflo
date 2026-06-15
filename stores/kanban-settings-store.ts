@@ -20,6 +20,8 @@ interface KanbanSettingsState {
     toggleColumnVisibility: (projectId: string, columnId: string) => void;
     hideColumn: (projectId: string, columnId: string) => void;
     showColumn: (projectId: string, columnId: string) => void;
+
+    reset: () => void;
 }
 
 const defaultCardSettings = {
@@ -125,6 +127,13 @@ export const useKanbanSettingsStore = create<KanbanSettingsState>()(
                         },
                     },
                 }));
+            },
+
+            reset: () => {
+                set({
+                    settings: {},
+                });
+                localStorage.removeItem('kanban-settings-storage');
             },
         }),
         {

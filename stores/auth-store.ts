@@ -70,6 +70,7 @@ export const useAuthStore = create<AuthState>()(
 
       reset: () => {
         get().clearCredentials();
+        
       },
 
       login: async (credentials) => {

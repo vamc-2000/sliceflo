@@ -13,6 +13,9 @@ interface LandingPageProps {
   buttonText: string;
   onButtonClick: () => void;
   imageHeight?: number;
+  imageWidth?: number;
+  titleClassName?: string;
+  descriptionClassName?: string;
 }
 
 export function LandingPage({
@@ -23,7 +26,10 @@ export function LandingPage({
   imageAlt,
   buttonText,
   onButtonClick,
-   imageHeight = 400,
+  imageHeight = 300,
+  imageWidth = 570,
+  titleClassName,
+  descriptionClassName,
 }: LandingPageProps) {
   return (
     <div className="bg-background text-foreground p-4">
@@ -32,11 +38,11 @@ export function LandingPage({
         <div className="w-full max-w-[1800px] mx-auto text-center px-5 space-y-1">
           {/* Hero section */}
           <div className="space-y-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-5xl xl:text-5xl font-bold text-foreground leading-tight">
+            <h1 className={titleClassName || "text-2xl sm:text-3xl lg:text-5xl xl:text-5xl font-bold text-foreground leading-tight"}>
               {title}
             </h1>
 
-            <p className="text-muted-foreground text-base sm:text-lg lg:text-xl max-w-4xl mx-auto leading-relaxed">
+            <p className={descriptionClassName || "text-muted-foreground text-base sm:text-lg lg:text-xl max-w-4xl mx-auto leading-relaxed"}>
               {description}
             </p>
           </div>
@@ -46,10 +52,8 @@ export function LandingPage({
             <Image
               src={imageSrc}
               alt={imageAlt}
-              width={570}
-              height={300}
-              // className="w-full max-w-4xl"
-              // className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl h-auto"
+              width={imageWidth}
+              height={imageHeight}
               priority
             />
           </div>

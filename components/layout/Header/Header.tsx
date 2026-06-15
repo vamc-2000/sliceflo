@@ -32,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "react-hot-toast";
 import LogoutConfirmModal from "@/components/LogoutConfirmModal";
+import { resetAllStores } from "@/stores/reset-stores";
 export function Header() {
     const { user: profile, fetchUserProfile } = useProfileStore();
     const { theme } = useTheme();
@@ -55,11 +56,16 @@ export function Header() {
     const handleLogout = async () => {
         try {
             setIsLoggingOut(true);
+            const userEmail = authStore.user?.email || profile?.email;
+            if (userEmail) {
+                localStorage.setItem("previouslyLoggedInEmail", userEmail);
+            }
             if (authStore.logout) {
                 await authStore.logout().catch(console.error);
             }
+            resetAllStores();
             toast.success("Logout successful");
-            router.push("/logout");
+            router.push("/login");
             setShowLogoutModal(false);
         } catch (error) {
             console.error("Logout failed:", error);

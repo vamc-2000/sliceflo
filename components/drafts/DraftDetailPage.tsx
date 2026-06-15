@@ -38,6 +38,7 @@ import {
     ChevronDown,
     GitBranch,
     Activity,
+    Hexagon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { formatLocalDate } from "@/utils/timezone-utils";
@@ -441,34 +442,55 @@ export function DraftDetailPage({
                                 </div>
 
                                 <div className={cn(
-                                    "transition-all duration-300 ease-in-out overflow-hidden space-y-1",
+                                    "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
                                     isDraftDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
                                 )}>
                                     {/* STATUS */}
-                                    <div className="flex items-center justify-between py-1">
-                                        <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
-                                            <Activity className="h-4 w-4" /> Status
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
+                                            <Hexagon className="h-4 w-4" /> Status
                                         </Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs", !currentDraft.status && "text-muted-foreground")}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={cn(
+                                                        "h-8 px-3 transition-opacity hover:opacity-90 text-xs font-semibold rounded-xs w-[150px] flex items-center justify-center",
+                                                        !currentDraft.status && "text-muted-foreground bg-secondary"
+                                                    )}
+                                                    style={currentDraft.status ? (() => {
+                                                        const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
+                                                        return {
+                                                            backgroundColor: s ? `${s.color}33` : undefined,
+                                                            color: s ? s.color : undefined,
+                                                        };
+                                                    })() : undefined}
+                                                >
                                                     {currentDraft.status ? (() => {
                                                         const s = taskStatusConfigs.find((x) => x.value === currentDraft.status);
-                                                        return (
-                                                            <span className="flex items-center gap-1.5">
-                                                                {s && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />}
-                                                                {s?.label || currentDraft.status}
-                                                            </span>
-                                                        );
+                                                        return s?.label || currentDraft.status;
                                                     })() : "—"}
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ status: undefined })}>Clear</DropdownMenuItem>
+                                            <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+                                                <DropdownMenuItem
+                                                    onSelect={() => handleUpdateDraft({ status: undefined })}
+                                                    className="h-9 text-xs font-semibold rounded-xs justify-center cursor-pointer px-3 w-full flex items-center focus:opacity-80"
+                                                >
+                                                    Clear
+                                                </DropdownMenuItem>
                                                 <Separator className="my-1" />
                                                 {taskStatusConfigs.map((s) => (
-                                                    <DropdownMenuItem key={s._id} onSelect={() => handleUpdateDraft({ status: s.value })}>
-                                                        <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: s.color }} />
+                                                    <DropdownMenuItem
+                                                        key={s._id}
+                                                        onSelect={() => handleUpdateDraft({ status: s.value })}
+                                                        className="h-9 text-xs font-semibold rounded-xs justify-center cursor-pointer px-3 w-full flex items-center focus:opacity-80"
+                                                        style={{
+                                                            backgroundColor: `${s.color}33`,
+                                                            color: s.color,
+                                                        }}
+                                                    >
                                                         {s.label}
                                                     </DropdownMenuItem>
                                                 ))}
@@ -477,30 +499,63 @@ export function DraftDetailPage({
                                     </div>
 
                                     {/* PRIORITY */}
-                                    <div className="flex items-center justify-between py-1">
-                                        <Label className="text-muted-foreground flex items-center gap-2 text-sm shrink-0">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                                             <Flag className="h-4 w-4" /> Priority
                                         </Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.priority && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={cn(
+                                                        "h-8 transition-opacity hover:opacity-90 overflow-hidden px-3 rounded-xs flex items-center justify-between gap-2 text-xs font-medium w-[150px]",
+                                                        !currentDraft.priority && "text-muted-foreground bg-secondary"
+                                                    )}
+                                                    style={currentDraft.priority ? (() => {
+                                                        const color = getPriorityColor(currentDraft.priority);
+                                                        return {
+                                                            backgroundColor: color ? `${color}33` : undefined,
+                                                        };
+                                                    })() : undefined}
+                                                >
                                                     {currentDraft.priority ? (
-                                                        <span className="flex items-center gap-1.5">
-                                                            {getPriorityColor(currentDraft.priority) && (
-                                                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getPriorityColor(currentDraft.priority) }} />
-                                                            )}
-                                                            {taskPriorityConfigs.find((p) => p.value === currentDraft.priority)?.label || currentDraft.priority}
-                                                        </span>
-                                                    ) : "—"}
+                                                        <>
+                                                            <span className="text-foreground font-semibold">
+                                                                {taskPriorityConfigs.find((p) => p.value === currentDraft.priority)?.label || currentDraft.priority}
+                                                            </span>
+                                                            <Flag
+                                                                className="h-3.5 w-3.5 flex-shrink-0"
+                                                                style={{ color: getPriorityColor(currentDraft.priority) || "#6b7280" }}
+                                                            />
+                                                        </>
+                                                    ) : (
+                                                        "—"
+                                                    )}
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ priority: undefined })}>Clear</DropdownMenuItem>
+                                            <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+                                                <DropdownMenuItem
+                                                    onSelect={() => handleUpdateDraft({ priority: undefined })}
+                                                    className="h-9 text-xs font-medium rounded-xs cursor-pointer px-3 flex items-center justify-center w-full focus:opacity-80"
+                                                >
+                                                    Clear
+                                                </DropdownMenuItem>
                                                 <Separator className="my-1" />
                                                 {taskPriorityConfigs.map((p) => (
-                                                    <DropdownMenuItem key={p._id} onSelect={() => handleUpdateDraft({ priority: p.value })}>
-                                                        <span className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: p.color }} />
-                                                        {p.label}
+                                                    <DropdownMenuItem
+                                                        key={p._id}
+                                                        onSelect={() => handleUpdateDraft({ priority: p.value })}
+                                                        className="h-9 text-xs font-medium rounded-xs cursor-pointer px-3 flex items-center justify-between gap-2 w-full focus:opacity-80"
+                                                        style={{
+                                                            backgroundColor: `${p.color}33`,
+                                                        }}
+                                                    >
+                                                        <span className="text-foreground">{p.label}</span>
+                                                        <Flag
+                                                            className="h-3.5 w-3.5 flex-shrink-0"
+                                                            style={{ color: p.color }}
+                                                        />
                                                     </DropdownMenuItem>
                                                 ))}
                                             </DropdownMenuContent>
@@ -508,13 +563,20 @@ export function DraftDetailPage({
                                     </div>
 
                                     {/* START DATE */}
-                                    <div className="flex items-center justify-between py-1">
+                                    <div className="flex items-center justify-between">
                                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
-                                            <CalendarIcon className="h-4 w-4" /> Start
+                                            <CalendarIcon className="h-4 w-4" /> Start Date
                                         </Label>
                                         <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
                                             <PopoverTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.startDate && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className={cn(
+                                                        "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
+                                                        !currentDraft.startDate && "text-muted-foreground"
+                                                    )}
+                                                >
                                                     {currentDraft.startDate ? formatLocalDate(currentDraft.startDate) : "—"}
                                                 </Button>
                                             </PopoverTrigger>
@@ -544,13 +606,20 @@ export function DraftDetailPage({
                                     </div>
 
                                     {/* DUE DATE */}
-                                    <div className="flex items-center justify-between py-1">
+                                    <div className="flex items-center justify-between">
                                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
-                                            <CalendarIcon className="h-4 w-4" /> Due
+                                            <CalendarIcon className="h-4 w-4" /> Due Date
                                         </Label>
                                         <Popover open={isDueDateOpen} onOpenChange={setIsDueDateOpen}>
                                             <PopoverTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 font-normal text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.dueDate && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className={cn(
+                                                        "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
+                                                        !currentDraft.dueDate && "text-muted-foreground"
+                                                    )}
+                                                >
                                                     {currentDraft.dueDate ? formatLocalDate(currentDraft.dueDate) : "—"}
                                                 </Button>
                                             </PopoverTrigger>
@@ -574,34 +643,62 @@ export function DraftDetailPage({
                                     </div>
 
                                     {/* ASSIGNEE */}
-                                    <div className="flex items-center justify-between py-1">
+                                    <div className="flex items-center justify-between">
                                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                                             <User className="h-4 w-4" /> Assignee
                                         </Label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm" className={cn("h-8 px-3 hover:bg-muted text-xs border bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40 dark:hover:bg-blue-900/40", !currentDraft.assigneeId && "text-blue-400 dark:text-blue-500/70")}>
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className={cn(
+                                                        "h-8 px-2 hover:bg-muted flex items-center justify-center gap-1 text-xs w-[150px] rounded-xs",
+                                                        !currentDraft.assigneeId && "text-muted-foreground"
+                                                    )}
+                                                >
                                                     {currentDraft.assigneeId ? (() => {
                                                         const member = projectMembers.find(m => m.userId === currentDraft.assigneeId);
                                                         return (
-                                                            <span className="flex items-center gap-1.5">
+                                                            <div className="flex items-center gap-1.5 min-w-0">
                                                                 <Avatar name={member?.name} src={getProfilePictureUrl(member?.avatar)} size="xs" />
-                                                            </span>
+                                                                <span className="truncate max-w-[100px] text-foreground font-medium">{member?.name}</span>
+                                                            </div>
                                                         );
                                                     })() : "—"}
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => handleUpdateDraft({ assigneeId: undefined })}>Clear</DropdownMenuItem>
+                                            <DropdownMenuContent align="end" className="p-2 w-[200px] space-y-1">
+                                                <DropdownMenuItem
+                                                    onSelect={() => handleUpdateDraft({ assigneeId: undefined })}
+                                                    className="h-8 text-xs font-semibold rounded-xs justify-center cursor-pointer px-3 w-full flex items-center hover:bg-muted"
+                                                >
+                                                    Clear
+                                                </DropdownMenuItem>
                                                 <Separator className="my-1" />
-                                                {projectMembers.map((m) => (
-                                                    <DropdownMenuItem key={m.userId} onSelect={() => handleUpdateDraft({ assigneeId: m.userId })}>
-                                                        <div className="flex items-center gap-2">
-                                                            <Avatar name={m.name} src={getProfilePictureUrl(m.avatar)} size="xs" />
-                                                            {m.name}
-                                                        </div>
-                                                    </DropdownMenuItem>
-                                                ))}
+                                                <div className="max-h-60 overflow-y-auto space-y-1">
+                                                    {projectMembers.map((m) => {
+                                                        const isSelected = currentDraft.assigneeId === m.userId;
+                                                        return (
+                                                            <DropdownMenuItem
+                                                                key={m.userId}
+                                                                onSelect={() => handleUpdateDraft({ assigneeId: m.userId })}
+                                                                className="p-0 focus:bg-transparent"
+                                                            >
+                                                                <div className={cn(
+                                                                    "w-full h-9 flex items-center justify-between gap-1.5 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer bg-background text-foreground",
+                                                                    isSelected && "bg-secondary"
+                                                                )}>
+                                                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                                                        <Avatar name={m.name} src={getProfilePictureUrl(m.avatar)} size="xs" />
+                                                                        <span className="truncate">{m.name}</span>
+                                                                    </div>
+                                                                    {isSelected && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 ml-1" />}
+                                                                </div>
+                                                            </DropdownMenuItem>
+                                                        );
+                                                    })}
+                                                </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>

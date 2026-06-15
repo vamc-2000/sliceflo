@@ -10,6 +10,7 @@ import { DraftHeader } from "@/components/drafts/DraftHeader";
 import { toast } from "@/components/ui/sonner";
 import { QuickDraftCreation } from "@/components/drafts/QuickDraftCreation";
 import ConfirmationModal from "@/components/ConfirmationModal";
+import { LandingPage } from "@/components/LandingPage";
 // import { DraftDetailView } from "@/components/drafts/DraftDetailView";
 // import { DraftResponse } from "@/lib/api/drafts-api";
 
@@ -192,6 +193,20 @@ export default function DraftsPage() {
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
+        ) : drafts.length === 0 ? (
+          <LandingPage
+            title="Draft tasks, publish when ready"
+            description="Create draft tasks to brainstorm and refine details. Once ready, publish them to your project's active task list."
+            extraText=""
+            imageSrc="/images/drafts/Documents-rafiki 1.svg"
+            imageAlt="Drafts illustration"
+            buttonText="Create your first Draft"
+            onButtonClick={() => setIsQuickDraftOpen(true)}
+            imageWidth={285}
+            imageHeight={150}
+            titleClassName="text-2xl font-bold text-foreground leading-tight"
+            descriptionClassName="text-base text-muted-foreground max-w-4xl mx-auto leading-relaxed"
+          />
         ) : (
           <DraftTaskTable
             tasks={filteredTasks as any}

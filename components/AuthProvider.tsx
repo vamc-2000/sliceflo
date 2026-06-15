@@ -7,7 +7,7 @@ import { resetAllStores } from "@/stores/reset-stores";
 import { AppSkeleton } from "@/components/layout/AppSkeleton";
 import { Loader } from "./Loader";
 
-const publicRoutes = ["/login", "/register", "/logout", "/signup"];
+const publicRoutes = ["/login", "/register", "/signup"];
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -56,7 +56,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
 
     // Redirect authenticated users away from login/register
-    if (isAuthenticated && isPublic && !pathname.startsWith('/logout')) {
+    if (isAuthenticated && isPublic) {
       if (user?.isQuestionnaireCompleted) {
         router.replace("/dashboard");
       } else {

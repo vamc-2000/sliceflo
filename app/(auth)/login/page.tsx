@@ -31,6 +31,16 @@ export default function LoginPage() {
   const { user, login, register, isLoading, setCredentials, verifyOtp, checkUserAuth, token, isHydrated, refreshToken } = authStore;
 
   const [isCheckingExistingAuth, setIsCheckingExistingAuth] = useState(true);
+  const [previouslyLoggedInEmail, setPreviouslyLoggedInEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const email = localStorage.getItem("previouslyLoggedInEmail");
+      if (email) {
+        setPreviouslyLoggedInEmail(email);
+      }
+    }
+  }, []);
 
   const [otp, setOtp] = useState("");
   const router = useRouter();
@@ -550,7 +560,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 disabled={googleLoading}
-                className="w-full h-10 border-[#8E8E93] text-[#001F3F] font-medium flex items-center justify-center gap-2 group-hover:bg-accent group-hover:text-accent-foreground dark:group-hover:bg-input/50 transition-colors"
+                className="w-full h-10 border-[#001F3F] text-[#001F3F] font-medium flex items-center justify-center gap-2 group-hover:bg-accent group-hover:text-accent-foreground dark:group-hover:bg-input/50 transition-colors"
               >
                 {googleLoading ? "Signing in..." : "Sign in with Google"}
                 {googleLoading ? (
@@ -567,12 +577,20 @@ export default function LoginPage() {
               </Button>
             </div>
 
+            {previouslyLoggedInEmail && (
+              <div className="flex items-center justify-center gap-1.5 text-xs text-neutral-500 py-1 px-2.5 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-800/80 rounded-full w-fit mx-auto shadow-sm transition-all">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span>Previously logged in:</span>
+                <span className="font-semibold text-[#001F3F] dark:text-neutral-200">{previouslyLoggedInEmail}</span>
+              </div>
+            )}
+
             <Button
               type="button"
               onClick={handleMicrosoftLogin}
               disabled={isLoading || msalLoading || !isMsalReady}
               variant="outline"
-              className="w-full h-10 border-[#8E8E93] text-[#001F3F] font-medium relative flex items-center justify-center"
+              className="w-full h-10 border-[#001F3F] text-[#001F3F] font-medium relative flex items-center justify-center"
             >
               {/* CENTER TEXT */}
               <span className="flex items-center gap-2 text-[#001F3F] font-medium">
@@ -592,7 +610,7 @@ export default function LoginPage() {
             <Button
               type="button"
               onClick={() => setShowEmailForm(true)}
-              className="w-full h-10 border-[#8E8E93] text-[#001F3F] font-medium"
+              className="w-full h-10 border-[#001F3F] text-[#001F3F] font-medium"
               variant="outline"
             >
               Sign in with Email

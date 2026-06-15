@@ -16,6 +16,8 @@ import { useOnboardingStore } from "./onboarding-store";
 import { useDocStore } from "./useDoc-store";
 import { useDiscussionStore } from "./discussions-store";
 import { useSidebarStore } from "./sidebar-store";
+import { useKanbanSettingsStore } from "./kanban-settings-store";
+import { useDraftsStore } from "./drafts-store";
 
 export function resetAllStores() {
   useAuthStore.getState().reset();
@@ -40,4 +42,6 @@ export function resetWorkspaceData() {
   useDocStore.getState().reset();
   useDiscussionStore.getState().reset();
   useSidebarStore.getState().reset();
+  useKanbanSettingsStore.getState().reset();
+  useDraftsStore.getState().reset();
 }
