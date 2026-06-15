@@ -19,7 +19,7 @@ const EmptyGoalsState = ({ teamId, onAddExistingGoal }: EmptyGoalsStateProps) =>
                 height={120}
                 className="object-contain"
             />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-row gap-52 items-center">
                 <button
                     data-testid="teamoverview-create-goal-btn"
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
@@ -38,7 +38,7 @@ const EmptyGoalsState = ({ teamId, onAddExistingGoal }: EmptyGoalsStateProps) =>
                     <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
                         <Triangle size={17} />
                     </span>
-                    <span >Add existing Goal</span>
+                    <span className='text-xs'>Add existing Goal</span>
                 </button>
             </div>
         </div>

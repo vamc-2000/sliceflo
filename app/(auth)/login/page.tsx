@@ -177,10 +177,10 @@ export default function LoginPage() {
       };
 
       const result = await verifyOtp(verificationData);
-      toast("success", {
-        title: "OTP verified successfully",
-        description: "Redirecting you to your workspace...",
-      });
+      // toast("success", {
+      //   title: "OTP verified successfully",
+      //   description: "Redirecting you to your workspace...",
+      // });
 
 
       localStorage.setItem("authToken", result.token);
@@ -266,7 +266,7 @@ export default function LoginPage() {
             isExistingUser: result.isExistingUser,
           },
         });
-        toast("success", { title: "Logged in successfully with Google" });
+        // toast("success", { title: "Logged in successfully with Google" });
         // Wait briefly for cookie to be set before navigation
         await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -324,7 +324,7 @@ export default function LoginPage() {
                 provider: "google",
               },
             });
-            toast("success", { title: "Account created successfully with Google" });
+            // toast("success", { title: "Account created successfully with Google" });
             await new Promise(resolve => setTimeout(resolve, 100));
             router.push('/onboarding');
           } catch (regErr: any) {
@@ -373,11 +373,10 @@ export default function LoginPage() {
       console.log("Microsoft login result:", result);
 
       localStorage.setItem("authToken", result?.token ?? "");
-
-      toast("success", {
-        title: "Microsoft login successful!",
-        description: `Welcome, ${response.account?.name ?? response.account?.username}!`,
-      });
+      // toast("success", {
+      //   title: "Microsoft login successful!",
+      //   description: `Welcome, ${response.account?.name ?? response.account?.username}!`,
+      // });
 
       const { isQuestionnaireCompleted } = await checkUserAuth();
 
@@ -448,13 +447,13 @@ export default function LoginPage() {
               Continue to enter security code
             </Button>
 
-            <Link
+            {/* <Link
               href="/login"
               onClick={handleBackToLogin}
               className="text-xs underline text-gray-500 hover:text-[#001F3F] transition-colors"
             >
               Back to login options
-            </Link>
+            </Link> */}
           </div>
         </div>
       ) : showOtpForm ? (
@@ -517,13 +516,13 @@ export default function LoginPage() {
                 {isOtpLoading ? "Verifying..." : "Continue"}
               </Button>
             </form>
-            <Link
+            {/* <Link
               href="/login"
               onClick={handleBackToLogin}
               className="block mt-4 text-xs underline text-gray-500 hover:text-[#001F3F] transition-colors"
             >
               Back to login options
-            </Link>
+            </Link> */}
 
             <p className="text-xs text-gray-500 mt-4">
               This code would be valid for 10 minutes*
@@ -647,13 +646,13 @@ export default function LoginPage() {
               {isEmailLoading ? "Sending Code..." : "Flow with Sliceflo"}
             </button>
           </form>
-          <Button
+          {/* <Button
             variant="ghost"
             onClick={() => setShowEmailForm(false)}
             className="w-full mt-2 text-gray-500  underline cursor-pointer "
           >
             Back to login options
-          </Button>
+          </Button> */}
         </div>
       )}
     </AuthPageLayout>

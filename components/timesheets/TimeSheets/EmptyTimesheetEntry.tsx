@@ -15,13 +15,13 @@ export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps
             <div className="
                 sticky top-0 z-10
                 grid grid-cols-[2fr_1.5fr_auto]
-                md:grid-cols-[2fr_3fr_1fr_1fr_1fr_1fr_max-content_auto] rounded-t-lg
+                md:grid-cols-[2fr_3fr_1fr_1fr_1fr_max-content_auto] rounded-t-lg
                 border-b bg-muted/50 text-sm font-semibold text-foreground text-center
             ">
                 <div className="px-4 py-3 border-r order-1">Task</div>
 
                 <div className="hidden md:block px-4 py-3 border-r order-2">Description</div>
-                <div className="hidden md:block px-4 py-3 border-r text-center order-3">Billable</div>
+                {/* <div className="hidden md:block px-4 py-3 border-r text-center order-3">Billable</div> */}
                 <div className="hidden md:block px-4 py-3 border-r order-4">Tags</div>
                 <div className="hidden md:block px-4 py-3 border-r order-5">Start Time</div>
                 <div className="hidden md:block px-4 py-3 border-r order-6">End Time</div>

@@ -87,7 +87,7 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
                         </Button>
 
                         <Button
-                            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                            className="flex-1 bg-[#EF4444] hover:bg-[#EF4444]/90 text-white"
                             onClick={onConfirm}
                             disabled={isLoading}
                         >
