@@ -1968,6 +1968,7 @@ export function DraftTaskTable({
                               <Input
                                 value={newSubtaskData.name}
                                 onChange={(e) => setNewSubtaskData({ ...newSubtaskData, name: e.target.value })}
+                                maxLength={250}
                                 placeholder="Enter sub task name..."
                                 className="border-0 pl-0 shadow-none focus-visible:ring-0 h-8 text-sm bg-transparent w-full"
                                 autoFocus

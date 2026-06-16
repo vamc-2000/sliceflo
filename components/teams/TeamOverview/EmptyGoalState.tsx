@@ -11,7 +11,7 @@ const EmptyGoalsState = ({ teamId, onAddExistingGoal }: EmptyGoalsStateProps) =>
     const router = useRouter();
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-25">
             <Image
                 src="/images/teams/GoalsLogo.svg"
                 alt="Goals illustration"
@@ -19,28 +19,26 @@ const EmptyGoalsState = ({ teamId, onAddExistingGoal }: EmptyGoalsStateProps) =>
                 height={120}
                 className="object-contain"
             />
-            <div className="flex flex-col gap-2">
-                <button
-                    data-testid="teamoverview-create-goal-btn"
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
-                    onClick={() => router.push(`/teams/${teamId}/create-goal`)}
-                >
-                    <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-                        <Plus size={18} />
-                    </span>
-                    <span className='text-xs'>Create new Goal</span>
-                </button>
-                <button
-                    data-testid="teamoverview-add-existing-goal-btn"
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
-                    onClick={onAddExistingGoal}
-                >
-                    <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-                        <Triangle size={17} />
-                    </span>
-                    <span >Add existing Goal</span>
-                </button>
-            </div>
+            <button
+                data-testid="teamoverview-create-goal-btn"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
+                onClick={() => router.push(`/teams/${teamId}/create-goal`)}
+            >
+                <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                    <Plus size={18} />
+                </span>
+                <span className='text-xs'>Create new Goal</span>
+            </button>
+            <button
+                data-testid="teamoverview-add-existing-goal-btn"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
+                onClick={onAddExistingGoal}
+            >
+                <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                    <Triangle size={17} />
+                </span>
+                <span className="text-xs">Add existing Goal</span>
+            </button>
         </div>
     )
 };

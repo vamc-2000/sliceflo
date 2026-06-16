@@ -73,16 +73,30 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
       const userId = m.userId || m.id;
       // Find projects where this user is a member AND the project belongs to this team
       const userProjects = projects
-        .filter(p => teamProjectIds.has(p.id!) && p.members?.some(pm => pm.userId === userId))
-        .map(p => p.name);
+        .filter(p => teamProjectIds.has(p.id!) && p.members?.some(pm => pm.userId === userId));
+
+      const userProjectNames = userProjects.map(p => p.name);
+
+      const userProjectRoles = userProjects
+        .map(p => {
+          const pm = p.members?.find(member => member.userId === userId);
+          return pm?.role;
+        })
+        .filter(Boolean) as string[];
+
+      const capitalize = (s: string) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
+
+      const displayRole = userProjectRoles.length > 0
+        ? Array.from(new Set(userProjectRoles)).map(capitalize).join(", ")
+        : capitalize(m.role || "member");
 
       return {
         id: userId,
         name: m.name || "Unknown User",
         email: m.email || "",
-        role: m.role || "Member",
+        role: displayRole,
         status: "Active",
-        project: userProjects.length > 0 ? userProjects.join(", ") : "-",
+        project: userProjectNames.length > 0 ? userProjectNames.join(", ") : "-",
         avatar: m.profilePictureUrl || m.avatar,
       };
     });
@@ -263,7 +277,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                       setConfirmOpen(true);
                     }}
                   >
-                    Remove Member
+                    Remove
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenuPortal>
@@ -405,8 +419,6 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
   //   await fetchTeam(); // refresh members immediately after dialog success
   // };
 
-
-
   return (
     <div     
       data-testid="team-members-page"
@@ -420,11 +432,6 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
           searchPlaceholder="Search members..."
           enableGlobalFilter
           enableColumnFilter
-          filterColumn="status"
-          filterOptions={[
-            { label: "Active", value: "Active" },
-            { label: "Inactive", value: "Inactive" },
-          ]}
           toolbarLeft={
             <Popover>
               <PopoverTrigger asChild>
@@ -465,9 +472,9 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
             <Button
               data-testid="btn-add-member"
               onClick={() => setOpenInvite(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer font-semibold"
             >
-              <span className="text-lg mr-2">+</span>
+              <Plus className="h-4 w-4 mr-1" />
               Add Member
             </Button>
           }

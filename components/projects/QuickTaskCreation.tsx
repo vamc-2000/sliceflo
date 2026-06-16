@@ -302,6 +302,7 @@ export function QuickTaskCreation({
                   if (e.key === "Escape") onClose();
                 }}
                 autoFocus
+                maxLength={250}
                 className="border-0 border-b border-border rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-ring text-sm"
                 data-testid="quick-task-name-input"
               />

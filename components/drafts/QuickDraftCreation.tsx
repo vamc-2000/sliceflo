@@ -238,6 +238,7 @@ export function QuickDraftCreation({
                   if (e.key === "Escape") onClose();
                 }}
                 autoFocus
+                maxLength={250}
                 className="border-0 border-b border-gray-200 dark:border-neutral-800 dark:bg-transparent dark:text-neutral-100 rounded-none shadow-none px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-neutral-700 text-base"
               />
 

@@ -194,10 +194,17 @@ export function DataTableForTeams<
       .sort((a, b) => a!.name.localeCompare(b!.name)) as { id: string; name: string; icon?: any; iconId?: any; color?: string }[];
   }, [teams, projects]);
 
+  const uniqueRoles = React.useMemo(() => {
+    const rows = table.getCoreRowModel().flatRows;
+    const roles = rows.map((row) => row.getValue("role") as string).filter(Boolean);
+    const unique = Array.from(new Set(roles));
+    return unique.sort();
+  }, [data, table]);
+
   const columnFiltersState = table.getState().columnFilters;
   const isAnyFilterActive = columnFiltersState.length > 0;
   const isNameFiltered = columnFiltersState.some((f) => f.id === "name");
-  const isStatusFiltered = filterColumn ? columnFiltersState.some((f) => f.id === filterColumn) : false;
+  const isRoleFiltered = columnFiltersState.some((f) => f.id === "role");
   const isProjectFiltered = columnFiltersState.some((f) => f.id === "project");
 
   return (
@@ -228,9 +235,11 @@ export function DataTableForTeams<
                 <Button data-testid="btn-filter-trigger" variant="outline" className="flex items-center gap-2 bg-muted text-muted-foreground relative cursor-pointer hover:bg-muted/80">
                   <Filter className="h-4 w-4" />
                   Filter
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                    {columnFiltersState.length}
-                  </span>
+                  {columnFiltersState.length > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                      {columnFiltersState.length}
+                    </span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48 bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
@@ -329,38 +338,38 @@ export function DataTableForTeams<
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
 
-                {/* Status Submenu (existing filter logic) */}
+                {/* Role Submenu */}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger 
-                    data-testid="filter-submenu-status"
+                    data-testid="filter-submenu-role"
                     className="flex items-center relative text-foreground"
                   >
-                    {isStatusFiltered && (
+                    {isRoleFiltered && (
                       <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                     )}
-                    <span>Status</span>
+                    <span>Role</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                       <DropdownMenuItem
-                        data-testid="filter-status-all"
-                        onClick={() => filterColumn && table.getColumn(filterColumn)?.setFilterValue(undefined)}
+                        data-testid="filter-role-all"
+                        onClick={() => table.getColumn("role")?.setFilterValue(undefined)}
                       >
-                        All Statuses
+                        All Roles
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
-                      {filterOptions.map((option) => (
+                      {uniqueRoles.map((role) => (
                         <DropdownMenuItem
-                          key={option.value}
-                          data-testid={`filter-status-${option.value.toLowerCase().replace(/\s+/g, '-')}`}
-                          onClick={() => filterColumn && table.getColumn(filterColumn)?.setFilterValue(option.value)}
+                          key={role}
+                          data-testid={`filter-role-${role.toLowerCase().replace(/\s+/g, '-')}`}
+                          onClick={() => table.getColumn("role")?.setFilterValue(role)}
                           className="relative"
                         >
-                          {filterColumn && table.getColumn(filterColumn)?.getFilterValue() === option.value && (
+                          {table.getColumn("role")?.getFilterValue() === role && (
                             <div className="absolute left-0 w-[3px] h-full bg-primary rounded-r-full" />
                           )}
-                          {option.label}
+                          {role}
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuSubContent>

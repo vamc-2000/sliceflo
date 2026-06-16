@@ -33,6 +33,8 @@ import { IoFolderOpenSharp } from 'react-icons/io5';
 
 import { getAvatarColor, getInitials } from '@/utils/avatar-utils';
 import { TeamWorkTaskTable } from './TeamAllWork/TeamWorkTaskTable';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const ProjectIcon = ({ project, size = 16 }: { project: any, size?: number }) => {
   const name = project?.name || 'Unknown';
@@ -729,13 +731,15 @@ export default function TeamAllWork() {
               {/* Tasks Table - Shown when expanded */}
               {expandedMembers.has(member.id) && (
                 <div className="max-h-[420px] overflow-auto rounded-md border border-border relative">
-                  <TeamWorkTaskTable
-                    data-testid={`tasks-table-${member.id}`}
-                    isTeamView
-                    groupId={member.id}
-                    filteredTasks={member.tasks}
-                    hideFields={[]}
-                  />
+                  <DndProvider backend={HTML5Backend}>
+                    <TeamWorkTaskTable
+                      data-testid={`tasks-table-${member.id}`}
+                      isTeamView
+                      groupId={member.id}
+                      filteredTasks={member.tasks}
+                      hideFields={[]}
+                    />
+                  </DndProvider>
                 </div>
               )}
             </Card>

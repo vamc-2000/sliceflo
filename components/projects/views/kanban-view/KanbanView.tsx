@@ -1638,6 +1638,7 @@ const KanbanView = ({
             onKeyDown={handleKeyDown}
             className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
             data-testid="kanban-add-task-name-input"
+            maxLength={250}
           />
 
           {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}
@@ -1945,6 +1946,7 @@ const KanbanView = ({
           onKeyDown={handleKeyDown}
           className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
           data-testid="kanban-add-subtask-name-input"
+          maxLength={250}
         />
 
         {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { RichTextEditor } from '../../rich-text-editor'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { Hash, Plus, SquareUser, User } from 'lucide-react'
+import { Hash, Plus, SquareUser, User, ChevronDown } from 'lucide-react'
 import {
   Popover,
   PopoverContent,
@@ -19,15 +19,18 @@ import { useCallback } from 'react'
 import { debounce } from 'lodash'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import PlusLabelManager from './PlusLabelManager'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface AboutTeamProps {
   teamDescription?: string
   teamName?: string
   teamOwner?: {
-    name?: string
+    name?: string;
     avatar?: string | null;
-    profilePicture?: string | null
-    profilePictureUrl?: string | null
+    profilePicture?: string | null;
+    profilePictureUrl?: string | null;
   }
   teamPicture?: string
 
@@ -54,6 +57,11 @@ export default function AboutTeam({
   const [charCount, setCharCount] = useState(0);
   const [localLabels, setLocalLabels] = useState<Label[]>([]);
   const [showLabelManager, setShowLabelManager] = useState(false);
+
+  // Collapsible sections state
+  const [isTeamDetailsExpanded, setIsTeamDetailsExpanded] = useState(true);
+  const [isLabelsExpanded, setIsLabelsExpanded] = useState(false);
+  const [isAboutTeamExpanded, setIsAboutTeamExpanded] = useState(false);
 
   const { user: profile, fetchUserProfile } = useProfileStore();
   const currentWorkspace = useWorkspaceStore(state => state.currentWorkspace);
@@ -150,124 +158,188 @@ export default function AboutTeam({
 
   return (
     <TooltipProvider>
-      <div data-testid="about-team-container" className="w-full mb-4">
+      <div data-testid="about-team-container" className="w-full mb-4 space-y-4">
 
-        {/* Team Info Grid */}
-        <div className="grid grid-cols-[24px_180px_1fr] gap-y-4 items-center mb-6 px-2">
+        {/* Team Details Section */}
+        <div className="space-y-2">
+          <div
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsTeamDetailsExpanded(!isTeamDetailsExpanded)}
+          >
+            <h3 className="text-sm font-semibold">Team Details</h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 pointer-events-none"
+            >
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isTeamDetailsExpanded ? "rotate-180" : "rotate-0")} />
+            </Button>
+          </div>
 
-          {/* Team Name */}
-          <SquareUser className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
-            Team Name
-          </h3>
-          <p className="text-xs font-medium text-foreground truncate">
-            {teamName || ""}
-          </p>
-
-          {/* Team Identifier */}
-          <Hash className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
-            Team Identifier
-          </h3>
-          <p className="text-xs font-medium text-foreground truncate">
-            {getIdentifier(teamName)}
-          </p>
-
-          {/* Team Owner */}
-          <User className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
-            Team Owner
-          </h3>
-          <p className="text-xs font-medium text-foreground truncate">
-            {ownerImage ? (
-              <img
-                src={ownerImage}
-                alt={owner?.name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <span className="bg-muted rounded-full w-8 h-8 flex items-center justify-center">
-                <span className="text-foreground text-xs font-semibold">
-                  {ownerInitials}
-                </span>
+          <div className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden space-y-3",
+            isTeamDetailsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+          )}>
+            {/* Team Name */}
+            <div className="flex items-center justify-between">
+              <label className="text-muted-foreground flex items-center gap-2 text-xs font-semibold">
+                <SquareUser className="h-4 w-4" />
+                Team Name
+              </label>
+              <span className="text-xs font-medium text-foreground truncate max-w-[150px]">
+                {teamName || ""}
               </span>
-            )}
+            </div>
 
-          </p>
+            {/* Team Identifier */}
+            <div className="flex items-center justify-between">
+              <label className="text-muted-foreground flex items-center gap-2 text-xs font-semibold">
+                <Hash className="h-4 w-4" />
+                Team Identifier
+              </label>
+              <span className="text-xs font-medium text-foreground truncate max-w-[150px]">
+                {getIdentifier(teamName)}
+              </span>
+            </div>
 
-        </div>
-
-        <div className="grid grid-cols-[180px_1fr] gap-y-2 items-start mb-6 px-0">
-
-          {/* Row 1: Label + Plus */}
-          <h3 className="font-semibold text-sm text-foreground">Labels</h3>
-
-          <div className="flex justify-end">
-            <Popover open={showLabelManager} onOpenChange={setShowLabelManager}>
-              <PopoverTrigger asChild>
-                <button
-                  data-testid="aboutteam-add-label-btn"
-                  type="button"
-                  className="p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors"
-                >
-                  <Plus className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </PopoverTrigger>
-
-              <PopoverContent
-                data-testid="popover-label-manager"
-                className="p-0"
-                align="end"
-                side="bottom"
-              >
-                <PlusLabelManager
-                  labels={localLabels}
-                  allLabels={allWorkspaceLabels}
-                  onLabelsChange={handleLabelsChange}
-                  showBorder={false}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Row 2: Labels list */}
-
-          <div className="flex flex-wrap gap-2">
-            {localLabels.length > 0 &&
-              localLabels.map((label) => (
-                <span
-                  key={label.id}
-                  data-testid={`label-badge-${label.id}`}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-xs text-white"
-                  style={{ backgroundColor: label.color }}
-                >
-                  {label.name}
+            {/* Team Owner */}
+            <div className="flex items-center justify-between">
+              <label className="text-muted-foreground flex items-center gap-2 text-xs font-semibold">
+                <User className="h-4 w-4" />
+                Team Owner
+              </label>
+              <div className="flex items-center gap-2">
+                {ownerImage ? (
+                  <img
+                    src={ownerImage}
+                    alt={owner?.name}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="bg-muted rounded-full w-6 h-6 flex items-center justify-center">
+                    <span className="text-foreground text-[10px] font-semibold">
+                      {ownerInitials}
+                    </span>
+                  </span>
+                )}
+                <span className="text-xs font-medium text-foreground truncate max-w-[120px]">
+                  {owner?.name || userName}
                 </span>
-              ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* ------------------ Team Description ------------------ */}
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-semibold text-sm text-foreground">About this Team</h3>
-        </div>
-        <ProseMirrorEditor
-          data-testid="editor-team-description"
-          initialContent={teamDescription || ""}
-          mentionableMembers={mentionableMembers}
-          onBlur={handleContentChange}
-          placeholder="Write something about the team..."
-          className="w-full h-full"
-          editable={true}
-        />
+        <Separator className="my-4" />
 
-        {charCount > 0 && (
-          <div className="flex justify-end mt-0">
-            <Badge variant="secondary" className="text-xs">
-              {charCount} chars
-            </Badge>
+        {/* Labels Section */}
+        <div className="space-y-2">
+          <div
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+          >
+            <h3 className="text-sm font-semibold cursor-pointer">Labels</h3>
+            <div className="flex items-center gap-1">
+              <Popover open={showLabelManager} onOpenChange={setShowLabelManager}>
+                <PopoverTrigger asChild>
+                  <Button
+                    data-testid="aboutteam-add-label-btn"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  data-testid="popover-label-manager"
+                  className="p-0 border-0 border-b-[5px] border-primary"
+                  align="end"
+                  side="bottom"
+                >
+                  <PlusLabelManager
+                    labels={localLabels}
+                    allLabels={allWorkspaceLabels}
+                    onLabelsChange={handleLabelsChange}
+                    showBorder={false}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 pointer-events-none"
+              >
+                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLabelsExpanded ? "rotate-180" : "rotate-0")} />
+              </Button>
+            </div>
           </div>
-        )}
+
+          <div className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLabelsExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+          )}>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {localLabels.length > 0 ? (
+                localLabels.map((label) => (
+                  <span
+                    key={label.id}
+                    data-testid={`label-badge-${label.id}`}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs text-white"
+                    style={{ backgroundColor: label.color }}
+                  >
+                    {label.name}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-muted-foreground">No labels</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Separator className="my-4" />
+
+        {/* About this Team Section */}
+        <div className="space-y-2">
+          <div
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsAboutTeamExpanded(!isAboutTeamExpanded)}
+          >
+            <h3 className="text-sm font-semibold cursor-pointer">About this Team</h3>
+            <div className="flex items-center gap-2">
+              {charCount > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {charCount} chars
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 pointer-events-none"
+              >
+                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAboutTeamExpanded ? "rotate-180" : "rotate-0")} />
+              </Button>
+            </div>
+          </div>
+
+          <div className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isAboutTeamExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none !mt-0"
+          )}>
+            <ProseMirrorEditor
+              data-testid="editor-team-description"
+              initialContent={teamDescription || ""}
+              mentionableMembers={mentionableMembers}
+              onBlur={handleContentChange}
+              placeholder="Write something about the team..."
+              className="w-full h-full"
+              editable={true}
+            />
+          </div>
+        </div>
 
       </div>
     </TooltipProvider>

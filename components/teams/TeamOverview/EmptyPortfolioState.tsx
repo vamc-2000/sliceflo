@@ -14,7 +14,7 @@ const EmptyPortfolioState = ({ teamId, onAddExistingPortfolio, onCreateNewPortfo
   return (
     <div
       data-testid="empty-portfolio-state"
-      className="flex items-center gap-4"
+      className="flex items-center gap-25"
     >
       <Image
         src="/images/teams/portfolios.svg"
@@ -23,34 +23,32 @@ const EmptyPortfolioState = ({ teamId, onAddExistingPortfolio, onCreateNewPortfo
         height={120}
         className="object-contain"
       />
-      <div className="flex flex-col gap-2">
-        <button
-          data-testid="teamoverview-create-portfolio-btn"
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
-          onClick={() => {
-            if (onCreateNewPortfolio) {
-              onCreateNewPortfolio();
-            } else {
-              router.push(`/teams/${teamId}/create-portfolio`);
-            }
-          }}
-        >
-          <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-            <Plus size={18} />
-          </span>
-          <span className='text-xs'>Create new Portfolio</span>
-        </button>
-        <button
-          data-testid="teamoverview-add-existing-portfolio-btn"
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
-          onClick={onAddExistingPortfolio}
-        >
-          <span className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
-            <Triangle size={17} />
-          </span>
-          <span className='text-xs'>Add existing Portfolio</span>
-        </button>
-      </div>
+      <button
+        data-testid="teamoverview-create-portfolio-btn"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
+        onClick={() => {
+          if (onCreateNewPortfolio) {
+            onCreateNewPortfolio();
+          } else {
+            router.push(`/teams/${teamId}/create-portfolio`);
+          }
+        }}
+      >
+        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+          <Plus size={18} />
+        </span>
+        <span className='text-xs'>Create new Portfolio</span>
+      </button>
+      <button
+        data-testid="teamoverview-add-existing-portfolio-btn"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-left cursor-pointer"
+        onClick={onAddExistingPortfolio}
+      >
+        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+          <Triangle size={17} />
+        </span>
+        <span className='text-xs'>Add existing Portfolio</span>
+      </button>
     </div>
   )
 };

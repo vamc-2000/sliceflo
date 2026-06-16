@@ -1426,6 +1426,7 @@ export const GanttTaskTable = React.forwardRef<
                               }}
                               className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
                               data-testid="gantt-new-subtask-name-input"
+                              maxLength={250}
                             />
                           </div>
                         </td>
@@ -2015,6 +2016,7 @@ export const GanttTaskTable = React.forwardRef<
                         }}
                         className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
                         data-testid="gantt-new-task-name-input"
+                        maxLength={250}
                       />
                     </div>
                   </td>

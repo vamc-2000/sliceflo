@@ -1786,6 +1786,7 @@ export function TaskTable({
                                     }}
                                     className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400"
                                     autoFocus
+                                    maxLength={250}
                                   />
                                 ) : displayOptions.wrapText ? (
                                   /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
@@ -2873,6 +2874,7 @@ export function TaskTable({
                               }
                               className="border-0 pl-0 shadow-none focus-visible:ring-0 h-8 text-xs bg-transparent w-full"
                               autoFocus
+                              maxLength={250}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter")
                                   handleSaveSubtask(task.id);
@@ -3650,6 +3652,7 @@ export function TaskTable({
                       }
                       className="border-0 pl-0 shadow-none focus-visible:ring-0 h-8 text-xs bg-transparent w-full"
                       autoFocus
+                      maxLength={250}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleSaveTask();
                         if (e.key === "Escape") {
@@ -4313,6 +4316,7 @@ export function TaskTable({
                 value={convertSubtaskData.name}
                 onChange={(e) => setConvertSubtaskData({ ...convertSubtaskData, name: e.target.value })}
                 placeholder="Subtask name…"
+                maxLength={250}
               />
             </div>
             <DialogFooter>
@@ -4854,6 +4858,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 }}
                 className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400 min-w-0"
                 autoFocus
+                maxLength={250}
               />
             ) : displayOptions.wrapText ? (
               /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
