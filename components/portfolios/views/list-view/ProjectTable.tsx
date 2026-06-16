@@ -1052,17 +1052,17 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                     <div
                       className={cn(
                         "flex items-center rounded-sm transition-all group",
-                        (isAddProjectRowHovered || showAddProjectMenu) ? "border border-primary/30" : "border border-transparent"
+                        (isAddProjectRowHovered || showAddProjectMenu) ? "border border-primary/30 dark:border-white/30" : "border border-transparent"
                       )}
                     >
                       <button
                         className={cn(
                           "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs focus:outline-none",
-                          (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground"
+                          (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60 dark:text-white" : "text-muted-foreground"
                         )}
                         onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
                       >
-                        <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60" : "text-muted-foreground")} />
+                        <Plus className={cn("h-3 w-3", (isAddProjectRowHovered || showAddProjectMenu) ? "text-primary/60 dark:text-white" : "text-muted-foreground")} />
                         Add New Project
                       </button>
 
@@ -1070,7 +1070,7 @@ export function ProjectTable({ projects, portfolioId, groupColor = "#3B82F6", vi
                         <DropdownMenuTrigger asChild>
                           <button
                             className={cn(
-                              "px-1 py-0.5 border-l border-primary/30 text-muted-foreground group-hover:text-primary/60 transition-colors outline-none",
+                              "px-1 py-0.5 border-l border-primary/30 dark:border-white/30 text-muted-foreground group-hover:text-primary/60 dark:group-hover:text-white transition-colors outline-none",
                               !(isAddProjectRowHovered || showAddProjectMenu) && "invisible"
                             )}
                             onClick={(e) => e.stopPropagation()}

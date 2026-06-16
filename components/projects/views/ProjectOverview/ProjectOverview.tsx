@@ -704,11 +704,10 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
               </div>
 
               <Card
-                className={`rounded-lg transition-shadow ${
-                  hasMilestones
+                className={`rounded-lg transition-shadow ${hasMilestones
                     ? "border-0 shadow-none bg-transparent py-0"
                     : "border-l-4 border-l-primary shadow-sm hover:shadow-md"
-                }`}
+                  }`}
               >
                 <CardContent className={hasMilestones ? "p-0" : "px-4 py-2"}>
                   {hasMilestones ? (
@@ -764,11 +763,10 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
               </div>
 
               <Card
-                className={`rounded-lg transition-shadow ${
-                  hasLinkedPortfolios
+                className={`rounded-lg transition-shadow ${hasLinkedPortfolios
                     ? "border-0 shadow-none bg-transparent py-0"
                     : "border-l-4 border-l-primary shadow-sm hover:shadow-md"
-                }`}
+                  }`}
               >
                 <CardContent
                   className={hasLinkedPortfolios ? "p-0" : "px-4 py-2"}

@@ -12,7 +12,7 @@ const EmptyPortfolioState = ({ teamId, onAddExistingPortfolio, onCreateNewPortfo
   const router = useRouter();
 
   return (
-    <div 
+    <div
       data-testid="empty-portfolio-state"
       className="flex items-center gap-4"
     >

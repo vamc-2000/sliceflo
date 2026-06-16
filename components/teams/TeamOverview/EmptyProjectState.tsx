@@ -12,7 +12,7 @@ const EmptyProjectsState = ({ teamId, onAddExistingProject, onCreateNewProject }
   const router = useRouter();
 
   return (
-    <div 
+    <div
       data-testid="empty-projects-state"
       className="flex items-center gap-4"
     >

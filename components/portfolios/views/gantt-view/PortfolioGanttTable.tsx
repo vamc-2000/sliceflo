@@ -648,7 +648,7 @@ export const PortfolioGanttTable = forwardRef<
                     className={cn(
                       "flex items-center rounded-sm transition-all group",
                       isAddProjectRowHovered || showAddProjectMenu
-                        ? "border border-primary/30"
+                        ? "border border-primary/30 dark:border-white/30"
                         : "border border-transparent",
                     )}
                   >
@@ -656,7 +656,7 @@ export const PortfolioGanttTable = forwardRef<
                       className={cn(
                         "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs focus:outline-none",
                         isAddProjectRowHovered || showAddProjectMenu
-                          ? "text-primary/60"
+                          ? "text-primary/60 dark:text-white"
                           : "text-muted-foreground",
                       )}
                       onClick={() =>
@@ -667,7 +667,7 @@ export const PortfolioGanttTable = forwardRef<
                         className={cn(
                           "h-3 w-3",
                           isAddProjectRowHovered || showAddProjectMenu
-                            ? "text-primary/60"
+                            ? "text-primary/60 dark:text-white"
                             : "text-muted-foreground",
                         )}
                       />
@@ -681,13 +681,13 @@ export const PortfolioGanttTable = forwardRef<
                       <DropdownMenuTrigger asChild>
                         <button
                           className={cn(
-                            "px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors outline-none",
+                            "px-1 py-0.5 border-l border-primary/30 dark:border-white/30 text-muted-foreground group-hover:text-primary/60 dark:group-hover:text-white transition-colors outline-none",
                             !(isAddProjectRowHovered || showAddProjectMenu) &&
                               "invisible",
                           )}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <ChevronUp className="h-3 w-3 text-primary/60" />
+                          <ChevronUp className="h-3 w-3" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuPortal>
