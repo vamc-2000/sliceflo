@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { Avatar as UIAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProjectsStore, getProfilePictureUrl } from "@/stores/projects-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -411,20 +411,17 @@ export function QuickDraftCreation({
                     <span className="truncate">{startDate ? formatLocalDate(startDate) : "Start Date"}</span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setStartDate(date);
-                        if (endDate && endDate < date) {
-                          setEndDate(undefined);
-                        }
+                <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+                  <CalendarPicker
+                    selectedDate={startDate}
+                    onDateSelect={(date) => {
+                      setStartDate(date);
+                      if (endDate && endDate < date) {
+                        setEndDate(undefined);
                       }
                       setIsStartCalendarOpen(false);
                     }}
-                    initialFocus
+                    disabled={(date) => (endDate ? date > endDate : false)}
                   />
                 </PopoverContent>
               </Popover>
@@ -436,16 +433,14 @@ export function QuickDraftCreation({
                     <span className="truncate">{endDate ? formatLocalDate(endDate) : "Due Date"}</span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={(date) => {
+                <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+                  <CalendarPicker
+                    selectedDate={endDate}
+                    onDateSelect={(date) => {
                       setEndDate(date);
                       setIsEndCalendarOpen(false);
                     }}
                     disabled={(date) => (startDate ? date < new Date(new Date(startDate).setHours(0, 0, 0, 0)) : false)}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

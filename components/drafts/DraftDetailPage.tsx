@@ -21,7 +21,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import {
     X as XIcon,
     Calendar as CalendarIcon,
@@ -41,7 +41,7 @@ import {
     Hexagon,
 } from "lucide-react";
 import { format } from "date-fns";
-import { formatLocalDate } from "@/utils/timezone-utils";
+import { formatLocalDate, convertUTCToCalendarDate } from "@/utils/timezone-utils";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useDraftsStore } from "@/stores/drafts-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -580,19 +580,20 @@ export function DraftDetailPage({
                                                     {currentDraft.startDate ? formatLocalDate(currentDraft.startDate) : "—"}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="end">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={currentDraft.startDate ? new Date(currentDraft.startDate) : undefined}
-                                                    onSelect={(d) => {
-                                                        if (d) {
-                                                            const updates: Partial<PatchDraftRequest> = { startDate: format(d, "yyyy-MM-dd") };
-                                                            if (currentDraft.dueDate && new Date(currentDraft.dueDate) < d) updates.dueDate = undefined;
-                                                            handleUpdateDraft(updates);
-                                                            setIsStartDateOpen(false);
-                                                        }
+                                            <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="end">
+                                                <CalendarPicker
+                                                    selectedDate={currentDraft.startDate ? convertUTCToCalendarDate(currentDraft.startDate) : undefined}
+                                                    onDateSelect={(d) => {
+                                                        const updates: Partial<PatchDraftRequest> = { startDate: format(d, "yyyy-MM-dd") };
+                                                        const endDateCal = currentDraft.dueDate ? convertUTCToCalendarDate(currentDraft.dueDate) : undefined;
+                                                        if (endDateCal && endDateCal < d) updates.dueDate = undefined;
+                                                        handleUpdateDraft(updates);
+                                                        setIsStartDateOpen(false);
                                                     }}
-                                                    initialFocus
+                                                    disabled={(date) => {
+                                                        const endDateCal = currentDraft.dueDate ? convertUTCToCalendarDate(currentDraft.dueDate) : undefined;
+                                                        return endDateCal ? date > endDateCal : false;
+                                                    }}
                                                 />
                                                 {currentDraft.startDate && (
                                                     <div className="p-2 border-t">
@@ -623,13 +624,17 @@ export function DraftDetailPage({
                                                     {currentDraft.dueDate ? formatLocalDate(currentDraft.dueDate) : "—"}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="end">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={currentDraft.dueDate ? new Date(currentDraft.dueDate) : undefined}
-                                                    onSelect={(d) => { if (d) { handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") }); } setIsDueDateOpen(false); }}
-                                                    disabled={(date) => (currentDraft.startDate ? date < new Date(new Date(currentDraft.startDate).setHours(0, 0, 0, 0)) : false)}
-                                                    initialFocus
+                                            <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="end">
+                                                <CalendarPicker
+                                                    selectedDate={currentDraft.dueDate ? convertUTCToCalendarDate(currentDraft.dueDate) : undefined}
+                                                    onDateSelect={(d) => {
+                                                        handleUpdateDraft({ dueDate: format(d, "yyyy-MM-dd") });
+                                                        setIsDueDateOpen(false);
+                                                    }}
+                                                    disabled={(date) => {
+                                                        const startDateCal = currentDraft.startDate ? convertUTCToCalendarDate(currentDraft.startDate) : undefined;
+                                                        return startDateCal ? date < new Date(new Date(startDateCal).setHours(0, 0, 0, 0)) : false;
+                                                    }}
                                                 />
                                                 {currentDraft.dueDate && (
                                                     <div className="p-2 border-t">

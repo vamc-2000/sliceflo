@@ -33,7 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -78,7 +78,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { formatLocalDate } from "@/utils/timezone-utils";
+import { formatLocalDate, convertUTCToCalendarDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
 import { SYSTEM_FIELDS, useTasksStore } from "@/stores/tasks-store";
 import { useDraftsStore } from "@/stores/drafts-store";
 import { DraftResponse } from "@/lib/api/drafts-api";
@@ -1492,15 +1492,17 @@ export function DraftTaskTable({
                                 )}
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="center">
-                              <Calendar
-                                mode="single"
-                                selected={task.startDate ? new Date(task.startDate) : undefined}
-                                onSelect={(date) => {
-                                  if (date) updateTask(task.id, { startDate: date.toISOString() });
+                            <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                              <CalendarPicker
+                                selectedDate={task.startDate ? convertUTCToCalendarDate(task.startDate) : undefined}
+                                onDateSelect={(date) => {
+                                  updateTask(task.id, { startDate: convertSelectedDateToUTC(date) });
                                   setActivePopoverId(null);
                                 }}
-                                initialFocus
+                                disabled={(date) => {
+                                  const endDateCal = task.endDate ? convertUTCToCalendarDate(task.endDate) : undefined;
+                                  return endDateCal ? date > endDateCal : false;
+                                }}
                               />
                             </PopoverContent>
                           </Popover>
@@ -1523,16 +1525,17 @@ export function DraftTaskTable({
                                 )}
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="center">
-                              <Calendar
-                                mode="single"
-                                selected={task.endDate ? new Date(task.endDate) : undefined}
-                                onSelect={(date) => {
-                                  if (date) updateTask(task.id, { endDate: date.toISOString() });
+                            <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                              <CalendarPicker
+                                selectedDate={task.endDate ? convertUTCToCalendarDate(task.endDate) : undefined}
+                                onDateSelect={(date) => {
+                                  updateTask(task.id, { endDate: convertSelectedDateToUTC(date) });
                                   setActivePopoverId(null);
                                 }}
-                                disabled={(date) => (task.startDate ? date < new Date(new Date(task.startDate).setHours(0, 0, 0, 0)) : false)}
-                                initialFocus
+                                disabled={(date) => {
+                                  const startDateCal = task.startDate ? convertUTCToCalendarDate(task.startDate) : undefined;
+                                  return startDateCal ? date < new Date(new Date(startDateCal).setHours(0, 0, 0, 0)) : false;
+                                }}
                               />
                             </PopoverContent>
                           </Popover>
@@ -1808,17 +1811,19 @@ export function DraftTaskTable({
                                     )}
                                   </button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="center">
-                                  <Calendar
-                                    mode="single"
-                                    selected={subtask.startDate ? new Date(subtask.startDate) : undefined}
-                                    onSelect={(date) => {
-                                      if (date) updateSubtask(subtask.id, { startDate: date.toISOString() });
-                                      setActivePopoverId(null);
-                                    }}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
+                                <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                                   <CalendarPicker
+                                     selectedDate={subtask.startDate ? convertUTCToCalendarDate(subtask.startDate) : undefined}
+                                     onDateSelect={(date) => {
+                                       updateSubtask(subtask.id, { startDate: convertSelectedDateToUTC(date) });
+                                       setActivePopoverId(null);
+                                     }}
+                                     disabled={(date) => {
+                                       const endDateCal = subtask.endDate ? convertUTCToCalendarDate(subtask.endDate) : undefined;
+                                       return endDateCal ? date > endDateCal : false;
+                                     }}
+                                   />
+                                 </PopoverContent>
                               </Popover>
                             </TableCell>
                           )}
@@ -1839,18 +1844,19 @@ export function DraftTaskTable({
                                     )}
                                   </button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="center">
-                                  <Calendar
-                                    mode="single"
-                                    selected={subtask.endDate ? new Date(subtask.endDate) : undefined}
-                                    onSelect={(date) => {
-                                      if (date) updateSubtask(subtask.id, { endDate: date.toISOString() });
-                                      setActivePopoverId(null);
-                                    }}
-                                    disabled={(date) => (subtask.startDate ? date < new Date(new Date(subtask.startDate).setHours(0, 0, 0, 0)) : false)}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
+                                <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                                   <CalendarPicker
+                                     selectedDate={subtask.endDate ? convertUTCToCalendarDate(subtask.endDate) : undefined}
+                                     onDateSelect={(date) => {
+                                       updateSubtask(subtask.id, { endDate: convertSelectedDateToUTC(date) });
+                                       setActivePopoverId(null);
+                                     }}
+                                     disabled={(date) => {
+                                       const startDateCal = subtask.startDate ? convertUTCToCalendarDate(subtask.startDate) : undefined;
+                                       return startDateCal ? date < new Date(new Date(startDateCal).setHours(0, 0, 0, 0)) : false;
+                                     }}
+                                   />
+                                 </PopoverContent>
                               </Popover>
                             </TableCell>
                           )}
@@ -2103,15 +2109,14 @@ export function DraftTaskTable({
                                         )}
                                       </button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="center">
-                                      <Calendar
-                                        mode="single"
-                                        selected={newSubtaskData.startDate}
-                                        onSelect={(date) => {
-                                          setNewSubtaskData(prev => ({ ...prev, startDate: date ?? undefined }));
+                                    <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                                      <CalendarPicker
+                                        selectedDate={newSubtaskData.startDate}
+                                        onDateSelect={(date) => {
+                                          setNewSubtaskData(prev => ({ ...prev, startDate: date }));
                                           setActivePopoverId(null);
                                         }}
-                                        initialFocus
+                                        disabled={(date) => (newSubtaskData.endDate ? date > newSubtaskData.endDate : false)}
                                       />
                                       {newSubtaskData.startDate && (
                                         <div className="border-t border-border p-2">
@@ -2149,16 +2154,14 @@ export function DraftTaskTable({
                                         )}
                                       </button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="center">
-                                      <Calendar
-                                        mode="single"
-                                        selected={newSubtaskData.endDate}
-                                        onSelect={(date) => {
-                                          setNewSubtaskData(prev => ({ ...prev, endDate: date ?? undefined }));
+                                    <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="center">
+                                      <CalendarPicker
+                                        selectedDate={newSubtaskData.endDate}
+                                        onDateSelect={(date) => {
+                                          setNewSubtaskData(prev => ({ ...prev, endDate: date }));
                                           setActivePopoverId(null);
                                         }}
                                         disabled={(date) => (newSubtaskData.startDate ? date < new Date(new Date(newSubtaskData.startDate).setHours(0, 0, 0, 0)) : false)}
-                                        initialFocus
                                       />
                                       {newSubtaskData.endDate && (
                                         <div className="border-t border-border p-2">
