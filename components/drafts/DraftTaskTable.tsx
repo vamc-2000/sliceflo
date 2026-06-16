@@ -1332,7 +1332,7 @@ export function DraftTaskTable({
                           {/* Hover actions */}
                           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                             <button
-                              className="px-1.5 py-0.5 text-primary hover:bg-muted rounded flex items-center gap-0.5"
+                              className="px-1.5 py-0.5 text-primary dark:text-white hover:bg-muted rounded flex items-center gap-0.5"
                               onClick={() => {
                                 setNewSubtaskData(prev => ({
                                   ...prev,
@@ -2283,15 +2283,15 @@ export function DraftTaskTable({
                   <div className="flex items-center gap-1 pl-4">
                     <div className={cn(
                       "flex items-center rounded-sm transition-all",
-                      isAddTaskRowHovered ? "border border-primary/30" : "border border-transparent"
+                      isAddTaskRowHovered ? "border border-primary/30 dark:border-white/30" : "border border-transparent"
                     )}>
                       <button
                         className={cn(
                           "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs",
-                          isAddTaskRowHovered ? "text-primary/60" : "text-muted-foreground"
+                          isAddTaskRowHovered ? "text-primary/60 dark:text-white" : "text-muted-foreground"
                         )}
                       >
-                        <Plus className={cn("h-3 w-3", isAddTaskRowHovered ? "text-primary/60" : "text-muted-foreground")} />
+                        <Plus className={cn("h-3 w-3", isAddTaskRowHovered ? "text-primary/60 dark:text-white" : "text-muted-foreground")} />
                         Draft a task
                       </button>
                     </div>
