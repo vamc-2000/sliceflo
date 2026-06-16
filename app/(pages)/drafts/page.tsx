@@ -147,7 +147,6 @@ export default function DraftsPage() {
         status: draftData.status,
       });
       toast('success', { title: "New draft created!" });
-      setIsQuickDraftOpen(false);
     } catch (error) {
       console.error("Failed to create draft:", error);
       toast('error', { title: "Failed to create draft" });

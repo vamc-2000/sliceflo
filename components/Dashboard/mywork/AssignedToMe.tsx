@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Info, Plus, ChevronRight as ChevronRightIcon, LayoutTemplate } from "lucide-react";
+import { Info, Plus, ChevronRight as ChevronRightIcon, LayoutTemplate, Flag } from "lucide-react";
 import { useProjectsStore } from "@/stores/projects-store";
 import { useProfileStore } from "@/stores/profile-store";
 import { PriorityBadge } from "./utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { format } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { cn } from "@/lib/utils";
 import { formatTaskId } from "@/utils/task-utils";
 import { iconComponentMap } from "@/components/ColorIconPicker";
@@ -197,11 +197,7 @@ export function AssignedToMe() {
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "No date";
-    try {
-      return format(new Date(dateStr), "d MMM");
-    } catch {
-      return dateStr;
-    }
+    return formatLocalDate(dateStr);
   };
 
   if (myTasks.length === 0) {
@@ -310,7 +306,6 @@ export function AssignedToMe() {
                         );
                         const priorityColor = priorityCfg?.color || "#6b7280";
                         const priorityLabel = priorityCfg?.label || item.priority || "Medium";
-                        const isPriorityHex = priorityColor.startsWith("#");
 
                         return (
                           <TableRow key={item.id} className="group bg-card hover:bg-card border-b border-border transition-colors" data-testid={`assigned-to-me-task-row-${item.id}`}>
@@ -329,18 +324,19 @@ export function AssignedToMe() {
                             <TableCell className={cn(bodyCellCls, "text-xs text-muted-foreground")}>
                               {formatDate(item.endDate)}
                             </TableCell>
-                            <TableCell className={bodyCellCls}>
-                              <span 
-                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-90 capitalize"
+                            <TableCell className="!p-0.5 text-center min-w-[110px] border-r border-border" style={{ height: "1px" }}>
+                              <div
+                                className="w-full h-full flex items-center justify-between rounded-xs text-[10px] font-bold transition-opacity hover:opacity-90 overflow-hidden px-3 py-0.5 shadow-xs uppercase tracking-wider"
                                 style={{
-                                  borderColor: isPriorityHex ? `${priorityColor}40` : "currentColor",
-                                  backgroundColor: isPriorityHex ? `${priorityColor}15` : "transparent",
-                                  color: priorityColor,
+                                  backgroundColor: priorityColor,
+                                  color: getContrastYIQ(priorityColor),
                                 }}
                               >
-                                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: priorityColor }} />
-                                {priorityLabel}
-                              </span>
+                                <span className="truncate">
+                                  {priorityLabel}
+                                </span>
+                                <Flag className="h-3.5 w-3.5 shrink-0 ml-2" />
+                              </div>
                             </TableCell>
                             <TableCell className="!p-0.5 text-center min-w-[90px] border-r border-border" style={{ height: "1px" }}>
                               <div

@@ -37,8 +37,8 @@ export default function ReportDetailsPage() {
   }
 
   return (
-    <div className="overflow-hidden h-full">
-      <div className="border-b">
+    <div className="overflow-hidden h-full bg-background text-foreground">
+      <div className="border-b border-border">
         <Breadcrumbs />
       </div>
       <ReportDetails />

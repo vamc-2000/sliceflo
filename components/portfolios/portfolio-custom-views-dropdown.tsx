@@ -28,11 +28,11 @@ interface Props {
 }
 
 const POPULAR_VIEWS = [
-    { id: "form", name: "Form", icon: FileText, iconName: "FileText" },
+    // { id: "form", name: "Form", icon: FileText, iconName: "FileText" },
     { id: "attachments", name: "Attachments", icon: Paperclip, iconName: "Paperclip" },
     { id: "notes", name: "Notes", icon: StickyNote, iconName: "StickyNote" },
-    { id: "listTree", name: "ListTree", icon: ListTree, iconName: "ListTree" },
-    { id: "whiteboard", name: "Whiteboard", icon: Presentation, iconName: "Presentation" },
+    // { id: "listTree", name: "ListTree", icon: ListTree, iconName: "ListTree" },
+    // { id: "whiteboard", name: "Whiteboard", icon: Presentation, iconName: "Presentation" },
     { id: "discussions", name: "Discussions", icon: MessageSquare, iconName: "MessageSquare" },
 ];
 
@@ -62,7 +62,7 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
                     <ChevronDown className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[400px] p-2 border-b-[5px] border-b-primary bg-popover">
+            <DropdownMenuContent align="end" className="w-60 p-2 border-b-[5px] border-b-primary bg-popover">
                 <Tabs defaultValue="popular" className="w-full">
                     <TabsList className="w-full rounded p-0">
                         <TabsTrigger
@@ -73,8 +73,8 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="popular" className="p-2 mt-0">
-                        <div className="grid grid-cols-2 gap-2">
+                    <TabsContent value="popular" className="p-1 mt-0">
+                        <div className="grid grid-cols-1 gap-2">
                             {POPULAR_VIEWS.map((view) => {
                                 const Icon = view.icon;
                                 const isSelected = isViewSelected(view.name);
@@ -85,12 +85,12 @@ export function PortfolioCustomViewsDropdown({ onAdd, portfolioId }: Props) {
                                         key={view.id}
                                         onClick={() => handleViewClick(view.id, view.name, view.iconName)}
                                         disabled={isSelected}
-                                        className="flex justify-start items-center gap-3 p-3 transition-colors text-left"
+                                        className="flex justify-start items-center gap-3 px-3 transition-colors text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-full bg-muted-foreground/30 flex items-center justify-center flex-shrink-0">
-                                            <Icon className="h-4 w-4 text-muted-foreground" />
+                                        <div className="w-7 h-7 rounded-full bg-muted-foreground/30 flex items-center justify-center flex-shrink-0">
+                                            <Icon className="h-2 w-2 text-muted-foreground" />
                                         </div>
-                                        <span className="text-sm font-medium text-foreground">
+                                        <span className="text-xs font-medium text-foreground">
                                             {view.name}
                                         </span>
                                     </Button>

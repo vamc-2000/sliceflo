@@ -65,14 +65,14 @@ export default function DocsLayout({
   const activeDocId = useDocStore((state) => state.activeDocId);
   const updateDocument = useDocStore((state) => state.updateDocument);
   const deleteDocument = useDocStore((state) => state.deleteDocument);
-  const addProjectToDocument = useDocStore((state) => state.addProjectToDocument);
-  const removeProjectFromDocument = useDocStore((state) => state.removeProjectFromDocument);
-  const addTeamToDocument = useDocStore((state) => state.addTeamToDocument);
-  const removeTeamFromDocument = useDocStore((state) => state.removeTeamFromDocument);
-  const addPortfolioToDocument = useDocStore((state) => state.addPortfolioToDocument);
-  const removePortfolioFromDocument = useDocStore((state) => state.removePortfolioFromDocument);
-  const addDocumentToDocument = useDocStore((state) => state.addDocumentToDocument);
-  const removeDocumentFromDocument = useDocStore((state) => state.removeDocumentFromDocument);
+  const addPageLinkProject = useDocStore((state) => state.addPageLinkProject);
+  const removePageLinkProject = useDocStore((state) => state.removePageLinkProject);
+  const addPageLinkTeam = useDocStore((state) => state.addPageLinkTeam);
+  const removePageLinkTeam = useDocStore((state) => state.removePageLinkTeam);
+  const addPageLinkPortfolio = useDocStore((state) => state.addPageLinkPortfolio);
+  const removePageLinkPortfolio = useDocStore((state) => state.removePageLinkPortfolio);
+  const addPageLinkDocument = useDocStore((state) => state.addPageLinkDocument);
+  const removePageLinkDocument = useDocStore((state) => state.removePageLinkDocument);
   const getDocument = useDocStore((state) => state.getDocument);
   const loadDocuments = useDocStore((state) => state.loadDocuments);
   const editingTitleId = useDocStore((state) => state.editingTitleId);
@@ -162,7 +162,7 @@ export default function DocsLayout({
 
         await fetchChildren(parentId);
         if (cancelled) return;
-        
+
         const children = Array.from(documents.values()).filter(d => d.parentId === parentId);
         children.forEach((child) => {
           if (child?.id && !visited.has(child.id)) queue.push(child.id);
@@ -178,7 +178,7 @@ export default function DocsLayout({
 
         // Always load the complete tree for the selected root.
         let rootNoteId = doc.rootId || id;
-        
+
         // If we don't have ancestors, we might need to fetch them, 
         // but for now let's assume rootId is enough or fallback to id.
         if (rootNoteId && rootNoteId !== id) {
@@ -241,6 +241,11 @@ export default function DocsLayout({
       clearTitleEdit();
     }
   }, [editingTitleId, rootId, rootDoc, documents, clearTitleEdit]);
+
+  useEffect(() => {
+    fetchProjects();
+    fetchPortfolios();
+  }, [fetchProjects, fetchPortfolios]);
 
   // const handleDragOver = (e: React.DragEvent) => {
   //   e.preventDefault();
@@ -381,50 +386,50 @@ export default function DocsLayout({
   };
 
   const handleAddProject = (projectId: string) => {
-    if (!rootId) return;
-    addProjectToDocument(rootId, projectId);
+    if (!id) return;
+    addPageLinkProject(id, projectId);
     setShowLinkTabs(false);
     setShowBadgeDropdown(false);
   };
 
   const handleRemoveProject = (projectId: string) => {
-    if (!rootId) return;
-    removeProjectFromDocument(rootId, projectId);
+    if (!id) return;
+    removePageLinkProject(id, projectId);
   };
 
   const handleAddTeam = (teamId: string) => {
-    if (!rootId) return;
-    addTeamToDocument(rootId, teamId);
+    if (!id) return;
+    addPageLinkTeam(id, teamId);
     setShowLinkTabs(false);
     setShowBadgeDropdown(false);
   };
 
   const handleRemoveTeam = (teamId: string) => {
-    if (!rootId) return;
-    removeTeamFromDocument(rootId, teamId);
+    if (!id) return;
+    removePageLinkTeam(id, teamId);
   };
 
   const handleAddPortfolio = (portfolioId: string) => {
-    if (!rootId) return;
-    addPortfolioToDocument(rootId, portfolioId);
+    if (!id) return;
+    addPageLinkPortfolio(id, portfolioId);
     setShowLinkTabs(false);
     setShowBadgeDropdown(false);
   };
 
   const handleRemovePortfolio = (portfolioId: string) => {
-    if (!rootId) return;
-    removePortfolioFromDocument(rootId, portfolioId);
+    if (!id) return;
+    removePageLinkPortfolio(id, portfolioId);
   };
 
   const handleAddDocument = (linkedDocId: string) => {
-    if (!rootId) return;
-    addDocumentToDocument(rootId, linkedDocId);
+    if (!id) return;
+    addPageLinkDocument(id, linkedDocId);
     setShowLinkTabs(false);
   };
 
   const handleRemoveDocument = (linkedDocId: string) => {
-    if (!rootId) return;
-    removeDocumentFromDocument(rootId, linkedDocId);
+    if (!id) return;
+    removePageLinkDocument(id, linkedDocId);
   };
 
 
@@ -834,7 +839,7 @@ export default function DocsLayout({
 
   //       {/* Action Buttons - Right Side */}
   //       <div className="flex items-center gap-2">
-  
+
   //         {/* Open in new window */}
   //         <Button
   //           variant="ghost"
@@ -1212,7 +1217,7 @@ export default function DocsLayout({
   //                 <span>Import</span>
   //               </DropdownMenuSubTrigger>
   //               <DropdownMenuSubContent className="w-100  p-5">
-                 
+
   //                 <div
   //                   className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
   //                   onClick={() => fileInputRef.current?.click()}
@@ -1234,7 +1239,7 @@ export default function DocsLayout({
   //                     <span className="text-xs bg-white px-2 py-1 rounded border">HTML</span>
   //                   </div>
 
-               
+
   //                   <input
   //                     ref={fileInputRef}
   //                     type="file"
@@ -1245,7 +1250,7 @@ export default function DocsLayout({
   //                   />
   //                 </div>
 
-               
+
   //                 {selectedFiles.length > 0 && (
   //                   <div className="mt-4 p-3 bg-gray-50 rounded-lg">
   //                     <p className="text-sm font-medium text-gray-900 mb-2">Selected files:</p>
@@ -1459,7 +1464,7 @@ export default function DocsLayout({
   //   </div >
   // );
 
- return (
+  return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Fixed Breadcrumb */}
       <div className="border-b shrink-0 no-print">
@@ -1500,11 +1505,12 @@ export default function DocsLayout({
           </div>
 
           {(() => {
+            const doc = currentPageDoc || rootDoc;
             const totalLinks =
-              (rootDoc?.linkedProjects?.length || 0) +
-              (rootDoc?.linkedTeams?.length || 0) +
-              (rootDoc?.linkedPortfolios?.length || 0) +
-              (rootDoc?.linkedDocuments?.length || 0);
+              (doc?.pageLinkedProjects?.length || 0) +
+              (doc?.pageLinkedTeams?.length || 0) +
+              (doc?.pageLinkedPortfolios?.length || 0) +
+              (doc?.pageLinkedDocuments?.length || 0);
             if (totalLinks === 0) return null;
             return (
               <DropdownMenu open={showBadgeDropdown} onOpenChange={setShowBadgeDropdown}>
@@ -1518,11 +1524,10 @@ export default function DocsLayout({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-80 p-0 bg-popover border border-border text-popover-foreground shadow-lg rounded-md">
                   {(() => {
-                    const doc = rootDoc;
-                    const linkedProjectsList = doc?.linkedProjects?.map(id => projects.find(p => p.id === id)).filter(Boolean) || [];
-                    // const linkedTeamsList = doc?.linkedTeams?.map(id => teams.find(t => t.id === id)).filter(Boolean) || [];
-                    const linkedPortfoliosList = doc?.linkedPortfolios?.map(id => portfolios.find(p => p.id === id)).filter(Boolean) || [];
-                    const linkedDocumentsList = doc?.linkedDocuments?.map(id => documents.get(id)).filter(Boolean) || [];
+                    const linkedProjectsList = doc?.pageLinkedProjects?.map(id => projects.find(p => p.id === id)).filter(Boolean) || [];
+                    // const linkedTeamsList = doc?.pageLinkedTeams?.map(id => teams.find(t => t.id === id)).filter(Boolean) || [];
+                    const linkedPortfoliosList = doc?.pageLinkedPortfolios?.map(id => portfolios.find(p => p.id === id)).filter(Boolean) || [];
+                    const linkedDocumentsList = doc?.pageLinkedDocuments?.map(id => documents.get(id)).filter(Boolean) || [];
                     const hasLinks = linkedProjectsList.length > 0 || linkedPortfoliosList.length > 0 || linkedDocumentsList.length > 0;
 
                     if (hasLinks && !showLinkTabs) return (
@@ -1547,7 +1552,7 @@ export default function DocsLayout({
                                     <img src={avatar.src} alt={p?.name} className="w-full h-full object-cover rounded" />
                                   ) : avatar?.type === "icon" ? (
                                     (() => {
-                                      const iconObj = iconLibrary.find((i: any) => i.name === avatar.name);
+                                      const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
                                       if (iconObj) {
                                         const IconComponent = iconObj.icon;
                                         return <IconComponent size={10} color={avatar.color} />;
@@ -1579,18 +1584,55 @@ export default function DocsLayout({
                               </Button>
                             </div>
                           ))} */}
-                          {linkedPortfoliosList.map((p: any) => (
-                            <div key={p?.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
-                              <span className="text-sm">💼</span>
-                              <span className="text-xs text-foreground flex-1 truncate">{p?.name}</span>
-                              <Button variant="ghost" size="sm" className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(p?.id!); }}>
-                                <X className="w-3 h-3 text-muted-foreground" />
-                              </Button>
-                            </div>
-                          ))}
+                          {linkedPortfoliosList.map((p: any) => {
+                            const avatar = getProjectAvatar(p);
+                            return (
+                              <div key={p?.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
+                                {/* Portfolio Icon */}
+                                <div
+                                  className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                  style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p?.color ? `${p.color}20` : "#3B82F620" }}
+                                >
+                                  {avatar?.type === "image" ? (
+                                    <img src={avatar.src} alt={p?.name} className="w-full h-full object-cover rounded" />
+                                  ) : avatar?.type === "icon" ? (
+                                    (() => {
+                                      const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                      if (iconObj) {
+                                        const IconComponent = iconObj.icon;
+                                        return (
+                                          <div className="w-full h-full flex items-center justify-center">
+                                            <IconComponent size={10} color={avatar.color} />
+                                          </div>
+                                        );
+                                      }
+                                      return (
+                                        <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                          {p?.name?.charAt(0)?.toUpperCase()}
+                                        </span>
+                                      );
+                                    })()
+                                  ) : (
+                                    <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                      {p?.name?.charAt(0)?.toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-xs text-foreground flex-1 truncate">{p?.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100"
+                                  onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(p?.id!); }}
+                                >
+                                  <X className="w-3 h-3 text-muted-foreground" />
+                                </Button>
+                              </div>
+                            );
+                          })}
                           {linkedDocumentsList.map((d: any) => (
                             <div key={d?.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
-                              <span className="text-sm">📄</span>
+                              <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                               <span className="text-xs text-foreground flex-1 truncate">{d?.title}</span>
                               <Button variant="ghost" size="sm" className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleRemoveDocument(d?.id); }}>
                                 <X className="w-3 h-3 text-muted-foreground" />
@@ -1644,7 +1686,7 @@ export default function DocsLayout({
                             return (
                               <div className="max-h-40 overflow-y-auto space-y-1">
                                 {activeTab === "project" && projects.map(p => {
-                                  const isSelected = doc?.linkedProjects?.includes(p.id!);
+                                  const isSelected = doc?.pageLinkedProjects?.includes(p.id!);
                                   const avatar = getProjectAvatar(p);
                                   return (
                                     <div
@@ -1680,7 +1722,7 @@ export default function DocsLayout({
                                   );
                                 })}
                                 {activeTab === "team" && teams.map(t => {
-                                  const isSelected = doc?.linkedTeams?.includes(t.id!);
+                                  const isSelected = doc?.pageLinkedTeams?.includes(t.id!);
                                   return (
                                     <div key={t.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemoveTeam(t.id!) : handleAddTeam(t.id!)}>
                                       <span className="text-xs text-foreground truncate">{t.name}</span>
@@ -1689,19 +1731,59 @@ export default function DocsLayout({
                                   );
                                 })}
                                 {activeTab === "portfolio" && portfolios.map(p => {
-                                  const isSelected = doc?.linkedPortfolios?.includes(p.id);
+                                  const isSelected = doc?.pageLinkedPortfolios?.includes(p.id);
+                                  const avatar = getProjectAvatar(p);
                                   return (
-                                    <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(p.id) : handleAddPortfolio(p.id)}>
-                                      <span className="text-xs text-foreground truncate">{p.name}</span>
+                                    <div
+                                      key={p.id}
+                                      className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer"
+                                      onClick={() => isSelected ? handleRemovePortfolio(p.id) : handleAddPortfolio(p.id)}
+                                    >
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        {/* Portfolio Icon */}
+                                        <div
+                                          className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                          style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p.color ? `${p.color}20` : "#3B82F620" }}
+                                        >
+                                          {avatar?.type === "image" ? (
+                                            <img src={avatar.src} alt={p.name} className="w-full h-full object-cover rounded" />
+                                          ) : avatar?.type === "icon" ? (
+                                            (() => {
+                                              const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                              if (iconObj) {
+                                                const IconComponent = iconObj.icon;
+                                                return (
+                                                  <div className="w-full h-full flex items-center justify-center">
+                                                    <IconComponent size={12} color={avatar.color} />
+                                                  </div>
+                                                );
+                                              }
+                                              return (
+                                                <span className="text-[10px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>
+                                                  {p.name?.charAt(0).toUpperCase()}
+                                                </span>
+                                              );
+                                            })()
+                                          ) : (
+                                            <span className="text-[10px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>
+                                              {p.name?.charAt(0).toUpperCase()}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className="text-xs text-foreground truncate">{p.name}</span>
+                                      </div>
                                       <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
                                     </div>
                                   );
                                 })}
                                 {activeTab === "document" && docList.map(d => {
-                                  const isSelected = doc?.linkedDocuments?.includes(d.id);
+                                  const isSelected = doc?.pageLinkedDocuments?.includes(d.id);
                                   return (
                                     <div key={d.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemoveDocument(d.id) : handleAddDocument(d.id)}>
-                                      <span className="text-xs text-foreground truncate">{d.title}</span>
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
+                                        <span className="text-xs text-foreground truncate">{d.title}</span>
+                                      </div>
                                       <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
                                     </div>
                                   );
@@ -1744,7 +1826,7 @@ export default function DocsLayout({
 
         {/* Action Buttons - Right Side */}
         <div className="flex items-center gap-2">
-  
+
           {/* Open in new window */}
           <Button
             variant="ghost"
@@ -1892,18 +1974,50 @@ export default function DocsLayout({
                                 </Button>
                               </div>
                             ))} */}
-                            {linkedPortfoliosList.map(p => (
-                              <div key={p?.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
-                                <span className="text-sm">📂</span>
-                                <span className="text-xs text-foreground flex-1 truncate">{p?.name}</span>
-                                <Button variant="ghost" size="sm" className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(p?.id!); }}>
-                                  <X className="w-3 h-3 text-muted-foreground" />
-                                </Button>
-                              </div>
-                            ))}
+                            {linkedPortfoliosList.map((p: any) => {
+                              const avatar = getProjectAvatar(p);
+                              return (
+                                <div key={p?.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
+                                  {/* Portfolio Icon */}
+                                  <div
+                                    className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                    style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p?.color ? `${p.color}20` : "#3B82F620" }}
+                                  >
+                                    {avatar?.type === "image" ? (
+                                      <img src={avatar.src} alt={p?.name} className="w-full h-full object-cover rounded" />
+                                    ) : avatar?.type === "icon" ? (
+                                      (() => {
+                                        const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                        if (iconObj) {
+                                          const IconComponent = iconObj.icon;
+                                          return (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                              <IconComponent size={10} color={avatar.color} />
+                                            </div>
+                                          );
+                                        }
+                                        return (
+                                          <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                            {p?.name?.charAt(0)?.toUpperCase()}
+                                          </span>
+                                        );
+                                      })()
+                                    ) : (
+                                      <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                        {p?.name?.charAt(0)?.toUpperCase()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-foreground flex-1 truncate">{p?.name}</span>
+                                  <Button variant="ghost" size="sm" className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(p?.id!); }}>
+                                    <X className="w-3 h-3 text-muted-foreground" />
+                                  </Button>
+                                </div>
+                              );
+                            })}
                             {linkedDocumentsList.map((d: any) => (
                               <div key={d.id} className="flex items-center gap-2 py-1 px-2 bg-card border border-border rounded shadow-sm group">
-                                <span className="text-sm">📄</span>
+                                <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                                 <span className="text-xs text-foreground flex-1 truncate">{d.title}</span>
                                 <Button variant="ghost" size="sm" className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleRemoveDocument(d.id); }}>
                                   <X className="w-3 h-3 text-muted-foreground" />

@@ -89,11 +89,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
   formatLocalDate,
   convertSelectedDateToUTC,
 } from "@/utils/timezone-utils";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
   getTaskTypeIcon,
@@ -990,19 +990,27 @@ const KanbanView = ({
     new Set(projectTasks.map((task) => task.id)),
   );
 
-  const handleDataChange = (newData: KanbanTask[]) => {
-    newData.forEach((kanbanTask) => {
-      const originalTask = tasks.find((t) => t.id === kanbanTask.id);
-      if (!originalTask) return;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const activeTaskId = active.id as string;
 
+    // Resolve column ID from target (which could be another task card or column container)
+    const overItem = kanbanTasks.find((item) => item.id === over.id);
+    const newColumnId =
+      overItem?.column ||
+      columns.find((col) => col.id === over.id)?.id ||
+      columns[0]?.id;
+
+    const originalTask = tasks.find((t) => t.id === activeTaskId);
+
+    if (originalTask) {
       if (groupBy === "status") {
-        const config = taskStatusConfigs.find(
-          (c) => c._id === kanbanTask.column,
-        );
+        const config = taskStatusConfigs.find((c) => c._id === newColumnId);
         if (config && originalTask.status !== config.value) {
-          updateTask(kanbanTask.id, { status: config.value });
+          updateTask(activeTaskId, { status: config.value });
           const taskSubtasks = subtasks.filter(
-            (st) => st.parentTaskId === kanbanTask.id,
+            (st) => st.parentTaskId === activeTaskId,
           );
           taskSubtasks.forEach((subtask) => {
             if (subtask.status !== config.value) {
@@ -1011,45 +1019,28 @@ const KanbanView = ({
           });
         }
       } else if (groupBy === "assignee") {
-        const newAssignee =
-          kanbanTask.column === "unassigned" ? "" : kanbanTask.column;
+        const newAssignee = newColumnId === "unassigned" ? "" : newColumnId;
         if (originalTask.assignee !== newAssignee) {
-          updateTask(kanbanTask.id, { assignee: newAssignee });
+          updateTask(activeTaskId, { assignee: newAssignee });
         }
       } else if (groupBy === "priority") {
         const priorityConfig = taskPriorityConfigs.find(
-          (p) => p._id === kanbanTask.column,
+          (p) => p._id === newColumnId,
         );
         const newValue = priorityConfig?.value || "";
         if (originalTask.priority !== newValue) {
-          updateTask(kanbanTask.id, { priority: newValue });
+          updateTask(activeTaskId, { priority: newValue });
         }
       } else if (groupBy === "dueDate") {
-        // Generally dueDate moving in Kanban is tricky because "Today", "Upcoming" are derived.
-        // For now, maybe we don't update date if moved to those columns, or we set it to today if moved to today.
-        if (kanbanTask.column === "date-today") {
+        if (newColumnId === "date-today") {
           const today = new Date().toISOString();
           if (originalTask.endDate !== today)
-            updateTask(kanbanTask.id, { endDate: today });
-        } else if (kanbanTask.column === "date-no-date") {
-          if (originalTask.endDate) updateTask(kanbanTask.id, { endDate: "" });
+            updateTask(activeTaskId, { endDate: today });
+        } else if (newColumnId === "date-no-date") {
+          if (originalTask.endDate) updateTask(activeTaskId, { endDate: "" });
         }
-      } /* else if (groupBy?.startsWith('custom-')) {
-        const fieldId = groupBy.replace('custom-', '');
-        const newValue = kanbanTask.column === 'no-value' ? '' : kanbanTask.column;
-        if (originalTask.customFieldValues?.[fieldId] !== newValue) {
-          updateTask(kanbanTask.id, {
-            customFieldValues: {
-              ...originalTask.customFieldValues,
-              [fieldId]: newValue
-            }
-          });
-        }
-      } */
-    });
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
+      }
+    }
     console.log("Drag ended:", event);
   };
 
@@ -1680,19 +1671,17 @@ const KanbanView = ({
                   </div>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0"
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <CalendarPicker
-                    mode="single"
-                    selected={newTaskData.startDate}
-                    onSelect={(date) =>
+                    selectedDate={newTaskData.startDate}
+                    onDateSelect={(date) =>
                       setNewTaskData((prev) => ({
                         ...prev,
-                        startDate: date ?? undefined,
+                        startDate: date,
                       }))
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -1727,16 +1716,15 @@ const KanbanView = ({
                   </div>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0"
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <CalendarPicker
-                    mode="single"
-                    selected={newTaskData.endDate}
-                    onSelect={(date) =>
+                    selectedDate={newTaskData.endDate}
+                    onDateSelect={(date) =>
                       setNewTaskData((prev) => ({
                         ...prev,
-                        endDate: date ?? undefined,
+                        endDate: date,
                       }))
                     }
                     disabled={(dt) =>
@@ -1752,7 +1740,6 @@ const KanbanView = ({
                           )
                         : false
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -1991,19 +1978,17 @@ const KanbanView = ({
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0"
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <CalendarPicker
-                  mode="single"
-                  selected={newSubtaskData.startDate}
-                  onSelect={(date) =>
+                  selectedDate={newSubtaskData.startDate}
+                  onDateSelect={(date) =>
                     setNewSubtaskData((prev) => ({
                       ...prev,
-                      startDate: date ?? undefined,
+                      startDate: date,
                     }))
                   }
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -2036,16 +2021,15 @@ const KanbanView = ({
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0"
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <CalendarPicker
-                  mode="single"
-                  selected={newSubtaskData.endDate}
-                  onSelect={(date) =>
+                  selectedDate={newSubtaskData.endDate}
+                  onDateSelect={(date) =>
                     setNewSubtaskData((prev) => ({
                       ...prev,
-                      endDate: date ?? undefined,
+                      endDate: date,
                     }))
                   }
                   disabled={(dt) =>
@@ -2061,7 +2045,6 @@ const KanbanView = ({
                         )
                       : false
                   }
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -2709,10 +2692,9 @@ const KanbanView = ({
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-auto p-0">
+                          <DropdownMenuSubContent className="w-auto p-2 border-0 border-b-[5px] border-primary">
                             <CalendarPicker
-                              mode="single"
-                              onSelect={(date) => {
+                              onDateSelect={(date) => {
                                 if (date) {
                                   setFilterConfig((prev) => {
                                     const existing = prev.find(
@@ -2742,7 +2724,6 @@ const KanbanView = ({
                                   });
                                 }
                               }}
-                              initialFocus
                             />
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
@@ -3120,7 +3101,6 @@ const KanbanView = ({
               <KanbanProvider
                 data={kanbanTasks}
                 columns={columns}
-                onDataChange={handleDataChange}
                 onDragEnd={handleDragEnd}
               >
                 {(column) => (
@@ -3128,7 +3108,7 @@ const KanbanView = ({
                     key={column.id}
                     id={column.id}
                     data-testid={`kanban-column-${column.id}`}
-                    className="w-80 bg-muted border-none shadow-none divide-y-0 overflow-visible rounded-t-lg"
+                    className="w-80 h-full flex flex-col shrink-0 bg-muted border-none shadow-none divide-y-0 overflow-visible rounded-t-lg"
                     style={{ borderTop: `4px solid ${column.color}` }}
                   >
                     {/* Column Header */}
@@ -3388,6 +3368,34 @@ const KanbanView = ({
                       id={column.id}
                       className="gap-2"
                       data-testid={`kanban-column-cards-${column.id}`}
+                      footer={
+                        <>
+                          {/* Show Add Task Card INSIDE KanbanCards */}
+                          {addingTaskInColumn === column.id && (
+                            <AddTaskCard
+                              columnName={column.name}
+                              onSave={() => handleSaveNewTask(column.id)}
+                              onCancel={handleCancelAddTask}
+                            />
+                          )}
+
+                          {/* Add Task Button at bottom of column */}
+                          <div className="px-2 pb-2">
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="flex justify-start items-center gap-2 border-l-4 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors py-2 px-3 rounded-md w-full h-8"
+                              style={{ borderLeftColor: `${column.color}80` }}
+                              onClick={() => handleAddTask(column.id)}
+                              disabled={addingTaskInColumn === column.id}
+                              data-testid={`kanban-column-add-task-bottom-btn-${column.id}`}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Task
+                            </Button>
+                          </div>
+                        </>
+                      }
                     >
                       {(task) => {
                         // Get the full task data
@@ -3419,7 +3427,7 @@ const KanbanView = ({
                             column={task.column}
                             onClick={() => handleTaskClick(fullTask.id)}
                             className={cn(
-                              "px-2 py-0 border-none gap-2 shadow-none bg-transparent",
+                              "px-2 py-0 border-none gap-2 shadow-none bg-transparent ring-0",
                               hasSubtasks && "p-2 bg-muted rounded-lg",
                             )}
                           >
@@ -3481,30 +3489,6 @@ const KanbanView = ({
                         );
                       }}
                     </KanbanCards>
-                    {/* Show Add Task Card OUTSIDE KanbanCards */}
-                    {addingTaskInColumn === column.id && (
-                      <AddTaskCard
-                        columnName={column.name}
-                        onSave={() => handleSaveNewTask(column.id)}
-                        onCancel={handleCancelAddTask}
-                      />
-                    )}
-
-                    {/* Add Task Button at bottom of column */}
-                    <div className="px-4 pb-4">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="flex justify-start items-center gap-2 border-l-4 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors py-2 px-3 rounded-md w-full h-8"
-                        style={{ borderLeftColor: `${column.color}80` }}
-                        onClick={() => handleAddTask(column.id)}
-                        disabled={addingTaskInColumn === column.id}
-                        data-testid={`kanban-column-add-task-bottom-btn-${column.id}`}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Task
-                      </Button>
-                    </div>
                   </KanbanBoard>
                 )}
               </KanbanProvider>

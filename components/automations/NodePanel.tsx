@@ -25,7 +25,7 @@ const NodePanelItem = ({ template, onDragStart, onClick }: NodePanelItemProps) =
             draggable
             onDragStart={(e) => onDragStart(e, template.type, template)}
             onClick={() => onClick(template)}
-            className={`group relative p-3.5 rounded-xl border border-gray-100 bg-white transition-all duration-300 cursor-grab active:cursor-grabbing hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.05)]
+            className={`group relative p-3.5 rounded-xl border border-border bg-card transition-all duration-300 cursor-grab active:cursor-grabbing hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.05)]
                 ${isTrigger ? 'hover:border-emerald-200' : isCondition ? 'hover:border-orange-200' : 'hover:border-blue-200'}`}
         >
             <div className="flex items-center gap-3.5">
@@ -41,15 +41,15 @@ const NodePanelItem = ({ template, onDragStart, onClick }: NodePanelItemProps) =
                     {template.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-gray-800 truncate group-hover:text-gray-900 transition-colors">
+                    <p className="text-[13px] font-bold text-foreground truncate group-hover:text-foreground transition-colors">
                         {template.label}
                     </p>
-                    <p className="text-[10px] text-gray-400 font-medium truncate mt-0.5 uppercase tracking-wider">
+                    <p className="text-[10px] text-muted-foreground font-medium truncate mt-0.5 uppercase tracking-wider">
                         {template.description}
                     </p>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <Plus className="w-3.5 h-3.5 text-gray-400" />
+                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <Plus className="w-3.5 h-3.5 text-muted-foreground" />
                 </div>
             </div>
         </div>
@@ -94,10 +94,10 @@ const NodePanel = ({ onDragStart, onAddItem }: NodePanelProps) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white select-none overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-50 bg-white/50 backdrop-blur-sm sticky top-0 z-10 shrink-0">
-                <h2 className="text-[13px] font-bold text-gray-900 tracking-tight uppercase tracking-[0.15em]">Components</h2>
-                <p className="text-[10px] text-gray-400 font-medium mt-1">Drag or click to build workflow</p>
+        <div className="flex flex-col h-full bg-card select-none overflow-hidden text-foreground">
+            <div className="px-6 py-5 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 shrink-0">
+                <h2 className="text-[13px] font-bold text-foreground tracking-tight uppercase tracking-[0.15em]">Components</h2>
+                <p className="text-[10px] text-muted-foreground font-medium mt-1">Drag or click to build workflow</p>
             </div>
 
             <ScrollArea className="flex-1 overflow-y-auto">
@@ -107,7 +107,7 @@ const NodePanel = ({ onDragStart, onAddItem }: NodePanelProps) => {
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#00CA72] shadow-[0_0_8px_rgba(0,202,114,0.4)]"></div>
-                                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em]">Event Triggers</h3>
+                                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.1em]">Event Triggers</h3>
                             </div>
                             <div className="space-y-2.5">
                                 {groupedTemplates.trigger.map((template, index) => (
@@ -127,7 +127,7 @@ const NodePanel = ({ onDragStart, onAddItem }: NodePanelProps) => {
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#0073EA] shadow-[0_0_8px_rgba(0,115,234,0.4)]"></div>
-                                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em]">Action Steps</h3>
+                                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.1em]">Action Steps</h3>
                             </div>
                             <div className="space-y-2.5">
                                 {groupedTemplates.action.map((template, index) => (
@@ -147,7 +147,7 @@ const NodePanel = ({ onDragStart, onAddItem }: NodePanelProps) => {
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#F97316] shadow-[0_0_8px_rgba(249,115,22,0.4)]"></div>
-                                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em]">Logic Gates</h3>
+                                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.1em]">Logic Gates</h3>
                             </div>
                             <div className="space-y-2.5">
                                 {groupedTemplates.condition.map((template, index) => (

@@ -27,14 +27,14 @@ export default function ReportsPage() {
 
 
   return (
-    <div className="overflow-hidden h-full flex flex-col">
-      <div className="border-b shrink-0">
+    <div className="overflow-hidden h-full flex flex-col bg-background text-foreground">
+      <div className="border-b border-border shrink-0">
         <Breadcrumbs />
       </div>
-
-      <div className="flex-1 overflow-auto px-6 py-3">
+ 
+      <div className="flex-1 overflow-auto px-6 py-3 bg-background text-foreground">
         {loading ? (
-          <h1>Loading reports...</h1>
+          <h1 className="text-foreground">Loading reports...</h1>
         ) : reports.length > 0 ? (
           <ReportsDashboard />
         ) : (

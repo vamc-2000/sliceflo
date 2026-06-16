@@ -13,7 +13,10 @@ import {
   type DragEndEvent,
 } from "@/components/ui/shadcn-io/kanban";
 import { usePortfoliosStore } from "@/stores/portfolios-store";
-import { useProjectsStore, getProfilePictureUrl } from "@/stores/projects-store";
+import {
+  useProjectsStore,
+  getProfilePictureUrl,
+} from "@/stores/projects-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useKanbanSettingsStore } from "@/stores/kanban-settings-store";
 import { PortfolioKanbanCard } from "./KanbanCard";
@@ -54,7 +57,11 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import PortfolioViewersSection from "../../PortfolioViewersSection";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
@@ -105,7 +112,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   const router = useRouter();
   const portfolios = usePortfoliosStore((state) => state.portfolios);
   const projects = useProjectsStore((state) => state.projects);
-  const { currentWorkspace, projectPhases, addProjectPhase, workspaceMembers } = useWorkspaceStore();
+  const { currentWorkspace, projectPhases, addProjectPhase, workspaceMembers } =
+    useWorkspaceStore();
 
   const portfolio = portfolios.find((p) => p.id === portfolioId);
   const portfolioProjectIds = portfolio?.projects || [];
@@ -136,11 +144,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     });
     return workspaceMembers.filter((m) => memberIds.has(m.userId));
   }, [portfolioProjects, workspaceMembers]);
-  const {
-    updateProjectPhase,
-    updateProjectStatus,
-    addProject,
-  } = useProjectsStore();
+  const { updateProjectPhase, updateProjectStatus, addProject } =
+    useProjectsStore();
 
   const { getSettings, hideColumn, showColumn } = useKanbanSettingsStore();
   const settings = getSettings(portfolioId);
@@ -152,10 +157,14 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   const [isCreatingNewGroup, setIsCreatingNewGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
 
-  const [addingProjectInColumn, setAddingProjectInColumn] = useState<string | null>(null);
+  const [addingProjectInColumn, setAddingProjectInColumn] = useState<
+    string | null
+  >(null);
   const [newProjectName, setNewProjectName] = useState("");
 
-  const [editingColumnName, setEditingColumnName] = useState<string | null>(null);
+  const [editingColumnName, setEditingColumnName] = useState<string | null>(
+    null,
+  );
   const [editedColumnName, setEditedColumnName] = useState("");
 
   // Sort, Filter, and Display states
@@ -168,17 +177,94 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   });
 
   const [sortFields, setSortFields] = useState<SortField[]>(() => [
-    { id: 'id', fieldName: 'ID', fieldType: 'number', isSelected: false, direction: null, order: 0 },
-    { id: 'name', fieldName: 'Project Name', fieldType: 'text', isSelected: false, direction: null, order: 0 },
-    { id: 'phase', fieldName: 'Phase', fieldType: 'select-one', isSelected: false, direction: null, order: 0 },
-    { id: 'update', fieldName: 'Update', fieldType: 'select-one', isSelected: false, direction: null, order: 0 },
-    { id: 'leader', fieldName: 'Leader', fieldType: 'user', isSelected: false, direction: null, order: 0 },
-    { id: 'members', fieldName: 'Members', fieldType: 'users', isSelected: false, direction: null, order: 0 },
-    { id: 'viewers', fieldName: 'Viewers', fieldType: 'users', isSelected: false, direction: null, order: 0 },
-    { id: 'priority', fieldName: 'Priority', fieldType: 'select-one', isSelected: false, direction: null, order: 0 },
-    { id: 'startDate', fieldName: 'Start Date', fieldType: 'date', isSelected: false, direction: null, order: 0 },
-    { id: 'endDate', fieldName: 'Due Date', fieldType: 'date', isSelected: false, direction: null, order: 0 },
-    { id: 'progress', fieldName: 'Progress', fieldType: 'number', isSelected: false, direction: null, order: 0 },
+    {
+      id: "id",
+      fieldName: "ID",
+      fieldType: "number",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "name",
+      fieldName: "Project Name",
+      fieldType: "text",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "phase",
+      fieldName: "Phase",
+      fieldType: "select-one",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "update",
+      fieldName: "Update",
+      fieldType: "select-one",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "leader",
+      fieldName: "Leader",
+      fieldType: "user",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "members",
+      fieldName: "Members",
+      fieldType: "users",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "viewers",
+      fieldName: "Viewers",
+      fieldType: "users",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "priority",
+      fieldName: "Priority",
+      fieldType: "select-one",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "startDate",
+      fieldName: "Start Date",
+      fieldType: "date",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "endDate",
+      fieldName: "Due Date",
+      fieldType: "date",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
+    {
+      id: "progress",
+      fieldName: "Progress",
+      fieldType: "number",
+      isSelected: false,
+      direction: null,
+      order: 0,
+    },
   ]);
 
   // Handle field selection (checkbox functionality)
@@ -187,11 +273,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
       const updatedFields = prev.map((field) =>
         field.id === fieldId
           ? {
-            ...field,
-            isSelected: !field.isSelected,
-            direction: !field.isSelected ? ("asc" as const) : null,
-          }
-          : field
+              ...field,
+              isSelected: !field.isSelected,
+              direction: !field.isSelected ? ("asc" as const) : null,
+            }
+          : field,
       );
 
       // Reassign order for selected fields
@@ -204,19 +290,22 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     });
   };
 
-  const hasSelectedSortFields = sortFields.some(field => field.isSelected);
+  const hasSelectedSortFields = sortFields.some((field) => field.isSelected);
 
   // Handle direction selection
-  const handleDirectionSelection = (fieldId: string, direction: "asc" | "desc") => {
+  const handleDirectionSelection = (
+    fieldId: string,
+    direction: "asc" | "desc",
+  ) => {
     setSortFields((prev) =>
       prev.map((field) =>
         field.id === fieldId
           ? {
-            ...field,
-            direction,
-          }
-          : field
-      )
+              ...field,
+              direction,
+            }
+          : field,
+      ),
     );
   };
 
@@ -228,7 +317,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         isSelected: false,
         direction: null,
         order: 0,
-      }))
+      })),
     );
   };
 
@@ -282,7 +371,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         className={`grid grid-cols-[20px_1fr_20px] items-center px-2 py-1 mr-3 hover:bg-muted rounded ${isDragging ? "opacity-50" : ""}`}
       >
         <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-        <span className="text-xs font-medium text-primary truncate max-w-[80px]">{field.fieldName}</span>
+        <span className="text-xs font-medium text-primary truncate max-w-[80px]">
+          {field.fieldName}
+        </span>
         {getSortIcon(field)}
       </div>
     );
@@ -318,16 +409,22 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         <button
           onClick={() => handleDirectionSelection(field.id, "asc")}
           disabled={!isSelected}
-          className={`p-1 rounded hover:bg-muted ${direction === "asc" ? "bg-muted text-primary" : "text-muted-foreground"
-            } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={`p-1 rounded hover:bg-muted ${
+            direction === "asc"
+              ? "bg-muted text-primary"
+              : "text-muted-foreground"
+          } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           {icons.asc}
         </button>
         <button
           onClick={() => handleDirectionSelection(field.id, "desc")}
           disabled={!isSelected}
-          className={`p-1 rounded hover:bg-muted ${direction === "desc" ? "bg-muted text-primary" : "text-muted-foreground"
-            } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={`p-1 rounded hover:bg-muted ${
+            direction === "desc"
+              ? "bg-muted text-primary"
+              : "text-muted-foreground"
+          } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           {icons.desc}
         </button>
@@ -338,9 +435,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   // Get active sort configuration
   const getActiveSortConfig = () => {
     return sortFields
-      .filter(f => f.isSelected && f.direction)
+      .filter((f) => f.isSelected && f.direction)
       .sort((a, b) => a.order - b.order)
-      .map(f => ({
+      .map((f) => ({
         fieldId: f.id,
         fieldName: f.fieldName,
         fieldType: f.fieldType,
@@ -353,38 +450,52 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     if (!name) return "?";
     const parts = name.trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return "?";
-    return parts.slice(0, 2).map(p => p[0]).join("").toUpperCase();
+    return parts
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase();
   };
 
   const getMemberNames = (userIds: string | string[]) => {
     const ids = Array.isArray(userIds) ? userIds : [userIds];
-    if (ids.length === 0) return '';
-    const firstUser = workspaceMembers.find(m => m.userId === ids[0]);
-    return firstUser?.name || '';
+    if (ids.length === 0) return "";
+    const firstUser = workspaceMembers.find((m) => m.userId === ids[0]);
+    return firstUser?.name || "";
   };
 
   const getFieldValueForFilter = (project: any, fieldId: string): any => {
-    if (fieldId === 'id') return project.slug || '';
-    if (fieldId === 'name') return project.name || '';
-    if (fieldId === 'phase') return project.phase || '';
-    if (fieldId === 'update') return project.statusHistory?.[0]?.status || project.currentProjectUpdate || '';
-    if (fieldId === 'leader') {
-      return project.leaders?.length ? project.leaders : (project.projectLeader ? [project.projectLeader] : []);
+    if (fieldId === "id") return project.slug || "";
+    if (fieldId === "name") return project.name || "";
+    if (fieldId === "phase") return project.phase || "";
+    if (fieldId === "update")
+      return (
+        project.statusHistory?.[0]?.status || project.currentProjectUpdate || ""
+      );
+    if (fieldId === "leader") {
+      return project.leaders?.length
+        ? project.leaders
+        : project.projectLeader
+          ? [project.projectLeader]
+          : [];
     }
-    if (fieldId === 'members') {
+    if (fieldId === "members") {
       return (project.members || []).map((m: any) => m.userId);
     }
-    if (fieldId === 'viewers') {
+    if (fieldId === "viewers") {
       return project.viewers || [];
     }
-    if (fieldId === 'priority') return project.priority || '';
-    if (fieldId === 'startDate') return project.startDate || '';
-    if (fieldId === 'endDate') return project.endDate || '';
-    if (fieldId === 'progress') return project.progress || 0;
+    if (fieldId === "priority") return project.priority || "";
+    if (fieldId === "startDate") return project.startDate || "";
+    if (fieldId === "endDate") return project.endDate || "";
+    if (fieldId === "progress") return project.progress || 0;
     return null;
   };
 
-  const matchesFilterCriteria = (project: any, criteria: FilterCriteria): boolean => {
+  const matchesFilterCriteria = (
+    project: any,
+    criteria: FilterCriteria,
+  ): boolean => {
     const fieldValue = getFieldValueForFilter(project, criteria.field);
     const filterValue = criteria.value;
 
@@ -395,22 +506,50 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         return fieldValue !== filterValue;
       case "contains":
         if (Array.isArray(fieldValue)) {
-          return fieldValue.some(val => String(val).toLowerCase() === String(filterValue || '').toLowerCase());
+          return fieldValue.some(
+            (val) =>
+              String(val).toLowerCase() ===
+              String(filterValue || "").toLowerCase(),
+          );
         }
-        if (criteria.field === 'leader' || criteria.field === 'members' || criteria.field === 'viewers') {
+        if (
+          criteria.field === "leader" ||
+          criteria.field === "members" ||
+          criteria.field === "viewers"
+        ) {
           const ids = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
-          return ids.some(val => String(val).toLowerCase() === String(filterValue || '').toLowerCase());
+          return ids.some(
+            (val) =>
+              String(val).toLowerCase() ===
+              String(filterValue || "").toLowerCase(),
+          );
         }
-        return String(fieldValue || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+        return String(fieldValue || "")
+          .toLowerCase()
+          .includes(String(filterValue || "").toLowerCase());
       case "does-not-contain":
         if (Array.isArray(fieldValue)) {
-          return !fieldValue.some(val => String(val).toLowerCase() === String(filterValue || '').toLowerCase());
+          return !fieldValue.some(
+            (val) =>
+              String(val).toLowerCase() ===
+              String(filterValue || "").toLowerCase(),
+          );
         }
-        return !String(fieldValue || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+        return !String(fieldValue || "")
+          .toLowerCase()
+          .includes(String(filterValue || "").toLowerCase());
       case "is-empty":
-        return !fieldValue || fieldValue === '' || (Array.isArray(fieldValue) && fieldValue.length === 0);
+        return (
+          !fieldValue ||
+          fieldValue === "" ||
+          (Array.isArray(fieldValue) && fieldValue.length === 0)
+        );
       case "is-not-empty":
-        return !!fieldValue && fieldValue !== '' && (!Array.isArray(fieldValue) || fieldValue.length > 0);
+        return (
+          !!fieldValue &&
+          fieldValue !== "" &&
+          (!Array.isArray(fieldValue) || fieldValue.length > 0)
+        );
 
       // Date conditions
       case "date-equals": {
@@ -439,8 +578,10 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         if (!fieldValue) return false;
         const today = new Date();
         const taskDate = new Date(fieldValue);
-        return taskDate.getMonth() === today.getMonth() &&
-          taskDate.getFullYear() === today.getFullYear();
+        return (
+          taskDate.getMonth() === today.getMonth() &&
+          taskDate.getFullYear() === today.getFullYear()
+        );
       }
       case "date-is-before":
         return fieldValue && new Date(fieldValue) < new Date(filterValue);
@@ -448,7 +589,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         return fieldValue && new Date(fieldValue) > new Date(filterValue);
       case "date-is-between": {
         if (!fieldValue || !filterValue) return false;
-        const [start, end] = String(filterValue).split(' - ');
+        const [start, end] = String(filterValue).split(" - ");
         const taskDate = new Date(fieldValue);
         return taskDate >= new Date(start) && taskDate <= new Date(end);
       }
@@ -478,15 +619,15 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         const valB = getFieldValueForFilter(b, sort.fieldId);
 
         if (valA === valB) continue;
-        if (valA === null || valA === undefined || valA === '') return 1;
-        if (valB === null || valB === undefined || valB === '') return -1;
+        if (valA === null || valA === undefined || valA === "") return 1;
+        if (valB === null || valB === undefined || valB === "") return -1;
 
         let comparison = 0;
-        if (sort.fieldType === 'number') {
+        if (sort.fieldType === "number") {
           comparison = Number(valA) - Number(valB);
-        } else if (sort.fieldType === 'date') {
+        } else if (sort.fieldType === "date") {
           comparison = new Date(valA).getTime() - new Date(valB).getTime();
-        } else if (sort.fieldType === 'user' || sort.fieldType === 'users') {
+        } else if (sort.fieldType === "user" || sort.fieldType === "users") {
           const nameA = getMemberNames(valA);
           const nameB = getMemberNames(valB);
           comparison = nameA.localeCompare(nameB);
@@ -495,7 +636,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
         }
 
         if (comparison !== 0) {
-          return sort.direction === 'asc' ? comparison : -comparison;
+          return sort.direction === "asc" ? comparison : -comparison;
         }
       }
       return 0;
@@ -508,36 +649,51 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     // Apply search query
     if (searchQuery) {
       result = result.filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     // Apply closed projects display option
     if (!displayOptions.closedProjects) {
       result = result.filter((p) => {
-        const displayUpdate = (p.statusHistory?.[0]?.status || p.currentProjectUpdate || "").toLowerCase();
-        return displayUpdate !== 'completed';
+        const displayUpdate = (
+          p.statusHistory?.[0]?.status ||
+          p.currentProjectUpdate ||
+          ""
+        ).toLowerCase();
+        return displayUpdate !== "completed";
       });
     }
 
     // Apply active filters
     if (filterConfig.length > 0) {
       result = result.filter((p) =>
-        filterConfig.every((criteria) => matchesFilterCriteria(p, criteria))
+        filterConfig.every((criteria) => matchesFilterCriteria(p, criteria)),
       );
     }
 
     // Apply sorting
     return sortProjects(result);
-  }, [projects, portfolioProjectIds, searchQuery, filterConfig, displayOptions.closedProjects, sortFields]);
-
+  }, [
+    projects,
+    portfolioProjectIds,
+    searchQuery,
+    filterConfig,
+    displayOptions.closedProjects,
+    sortFields,
+  ]);
 
   const columns: KanbanColumn[] = useMemo(() => {
     let rawCols: KanbanColumn[] = [];
     if (groupBy === "status") {
       rawCols = [
         { id: "active", name: "Active", value: "active", color: "#10B981" },
-        { id: "archived", name: "Archived", value: "archived", color: "#6B7280" },
+        {
+          id: "archived",
+          name: "Archived",
+          value: "archived",
+          color: "#6B7280",
+        },
       ];
     } else {
       const phases = projectPhases.flatMap((p) => [p, ...(p.children || [])]);
@@ -550,16 +706,21 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     }
 
     // Add "No value" column if there are unassigned projects
-    const hasUnassigned = filteredProjects.some(p => {
+    const hasUnassigned = filteredProjects.some((p) => {
       if (groupBy === "status") return !p.status;
       return !p.phase;
     });
 
     if (hasUnassigned) {
-      rawCols.push({ id: "unassigned", name: "No value", value: "unassigned", color: "#9CA3AF" });
+      rawCols.push({
+        id: "unassigned",
+        name: "No value",
+        value: "unassigned",
+        color: "#9CA3AF",
+      });
     }
 
-    return rawCols.filter(c => !settings.hiddenColumns.includes(c.id));
+    return rawCols.filter((c) => !settings.hiddenColumns.includes(c.id));
   }, [groupBy, projectPhases, settings.hiddenColumns, filteredProjects]);
 
   const kanbanData = useMemo(() => {
@@ -583,8 +744,15 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     const { active, over } = event;
     if (!over) return;
     const projectId = active.id as string;
-    const newColumnId = over.id as string;
-    const project = projects.find(p => p.id === projectId);
+
+    // Resolve column ID from target (which could be another project card or column container)
+    const overItem = kanbanData.find((item) => item.id === over.id);
+    const newColumnId =
+      overItem?.column ||
+      columns.find((col) => col.id === over.id)?.id ||
+      columns[0]?.id;
+
+    const project = projects.find((p) => p.id === projectId);
     if (!project) return;
     if (groupBy === "status") {
       await updateProjectStatus(projectId, newColumnId as any);
@@ -598,7 +766,7 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
   };
 
   const handleStartEditColumnName = (columnId: string) => {
-    const col = columns.find(c => c.id === columnId);
+    const col = columns.find((c) => c.id === columnId);
     if (col) {
       setEditingColumnName(columnId);
       setEditedColumnName(col.name);
@@ -612,7 +780,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
 
   const handleSaveNewGroup = async () => {
     if (newGroupName.trim() && currentWorkspace?.id) {
-      const randomColor = colorOptions[Math.floor(Math.random() * colorOptions.length)].value;
+      const randomColor =
+        colorOptions[Math.floor(Math.random() * colorOptions.length)].value;
       await addProjectPhase(currentWorkspace.id, {
         label: newGroupName.trim(),
         color: randomColor,
@@ -627,13 +796,23 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
     setNewGroupName("");
   };
 
-  const AddGroupCard = ({ onSave, onCancel }: { onSave: () => void; onCancel: () => void; }) => {
+  const AddGroupCard = ({
+    onSave,
+    onCancel,
+  }: {
+    onSave: () => void;
+    onCancel: () => void;
+  }) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    useEffect(() => { inputRef.current?.focus(); }, []);
+    useEffect(() => {
+      inputRef.current?.focus();
+    }, []);
     return (
       <div className="w-80 bg-card rounded-lg border-2 border-dashed border-input p-4">
         <div className="mb-3">
-          <label className="text-xs font-medium text-foreground mb-2 block">Group Name</label>
+          <label className="text-xs font-medium text-foreground mb-2 block">
+            Group Name
+          </label>
           <Input
             ref={inputRef}
             type="text"
@@ -641,15 +820,26 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') onSave();
-              else if (e.key === 'Escape') onCancel();
+              if (e.key === "Enter") onSave();
+              else if (e.key === "Escape") onCancel();
             }}
             className="w-full"
           />
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={onSave} className="flex-1"><Check className="w-4 h-4 mr-2" />Create</Button>
-          <Button size="sm" variant="outline" onClick={onCancel} className="flex-1"><X className="w-4 h-4 mr-2" />Cancel</Button>
+          <Button size="sm" onClick={onSave} className="flex-1">
+            <Check className="w-4 h-4 mr-2" />
+            Create
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
         </div>
       </div>
     );
@@ -673,14 +863,31 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="secondary" className="gap-2 rounded cursor-pointer text-xs">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="gap-2 rounded cursor-pointer text-xs"
+                >
                   <Layers className="h-4 w-4" />
                   Group by: <span className="capitalize">{groupBy}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-40 border-b-5 border-b-primary p-1">
-                <DropdownMenuItem onClick={() => setGroupBy("phase")} className="cursor-pointer text-sm">Phase</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setGroupBy("status")} className="cursor-pointer text-sm">Status</DropdownMenuItem>
+              <DropdownMenuContent
+                align="start"
+                className="w-40 border-b-5 border-b-primary p-1"
+              >
+                <DropdownMenuItem
+                  onClick={() => setGroupBy("phase")}
+                  className="cursor-pointer text-sm"
+                >
+                  Phase
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setGroupBy("status")}
+                  className="cursor-pointer text-sm"
+                >
+                  Status
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -696,30 +903,46 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
             {showSortOptions && (
               <>
                 {/* Sort Dropdown */}
-                <DropdownMenu open={activeDropdown === 'sort'} onOpenChange={(open) => setActiveDropdown(open ? 'sort' : null)}>
+                <DropdownMenu
+                  open={activeDropdown === "sort"}
+                  onOpenChange={(open) =>
+                    setActiveDropdown(open ? "sort" : null)
+                  }
+                >
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-2 rounded cursor-pointer text-xs"
+                    >
                       <ArrowUpDown className="h-4 w-4" />
                       Sort
                       {hasSelectedSortFields && (
                         <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
-                          {sortFields.filter(f => f.isSelected).length}
+                          {sortFields.filter((f) => f.isSelected).length}
                         </span>
                       )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className={`p-0 transition-all duration-200 border-b-[5px] border-b-primary ${hasSelectedSortFields ? "w-155" : "w-105"
-                      }`}
+                    className={`p-0 transition-all duration-200 border-b-[5px] border-b-primary ${
+                      hasSelectedSortFields ? "w-155" : "w-105"
+                    }`}
                   >
                     <div className="flex items-center justify-between px-4 py-3">
-                      <h3 className="text-sm font-semibold text-primary">Sort fields by</h3>
+                      <h3 className="text-sm font-semibold text-primary">
+                        Sort fields by
+                      </h3>
                     </div>
-                    <div className={`grid ${hasSelectedSortFields ? "grid-cols-2" : "grid-cols-1"} divide-x`}>
+                    <div
+                      className={`grid ${hasSelectedSortFields ? "grid-cols-2" : "grid-cols-1"} divide-x`}
+                    >
                       {/* Column 1: Available fields */}
                       <div className="px-2 py-1">
-                        <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-2">Project fields</h4>
+                        <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-2">
+                          Project fields
+                        </h4>
                         <div className="space-y-1 max-h-60 overflow-y-auto">
                           {sortFields.map((field) => (
                             <div
@@ -728,8 +951,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                               className="grid grid-cols-[20px_1fr] items-center px-2 py-1 hover:bg-muted rounded cursor-pointer"
                             >
                               <div
-                                className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${field.isSelected ? "bg-primary border-primary" : "border-input"
-                                  }`}
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer ${
+                                  field.isSelected
+                                    ? "bg-primary border-primary"
+                                    : "border-input"
+                                }`}
                               >
                                 {field.isSelected && (
                                   <svg
@@ -745,7 +971,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                                   </svg>
                                 )}
                               </div>
-                              <span className="text-xs font-medium text-primary">{field.fieldName}</span>
+                              <span className="text-xs font-medium text-primary">
+                                {field.fieldName}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -754,7 +982,9 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                       {/* Column 2: My Sort */}
                       {hasSelectedSortFields && (
                         <div className="px-2 py-1">
-                          <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-2">My Sort</h4>
+                          <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-2">
+                            My Sort
+                          </h4>
                           <div className="space-y-1">
                             <div className="flex flex-col gap-1 px-0">
                               {sortFields
@@ -788,9 +1018,18 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                 </DropdownMenu>
 
                 {/* Filter Dropdown */}
-                <DropdownMenu open={activeDropdown === 'filter'} onOpenChange={(open) => setActiveDropdown(open ? 'filter' : null)}>
+                <DropdownMenu
+                  open={activeDropdown === "filter"}
+                  onOpenChange={(open) =>
+                    setActiveDropdown(open ? "filter" : null)
+                  }
+                >
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-2 rounded cursor-pointer text-xs"
+                    >
                       <Funnel className="h-4 w-4" />
                       Filter
                       {filterConfig.length > 0 && (
@@ -800,7 +1039,10 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="px-2 py-2 border-b-[5px] border-b-primary w-50">
+                  <DropdownMenuContent
+                    align="center"
+                    className="px-2 py-2 border-b-[5px] border-b-primary w-50"
+                  >
                     <div className="space-y-1 mb-1">
                       {/* Leader Submenu */}
                       <DropdownMenuSub>
@@ -808,21 +1050,42 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                           <span className="text-primary text-xs">Leader</span>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-64 max-h-64 overflow-y-auto p-1">
-                          {portfolioLeaders.map(member => (
+                          {portfolioLeaders.map((member) => (
                             <DropdownMenuItem
                               key={member.userId}
                               onClick={() => {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'leader');
-                                  if (existing) return prev.map(f => f.field === 'leader' ? { ...f, value: member.userId } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'leader', condition: 'contains', value: member.userId }];
+                                setFilterConfig((prev) => {
+                                  const existing = prev.find(
+                                    (f) => f.field === "leader",
+                                  );
+                                  if (existing)
+                                    return prev.map((f) =>
+                                      f.field === "leader"
+                                        ? { ...f, value: member.userId }
+                                        : f,
+                                    );
+                                  return [
+                                    ...prev,
+                                    {
+                                      id: Math.random()
+                                        .toString(36)
+                                        .substring(2, 9),
+                                      field: "leader",
+                                      condition: "contains",
+                                      value: member.userId,
+                                    },
+                                  ];
                                 });
                               }}
                               className="flex items-center gap-2 p-2 cursor-pointer text-xs"
                             >
                               {member.profilePicture ? (
                                 <img
-                                  src={getProfilePictureUrl(member.profilePicture) || '/images/default-avatar.png'}
+                                  src={
+                                    getProfilePictureUrl(
+                                      member.profilePicture,
+                                    ) || "/images/default-avatar.png"
+                                  }
                                   alt={member.name}
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
@@ -843,21 +1106,42 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                           <span className="text-primary text-xs">Member</span>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-64 max-h-64 overflow-y-auto p-1">
-                          {portfolioMembers.map(member => (
+                          {portfolioMembers.map((member) => (
                             <DropdownMenuItem
                               key={member.userId}
                               onClick={() => {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'members');
-                                  if (existing) return prev.map(f => f.field === 'members' ? { ...f, value: member.userId } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'members', condition: 'contains', value: member.userId }];
+                                setFilterConfig((prev) => {
+                                  const existing = prev.find(
+                                    (f) => f.field === "members",
+                                  );
+                                  if (existing)
+                                    return prev.map((f) =>
+                                      f.field === "members"
+                                        ? { ...f, value: member.userId }
+                                        : f,
+                                    );
+                                  return [
+                                    ...prev,
+                                    {
+                                      id: Math.random()
+                                        .toString(36)
+                                        .substring(2, 9),
+                                      field: "members",
+                                      condition: "contains",
+                                      value: member.userId,
+                                    },
+                                  ];
                                 });
                               }}
                               className="flex items-center gap-2 p-2 cursor-pointer text-xs"
                             >
                               {member.profilePicture ? (
                                 <img
-                                  src={getProfilePictureUrl(member.profilePicture) || '/images/default-avatar.png'}
+                                  src={
+                                    getProfilePictureUrl(
+                                      member.profilePicture,
+                                    ) || "/images/default-avatar.png"
+                                  }
                                   alt={member.name}
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
@@ -875,28 +1159,58 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                       {/* Phase Submenu */}
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger
-                          disabled={groupBy === 'phase'}
-                          className={cn("flex items-center justify-between text-xs cursor-pointer", groupBy === 'phase' && "opacity-50 cursor-not-allowed")}
+                          disabled={groupBy === "phase"}
+                          className={cn(
+                            "flex items-center justify-between text-xs cursor-pointer",
+                            groupBy === "phase" &&
+                              "opacity-50 cursor-not-allowed",
+                          )}
                         >
                           <span className="text-primary text-xs">Phase</span>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-48 p-2">
-                          {projectPhases.flatMap(p => [p, ...(p.children || [])]).map(phase => (
-                            <DropdownMenuItem
-                              key={phase.value}
-                              onClick={() => {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'phase');
-                                  if (existing) return prev.map(f => f.field === 'phase' ? { ...f, value: phase.value } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'phase', condition: 'is', value: phase.value }];
-                                });
-                              }}
-                              className="flex items-center gap-2 cursor-pointer text-xs"
-                            >
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: phase.color || '#3B82F6' }} />
-                              <span className="text-xs font-medium">{phase.label}</span>
-                            </DropdownMenuItem>
-                          ))}
+                          {projectPhases
+                            .flatMap((p) => [p, ...(p.children || [])])
+                            .map((phase) => (
+                              <DropdownMenuItem
+                                key={phase.value}
+                                onClick={() => {
+                                  setFilterConfig((prev) => {
+                                    const existing = prev.find(
+                                      (f) => f.field === "phase",
+                                    );
+                                    if (existing)
+                                      return prev.map((f) =>
+                                        f.field === "phase"
+                                          ? { ...f, value: phase.value }
+                                          : f,
+                                      );
+                                    return [
+                                      ...prev,
+                                      {
+                                        id: Math.random()
+                                          .toString(36)
+                                          .substring(2, 9),
+                                        field: "phase",
+                                        condition: "is",
+                                        value: phase.value,
+                                      },
+                                    ];
+                                  });
+                                }}
+                                className="flex items-center gap-2 cursor-pointer text-xs"
+                              >
+                                <div
+                                  className="w-2.5 h-2.5 rounded-full"
+                                  style={{
+                                    backgroundColor: phase.color || "#3B82F6",
+                                  }}
+                                />
+                                <span className="text-xs font-medium">
+                                  {phase.label}
+                                </span>
+                              </DropdownMenuItem>
+                            ))}
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
 
@@ -907,24 +1221,62 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-48 p-2">
                           {[
-                            { value: 'active', label: 'Active', color: '#10B981' },
-                            { value: 'planning', label: 'Planning', color: '#3B82F6' },
-                            { value: 'on-hold', label: 'On Hold', color: '#F59E0B' },
-                            { value: 'completed', label: 'Completed', color: '#6B7280' }
-                          ].map(cfg => (
+                            {
+                              value: "active",
+                              label: "Active",
+                              color: "#10B981",
+                            },
+                            {
+                              value: "planning",
+                              label: "Planning",
+                              color: "#3B82F6",
+                            },
+                            {
+                              value: "on-hold",
+                              label: "On Hold",
+                              color: "#F59E0B",
+                            },
+                            {
+                              value: "completed",
+                              label: "Completed",
+                              color: "#6B7280",
+                            },
+                          ].map((cfg) => (
                             <DropdownMenuItem
                               key={cfg.value}
                               onClick={() => {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'update');
-                                  if (existing) return prev.map(f => f.field === 'update' ? { ...f, value: cfg.value } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'update', condition: 'is', value: cfg.value }];
+                                setFilterConfig((prev) => {
+                                  const existing = prev.find(
+                                    (f) => f.field === "update",
+                                  );
+                                  if (existing)
+                                    return prev.map((f) =>
+                                      f.field === "update"
+                                        ? { ...f, value: cfg.value }
+                                        : f,
+                                    );
+                                  return [
+                                    ...prev,
+                                    {
+                                      id: Math.random()
+                                        .toString(36)
+                                        .substring(2, 9),
+                                      field: "update",
+                                      condition: "is",
+                                      value: cfg.value,
+                                    },
+                                  ];
                                 });
                               }}
                               className="flex items-center gap-2 cursor-pointer text-xs"
                             >
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                              <span className="text-xs font-medium">{cfg.label}</span>
+                              <div
+                                className="w-2.5 h-2.5 rounded-full"
+                                style={{ backgroundColor: cfg.color }}
+                              />
+                              <span className="text-xs font-medium">
+                                {cfg.label}
+                              </span>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuSubContent>
@@ -937,24 +1289,54 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="w-48 p-2">
                           {[
-                            { value: 'urgent', label: 'Urgent', color: '#EF4444' },
-                            { value: 'high', label: 'High', color: '#F59E0B' },
-                            { value: 'medium', label: 'Medium', color: '#3B82F6' },
-                            { value: 'low', label: 'Low', color: '#9CA3AF' }
-                          ].map(cfg => (
+                            {
+                              value: "urgent",
+                              label: "Urgent",
+                              color: "#EF4444",
+                            },
+                            { value: "high", label: "High", color: "#F59E0B" },
+                            {
+                              value: "medium",
+                              label: "Medium",
+                              color: "#3B82F6",
+                            },
+                            { value: "low", label: "Low", color: "#9CA3AF" },
+                          ].map((cfg) => (
                             <DropdownMenuItem
                               key={cfg.value}
                               onClick={() => {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'priority');
-                                  if (existing) return prev.map(f => f.field === 'priority' ? { ...f, value: cfg.value } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'priority', condition: 'is', value: cfg.value }];
+                                setFilterConfig((prev) => {
+                                  const existing = prev.find(
+                                    (f) => f.field === "priority",
+                                  );
+                                  if (existing)
+                                    return prev.map((f) =>
+                                      f.field === "priority"
+                                        ? { ...f, value: cfg.value }
+                                        : f,
+                                    );
+                                  return [
+                                    ...prev,
+                                    {
+                                      id: Math.random()
+                                        .toString(36)
+                                        .substring(2, 9),
+                                      field: "priority",
+                                      condition: "is",
+                                      value: cfg.value,
+                                    },
+                                  ];
                                 });
                               }}
                               className="flex items-center gap-2 cursor-pointer text-xs"
                             >
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                              <span className="text-xs font-medium">{cfg.label}</span>
+                              <div
+                                className="w-2.5 h-2.5 rounded-full"
+                                style={{ backgroundColor: cfg.color }}
+                              />
+                              <span className="text-xs font-medium">
+                                {cfg.label}
+                              </span>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuSubContent>
@@ -970,10 +1352,27 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                             mode="single"
                             onSelect={(date) => {
                               if (date) {
-                                setFilterConfig(prev => {
-                                  const existing = prev.find(f => f.field === 'endDate');
-                                  if (existing) return prev.map(f => f.field === 'endDate' ? { ...f, value: date.toISOString() } : f);
-                                  return [...prev, { id: Math.random().toString(36).substring(2, 9), field: 'endDate', condition: 'date-equals', value: date.toISOString() }];
+                                setFilterConfig((prev) => {
+                                  const existing = prev.find(
+                                    (f) => f.field === "endDate",
+                                  );
+                                  if (existing)
+                                    return prev.map((f) =>
+                                      f.field === "endDate"
+                                        ? { ...f, value: date.toISOString() }
+                                        : f,
+                                    );
+                                  return [
+                                    ...prev,
+                                    {
+                                      id: Math.random()
+                                        .toString(36)
+                                        .substring(2, 9),
+                                      field: "endDate",
+                                      condition: "date-equals",
+                                      value: date.toISOString(),
+                                    },
+                                  ];
                                 });
                               }
                             }}
@@ -1000,9 +1399,18 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                 </DropdownMenu>
 
                 {/* Display Dropdown */}
-                <DropdownMenu open={activeDropdown === 'display'} onOpenChange={(open) => setActiveDropdown(open ? 'display' : null)}>
+                <DropdownMenu
+                  open={activeDropdown === "display"}
+                  onOpenChange={(open) =>
+                    setActiveDropdown(open ? "display" : null)
+                  }
+                >
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="gap-2 rounded cursor-pointer text-xs">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-2 rounded cursor-pointer text-xs"
+                    >
                       <Monitor className="h-4 w-4" />
                       Display
                     </Button>
@@ -1010,28 +1418,40 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                   <DropdownMenuContent className="w-64 px-4 py-2 border-b-[5px] border-b-primary">
                     {/* Closed Projects */}
                     <div className="flex items-center justify-between py-2">
-                      <Label htmlFor="closed-projects" className="text-xs cursor-pointer text-primary">
+                      <Label
+                        htmlFor="closed-projects"
+                        className="text-xs cursor-pointer text-primary"
+                      >
                         Closed Projects
                       </Label>
                       <Switch
                         id="closed-projects"
                         checked={displayOptions.closedProjects}
                         onCheckedChange={(checked) =>
-                          setDisplayOptions(prev => ({ ...prev, closedProjects: !!checked }))
+                          setDisplayOptions((prev) => ({
+                            ...prev,
+                            closedProjects: !!checked,
+                          }))
                         }
                       />
                     </div>
 
                     {/* Hide Empty Groups */}
                     <div className="flex items-center justify-between py-2">
-                      <Label htmlFor="hide-empty-groups" className="text-xs cursor-pointer text-primary">
+                      <Label
+                        htmlFor="hide-empty-groups"
+                        className="text-xs cursor-pointer text-primary"
+                      >
                         Hide Empty Groups
                       </Label>
                       <Switch
                         id="hide-empty-groups"
                         checked={displayOptions.hideEmptyGroups}
                         onCheckedChange={(checked) =>
-                          setDisplayOptions(prev => ({ ...prev, hideEmptyGroups: !!checked }))
+                          setDisplayOptions((prev) => ({
+                            ...prev,
+                            hideEmptyGroups: !!checked,
+                          }))
                         }
                       />
                     </div>
@@ -1044,7 +1464,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
           <div className="flex items-center gap-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="sm" className="gap-2 rounded text-xs">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="gap-2 rounded text-xs"
+                >
                   <EyeOff className="h-4 w-4" />
                   {settings.hiddenColumns.length > 0 && (
                     <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-[#F68C1F] text-white rounded-full">
@@ -1054,19 +1478,24 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 p-3 border-b-5 border-b-primary">
+              <DropdownMenuContent
+                align="end"
+                className="w-64 p-3 border-b-5 border-b-primary"
+              >
                 <h3 className="text-sm font-semibold mb-3">Unhide Group</h3>
                 {settings.hiddenColumns.length === 0 ? (
-                  <p className="text-xs text-muted-foreground py-2">No hidden groups</p>
+                  <p className="text-xs text-muted-foreground py-2">
+                    No hidden groups
+                  </p>
                 ) : (
                   <div className="space-y-1">
-                    {settings.hiddenColumns.map(colId => (
+                    {settings.hiddenColumns.map((colId) => (
                       <button
                         key={colId}
                         onClick={() => showColumn(portfolioId, colId)}
                         className="w-full flex items-center justify-between p-2 rounded hover:bg-muted text-sm transition-colors capitalize"
                       >
-                        <span>{colId.replace(/-/g, ' ')}</span>
+                        <span>{colId.replace(/-/g, " ")}</span>
                         <Check className="h-4 w-4 text-blue-600" />
                       </button>
                     ))}
@@ -1086,30 +1515,60 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
               onDragEnd={handleDragEnd}
             >
               {(column) => (
-                <KanbanBoard key={column.id} id={column.id} className="w-80 h-full flex flex-col shrink-0 bg-muted border-none shadow-none ring-0 divide-y-0 overflow-visible rounded-t-lg" style={{ borderTop: `4px solid ${column.color}` }}>
+                <KanbanBoard
+                  key={column.id}
+                  id={column.id}
+                  className="w-80 h-full flex flex-col shrink-0 bg-muted border-none shadow-none ring-0 divide-y-0 overflow-visible rounded-t-lg"
+                  style={{ borderTop: `4px solid ${column.color}` }}
+                >
                   <KanbanHeader className="border-none py-2 px-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {editingColumnName === column.id ? (
                           <Input
                             value={editedColumnName}
-                            onChange={(e) => setEditedColumnName(e.target.value)}
+                            onChange={(e) =>
+                              setEditedColumnName(e.target.value)
+                            }
                             onBlur={() => setEditingColumnName(null)}
-                            onKeyDown={(e) => e.key === 'Enter' && setEditingColumnName(null)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && setEditingColumnName(null)
+                            }
                             className="h-8 w-40 text-xs font-semibold uppercase"
                             autoFocus
                           />
                         ) : (
                           <>
-                            <h3 className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline" onClick={() => handleStartEditColumnName(column.id)}>{column.name}</h3>
-                            <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold">
-                              {kanbanData.filter(item => item.column === column.id).length}
+                            <h3
+                              className="font-semibold text-xs text-foreground uppercase tracking-wide truncate cursor-pointer hover:underline"
+                              onClick={() =>
+                                handleStartEditColumnName(column.id)
+                              }
+                            >
+                              {column.name}
+                            </h3>
+                            <Badge
+                              variant="secondary"
+                              className="px-1.5 py-0 h-5 text-xs bg-muted text-muted-foreground border-none font-bold"
+                            >
+                              {
+                                kanbanData.filter(
+                                  (item) => item.column === column.id,
+                                ).length
+                              }
                             </Badge>
                           </>
                         )}
                       </div>
                       <div className="flex items-center gap-0.5">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400" onClick={() => hideColumn(portfolioId, column.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-gray-400"
+                          onClick={() => hideColumn(portfolioId, column.id)}
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
                     </div>
                   </KanbanHeader>
@@ -1120,8 +1579,8 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                     footer={
                       <div className="px-2 pb-2">
                         <div
-                          className="flex items-center justify-between border border-border border-l-4 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all rounded-lg w-full h-10 overflow-hidden bg-card shadow-sm"
-                          style={{ borderLeftColor: column.color }}
+                          className="flex items-center justify-between border border-border border-l-4 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all rounded-md w-full h-8 overflow-hidden bg-card shadow-sm"
+                          style={{ borderLeft: `4px solid ${column.color}80` }}
                         >
                           <button
                             className="flex-1 flex items-center justify-start gap-2 h-full px-3 text-left focus:outline-none hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer"
@@ -1146,7 +1605,11 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                               className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[170px] p-0"
                             >
                               <DropdownMenuItem
-                                onClick={() => router.push(`/portfolio/${portfolioId}/create-project`)}
+                                onClick={() =>
+                                  router.push(
+                                    `/portfolio/${portfolioId}/create-project`,
+                                  )
+                                }
                                 className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground cursor-pointer rounded-none focus:bg-muted"
                               >
                                 <Plus className="h-3.5 w-3.5" />
@@ -1175,7 +1638,10 @@ export function KanbanView({ portfolioId }: KanbanViewProps) {
                         className="px-2 py-0 border-none bg-transparent shadow-none ring-0 h-auto"
                         disabled={true}
                       >
-                        <PortfolioKanbanCard project={item.project as any} groupColor={column.color} />
+                        <PortfolioKanbanCard
+                          project={item.project as any}
+                          groupColor={column.color}
+                        />
                       </KanbanCard>
                     )}
                   </KanbanCards>

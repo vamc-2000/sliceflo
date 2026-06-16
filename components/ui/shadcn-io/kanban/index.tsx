@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react'
+import React from "react";
 import type {
   Announcements,
   DndContextProps,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   closestCenter,
   DndContext,
@@ -19,25 +19,25 @@ import {
   useDroppable,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
-import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   createContext,
   type HTMLAttributes,
   type ReactNode,
   useContext,
   useState,
-} from 'react';
-import { createPortal } from 'react-dom';
-import tunnel from 'tunnel-rat';
-import { Card } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+} from "react";
+import { createPortal } from "react-dom";
+import tunnel from "tunnel-rat";
+import { Card } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 const t = tunnel();
 
-export type { DragEndEvent } from '@dnd-kit/core';
+export type { DragEndEvent } from "@dnd-kit/core";
 
 type KanbanItemProps = {
   id: string;
@@ -72,12 +72,18 @@ export type KanbanBoardProps = {
   style?: React.CSSProperties;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const KanbanBoard = ({ id, children, className, style, ...props }: KanbanBoardProps) => {
+export const KanbanBoard = ({
+  id,
+  children,
+  className,
+  style,
+  ...props
+}: KanbanBoardProps) => {
   return (
     <div
       className={cn(
-        'flex flex-col h-full min-h-40 divide-y overflow-hidden rounded-md border bg-secondary text-xs shadow-sm transition-all',
-        className
+        "flex flex-col h-full min-h-40 divide-y overflow-hidden rounded-md border bg-secondary text-xs shadow-sm transition-all",
+        className,
       )}
       style={style}
       {...props}
@@ -125,10 +131,10 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 
     // Don't trigger if clicking interactive elements
     if (
-      target.closest('button') ||
-      target.closest('input') ||
+      target.closest("button") ||
+      target.closest("input") ||
       target.closest('[role="button"]') ||
-      target.closest('a')
+      target.closest("a")
     ) {
       return;
     }
@@ -138,20 +144,16 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 
   return (
     <>
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="touch-none"
-      >
+      <div ref={setNodeRef} style={style} className="touch-none">
         <Card
           {...(!disabled ? listeners : {})}
           {...(!disabled ? attributes : {})}
           onClick={handleClick}
           className={cn(
-            'cursor-pointer gap-4 rounded-md p-3 shadow-sm transition-all',
-            !disabled && 'cursor-grab',
-            isDragging && 'cursor-grabbing opacity-30',
-            className
+            "cursor-pointer gap-4 rounded-md p-3 shadow-sm transition-all",
+            !disabled && "cursor-grab",
+            isDragging && "cursor-grabbing opacity-30",
+            className,
           )}
         >
           {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
@@ -161,8 +163,8 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
         <t.In>
           <Card
             className={cn(
-              'cursor-grabbing gap-4 rounded-md p-3 shadow-sm ring-2 ring-primary',
-              className
+              "cursor-grabbing gap-4 rounded-md p-3 shadow-sm ring-2 ring-primary",
+              className,
             )}
           >
             {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
@@ -174,7 +176,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 };
 
 export type KanbanCardsProps<T extends KanbanItemProps = KanbanItemProps> =
-  Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'id'> & {
+  Omit<HTMLAttributes<HTMLDivElement>, "children" | "id"> & {
     children: (item: T) => ReactNode;
     id: string;
     footer?: ReactNode;
@@ -196,20 +198,21 @@ export const KanbanCards = <T extends KanbanItemProps = KanbanItemProps>({
   });
 
   const { over } = useDndContext();
-  const isOverThisColumn = isOver || (over && (over.id === id || items.includes(over.id as string)));
+  const isOverThisColumn =
+    isOver || (over && (over.id === id || items.includes(over.id as string)));
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
         "flex-1 min-h-0 flex flex-col transition-all rounded-md",
-        isOverThisColumn && "ring-2 ring-primary bg-secondary/50"
+        isOverThisColumn && "ring-2 ring-primary bg-secondary/50",
       )}
     >
       <ScrollArea className="flex-grow overflow-hidden">
         <SortableContext items={items}>
           <div
-            className={cn('flex flex-col gap-2 p-2', className)}
+            className={cn("flex flex-col gap-2 p-2", className)}
             {...(props as any)}
           >
             {filteredData.map(children)}
@@ -225,13 +228,16 @@ export const KanbanCards = <T extends KanbanItemProps = KanbanItemProps>({
 export type KanbanHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export const KanbanHeader = ({ className, ...props }: KanbanHeaderProps) => (
-  <div className={cn('m-0 p-2 font-semibold text-sm', className)} {...(props as any)} />
+  <div
+    className={cn("m-0 p-2 font-semibold text-sm", className)}
+    {...(props as any)}
+  />
 );
 
 export type KanbanProviderProps<
   T extends KanbanItemProps = KanbanItemProps,
   C extends KanbanColumnProps = KanbanColumnProps,
-> = Omit<DndContextProps, 'children'> & {
+> = Omit<DndContextProps, "children"> & {
   children: (column: C) => ReactNode;
   className?: string;
   columns: C[];
@@ -270,7 +276,7 @@ export const KanbanProvider = <
         tolerance: 5,
       },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -291,14 +297,14 @@ export const KanbanProvider = <
     const activeItem = data.find((item) => item.id === active.id);
     const overItem = data.find((item) => item.id === over.id);
 
-    if (!(activeItem)) {
+    if (!activeItem) {
       return;
     }
 
     const activeColumn = activeItem.column;
     const overColumn =
       overItem?.column ||
-      columns.find(col => col.id === over.id)?.id ||
+      columns.find((col) => col.id === over.id)?.id ||
       columns[0]?.id;
 
     if (activeColumn !== overColumn) {
@@ -309,10 +315,14 @@ export const KanbanProvider = <
       newData[activeIndex].column = overColumn;
 
       if (overIndex === -1) {
-        const columnTasks = newData.filter(item => item.column === overColumn && item.id !== active.id);
+        const columnTasks = newData.filter(
+          (item) => item.column === overColumn && item.id !== active.id,
+        );
         if (columnTasks.length > 0) {
           const lastColumnTask = columnTasks[columnTasks.length - 1];
-          overIndex = newData.findIndex(item => item.id === lastColumnTask.id);
+          overIndex = newData.findIndex(
+            (item) => item.id === lastColumnTask.id,
+          );
         } else {
           overIndex = newData.length;
         }
@@ -344,12 +354,13 @@ export const KanbanProvider = <
 
     if (newIndex === -1) {
       const overColumn =
-        columns.find(col => col.id === over.id)?.id ||
-        columns[0]?.id;
-      const columnTasks = newData.filter(item => item.column === overColumn && item.id !== active.id);
+        columns.find((col) => col.id === over.id)?.id || columns[0]?.id;
+      const columnTasks = newData.filter(
+        (item) => item.column === overColumn && item.id !== active.id,
+      );
       if (columnTasks.length > 0) {
         const lastColumnTask = columnTasks[columnTasks.length - 1];
-        newIndex = newData.findIndex(item => item.id === lastColumnTask.id);
+        newIndex = newData.findIndex((item) => item.id === lastColumnTask.id);
       } else {
         newIndex = newData.length;
       }
@@ -396,20 +407,15 @@ export const KanbanProvider = <
         sensors={sensors}
         {...(props as any)}
       >
-        <div
-          className={cn(
-            'flex flex-row items-stretch gap-4',
-            className
-          )}
-        >
+        <div className={cn("flex flex-row items-stretch gap-4", className)}>
           {columns.map((column) => children(column))}
         </div>
-        {typeof window !== 'undefined' &&
+        {typeof window !== "undefined" &&
           createPortal(
             <DragOverlay>
               <t.Out />
             </DragOverlay>,
-            document.body
+            document.body,
           )}
       </DndContext>
     </KanbanContext.Provider>

@@ -41,10 +41,10 @@ export function SyncObserver() {
     // 3. React to Data Changes
     // If teams or projects are updated elsewhere, ensure sidebar reflects them.
     useEffect(() => {
-        if (isAuthenticated && (teams.length > 0 || projects.length > 0)) {
+        if (isAuthenticated) {
             initializeDynamicData();
         }
-    }, [teams.length, projects.length, isAuthenticated, initializeDynamicData]);
+    }, [teams, projects, isAuthenticated, initializeDynamicData]);
 
       useEffect(() => {
     if (isAuthHydrated && isAuthenticated && currentWorkspace?.id) {

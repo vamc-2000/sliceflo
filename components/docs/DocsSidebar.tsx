@@ -1208,18 +1208,50 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                     </div>
                                   );
                                 })}
-                                {linkedPortfoliosList.map(p => (
-                                  <div key={p?.id} className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted group">
-                                    <span className="text-base">📂</span>
-                                    <span className="text-sm text-foreground flex-1 truncate">{p?.name}</span>
-                                    <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(item.id, p?.id!); }}>
-                                      <X className="w-3 h-3 text-muted-foreground" />
-                                    </Button>
-                                  </div>
-                                ))}
+                                {linkedPortfoliosList.map((p: any) => {
+                                  const avatar = getProjectAvatar(p);
+                                  return (
+                                    <div key={p?.id} className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted group">
+                                      {/* Portfolio Icon */}
+                                      <div
+                                        className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                        style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p?.color ? `${p.color}20` : "#3B82F620" }}
+                                      >
+                                        {avatar?.type === "image" ? (
+                                          <img src={avatar.src} alt={p?.name} className="w-full h-full object-cover rounded" />
+                                        ) : avatar?.type === "icon" ? (
+                                          (() => {
+                                            const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                            if (iconObj) {
+                                              const IconComponent = iconObj.icon;
+                                              return (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                  <IconComponent size={10} color={avatar.color} />
+                                                </div>
+                                              );
+                                            }
+                                            return (
+                                              <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                                {p?.name?.charAt(0)?.toUpperCase()}
+                                              </span>
+                                            );
+                                          })()
+                                        ) : (
+                                          <span className="text-[9px] font-bold" style={{ color: p?.color ?? "#3B82F6" }}>
+                                            {p?.name?.charAt(0)?.toUpperCase()}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <span className="text-sm text-foreground flex-1 truncate">{p?.name}</span>
+                                      <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(item.id, p?.id!); }}>
+                                        <X className="w-3 h-3 text-muted-foreground" />
+                                      </Button>
+                                    </div>
+                                  );
+                                })}
                                 {linkedDocumentsList.map((d: any) => (
                                   <div key={d.id} className="flex items-center gap-2 py-1.5 px-2 bg-card border border-border rounded hover:bg-muted group">
-                                    <span className="text-base">📄</span>
+                                    <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                                     <span className="text-sm text-foreground flex-1 truncate">{d.title}</span>
                                     <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleRemoveDocument(item.id, d.id); }}>
                                       <X className="w-3 h-3 text-muted-foreground" />
@@ -1375,7 +1407,10 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                     const isSelected = currentDoc?.pageLinkedDocuments?.includes(d.id);
                                     return (
                                       <div key={d.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemoveDocument(item.id, d.id) : handleAddDocument(item.id, d.id)}>
-                                        <span className="text-xs text-foreground truncate">{d.title}</span>
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
+                                          <span className="text-xs text-foreground truncate">{d.title}</span>
+                                        </div>
                                         <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-document-${d.id}`} />
                                       </div>
                                     );

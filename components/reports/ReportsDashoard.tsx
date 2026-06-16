@@ -75,29 +75,29 @@ const ReportsDashboard = () => {
                         <Button
                             // onClick={handleStartFromScratch}
                             onClick={handleCreateClick}
-                            className="bg-[#001F3F]"
+                            className="bg-[#001F3F] dark:bg-primary dark:text-primary-foreground"
                         >
                             Create Report
                         </Button>
                     </div>
-                    <div className="rounded-md border bg-white">
+                    <div className="rounded-md border border-border bg-card">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-100">Report Name</TableHead>
-                                    <TableHead>Date Created</TableHead>
-                                    <TableHead>Date Updated</TableHead>
+                                <TableRow className="border-border">
+                                    <TableHead className="w-100 text-muted-foreground">Report Name</TableHead>
+                                    <TableHead className="text-muted-foreground">Date Created</TableHead>
+                                    <TableHead className="text-muted-foreground">Date Updated</TableHead>
                                 </TableRow>
                             </TableHeader>
 
                             <TableBody>
                                 {reports.map((row: any) => (
-                                    <TableRow key={row.id}>
-                                        <TableCell>
+                                    <TableRow key={row.id} className="border-border">
+                                        <TableCell className="text-foreground">
                                             <div className="flex items-center justify-between gap-4 text-sm font-semibold">
                                                 {reportUnderEdit?.id === row.id ? (
                                                     <input
-                                                        className="bg-transparent outline-none border-none w-full max-w-80"
+                                                        className="bg-transparent outline-none border-none w-full max-w-80 text-foreground"
                                                         value={reportUnderEdit.name}
                                                         onChange={(e) =>
                                                             setReportUnderEdit({
@@ -120,29 +120,29 @@ const ReportsDashboard = () => {
                                                         className={
                                                             row.isFavorite
                                                                 ? "text-yellow-400"
-                                                                : "text-gray-400"
+                                                                : "text-muted-foreground hover:text-foreground"
                                                         }
                                                     >
                                                         <Star
-                                                            className={`size-4 ${row.isFavorite ? "fill-yellow-400" : ""
+                                                            className={`size-4 ${row.isFavorite ? "fill-yellow-400 animate-pulse" : ""
                                                                 }`}
                                                         />
                                                     </IconContainer>
 
                                                     <Link href={`/reports/${row.id}`} target="_blank">
-                                                        <Maximize2 className="size-4 text-gray-400 hover:text-gray-700" />
+                                                        <Maximize2 className="size-4 text-muted-foreground hover:text-foreground" />
                                                     </Link>
 
                                                     <IconContainer
                                                         onClick={() => setReportUnderEdit(row)}
-                                                        className="text-gray-400 hover:text-gray-700"
+                                                        className="text-muted-foreground hover:text-foreground"
                                                     >
                                                         <Edit3Icon className="size-4" />
                                                     </IconContainer>
 
                                                     <IconContainer
                                                         onClick={() => deleteReport(row.id)}
-                                                        className="text-gray-400 hover:text-red-500"
+                                                        className="text-muted-foreground hover:text-red-500"
                                                     >
                                                         <Trash className="size-4" />
                                                     </IconContainer>
@@ -150,11 +150,11 @@ const ReportsDashboard = () => {
                                             </div>
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="text-muted-foreground">
                                             {formatDateWithSuffix(row.createdAt)}
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="text-muted-foreground">
                                             {formatDateWithSuffix(row.updatedAt)}
                                         </TableCell>
                                     </TableRow>
@@ -163,7 +163,7 @@ const ReportsDashboard = () => {
                         </Table>
 
                         {/* Simple Pagination */}
-                        <div className="flex justify-between items-center p-4">
+                        <div className="flex justify-between items-center p-4 border-t border-border">
                             <span className="text-sm text-muted-foreground">
                                 Page {reportsMeta?.currentPage} of{" "}
                                 {reportsMeta?.pageCount}
@@ -173,6 +173,7 @@ const ReportsDashboard = () => {
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="border-border text-foreground hover:bg-muted"
                                     disabled={reportsMeta?.currentPage === 1}
                                     onClick={() =>
                                         getReports(safeMeta.currentPage - 1)
@@ -184,6 +185,7 @@ const ReportsDashboard = () => {
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="border-border text-foreground hover:bg-muted"
                                     disabled={
                                         reportsMeta?.currentPage ===
                                         reportsMeta?.pageCount

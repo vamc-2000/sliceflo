@@ -121,7 +121,7 @@ export default function ReportDetails() {
     if (!activeReport) return <div className="p-6">Report not found</div>;
 
     return (
-        <div className="px-4 py-2 flex flex-col h-full">
+        <div className="px-4 py-2 flex flex-col h-full bg-background text-foreground">
             <div className="flex items-center justify-between shrink-0">
                 {/* Left Side */}
                 <div className="flex items-center gap-3">
@@ -140,8 +140,8 @@ export default function ReportDetails() {
                                     }
                                 }}
                                 className="
-                                    text-[28px] font-semibold text-[#001F3F]
-                                    border-b border-gray-300
+                                    text-[28px] font-semibold text-[#001F3F] dark:text-foreground
+                                    border-b border-gray-300 dark:border-border
                                     outline-none bg-transparent
                                     px-1 transition-all duration-150
                                 "
@@ -150,9 +150,9 @@ export default function ReportDetails() {
                             {/* Save */}
                             <button
                                 onClick={handleUpdate}
-                                className="p-1 rounded hover:bg-green-100"
+                                className="p-1 rounded hover:bg-green-100 dark:hover:bg-green-950"
                             >
-                                <Check className="w-4 h-4 text-green-600" />
+                                <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                             </button>
 
                             {/* Cancel */}
@@ -161,14 +161,14 @@ export default function ReportDetails() {
                                     setIsEditing(false);
                                     setEditedName(activeReport.name);
                                 }}
-                                className="p-1 rounded hover:bg-red-100"
+                                className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-950"
                             >
-                                <X className="w-4 h-4 text-red-500" />
+                                <X className="w-4 h-4 text-red-500 dark:text-red-400" />
                             </button>
                         </div>
                     ) : (
                         <h1
-                            className="text-[28px] font-semibold text-[#001F3F] cursor-pointer transition-all duration-200"
+                            className="text-[28px] font-semibold text-[#001F3F] dark:text-foreground cursor-pointer transition-all duration-200"
                             onClick={() => {
                                 setEditedName(activeReport.name);
                                 setIsEditing(true);
@@ -179,7 +179,7 @@ export default function ReportDetails() {
                     )}
 
                     <TooltipProvider>
-                        <div className="flex items-center gap-3 text-[#001F3F]">
+                        <div className="flex items-center gap-3 text-[#001F3F] dark:text-foreground">
                             {/* More menu */}
                             <ReportMoreMenu
                                 onRename={() => {
@@ -198,9 +198,9 @@ export default function ReportDetails() {
                     </TooltipProvider>
                 </div>
                 {/* Right Side Icons */}
-                <div className="flex items-center gap-3 text-[#001F3F]">
+                <div className="flex items-center gap-3 text-[#001F3F] dark:text-foreground">
 
-                    <div className="bg-[#F2F2F7] border border-[#AEAEB2] text-[#AEAEB2] text-center px-4 py-1.5 rounded-full">
+                    <div className="bg-[#F2F2F7] dark:bg-muted/30 border border-[#AEAEB2] dark:border-border text-[#AEAEB2] dark:text-muted-foreground text-center px-4 py-1.5 rounded-full text-xs">
                         Refreshed 8 minutes ago
                     </div>
                     {/* Favorite */}
@@ -218,8 +218,8 @@ export default function ReportDetails() {
                                         p-2 rounded-full
                                         transition-all duration-200
                                         ${activeReport.isFavorite
-                                        ? "bg-yellow-100"
-                                        : "bg-[#E3EFFF] hover:bg-[#d5e6ff]"
+                                        ? "bg-yellow-100 dark:bg-yellow-950"
+                                        : "bg-[#E3EFFF] dark:bg-neutral-800 hover:bg-[#d5e6ff] dark:hover:bg-neutral-700"
                                     }
                                 `}
                             >
@@ -228,7 +228,7 @@ export default function ReportDetails() {
                                             w-4 h-4 transition-all duration-200
                                             ${activeReport.isFavorite
                                             ? "text-yellow-500 fill-yellow-500 scale-110"
-                                            : "text-[#001F3F]"
+                                            : "text-[#001F3F] dark:text-foreground"
                                         }
                                     `}
                                     strokeWidth={2.5}
@@ -241,8 +241,8 @@ export default function ReportDetails() {
                         </TooltipContent>
                     </Tooltip>
 
-                    <button className="bg-[#E3EFFF] p-2 rounded-full hover:bg-[#d5e6ff]">
-                        <Share2 className="w-4 h-4 text-[#001F3F]" strokeWidth={2.5} />
+                    <button className="bg-[#E3EFFF] dark:bg-neutral-800 p-2 rounded-full hover:bg-[#d5e6ff] dark:hover:bg-neutral-700">
+                        <Share2 className="w-4 h-4 text-[#001F3F] dark:text-foreground" strokeWidth={2.5} />
                     </button>
 
                     {activeReport.charts && activeReport.charts.length > 0 && (
@@ -250,9 +250,9 @@ export default function ReportDetails() {
                             <TooltipTrigger asChild>
                                 <button
                                     onClick={() => setIsWidgetModalOpen(true)}
-                                    className="bg-[#E3EFFF] p-2 rounded-full hover:bg-[#d5e6ff] flex items-center justify-center"
+                                    className="bg-[#E3EFFF] dark:bg-neutral-800 p-2 rounded-full hover:bg-[#d5e6ff] dark:hover:bg-neutral-700 flex items-center justify-center"
                                 >
-                                    <Plus className="w-4 h-4 text-[#001F3F]" strokeWidth={2.5} />
+                                    <Plus className="w-4 h-4 text-[#001F3F] dark:text-foreground" strokeWidth={2.5} />
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -261,8 +261,8 @@ export default function ReportDetails() {
                         </Tooltip>
                     )}
 
-                    <button className="bg-[#E3EFFF] p-2 rounded-full hover:bg-[#d5e6ff]">
-                        <Expand className="w-4 h-4 text-[#001F3F]" strokeWidth={2.5} />
+                    <button className="bg-[#E3EFFF] dark:bg-neutral-800 p-2 rounded-full hover:bg-[#d5e6ff] dark:hover:bg-neutral-700">
+                        <Expand className="w-4 h-4 text-[#001F3F] dark:text-foreground" strokeWidth={2.5} />
                     </button>
                 </div>
             </div>
@@ -293,7 +293,7 @@ export default function ReportDetails() {
                         />
                         <button
                             onClick={() => setIsWidgetModalOpen(true)}
-                            className="flex items-center gap-2 bg-[#001F3F] text-white px-6 py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
+                            className="flex items-center gap-2 bg-[#001F3F] dark:bg-primary text-white dark:text-primary-foreground px-6 py-2 rounded-lg hover:bg-[#003366] dark:hover:bg-primary/90 transition-all duration-200 shadow-md hover:shadow-lg"
                         >
                             <Plus className="w-4 h-4" /> Add Widget
                         </button>

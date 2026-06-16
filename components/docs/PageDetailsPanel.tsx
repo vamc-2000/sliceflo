@@ -132,7 +132,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                                     {/* Documents */}
                                     {linkedDocuments.map((doc) => (
                                         <div key={doc.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-doc-link-document-${doc.id}`}>
-                                            <span className="text-sm">📄</span>
+                                            <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                                             <span className="text-sm text-gray-600">{doc.title}</span>
                                         </div>
                                     ))}
@@ -181,7 +181,7 @@ export function PageDetailsPanel({ isOpen, onClose, currentTitle, documentId }: 
                                     {/* Documents */}
                                     {pageLinkedDocuments.map((doc) => (
                                         <div key={doc.id} className="flex items-center gap-2 text-gray-500" data-testid={`page-details-panel-page-link-document-${doc.id}`}>
-                                            <span className="text-sm">📄</span>
+                                            <img src="/images/docsidebar.svg" className="w-4 h-4 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
                                             <span className="text-sm text-gray-600">{doc.title}</span>
                                         </div>
                                     ))}

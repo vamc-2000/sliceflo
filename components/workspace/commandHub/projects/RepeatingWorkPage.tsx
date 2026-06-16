@@ -104,24 +104,24 @@ const RepeatingWorkPage: React.FC<RepeatingWorkPageProps> = ({
   const getIcon = (type: string) => {
     switch (type) {
       case 'recurring-tasks':
-        return <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
+        return <RefreshCw className="w-5 h-5 text-muted-foreground" />;
       case 'recurring-milestones':
-        return <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
+        return <Calendar className="w-5 h-5 text-muted-foreground" />;
       default:
-        return <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
+        return <FileText className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 bg-background text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-[16px] font-semibold text-foreground">
             Repeating work
           </h2>
-          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
-            Subtext
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            Configure repeating work and schedules for this project.
           </p>
         </div>
       </div>
@@ -131,26 +131,26 @@ const RepeatingWorkPage: React.FC<RepeatingWorkPageProps> = ({
         {sections.map((section) => (
           <div
             key={section.id}
-            className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-sm transition-shadow border-l-4 border-l-[#001F3F]"
+            className="flex items-center justify-between p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-shadow border-l-4 border-l-primary"
           >
             <div className="flex items-start gap-3 flex-1">
               {/* Icon */}
-              <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
                 {getIcon(section.type)}
               </div>
 
               {/* Content */}
               <div className="flex-1">
-                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-[14px] font-semibold text-foreground">
                   {section.title}
                 </h3>
-                <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-[12px] text-muted-foreground mt-0.5">
                   {section.description}
                 </p>
               </div>
             </div>
 
-           <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 ml-4" />
+           <ChevronDown className="w-5 h-5 text-muted-foreground ml-4" />
           </div>
         ))}
       </div>
@@ -158,7 +158,7 @@ const RepeatingWorkPage: React.FC<RepeatingWorkPageProps> = ({
       {/* Empty State */}
       {sections.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-[13px]">
+          <p className="text-muted-foreground text-[13px]">
             No repeating work sections available for this project.
           </p>
         </div>

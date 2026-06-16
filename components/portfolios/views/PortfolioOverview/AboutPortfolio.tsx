@@ -37,6 +37,7 @@ import Link from "next/link";
 import { PortfolioAttachments } from "./PortfolioAttachments";
 import { FileAttachment } from "@/types/attachment.types";
 import { getUpload } from "@/lib/api/uploads-api";
+import { PortfolioCalendarPicker } from "./PortfolioCalendarPicker";
 
 interface Props {
   portfolioId?: string;
@@ -350,13 +351,15 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
     <div className="space-y-4">
       {/* Portfolio Details */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsPortfolioDetailsExpanded(!isPortfolioDetailsExpanded)}
+        >
           <h3 className="text-sm font-semibold">Portfolio Details</h3>
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
-            onClick={() => setIsPortfolioDetailsExpanded(!isPortfolioDetailsExpanded)}
+            className="h-6 w-6 pointer-events-none"
           >
             <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isPortfolioDetailsExpanded ? "rotate-180" : "rotate-0")} />
           </Button>
@@ -380,14 +383,14 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 transition-opacity hover:opacity-90 text-xs font-semibold rounded-xs w-[150px] flex items-center justify-center",
+                    "h-8 px-3 transition-opacity hover:opacity-90 text-xs font-semibold rounded-xs w-[150px] flex items-center justify-center cursor-pointer",
                     statusColors[portfolio.status as string] || statusColors.open
                   )}
                 >
                   {currentStatus.label}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary">
                 {STATUS_OPTIONS.map((s) => (
                   <DropdownMenuItem
                     key={s.value}
@@ -416,7 +419,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 transition-opacity hover:opacity-90 overflow-hidden px-2 rounded-xs flex items-center justify-between gap-2 text-xs font-medium w-[150px]",
+                    "h-8 transition-opacity hover:opacity-90 overflow-hidden px-2 rounded-xs flex items-center justify-between gap-2 text-xs font-medium w-[150px] cursor-pointer",
                     !portfolio.priority && "text-muted-foreground bg-secondary"
                   )}
                   style={portfolio.priority ? {
@@ -438,7 +441,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary">
                 {PRIORITY_LEVELS.map((level) => (
                   <DropdownMenuItem
                     key={level.value}
@@ -471,23 +474,21 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
                     !portfolio.startDate && "text-muted-foreground"
                   )}
                 >
                   {portfolio.startDate ? formatLocalDate(portfolio.startDate) : "—"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={portfolio.startDate ? convertUTCToCalendarDate(portfolio.startDate) : undefined}
-                  onSelect={handleUpdateStartDate}
+              <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="end">
+                <PortfolioCalendarPicker
+                  selectedDate={portfolio.startDate ? convertUTCToCalendarDate(portfolio.startDate) : undefined}
+                  onDateSelect={handleUpdateStartDate}
                   disabled={(date) => {
                     const endDateCal = portfolio.endDate ? convertUTCToCalendarDate(portfolio.endDate) : undefined;
                     return endDateCal ? date > endDateCal : false;
                   }}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -505,23 +506,21 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
                     !portfolio.endDate && "text-muted-foreground"
                   )}
                 >
                   {portfolio.endDate ? formatLocalDate(portfolio.endDate) : "—"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={portfolio.endDate ? convertUTCToCalendarDate(portfolio.endDate) : undefined}
-                  onSelect={handleUpdateEndDate}
+              <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="end">
+                <PortfolioCalendarPicker
+                  selectedDate={portfolio.endDate ? convertUTCToCalendarDate(portfolio.endDate) : undefined}
+                  onDateSelect={handleUpdateEndDate}
                   disabled={(date) => {
                     const startDateCal = portfolio.startDate ? convertUTCToCalendarDate(portfolio.startDate) : undefined;
                     return startDateCal ? date < startDateCal : false;
                   }}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -541,7 +540,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-2 hover:bg-muted flex items-center justify-center gap-1 text-xs w-[150px] rounded-xs",
+                    "h-8 px-2 hover:bg-muted flex items-center justify-center gap-1 text-xs w-[150px] rounded-xs cursor-pointer",
                     (!portfolio.leaders || portfolio.leaders.length === 0) && "text-muted-foreground"
                   )}
                 >
@@ -575,7 +574,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
                   })()}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1">
+              <DropdownMenuContent align="end" className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary">
                 <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
                   <Input
                     placeholder="Type @ or name..."
@@ -632,17 +631,24 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
 
       {/* Labels */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Labels</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">Labels</Label>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-6 w-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Plus className="h-3 w-3" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLabelsExpanded ? "rotate-180" : "rotate-0")} />
             </Button>
@@ -660,8 +666,11 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
 
       {/* About this Portfolio */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">About this Portfolio</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsAboutPortfolioExpanded(!isAboutPortfolioExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">About this Portfolio</Label>
           <div className="flex items-center gap-2">
             {charCount > 0 && (
               <span className="text-xs text-muted-foreground">
@@ -671,8 +680,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAboutPortfolioExpanded(!isAboutPortfolioExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAboutPortfolioExpanded ? "rotate-180" : "rotate-0")} />
             </Button>
@@ -698,95 +706,99 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
 
       {/* Linked Items */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Linked Items</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">Linked Items</Label>
           <div className="flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 max-h-72 overflow-y-auto p-2">
-                {linkedDocs.length > 0 && (
-                  <>
-                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-popover z-10">
-                      Linked Documents
-                    </div>
-                    {linkedDocs.map((doc) => (
-                      <DropdownMenuItem
-                        key={doc.id}
-                        className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
-                        onSelect={(e) => e.preventDefault()}
-                      >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                          <span className="truncate text-xs">{doc.title}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveDocument(doc.id);
-                          }}
-                        >
-                          <X className="w-3 h-3 text-red-500" />
-                        </Button>
-                      </DropdownMenuItem>
-                    ))}
-                    <div className="h-px bg-border my-2" />
-                  </>
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
-                      <Plus className="w-4 h-4 text-muted-foreground" />
-                      <span>Link Docs</span>
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" side="right" className="w-56 p-0">
-                    {availableDocs.length > 0 ? (
-                      <>
-                        <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
-                          Available Documents
-                        </div>
-                        {/* Only ONE scroll container */}
-                        <div className="max-h-52 overflow-y-auto">
-                          {availableDocs.map((doc) => (
-                            <DropdownMenuItem
-                              key={doc.id}
-                              onClick={() => handleAddDocument(doc.id)}
-                              className="cursor-pointer px-2 py-2 text-xs"
-                            >
-                              <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
-                              <span className="truncate">{doc.title}</span>
-                            </DropdownMenuItem>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="p-4 text-xs text-muted-foreground text-center">
-                        No documents available to link
+            <div onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 max-h-72 overflow-y-auto p-2">
+                  {linkedDocs.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase sticky top-0 bg-popover z-10">
+                        Linked Documents
                       </div>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      {linkedDocs.map((doc) => (
+                        <DropdownMenuItem
+                          key={doc.id}
+                          className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
+                          onSelect={(e) => e.preventDefault()}
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <span className="truncate text-xs">{doc.title}</span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveDocument(doc.id);
+                            }}
+                          >
+                            <X className="w-3 h-3 text-red-500" />
+                          </Button>
+                        </DropdownMenuItem>
+                      ))}
+                      <div className="h-px bg-border my-2" />
+                    </>
+                  )}
 
-                {linkedDocs.length === 0 && (
-                  <div className="px-2 py-1 text-xs text-muted-foreground italic">
-                    No documents linked yet
-                  </div>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
+                        <Plus className="w-4 h-4 text-muted-foreground" />
+                        <span>Link Docs</span>
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" side="right" className="w-56 p-0">
+                      {availableDocs.length > 0 ? (
+                        <>
+                          <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
+                            Available Documents
+                          </div>
+                          {/* Only ONE scroll container */}
+                          <div className="max-h-52 overflow-y-auto">
+                            {availableDocs.map((doc) => (
+                              <DropdownMenuItem
+                                key={doc.id}
+                                onClick={() => handleAddDocument(doc.id)}
+                                className="cursor-pointer px-2 py-2 text-xs"
+                              >
+                                <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
+                                <span className="truncate">{doc.title}</span>
+                              </DropdownMenuItem>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-4 text-xs text-muted-foreground text-center">
+                          No documents available to link
+                        </div>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {linkedDocs.length === 0 && (
+                    <div className="px-2 py-1 text-xs text-muted-foreground italic">
+                      No documents linked yet
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isLinkedItemsExpanded ? "rotate-180" : "rotate-0")} />
             </Button>
@@ -842,9 +854,12 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
 
       {/* Attachments */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+        >
           <div className="flex gap-2">
-            <Label className="font-semibold">Attachments</Label>
+            <Label className="font-semibold cursor-pointer">Attachments</Label>
             {portfolioAttachments.length > 0 && (
               <span className="text-xs text-muted-foreground">
                 {portfolioAttachments.length} items
@@ -855,7 +870,10 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
             {portfolioAttachments.length > 0 && (
               <button
                 type="button"
-                onClick={() => setIsAttachOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAttachOpen(true);
+                }}
                 className="p-2 rounded-md bg-muted hover:bg-muted transition"
               >
                 <Paperclip className="h-5 w-5 text-muted-foreground" />
@@ -864,8 +882,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
             </Button>

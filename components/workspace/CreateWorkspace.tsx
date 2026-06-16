@@ -154,17 +154,17 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
   };
   return (
     <>
-      <div className="px-2 space-y-4">
-        <div className="bg-[#F2F2F7] px-5 py-3 rounded-lg">
+      <div className="px-2 space-y-4 bg-background text-foreground">
+        <div className="bg-[#F2F2F7] dark:bg-muted/30 px-5 py-3 rounded-lg">
           <div className="grid grid-cols-[50px_1fr_1fr_1fr] gap-3 items-start">
 
             {/* Icon */}
             <div>
-              <Label className="text-sm text-[#8E8E93]">Icon</Label>
+              <Label className="text-sm text-[#8E8E93] dark:text-muted-foreground">Icon</Label>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-9 h-9 border border-[#8E8E93] rounded-md flex items-center justify-center bg-white mt-2"
+                className="w-9 h-9 border border-[#8E8E93] dark:border-border rounded-md flex items-center justify-center bg-white dark:bg-neutral-900 mt-2"
               >
                 {selectedImage ? (
                   <Image
@@ -175,7 +175,7 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
                     className="rounded-md object-cover"
                   />
                 ) : (
-                  <ImageIcon className="text-[#8E8E93]" />
+                  <ImageIcon className="text-[#8E8E93] dark:text-muted-foreground" />
                 )}
               </button>
               <Input
@@ -189,20 +189,20 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
 
             {/* Workspace Name */}
             <div>
-              <Label className="text-sm text-[#8E8E93]">Workspace name</Label>
+              <Label className="text-sm text-[#8E8E93] dark:text-muted-foreground">Workspace name</Label>
               <Input
                 placeholder="e.g. Marketing"
-                className="mt-2 border-[#8E8E93]"
+                className="mt-2 border-[#8E8E93] dark:border-border bg-background text-foreground"
                 {...form.register("workspaceName")}
               />
             </div>
 
             {/* Workspace Identifier */}
             <div>
-              <Label className="text-sm text-[#8E8E93]">Workspace identifier</Label>
+              <Label className="text-sm text-[#8E8E93] dark:text-muted-foreground">Workspace identifier</Label>
               <Input
                 placeholder="e.g. MAR"
-                className="mt-2 border-[#8E8E93]"
+                className="mt-2 border-[#8E8E93] dark:border-border bg-background text-foreground"
                 {...form.register("workspaceIdentifier")}
               />
             </div>
@@ -210,10 +210,10 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
         </div>
 
         {/* -------------------- PURPOSE -------------------- */}
-        <div className="border border-[#E5E5EA] rounded-md mb-4">
-          <div className="border-l-4 border-[#001F3F] rounded-lg p-4 flex items-center justify-between">
+        <div className="border border-[#E5E5EA] dark:border-border rounded-md mb-4 bg-card">
+          <div className="border-l-4 border-[#001F3F] dark:border-primary rounded-lg p-4 flex items-center justify-between">
             <div>
-              <p className="font-medium">Workspace purpose</p>
+              <p className="font-medium text-foreground">Workspace purpose</p>
               <p className="text-sm text-muted-foreground">
                 Set the purpose of your workspace to organize tasks based on work,
                 personal, or student needs.
@@ -221,28 +221,28 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
             </div>
 
             <Select onValueChange={(v) => form.setValue("workspacePurpose", v)}>
-              <SelectTrigger className="w-50">
+              <SelectTrigger className="w-50 bg-background text-foreground border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
 
-              <SelectContent>
+              <SelectContent className="bg-popover border-border text-popover-foreground">
                 <SelectItem
                   value="work"
-                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F]"
+                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F] dark:data-[state=checked]:before:bg-primary"
                 >
                   Work
                 </SelectItem>
 
                 <SelectItem
                   value="personal"
-                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F]"
+                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F] dark:data-[state=checked]:before:bg-primary"
                 >
                   Personal
                 </SelectItem>
 
                 <SelectItem
                   value="student"
-                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F]"
+                  className="relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F] dark:data-[state=checked]:before:bg-primary"
                 >
                   Student
                 </SelectItem>
@@ -253,10 +253,10 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
         </div>
 
         {/* -------------------- DEFAULT WORKSPACE -------------------- */}
-        <div className="border border-[#E5E5EA] rounded-md mb-4">
-          <div className="border-l-4 border-[#001F3F] rounded-lg p-4 flex items-center justify-between">
+        <div className="border border-[#E5E5EA] dark:border-border rounded-md mb-4 bg-card">
+          <div className="border-l-4 border-[#001F3F] dark:border-primary rounded-lg p-4 flex items-center justify-between">
             <div>
-              <p className="font-medium">Default workspace</p>
+              <p className="font-medium text-foreground">Default workspace</p>
               <p className="text-sm text-muted-foreground">
                 Always open this workspace when you sign in.
               </p>
@@ -266,19 +266,19 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
               // defaultValue="yes"
               onValueChange={(v) => form.setValue("defaultWorkspace", v)}
             >
-              <SelectTrigger className="w-50">
+              <SelectTrigger className="w-50 bg-background text-foreground border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover border-border text-popover-foreground">
                 <SelectItem
                   value="yes"
-                  className="flex items-center gap-2 relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F]"
+                  className="flex items-center gap-2 relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F] dark:data-[state=checked]:before:bg-primary"
                 >
                   Yes
                 </SelectItem>
                 <SelectItem
                   value="no"
-                  className="flex items-center gap-2 relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F]"
+                  className="flex items-center gap-2 relative pl-4 data-[state=checked]:before:absolute data-[state=checked]:before:left-0 data-[state=checked]:before:top-1/2 data-[state=checked]:before:-translate-y-1/2 data-[state=checked]:before:h-4 data-[state=checked]:before:w-1 data-[state=checked]:before:bg-[#001F3F] dark:data-[state=checked]:before:bg-primary"
                 >
                   No
                 </SelectItem>
@@ -288,10 +288,10 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
         </div>
 
         {/* -------------------- INVITE MEMBERS -------------------- */}
-        <div className="border border-[#E5E5EA] rounded-md">
-          <div className="border-l-4 border-[#001F3F] rounded-lg p-4 flex items-center justify-between">
+        <div className="border border-[#E5E5EA] dark:border-border rounded-md bg-card">
+          <div className="border-l-4 border-[#001F3F] dark:border-primary rounded-lg p-4 flex items-center justify-between">
             <div>
-              <p className="font-medium">Invite members</p>
+              <p className="font-medium text-foreground">Invite members</p>
               <p className="text-sm text-muted-foreground">
                 Choose how you want to invite the members to this workspace
               </p>
@@ -299,7 +299,7 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
 
             <Button
               variant="outline"
-              className="flex items-center w-50 text-[#8E8E93] bg-[#F2F2F7] px-2 py-1 overflow-hidden whitespace-nowrap text-ellipsis"
+              className="flex items-center w-50 text-[#8E8E93] dark:text-muted-foreground bg-[#F2F2F7] dark:bg-muted/40 border-border px-2 py-1 overflow-hidden whitespace-nowrap text-ellipsis"
               onClick={() => setInviteModalOpen(true)}
             >
               <span className="truncate">
@@ -308,7 +308,7 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
                   : "Add members"}
               </span>
 
-              <span className="ml-auto border-2 border-dashed border-[#E5E5EA] rounded-xl p-1 flex items-center justify-center">
+              <span className="ml-auto border-2 border-dashed border-[#E5E5EA] dark:border-border rounded-xl p-1 flex items-center justify-center">
                 <UserPlus size={16} />
               </span>
             </Button>
@@ -318,15 +318,15 @@ export default function CreateWorkspace({ onClose }: CreateWorkspaceProps) {
       </div>
 
       {/* -------------------- FOOTER -------------------- */}
-      <DialogFooter className="px-1 space-x-2">
-        <Button variant="outline" onClick={onClose} className="w-38">
+      <DialogFooter className="px-1 space-x-2 border-t border-border pt-4">
+        <Button variant="outline" onClick={onClose} className="w-38 border-border">
           Cancel
         </Button>
 
         <Button
           onClick={form.handleSubmit(onSubmit)}
           className={`w-38 flex items-center justify-center gap-2
-              ${workspaceName ? "bg-[#001F3F] text-white cursor-pointer" : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+              ${workspaceName ? "bg-[#001F3F] text-white dark:bg-primary dark:text-primary-foreground cursor-pointer" : "bg-gray-300 dark:bg-neutral-800 text-gray-500 dark:text-neutral-500 cursor-not-allowed"}
             `}
           disabled={!workspaceName || isLoading}
         >

@@ -181,14 +181,14 @@ const ProjectDetailsPage = () => {
   // Check if workspace exists
   if (!currentWorkspace?.id) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-background text-foreground">
+        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
           <span className="text-2xl">🏢</span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           No Workspace Selected
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Please select a workspace to manage custom fields
         </p>
       </div>
@@ -198,21 +198,21 @@ const ProjectDetailsPage = () => {
   // Show loader while fetching custom fields
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full bg-white">
+      <div className="flex items-center justify-center h-full bg-background">
         <Loader message="Loading custom fields..." size="md" />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background text-foreground">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-foreground">
             Project details
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Create and customize the fields used to capture project-level information.
           </p>
         </div>
@@ -226,7 +226,6 @@ const ProjectDetailsPage = () => {
 
         {/* ── Project System Fields ─────────────────────────────── */}
         <div>
-          {/* <h3 className="text-sm font-medium text-gray-700 mb-3">System Fields</h3> */}
           <div className="space-y-2">
             {systemFieldsList.map((field) => {
               const Icon = field.icon;
@@ -235,7 +234,7 @@ const ProjectDetailsPage = () => {
               return (
                 <div
                   key={field.id}
-                  className="flex items-center justify-between p-3 rounded-md border border-gray-200 bg-gray-50"
+                  className="flex items-center justify-between p-3 rounded-md border border-border bg-secondary"
                 >
                   {/* Left: checkbox + icon + info */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -243,10 +242,10 @@ const ProjectDetailsPage = () => {
                       checked={field.checked}
                       disabled={field.required}
                       onCheckedChange={() => !field.required && toggleProjectSystemField(field.id)}
-                      className="h-5 w-5"
+                      className="h-5 w-5 cursor-pointer"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <div className="text-sm font-medium text-foreground flex items-center gap-2">
                         {field.label}
                         {field.required && (
                           <span className="text-xs text-red-500">*</span>
@@ -255,7 +254,7 @@ const ProjectDetailsPage = () => {
 
                       {/* ✅ Type and Values inline */}
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="bg-gray-200 px-1.5 py-0.5 rounded-sm inline-block text-xs text-gray-600">
+                        <span className="bg-muted px-1.5 py-0.5 rounded-sm inline-block text-xs text-muted-foreground">
                           {field.type}
                         </span>
 
@@ -266,7 +265,7 @@ const ProjectDetailsPage = () => {
                   </div>
 
                   {/* Right: System badge */}
-                  <span className="px-2.5 py-1 text-xs font-medium text-gray-600 bg-gray-200 rounded flex-shrink-0">
+                  <span className="px-2.5 py-1 text-xs font-medium text-muted-foreground bg-muted rounded flex-shrink-0">
                     System
                   </span>
                 </div>
@@ -278,7 +277,6 @@ const ProjectDetailsPage = () => {
         {/* ✅ Custom Fields Section */}
         {customFieldsList.length > 0 && (
           <div className="mt-2">
-            {/* <h3 className="text-sm font-medium text-gray-700 mb-3">Custom Fields</h3> */}
             <div className="space-y-2">
               {customFieldsList.map((field) => {
                 const fieldValues = getCustomFieldValues(field);
@@ -287,18 +285,18 @@ const ProjectDetailsPage = () => {
                 return (
                   <div
                     key={field.id}
-                    className="group flex items-center justify-between p-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="group flex items-center justify-between p-3 rounded-md border border-border bg-card hover:bg-accent/40 transition-colors"
                   >
                     {/* Left side: Checkbox + Field info */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <Checkbox
                         checked={field.checked}
                         disabled={field.isSystem}
-                        className="h-5 w-5"
+                        className="h-5 w-5 cursor-pointer"
                       />
 
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground">
                           {field.name}
                           {field.required && (
                             <span className="text-red-500 ml-1">*</span>
@@ -307,7 +305,7 @@ const ProjectDetailsPage = () => {
 
                         {/* ✅ Type and Values inline */}
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-sm inline-block text-xs">
+                          <span className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground px-1.5 py-0.5 rounded-sm inline-block text-xs">
                             {field.type}
                           </span>
 
@@ -337,20 +335,21 @@ const ProjectDetailsPage = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 flex-shrink-0"
+                            className="h-8 w-8 p-0 flex-shrink-0 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="border-b-5 border-b-[#001F3F]">
+                        <DropdownMenuContent align="end" className="bg-popover border border-border text-popover-foreground border-b-5 border-b-primary">
                           <DropdownMenuItem
                             onClick={() => handleEditField(field.id)}
+                            className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
                             Edit field
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDeleteField(field.id)}
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
                           >
                             Delete field
                           </DropdownMenuItem>
@@ -374,21 +373,6 @@ const ProjectDetailsPage = () => {
           loadingLabel="Deleting..."
           loading={isDeleting}
         />
-
-        {/* Empty State */}
-        {/* {customFieldsList.length === 0 && (
-          <div className="mt-6 flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-lg">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-              <Flag className="h-6 w-6 text-gray-400" />
-            </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">
-              No custom fields yet
-            </h3>
-            <p className="text-xs text-gray-500 text-center max-w-xs">
-              Create custom fields to track additional project-level information
-            </p>
-          </div>
-        )} */}
       </div>
     </div>
   );

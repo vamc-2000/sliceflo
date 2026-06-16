@@ -131,32 +131,32 @@ const CommandHubLayout = ({
     <div className="space-y-2">
       {/* Project Selector - Only show when Projects tab is active */}
       {activeTab === "projects" && (
-        <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm p-2">
+        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm p-2">
           {projects.length === 0 ? (
-            // ✅ ADD THIS: Empty state
-            <div className="p-3 text-center text-sm text-gray-500">
+            // ✅ Empty state
+            <div className="p-3 text-center text-sm text-muted-foreground">
               No projects available
             </div>
           ) : selectedProject ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">
+                <button className="w-full flex items-center justify-between p-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors cursor-pointer">
                   <div className="flex items-center gap-2">
                     {/* Use helper function instead of hardcoded letter */}
                     {renderProjectIcon(selectedProject)}
-                    <span className="text-[13px] font-medium text-gray-900 dark:text-white">
+                    <span className="text-[13px] font-medium text-foreground">
                       {selectedProject.name}
                     </span>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-48 bg-popover border border-border">
                 {projects.map((project) => (
                   <DropdownMenuItem
                     key={project.id}
                     onClick={() => handleProjectChange(project)}
-                    className="flex items-center gap-2 cursor-pointer text-[13px]"
+                    className="flex items-center gap-2 cursor-pointer text-[13px] text-popover-foreground hover:bg-accent hover:text-accent-foreground"
                   >
                     {/* Use helper function for each project in dropdown */}
                     {renderProjectIcon(project)}
@@ -171,27 +171,27 @@ const CommandHubLayout = ({
 
 
       {/* Menu Items */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm">
+      <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
         {menuItems.map((item, index) => (
           <React.Fragment key={item.id}>
             <button
               onClick={() => onSectionChange(item.id)}
               className={cn(
-                "w-full text-left px-3 py-2.5 font-inter text-[13px] font-normal leading-4 transition-all relative bg-white dark:bg-gray-800 tracking-[0px]",
+                "w-full text-left px-3 py-2.5 font-inter text-[13px] font-normal leading-4 transition-all relative bg-card tracking-[0px] cursor-pointer",
                 activeSection === item.id
-                  ? "text-[#001F3F] dark:text-white font-medium"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  ? "text-primary dark:text-foreground font-semibold"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
               {activeSection === item.id && (
-                <span className="absolute left-0 top-0 bottom-0 w-1 rounded-r bg-[#001F3F]" />
+                <span className="absolute left-0 top-0 bottom-0 w-1 rounded-r bg-primary dark:bg-foreground" />
               )}
               <span className={cn(activeSection === item.id ? "ml-1.5" : "")}>
                 {item.text}
               </span>
             </button>
             {index < menuItems.length - 1 && (
-              <div className="border-b border-gray-200 dark:border-gray-700" />
+              <div className="border-b border-border" />
             )}
           </React.Fragment>
         ))}
@@ -200,30 +200,30 @@ const CommandHubLayout = ({
   );
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-gray-950 font-inter overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-background text-foreground font-inter overflow-hidden border border-border">
       {/* FIXED HEADER */}
-      <div className="bg-white dark:bg-gray-950 border-b flex-shrink-0">
+      <div className="bg-background border-b border-border flex-shrink-0">
         <div className="px-8 py-3">
           <div className="flex items-center justify-between">
             {/* Left Title */}
-            <div className="font-inter text-[20px] font-semibold leading-tight text-gray-900 dark:text-white tracking-[0px]">
+            <div className="font-inter text-[20px] font-semibold leading-tight text-foreground tracking-[0px]">
               {title}
               {subtitle && (
-                <div className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-normal">
+                <div className="text-[13px] text-muted-foreground mt-0.5 font-normal">
                   {subtitle}
                 </div>
               )}
             </div>
 
             {/* Right Tabs */}
-            <div className="flex items-center justify-end rounded-xl overflow-hidden bg-[#E5E5EA] p-1 mr-2">
+            <div className="flex items-center justify-end rounded-xl overflow-hidden bg-muted p-1 mr-2">
               <button
                 onClick={() => onTabChange("workspace")}
                 className={cn(
-                  "px-5 py-1.5 font-inter text-[13px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-lg",
+                  "px-5 py-1.5 font-inter text-[13px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-lg cursor-pointer",
                   activeTab === "workspace"
-                    ? "text-white shadow-sm bg-[#001F3F]"
-                    : "text-gray-500 dark:text-gray-600 hover:text-gray-700 bg-transparent"
+                    ? "text-primary-foreground shadow-sm bg-primary"
+                    : "text-muted-foreground hover:text-foreground bg-transparent"
                 )}
               >
                 Workspace
@@ -231,10 +231,10 @@ const CommandHubLayout = ({
               <button
                 onClick={() => onTabChange("projects")}
                 className={cn(
-                  "px-5 py-1.5 font-inter text-[13px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-lg",
+                  "px-5 py-1.5 font-inter text-[13px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-lg cursor-pointer",
                   activeTab === "projects"
-                    ? "text-white shadow-sm bg-[#001F3F]"
-                    : "text-gray-500 dark:text-gray-600 hover:text-gray-700 bg-transparent"
+                    ? "text-primary-foreground shadow-sm bg-primary"
+                    : "text-muted-foreground hover:text-foreground bg-transparent"
                 )}
               >
                 Projects
@@ -256,7 +256,7 @@ const CommandHubLayout = ({
 
       {/* MOBILE SIDEBAR */}
       {mobileOpen && (
-        <div className="md:hidden px-4 py-4 border-b bg-gray-50 dark:bg-gray-900 flex-shrink-0 max-h-96 overflow-y-auto">
+        <div className="md:hidden px-4 py-4 border-b border-border bg-secondary flex-shrink-0 max-h-96 overflow-y-auto">
           <Sidebar />
         </div>
       )}
@@ -271,7 +271,7 @@ const CommandHubLayout = ({
             </aside>
 
             {/* SCROLLABLE CONTENT */}
-            <main className="flex-1 w-full overflow-y-auto font-inter text-[14px] font-normal leading-6 tracking-[0px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            <main className="flex-1 w-full overflow-y-auto font-inter text-[14px] font-normal leading-6 tracking-[0px] scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
               {children}
             </main>
           </div>

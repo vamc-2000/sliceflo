@@ -52,83 +52,28 @@ export default function Templates({
     return (
         <div
             className={cn(
-                "flex flex-col items-center justify-center shadow-[0px_0px_10px_0px_#D9D9D9] px-4 py-3 rounded-xl w-full",
+                "flex flex-col items-center justify-center bg-card border border-border shadow-sm dark:shadow-none px-4 py-3 rounded-xl w-full",
                 className
             )}
         >
-            <h2 className="text-sm 2xl:text-base font-semibold text-black">
+            <h2 className="text-sm 2xl:text-base font-semibold text-foreground">
                 {dashboard ? "Start with Template" : "Templates"}
             </h2>
 
             <div className="flex flex-col items-center justify-center gap-4 mt-3 2xl:mt-4 w-full">
-                <p className="text-sm 2xl:text-base font-medium text-black">
+                <p className="text-sm 2xl:text-base font-medium text-muted-foreground">
                     No templates found. Please start from scratch.
                 </p>
                 {isLoading ? (
                     <>
-                        {/* <TemplateCard
-                            isLoading={true}
-                            name="Loading..."
-                            dashboard={dashboard}
-                            description="Loading..."
-                        /> */}
-                        {/* <TemplateCard
-                            isLoading={true}
-                            name="Loading..."
-                            dashboard={dashboard}
-                            description="Loading..."
-                        /> */}
-                        {/* <TemplateCard
-                            isLoading={true}
-                            name="Loading..."
-                            dashboard={dashboard}
-                            description="Loading..."
-                        /> */}
                     </>
                 ) : (
                     <>
-                        {/* {!templates || templates.length === 0 ? ( */}
-                        <p className="text-sm 2xl:text-base font-medium text-black">
+                        <p className="text-sm 2xl:text-base font-medium text-muted-foreground">
                             No templates found. Please start from scratch.
                         </p>
-                        {/* ) : ( */}
-                        {/* templates.map((template: ReportTemplate) => (
-                                <div
-                                    // key={template.id}
-                                    // onClick={() => handleTemplateClick(template)}
-                                    className="cursor-pointer w-full"
-                                >
-                                    <TemplateCard
-                                        name={template.name}
-                                        description={template.description}
-                                        dashboard={dashboard}
-                                    />
-                                </div>
-                            )) */}
-                        {/* )} */}
                     </>
                 )}
-
-                {/* {isLoading ? (
-                    <Skeleton
-                        variant="text"
-                        width={80}
-                        height={24}
-                        className={cn("rounded-md self-end", dashboard && "self-center")}
-                    />
-                ) : (
-                    templates &&
-                    templates.length > 0 && (
-                        <button
-                            className={cn(
-                                "text-sm 2xl:text-base font-medium text-black underline underline-offset-4 self-end",
-                                dashboard && "self-center text-xs"
-                            )}
-                        >
-                            Explore More
-                        </button>
-                    )
-                )} */}
             </div>
         </div>
     );

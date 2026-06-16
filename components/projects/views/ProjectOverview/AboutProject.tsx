@@ -25,6 +25,9 @@ import {
   Paperclip,
   Check,
   ChevronDown,
+  Type,
+  CalendarCheck,
+  CheckCircle2,
 } from "lucide-react";
 import { useProfileStore } from "@/stores/profile-store";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -53,7 +56,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { Separator } from "@/components/ui/separator";
 import {
   formatLocalDate,
@@ -112,9 +115,12 @@ export default function AboutProject({
   const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] =
     useState(true);
   const [isCustomFieldsExpanded, setIsCustomFieldsExpanded] = useState(false);
-  const [openPopoverFieldId, setOpenPopoverFieldId] = useState<string | null>(null);
+  const [openPopoverFieldId, setOpenPopoverFieldId] = useState<string | null>(
+    null,
+  );
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
+  const [leaderSearchQuery, setLeaderSearchQuery] = useState("");
 
   const { user: profile } = useProfileStore();
   const {
@@ -217,9 +223,7 @@ export default function AboutProject({
               : "0 KB",
           type: !isString ? att.mimeType || "unknown" : "unknown",
           uploadedOn:
-            !isString && att.createdAt
-              ? formatLocalDate(att.createdAt)
-              : "",
+            !isString && att.createdAt ? formatLocalDate(att.createdAt) : "",
           uploadedBy: {
             name: uploader?.name || "Unknown",
             id: uploaderId,
@@ -294,6 +298,16 @@ export default function AboutProject({
         avatar: m.avatar || m.profilePicture || "",
       }));
   }, [currentProject?.members, workspaceMembers]);
+
+  const filteredLeaders = useMemo(() => {
+    return workspaceMembers.filter((m) => {
+      if (!leaderSearchQuery) return true;
+      const q = leaderSearchQuery.startsWith("@")
+        ? leaderSearchQuery.slice(1)
+        : leaderSearchQuery;
+      return m.name.toLowerCase().includes(q.toLowerCase());
+    });
+  }, [workspaceMembers, leaderSearchQuery]);
 
   useEffect(() => {
     if (projectDescription) {
@@ -564,66 +578,76 @@ export default function AboutProject({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 hover:bg-muted",
-                    !assignedPhase && "text-muted-foreground",
+                    "h-8 transition-opacity hover:opacity-90 overflow-hidden px-2 rounded-xs flex items-center justify-center text-xs font-semibold w-[150px] cursor-pointer text-foreground",
+                    !assignedPhase && "text-muted-foreground bg-secondary",
                   )}
+                  style={
+                    assignedPhase
+                      ? {
+                          backgroundColor: assignedPhase.color || "#c4c4c4",
+                        }
+                      : {}
+                  }
                 >
                   {assignedPhase ? (
-                    <Badge
-                      className={cn(
-                        "h-6",
-                        statusColors[
-                          projectStatus as keyof typeof statusColors
-                        ],
-                      )}
-                      // style={{ background: assignedPhase.color }}
-                    >
+                    <span className="truncate w-full text-center">
                       {assignedPhase.label}
-                    </Badge>
+                    </span>
                   ) : (
-                    "—"
+                    <Hexagon className="h-4 w-4 text-muted-foreground" />
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent
+                align="end"
+                className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background"
+              >
                 <DropdownMenuItem
                   onClick={() => projectId && updateProjectPhase(projectId, "")}
-                  className="text-xs"
+                  className="p-0 focus:bg-transparent"
                 >
-                  Clear
+                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold hover:bg-muted transition-colors px-3 bg-muted text-muted-foreground cursor-pointer">
+                    Clear
+                  </div>
                 </DropdownMenuItem>
-                
+                <DropdownMenuSeparator />
                 {projectPhases.map((phase) => (
                   <React.Fragment key={phase._id}>
                     <DropdownMenuItem
                       onClick={() =>
                         projectId && updateProjectPhase(projectId, phase.value)
                       }
-                      className="text-xs"
+                      className="p-0 focus:bg-transparent"
                     >
-                      <span
-                        className="w-2 h-2 rounded-full mr-2"
-                        style={{ background: phase.color }}
-                      />
-                      {phase.label}
+                      <div
+                        className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                        style={{ backgroundColor: phase.color || "#c4c4c4" }}
+                      >
+                        <span className="truncate w-full text-center">
+                          {phase.label}
+                        </span>
+                      </div>
                     </DropdownMenuItem>
                     {phase.children?.map((child) => (
                       <DropdownMenuItem
                         key={child._id}
-                        className="pl-6 text-xs"
                         onClick={() =>
                           projectId &&
                           updateProjectPhase(projectId, child.value)
                         }
+                        className="p-0 focus:bg-transparent"
                       >
-                        <span
-                          className="w-2 h-2 rounded-full mr-2"
-                          style={{ background: child.color }}
-                        />
-                        {child.label}
+                        <div
+                          className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 pl-6 pr-3 cursor-pointer mt-1"
+                          style={{ backgroundColor: child.color || "#c4c4c4" }}
+                        >
+                          <span className="truncate w-full text-center">
+                            {child.label}
+                          </span>
+                        </div>
                       </DropdownMenuItem>
                     ))}
                   </React.Fragment>
@@ -644,45 +668,50 @@ export default function AboutProject({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 transition-all duration-200",
-                    projectPriority
-                      ? "w-8 p-0 rounded-full"
-                      : "px-3 bg-secondary hover:bg-muted",
-                    !projectPriority && "text-muted-foreground",
+                    "h-8 transition-opacity hover:opacity-90 overflow-hidden px-2 rounded-xs flex items-center justify-center text-xs font-medium w-[150px] cursor-pointer",
+                    !projectPriority && "text-muted-foreground bg-secondary",
                   )}
                   style={
                     projectPriority
-                      ? (() => {
-                          const matched = projectPriorityConfigs.find(
-                            (p) => p.value === projectPriority,
-                          );
-                          return {
-                            backgroundColor: matched
-                              ? matched.color + "15"
-                              : "#e5e7eb15",
-                          };
-                        })()
+                      ? {
+                          backgroundColor: (() => {
+                            const matched = projectPriorityConfigs.find(
+                              (p) => p.value === projectPriority,
+                            );
+                            return matched ? matched.color + "33" : "#e5e7eb33";
+                          })(),
+                        }
                       : {}
                   }
                 >
-                  {projectPriority
-                    ? (() => {
-                        const matched = projectPriorityConfigs.find(
-                          (p) => p.value === projectPriority,
-                        );
-                        return (
+                  {projectPriority ? (
+                    (() => {
+                      const matched = projectPriorityConfigs.find(
+                        (p) => p.value === projectPriority,
+                      );
+                      return (
+                        <div className="flex items-center justify-between w-full gap-2 px-1">
+                          <span className="text-foreground">
+                            {matched ? matched.label : projectPriority}
+                          </span>
                           <Flag
-                            className="h-4 w-4"
+                            className="h-3.5 w-3.5 flex-shrink-0"
                             style={{
                               color: matched ? matched.color : "#6b7280",
                             }}
                           />
-                        );
-                      })()
-                    : "—"}
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <Flag className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent
+                align="end"
+                className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary"
+              >
                 {priorityLevels.length === 0 ? (
                   <div className="px-2 py-2 text-xs text-muted-foreground italic">
                     No priorities configured
@@ -692,15 +721,16 @@ export default function AboutProject({
                     <DropdownMenuItem
                       key={level.value}
                       onSelect={() => handleUpdatePriority(level.value)}
-                      className="text-xs"
+                      className="h-9 text-xs font-medium rounded-xs cursor-pointer px-2 flex items-center justify-between gap-2 w-full focus:opacity-80"
+                      style={{
+                        backgroundColor: `${level.color}33`,
+                      }}
                     >
-                      <div className="flex items-center gap-2">
-                        <Flag
-                          className="h-3.5 w-3.5"
-                          style={{ color: level.color }}
-                        />
-                        <span>{level.label}</span>
-                      </div>
+                      <span className="text-foreground">{level.label}</span>
+                      <Flag
+                        className="h-3.5 w-3.5 flex-shrink-0"
+                        style={{ color: level.color }}
+                      />
                     </DropdownMenuItem>
                   ))
                 )}
@@ -714,30 +744,37 @@ export default function AboutProject({
               <CalendarIcon className="h-4 w-4" />
               Start Date
             </Label>
-            <Popover open={isStartDatePopoverOpen} onOpenChange={setIsStartDatePopoverOpen}>
+            <Popover
+              open={isStartDatePopoverOpen}
+              onOpenChange={setIsStartDatePopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
                     !currentProject?.startDate && "text-muted-foreground",
                   )}
                 >
-                  {currentProject?.startDate
-                    ? formatLocalDate(currentProject.startDate)
-                    : "—"}
+                  {currentProject?.startDate ? (
+                    formatLocalDate(currentProject.startDate)
+                  ) : (
+                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={
+              <PopoverContent
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                align="end"
+              >
+                <CalendarPicker
+                  selectedDate={
                     currentProject?.startDate
                       ? convertUTCToCalendarDate(currentProject.startDate)
                       : undefined
                   }
-                  onSelect={(date) => {
+                  onDateSelect={(date) => {
                     handleUpdateStartDate(date);
                     setIsStartDatePopoverOpen(false);
                   }}
@@ -747,7 +784,6 @@ export default function AboutProject({
                       : undefined;
                     return endDateCal ? date > endDateCal : false;
                   }}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -759,30 +795,37 @@ export default function AboutProject({
               <CalendarIcon className="h-4 w-4" />
               End Date
             </Label>
-            <Popover open={isEndDatePopoverOpen} onOpenChange={setIsEndDatePopoverOpen}>
+            <Popover
+              open={isEndDatePopoverOpen}
+              onOpenChange={setIsEndDatePopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 font-normal hover:bg-muted text-xs",
+                    "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
                     !currentProject?.endDate && "text-muted-foreground",
                   )}
                 >
-                  {currentProject?.endDate
-                    ? formatLocalDate(currentProject.endDate)
-                    : "—"}
+                  {currentProject?.endDate ? (
+                    formatLocalDate(currentProject.endDate)
+                  ) : (
+                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={
+              <PopoverContent
+                className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                align="end"
+              >
+                <CalendarPicker
+                  selectedDate={
                     currentProject?.endDate
                       ? convertUTCToCalendarDate(currentProject.endDate)
                       : undefined
                   }
-                  onSelect={(date) => {
+                  onDateSelect={(date) => {
                     handleUpdateEndDate(date);
                     setIsEndDatePopoverOpen(false);
                   }}
@@ -792,7 +835,6 @@ export default function AboutProject({
                       : undefined;
                     return startDateCal ? date < startDateCal : false;
                   }}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
@@ -804,13 +846,17 @@ export default function AboutProject({
               <User className="h-4 w-4" />
               Leaders
             </Label>
-            <DropdownMenu>
+            <DropdownMenu
+              onOpenChange={(open) => {
+                if (!open) setLeaderSearchQuery("");
+              }}
+            >
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   className={cn(
-                    "h-8 px-2 hover:bg-muted flex items-center gap-1",
+                    "h-8 px-2 hover:bg-muted flex items-center justify-center gap-1 text-xs w-[150px] rounded-xs cursor-pointer",
                     (!currentProject?.leaders ||
                       currentProject.leaders.length === 0) &&
                       !currentProject?.projectLeader &&
@@ -824,7 +870,9 @@ export default function AboutProject({
                         ? [currentProject.projectLeader]
                         : [];
 
-                    if (leaderIds.length === 0) return "—";
+                    if (leaderIds.length === 0) {
+                      return <User className="h-4 w-4 text-muted-foreground" />;
+                    }
 
                     return (
                       <div className="flex -space-x-2 overflow-hidden">
@@ -835,7 +883,7 @@ export default function AboutProject({
                           return (
                             <Avatar
                               key={id}
-                              className="h-6 w-6 border-2 border-white"
+                              className="h-6 w-6 border-0"
                               style={{ zIndex: 10 - i }}
                               title={m?.name}
                             >
@@ -860,54 +908,82 @@ export default function AboutProject({
                   })()}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold py-1 px-2.5">
-                  Project Leaders
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {workspaceMembers.map((member) => {
-                  const isLeader =
-                    (currentProject?.leaders || []).includes(member.userId) ||
-                    currentProject?.projectLeader === member.userId;
-                  return (
-                    <DropdownMenuItem
-                      key={member.userId}
-                      onSelect={() => handleUpdateLeader(member.userId)}
-                      className="flex items-center justify-between pointer-events-auto text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6 border">
-                          {member.profilePicture && (
-                            <AvatarImage src={member.profilePicture} />
-                          )}
-                          <AvatarFallback
-                            className="text-white text-[10px] font-semibold"
-                            style={{
-                              backgroundColor: getAvatarColor(member.name),
-                            }}
-                          >
-                            {member.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{member.name}</span>
-                      </div>
-                      {isLeader && (
-                        <Check className="h-3.5 w-3.5 text-blue-600" />
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
+              <DropdownMenuContent
+                align="end"
+                className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary"
+              >
+                <div
+                  className="px-1 pb-2"
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  <Input
+                    placeholder="Type @ or name..."
+                    value={leaderSearchQuery}
+                    onChange={(e) => setLeaderSearchQuery(e.target.value)}
+                    className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-60 overflow-y-auto space-y-1">
+                  {filteredLeaders.length === 0 ? (
+                    <div className="text-center py-2 text-xs text-muted-foreground">
+                      No members found
+                    </div>
+                  ) : (
+                    filteredLeaders.map((member) => {
+                      const isLeader =
+                        (currentProject?.leaders || []).includes(
+                          member.userId,
+                        ) || currentProject?.projectLeader === member.userId;
+                      return (
+                        <DropdownMenuItem
+                          key={member.userId}
+                          onSelect={() => handleUpdateLeader(member.userId)}
+                          className="p-0 focus:bg-transparent"
+                        >
+                          <div className="w-full h-9 flex items-center justify-between rounded-xs text-xs font-medium hover:bg-muted transition-colors px-2 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6 border-0">
+                                {member.profilePicture && (
+                                  <AvatarImage src={member.profilePicture} />
+                                )}
+                                <AvatarFallback
+                                  className="text-white text-[10px] font-semibold"
+                                  style={{
+                                    backgroundColor: getAvatarColor(
+                                      member.name,
+                                    ),
+                                  }}
+                                >
+                                  {member.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="truncate max-w-[100px]">
+                                {member.name}
+                              </span>
+                            </div>
+                            {isLeader && (
+                              <Check className="h-3.5 w-3.5 text-primary" />
+                            )}
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    })
+                  )}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </div>
 
+      <Separator className="my-4" />
+
       {/* Workspace Custom Fields - Left-Right Alignment */}
       {workspaceCustomFields.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold">Custom Fields</h3>
+            <h3 className="text-sm font-semibold">Custom Fields</h3>
             <Button
               variant="ghost"
               size="icon"
@@ -936,60 +1012,84 @@ export default function AboutProject({
               const fieldKey = field.name || field.label || "";
               const currentValue = projectCustomFieldValues[fieldKey] ?? "";
 
+              // Pick the icon matching the field type
+              const FieldIcon =
+                field.type === "text"
+                  ? Type
+                  : field.type === "number"
+                    ? Hash
+                    : field.type === "date"
+                      ? CalendarCheck
+                      : field.type === "dropdown"
+                        ? CheckCircle2
+                        : Hash;
+
               return (
                 <div
                   key={fieldId}
                   className="flex items-center justify-between"
                 >
                   <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-                    <Hash className="h-4 w-4" />
+                    <FieldIcon className="h-4 w-4" />
                     {field.label}
                     {field.required && <span className="text-red-500">*</span>}
                   </Label>
 
                   {/* text — string value */}
                   {field.type === "text" && (
-                    <Input
-                      defaultValue={currentValue}
-                      onBlur={(e) =>
-                        projectId &&
-                        updateProjectCustomFieldValue(
-                          projectId,
-                          fieldId,
-                          fieldKey,
-                          e.target.value,
-                        )
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.currentTarget.blur(); // triggers onBlur which calls the update
+                    <div className="relative w-[150px]">
+                      <Input
+                        placeholder=" "
+                        defaultValue={currentValue}
+                        onBlur={(e) =>
+                          projectId &&
+                          updateProjectCustomFieldValue(
+                            projectId,
+                            fieldId,
+                            fieldKey,
+                            e.target.value,
+                          )
                         }
-                      }}
-                      className="h-8 w-auto max-w-[180px] text-xs"
-                    />
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.currentTarget.blur();
+                          }
+                        }}
+                        className="h-8 w-full text-xs rounded-xs peer"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-placeholder-shown:opacity-100 peer-focus:opacity-0 transition-opacity">
+                        <Type className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
                   )}
 
                   {/* number — send as number, not string */}
                   {field.type === "number" && (
-                    <Input
-                      type="number"
-                      defaultValue={currentValue}
-                      onBlur={(e) =>
-                        projectId &&
-                        updateProjectCustomFieldValue(
-                          projectId,
-                          fieldId,
-                          fieldKey,
-                          e.target.value ? Number(e.target.value) : "", // 👈 cast to number
-                        )
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.currentTarget.blur(); // triggers onBlur which calls the update
+                    <div className="relative w-[150px]">
+                      <Input
+                        type="number"
+                        placeholder=" "
+                        defaultValue={currentValue}
+                        onBlur={(e) =>
+                          projectId &&
+                          updateProjectCustomFieldValue(
+                            projectId,
+                            fieldId,
+                            fieldKey,
+                            e.target.value ? Number(e.target.value) : "",
+                          )
                         }
-                      }}
-                      className="h-8 w-auto max-w-[180px] text-xs"
-                    />
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.currentTarget.blur();
+                          }
+                        }}
+                        className="h-8 w-full text-xs rounded-xs peer"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-placeholder-shown:opacity-100 peer-focus:opacity-0 transition-opacity">
+                        <Hash className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
                   )}
 
                   {/* date — send as ISO date string */}
@@ -1001,23 +1101,32 @@ export default function AboutProject({
                       }
                     >
                       <PopoverTrigger asChild>
-                        <button className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className={cn(
+                            "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
+                            !currentValue && "text-muted-foreground",
+                          )}
+                        >
                           {currentValue ? (
                             formatLocalDate(currentValue)
                           ) : (
-                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                            <CalendarCheck className="h-4 w-4 text-muted-foreground" />
                           )}
-                        </button>
+                        </Button>
                       </PopoverTrigger>
-                      <PopoverContent>
-                        <Calendar
-                          mode="single"
-                          selected={
+                      <PopoverContent
+                        align="end"
+                        className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                      >
+                        <CalendarPicker
+                          selectedDate={
                             currentValue
                               ? convertUTCToCalendarDate(currentValue)
                               : undefined
                           }
-                          onSelect={(date) => {
+                          onDateSelect={(date) => {
                             if (date && projectId) {
                               updateProjectCustomFieldValue(
                                 projectId,
@@ -1028,7 +1137,6 @@ export default function AboutProject({
                               setOpenPopoverFieldId(null);
                             }
                           }}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -1040,17 +1148,37 @@ export default function AboutProject({
                     field.options.length > 0 && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="text-xs text-muted-foreground">
-                            {currentValue
-                              ? field.options.find(
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "h-8 px-3 text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer hover:opacity-90 transition-opacity",
+                              !currentValue &&
+                                "text-muted-foreground bg-secondary",
+                            )}
+                            style={
+                              currentValue
+                                ? { backgroundColor: "hsl(var(--muted))" }
+                                : {}
+                            }
+                          >
+                            <span className="truncate">
+                              {currentValue ? (
+                                field.options.find(
                                   (o) => o.value === currentValue,
                                 )?.label || currentValue
-                              : "—"}
-                          </button>
+                              ) : (
+                                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </span>
+                          </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent
+                          align="end"
+                          className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background"
+                        >
                           <DropdownMenuItem
-                            onClick={() =>
+                            onSelect={() =>
                               projectId &&
                               updateProjectCustomFieldValue(
                                 projectId,
@@ -1059,14 +1187,16 @@ export default function AboutProject({
                                 "",
                               )
                             }
-                            className="text-xs"
+                            className="p-0 focus:bg-transparent"
                           >
-                            Clear
+                            <div className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-muted-foreground">
+                              Clear
+                            </div>
                           </DropdownMenuItem>
                           {field.options.map((option) => (
                             <DropdownMenuItem
                               key={option.value}
-                              onClick={() =>
+                              onSelect={() =>
                                 projectId &&
                                 updateProjectCustomFieldValue(
                                   projectId,
@@ -1075,9 +1205,11 @@ export default function AboutProject({
                                   option.value,
                                 )
                               }
-                              className="text-xs"
+                              className="p-0 focus:bg-transparent"
                             >
-                              {option.label}
+                              <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted">
+                                {option.label}
+                              </div>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -1094,6 +1226,115 @@ export default function AboutProject({
           </div>
         </div>
       )}
+
+      <Separator className="my-4" />
+
+      {/* Labels */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="font-semibold">Labels</Label>
+          <div className="flex items-center gap-1">
+            <LabelPicker
+              selectedLabelIds={assignedLabels.map((l) => l.id)}
+              onSelect={handleSelectLabel}
+              onRemove={handleRemoveLabel}
+            >
+              <Button variant="ghost" size="icon" className="h-6 w-6">
+                <Plus className="h-3 w-3" />
+              </Button>
+            </LabelPicker>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+            >
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isLabelsExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
+            </Button>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLabelsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
+          <div className="flex flex-wrap gap-2">
+            {assignedLabels.length > 0 ? (
+              assignedLabels.map((label) => (
+                <LabelBadge
+                  key={label.id}
+                  label={label}
+                  onRemove={handleRemoveLabel}
+                />
+              ))
+            ) : (
+              <div className="text-xs text-muted-foreground italic">
+                No labels assigned yet.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+
+      {/* About this Project */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="font-semibold">About this Project</Label>
+          <div className="flex items-center gap-2">
+            {charCount > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {charCount} chars
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setIsAboutProjectExpanded(!isAboutProjectExpanded)}
+            >
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-200",
+                  isAboutProjectExpanded ? "rotate-180" : "rotate-0",
+                )}
+              />
+            </Button>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isAboutProjectExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
+          <TooltipProvider>
+            <ProseMirrorEditor
+              initialContent={content}
+              mentionableMembers={mentionableMembers}
+              onBlur={(newContent) => {
+                if (projectId) {
+                  updateProject(projectId, { description: newContent });
+                }
+              }}
+              placeholder="Add project description..."
+            />
+          </TooltipProvider>
+        </div>
+      </div>
 
       <Separator className="my-4" />
 
@@ -1255,115 +1496,6 @@ export default function AboutProject({
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      <Separator className="my-4" />
-
-      {/* Labels */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Labels</Label>
-          <div className="flex items-center gap-1">
-            <LabelPicker
-              selectedLabelIds={assignedLabels.map((l) => l.id)}
-              onSelect={handleSelectLabel}
-              onRemove={handleRemoveLabel}
-            >
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <Plus className="h-3 w-3" />
-              </Button>
-            </LabelPicker>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
-            >
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  isLabelsExpanded ? "rotate-180" : "rotate-0",
-                )}
-              />
-            </Button>
-          </div>
-        </div>
-
-        <div
-          className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden",
-            isLabelsExpanded
-              ? "max-h-[1000px] opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none !mt-0",
-          )}
-        >
-          <div className="flex flex-wrap gap-2">
-            {assignedLabels.length > 0 ? (
-              assignedLabels.map((label) => (
-                <LabelBadge
-                  key={label.id}
-                  label={label}
-                  onRemove={handleRemoveLabel}
-                />
-              ))
-            ) : (
-              <div className="text-xs text-muted-foreground italic">
-                No labels assigned yet.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <Separator className="my-4" />
-
-      {/* About this Project */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">About this Project</Label>
-          <div className="flex items-center gap-2">
-            {charCount > 0 && (
-              <span className="text-xs text-muted-foreground">
-                {charCount} chars
-              </span>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAboutProjectExpanded(!isAboutProjectExpanded)}
-            >
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  isAboutProjectExpanded ? "rotate-180" : "rotate-0",
-                )}
-              />
-            </Button>
-          </div>
-        </div>
-
-        <div
-          className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden",
-            isAboutProjectExpanded
-              ? "max-h-[1000px] opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none !mt-0",
-          )}
-        >
-          <TooltipProvider>
-            <ProseMirrorEditor
-              initialContent={content}
-              mentionableMembers={mentionableMembers}
-              onBlur={(newContent) => {
-                if (projectId) {
-                  updateProject(projectId, { description: newContent });
-                }
-              }}
-              placeholder="Add project description..."
-            />
-          </TooltipProvider>
         </div>
       </div>
 

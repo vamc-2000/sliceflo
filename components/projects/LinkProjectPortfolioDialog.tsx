@@ -56,9 +56,24 @@ export default function LinkProjectPortfolioDialog({
       (p.name ?? '').toLowerCase().includes(query.toLowerCase())
     )
 
+  const allSelected =
+    availablePortfolios.length > 0 &&
+    availablePortfolios.every((p) => selectedIds.has(p.id!))
+
+  const someSelected =
+    availablePortfolios.some((p) => selectedIds.has(p.id!)) && !allSelected
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(availablePortfolios.map((p) => p.id!)))
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full">
+      <DialogContent className="max-w-lg w-full border-b-[5px] border-b-primary">
         <DialogHeader>
           <DialogTitle className="text-sm font-bold">Link Project to Portfolios</DialogTitle>
         </DialogHeader>
@@ -81,8 +96,17 @@ export default function LinkProjectPortfolioDialog({
           {/* Table */}
           <div className="w-full border border-border rounded-md relative">
             {/* Table Header */}
-            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary">
-              <div />
+            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary border-b border-border">
+              <div className="flex items-center">
+                <Checkbox
+                  checked={allSelected}
+                  data-state={someSelected ? 'indeterminate' : allSelected ? 'checked' : 'unchecked'}
+                  onCheckedChange={toggleSelectAll}
+                  disabled={availablePortfolios.length === 0}
+                  data-testid="link-portfolio-select-all-checkbox"
+                  aria-label="Select all portfolios"
+                />
+              </div>
               <div className="pr-2">Portfolios</div>
               <div className="grid place-items-center pl-0 pr-4">Leader</div>
             </div>

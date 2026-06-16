@@ -833,11 +833,11 @@ const WorkflowBuilderInner = ({
     const nodeLabel = String(configNode?.data?.label || '').toLowerCase();
 
     return (
-        <div className="flex h-full w-full relative overflow-hidden">
+        <div className="flex h-full w-full relative overflow-hidden bg-background text-foreground">
 
             {/* Left Sidebar */}
             {!readOnly && (
-                <div className="w-72 border-r border-gray-100 bg-white flex-shrink-0 z-10 overflow-hidden flex flex-col">
+                <div className="w-72 border-r border-border bg-card flex-shrink-0 z-10 overflow-hidden flex flex-col text-foreground">
                     <NodePanel
                         onDragStart={onDragStart}
                         onAddItem={(template) => handleAddNode(template)}
@@ -846,7 +846,7 @@ const WorkflowBuilderInner = ({
             )}
 
             {/* ReactFlow Canvas */}
-            <div ref={reactFlowWrapper} className="flex-1 bg-[#FDFDFF] relative">
+            <div ref={reactFlowWrapper} className="flex-1 bg-background relative text-foreground">
                 <ReactFlow
                     nodes={nodes}
                     edges={animatedEdges}
@@ -898,8 +898,8 @@ const WorkflowBuilderInner = ({
                         setIsLibrarySidebarOpen(false);
                     }}
                 >
-                    <Background variant={BackgroundVariant.Lines} gap={40} size={1} color="#f1f5f9" />
-                    <Controls className="!bg-white !border !border-gray-200 !shadow-sm rounded-lg overflow-hidden [&_button]:!border-gray-100" />
+                    <Background variant={BackgroundVariant.Lines} gap={40} size={1} className="opacity-40" />
+                    <Controls className="!bg-card !border !border-border !shadow-sm rounded-lg overflow-hidden [&_button]:!border-border [&_button]:!bg-card [&_button]:!text-foreground [&_button]:hover:!bg-accent" />
 
                     {/* ── Right-side overlay: buttons + sidebars ── */}
                     <Panel position="top-right" className="!m-0 h-full p-4 flex flex-col items-end gap-3 pointer-events-none">
@@ -910,13 +910,13 @@ const WorkflowBuilderInner = ({
                                 <Input
                                     value={automationName}
                                     onChange={(e) => setAutomationName(e.target.value)}
-                                    className="h-8 w-48 text-[11px] font-semibold bg-white border-gray-200 rounded-lg shadow-sm"
+                                    className="h-8 w-48 text-[11px] font-semibold bg-card border-border rounded-lg shadow-sm text-foreground placeholder:text-muted-foreground/60"
                                     placeholder="Automation name..."
                                 />
                                 <Button
                                     onClick={() => fitView({ padding: 0.2 })}
                                     variant="outline" size="sm"
-                                    className="bg-white border-gray-200 hover:bg-gray-50 h-8 text-[11px] font-semibold shadow-sm"
+                                    className="bg-card border-border hover:bg-accent hover:text-accent-foreground text-foreground h-8 text-[11px] font-semibold shadow-sm cursor-pointer"
                                 >
                                     <Maximize2 className="w-3.5 h-3.5 mr-1.5" /> Fit View
                                 </Button>
@@ -924,7 +924,7 @@ const WorkflowBuilderInner = ({
                                     <Button
                                         onClick={deleteSelectedNodes}
                                         variant="outline" size="sm"
-                                        className="bg-white border-red-100 text-red-600 hover:bg-red-50 h-8 text-[11px] font-semibold shadow-sm"
+                                        className="bg-card border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[11px] font-semibold shadow-sm cursor-pointer"
                                     >
                                         <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
                                     </Button>
@@ -932,7 +932,7 @@ const WorkflowBuilderInner = ({
                                 <Button
                                     onClick={handleSaveAutomation}
                                     disabled={isSaving} size="sm"
-                                    className="bg-[#001F3F] hover:bg-[#002b5a] text-white h-8 text-[11px] font-semibold px-4 rounded-lg shadow-lg"
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-[11px] font-semibold px-4 rounded-lg shadow-lg cursor-pointer"
                                 >
                                     {isSaving ? "Saving..." : "Save & Publish"}
                                 </Button>
@@ -960,10 +960,10 @@ const WorkflowBuilderInner = ({
 
                             return (
                                 <div className="flex-1 pointer-events-auto">
-                                    <div className="w-[450px] h-full rounded-2xl border border-gray-100 bg-white shadow-2xl overflow-hidden flex flex-col shrink-0">
+                                    <div className="w-[450px] h-full rounded-2xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col shrink-0 text-foreground">
 
                                         {/* Header */}
-                                        <header className="px-6 py-2 flex items-start justify-between bg-white shrink-0 border-b border-gray-50/50">
+                                        <header className="px-6 py-2 flex items-start justify-between bg-card shrink-0 border-b border-border">
                                             <div className="flex items-start gap-4">
                                                 <div
                                                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-100/50"
@@ -992,10 +992,10 @@ const WorkflowBuilderInner = ({
                                                     })()}
                                                 </div>
                                                 <div className="pt-0.5">
-                                                    <h2 className="text-lg font-semibold text-gray-900 leading-tight">
+                                                    <h2 className="text-lg font-semibold text-foreground leading-tight">
                                                         {activeNode?.data?.label as string} — Configure Step
                                                     </h2>
-                                                    <p className="text-sm text-gray-400 font-medium mt-0.5">
+                                                    <p className="text-sm text-muted-foreground font-medium mt-0.5">
                                                         {activeNode?.type} · Step {(activeNode?.data?.sequence as number) + 1}
                                                     </p>
                                                 </div>
@@ -1003,22 +1003,22 @@ const WorkflowBuilderInner = ({
                                             <Button
                                                 variant="ghost" size="icon"
                                                 onClick={() => setIsConfigOpen(false)}
-                                                className="rounded-full w-8 h-8 hover:bg-gray-50 -mt-1 -mr-2 text-gray-400 hover:text-gray-600"
+                                                className="rounded-full w-8 h-8 hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer -mt-1 -mr-2"
                                             >
                                                 <X className="w-5 h-5" />
                                             </Button>
                                         </header>
 
                                         {/* Body */}
-                                        <div className="flex-1 min-h-0">
+                                        <div className="flex-1 min-h-0 bg-card">
                                             <ScrollArea className="h-full">
-                                                <div className="p-6 space-y-8 bg-white">
+                                                <div className="p-6 space-y-8 bg-card">
                                                     <div className="space-y-4">
                                                         <div className="space-y-2">
-                                                            <label className="text-[10px] font-semibold text-gray-700 uppercase tracking-widest">
+                                                            <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
                                                                 {activeNode?.type === 'trigger' ? 'When this happens...' : 'Then do this...'}
                                                             </label>
-                                                            <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                                                            <h3 className="text-lg font-bold text-foreground leading-tight">
                                                                 {activeNode?.data?.label as React.ReactNode}
                                                             </h3>
                                                         </div>
@@ -1080,10 +1080,10 @@ const WorkflowBuilderInner = ({
                                         </div>
 
                                         {/* Footer */}
-                                        <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 shrink-0">
+                                        <div className="px-6 py-4 bg-secondary/10 border-t border-border shrink-0">
                                             <Button
                                                 onClick={() => setIsConfigOpen(false)}
-                                                className="w-full h-11 bg-[#0073EA] hover:bg-[#005fb8] text-white font-bold rounded-xl shadow-lg shadow-blue-100 transition-all"
+                                                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg transition-all cursor-pointer"
                                             >
                                                 Done
                                             </Button>

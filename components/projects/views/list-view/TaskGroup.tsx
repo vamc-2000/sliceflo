@@ -40,7 +40,7 @@ import {
 import { TaskTable } from "./TaskTable";
 import { useTasksStore } from "@/stores/tasks-store";
 import { AnimatePresence, motion } from "framer-motion";
-import { Task, ColumnConfig } from '@/types/task.types';
+import { Task, ColumnConfig } from "@/types/task.types";
 import { FilterBlock } from "@/components/projects/views/list-view/filters/AdvancedFiltersNew";
 import { useProjectsStore } from "@/stores/projects-store";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -93,7 +93,7 @@ export function TaskGroup({
   group,
   projectId,
   hideFields = [],
-  groupBy = 'status',
+  groupBy = "status",
   sortConfig = [],
   filterBlock = null,
   columnConfigs = [],
@@ -113,9 +113,7 @@ export function TaskGroup({
   onSelectionChange,
   clearSelection,
 }: TaskGroupProps) {
-  const {
-    tasks
-  } = useTasksStore();
+  const { tasks } = useTasksStore();
 
   const {
     getTaskTypesByProject,
@@ -144,33 +142,46 @@ export function TaskGroup({
 
   // Color palette
   const COLOR_PALETTE = [
-    '#FF3B30', '#FF9500', '#34C759', '#FFCC00', '#00C7BE', '#007AFF',
-    '#5856D6', '#AF52DE', '#FF2D55', '#001F3F', '#A2845E',
+    "#FF3B30",
+    "#FF9500",
+    "#34C759",
+    "#FFCC00",
+    "#00C7BE",
+    "#007AFF",
+    "#5856D6",
+    "#AF52DE",
+    "#FF2D55",
+    "#001F3F",
+    "#A2845E",
   ];
 
   const getGroupByLabel = () => {
-    if (groupBy === 'status') return 'Status';
-    if (groupBy === 'priority') return 'Priority';
-    if (groupBy === 'assginee') return 'Assginee';
-    if (groupBy === 'dueDate') return 'Date';
-    if (groupBy === 'taskType') return 'Type';
-    if (groupBy?.startsWith('custom-')) {
-      const fieldId = groupBy.replace('custom-', '');
+    if (groupBy === "status") return "Status";
+    if (groupBy === "priority") return "Priority";
+    if (groupBy === "assginee") return "Assginee";
+    if (groupBy === "dueDate") return "Date";
+    if (groupBy === "taskType") return "Type";
+    if (groupBy?.startsWith("custom-")) {
+      const fieldId = groupBy.replace("custom-", "");
       const field = customFields?.find((f) => f.id === fieldId);
-      return field?.name || 'Field';
+      return field?.name || "Field";
     }
-    return 'Group';
+    return "Group";
   };
 
   const canAddGroup = () => {
-    return groupBy === 'status' || groupBy === 'priority' || groupBy?.startsWith('custom-');
+    return (
+      groupBy === "status" ||
+      groupBy === "priority" ||
+      groupBy?.startsWith("custom-")
+    );
   };
 
   const handleColorSelect = async (color: string) => {
-    setMenuOpen(false);   // ← closes the whole dropdown immediately
-    if (groupBy === 'status') {
+    setMenuOpen(false); // ← closes the whole dropdown immediately
+    if (groupBy === "status") {
       await updateTaskStatusConfig(projectId, group.id, { color });
-    } else if (groupBy === 'priority' && group.optionId) {
+    } else if (groupBy === "priority" && group.optionId) {
       await updateTaskPriorityConfig(projectId, group.optionId, { color });
     }
   };
@@ -178,33 +189,35 @@ export function TaskGroup({
   const handleDuplicateGroup = async () => {
     const duplicatedName = `${group.name} Copy`;
 
-    if (groupBy === 'status') {
+    if (groupBy === "status") {
       const original = taskStatusConfigs.find((c) => c._id === group.id);
       if (original) {
         await addTaskStatusConfig(projectId, {
           label: duplicatedName,
           color: original.color,
-          value: duplicatedName.toLowerCase().replace(/\s+/g, '_'),
+          value: duplicatedName.toLowerCase().replace(/\s+/g, "_"),
         });
       }
-    } else if (groupBy === 'priority' && group.optionId) {
-      const originalOption = taskPriorityConfigs.find((opt) => opt._id === group.optionId);
+    } else if (groupBy === "priority" && group.optionId) {
+      const originalOption = taskPriorityConfigs.find(
+        (opt) => opt._id === group.optionId,
+      );
       if (originalOption) {
-        const value = duplicatedName.toLowerCase().replace(/\s+/g, '_');
+        const value = duplicatedName.toLowerCase().replace(/\s+/g, "_");
         await addTaskPriorityConfig(projectId, {
           label: duplicatedName,
           value,
-          description: '',
+          description: "",
           color: originalOption.color,
           order: taskPriorityConfigs.length + 1,
         });
       }
-    } else if (groupBy === 'taskType') {
+    } else if (groupBy === "taskType") {
       // ✅ ADD THIS - Duplicate task type
-      const taskType = taskTypes.find(t => t.label === group.name);
+      const taskType = taskTypes.find((t) => t.label === group.name);
       if (taskType) {
         const { addTaskTypeToProject } = useProjectsStore.getState();
-        const value = duplicatedName.toLowerCase().replace(/\s+/g, '-');
+        const value = duplicatedName.toLowerCase().replace(/\s+/g, "-");
         addTaskTypeToProject(projectId, {
           value,
           label: duplicatedName,
@@ -213,11 +226,11 @@ export function TaskGroup({
           order: taskTypes.length + 1,
         });
       }
-    } else if (groupBy?.startsWith('custom-') && group.fieldId) {
+    } else if (groupBy?.startsWith("custom-") && group.fieldId) {
       const field = customFields.find((f) => f.id === group.fieldId);
       if (field && !field.options.includes(duplicatedName)) {
         const updatedOptions = [...field.options, duplicatedName];
-        updateTaskCustomFieldOptions(projectId, group.fieldId, updatedOptions);  // ← new
+        updateTaskCustomFieldOptions(projectId, group.fieldId, updatedOptions); // ← new
       }
     }
   };
@@ -225,7 +238,13 @@ export function TaskGroup({
   const handleExportCSV = () => {
     if (sortedAndFilteredTasks.length === 0) return;
 
-    const headers = ["Task Name", "Status", "Priority", "Assignee", "Start Date", "Due Date",
+    const headers = [
+      "Task Name",
+      "Status",
+      "Priority",
+      "Assignee",
+      "Start Date",
+      "Due Date",
       ...customFields.map((f) => f.name),
     ];
 
@@ -240,7 +259,9 @@ export function TaskGroup({
     ]);
 
     const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      )
       .join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -254,7 +275,13 @@ export function TaskGroup({
   const handleExportExcel = () => {
     if (sortedAndFilteredTasks.length === 0) return;
 
-    const headers = ["Task Name", "Status", "Priority", "Assignee", "Start Date", "Due Date",
+    const headers = [
+      "Task Name",
+      "Status",
+      "Priority",
+      "Assignee",
+      "Start Date",
+      "Due Date",
       ...customFields.map((f) => f.name),
     ];
 
@@ -269,10 +296,14 @@ export function TaskGroup({
     ]);
 
     const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => String(cell).replace(/"/g, '""')).join(","))
+      .map((row) =>
+        row.map((cell) => String(cell).replace(/"/g, '""')).join(","),
+      )
       .join("\n");
 
-    const blob = new Blob([csvContent], { type: "application/vnd.ms-excel;charset=utf-8;" });
+    const blob = new Blob([csvContent], {
+      type: "application/vnd.ms-excel;charset=utf-8;",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `${group.name}-tasks-${new Date().toISOString().split("T")[0]}.xlsx`;
@@ -297,7 +328,7 @@ export function TaskGroup({
         <td>${task.startDate ?? "-"}</td>
         <td>${task.endDate ?? "-"}</td>
         ${customFields.map((f) => `<td>${task.customFieldValues?.[f.id] ?? "-"}</td>`).join("")}
-      </tr>`
+      </tr>`,
       )
       .join("");
 
@@ -330,16 +361,16 @@ export function TaskGroup({
     setTimeout(() => printWindow.print(), 250);
   };
 
-
   const canDeleteGroup = () => {
     if (group.isUntitled) return false;
-    if (groupBy?.startsWith('custom-') && group.name === 'No Value') return false;
-    if (groupBy === 'dueDate') return false;
-    if (groupBy === 'assignee') return false;
+    if (groupBy?.startsWith("custom-") && group.name === "No Value")
+      return false;
+    if (groupBy === "dueDate") return false;
+    if (groupBy === "assignee") return false;
     // ✅ System task types cannot be deleted, but custom ones can
-    if (groupBy === 'taskType') {
-      const taskType = taskTypes.find(t => t.label === group.name);
-      return taskType ? !taskType._id.startsWith('system-') : false;
+    if (groupBy === "taskType") {
+      const taskType = taskTypes.find((t) => t.label === group.name);
+      return taskType ? !taskType._id.startsWith("system-") : false;
     }
     return true;
   };
@@ -347,24 +378,24 @@ export function TaskGroup({
   // AFTER — opener just opens the modal, executor does the work
   const handleDeleteGroup = () => {
     if (!canDeleteGroup()) return;
-    setMenuOpen(false);          // close dropdown first
-    setDeleteConfirmOpen(true);  // then open confirmation modal
+    setMenuOpen(false); // close dropdown first
+    setDeleteConfirmOpen(true); // then open confirmation modal
   };
 
   const handleDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
-      if (groupBy === 'status') {
+      if (groupBy === "status") {
         await deleteTaskStatusConfig(projectId, group.id);
-      } else if (groupBy === 'priority' && group.optionId) {
+      } else if (groupBy === "priority" && group.optionId) {
         await deleteTaskPriorityConfig(projectId, group.optionId);
-      } else if (groupBy === 'taskType') {
-        const taskType = taskTypes.find(t => t.label === group.name);
-        if (taskType && !taskType._id.startsWith('system-')) {
+      } else if (groupBy === "taskType") {
+        const taskType = taskTypes.find((t) => t.label === group.name);
+        if (taskType && !taskType._id.startsWith("system-")) {
           const { deleteTaskTypeFromProject } = useProjectsStore.getState();
           deleteTaskTypeFromProject(projectId, taskType._id);
         }
-      } else if (groupBy?.startsWith('custom-') && group.fieldId) {
+      } else if (groupBy?.startsWith("custom-") && group.fieldId) {
         deleteTaskCustomFieldOption(projectId, group.fieldId, group.name);
       }
       if (onDeleteGroup) {
@@ -381,18 +412,18 @@ export function TaskGroup({
 
     try {
       const { addTaskTypeToProject } = useProjectsStore.getState();
-      const value = name.toLowerCase().replace(/\s+/g, '-');
+      const value = name.toLowerCase().replace(/\s+/g, "-");
       const order = taskTypes.length + 1;
 
       await addTaskTypeToProject(projectId, {
         value,
         label: name.trim(),
         description: `Custom ${name.trim()} type`,
-        color: '#6366f1', // Default color
+        color: "#6366f1", // Default color
         order,
       });
     } catch (error) {
-      console.error('Failed to add task type:', error);
+      console.error("Failed to add task type:", error);
     }
   };
 
@@ -400,34 +431,35 @@ export function TaskGroup({
   const getFilteredTasks = () => {
     const allProjectTasks = tasks.filter((t) => t.projectId === projectId);
 
-    if (groupBy === 'status') {
+    if (groupBy === "status") {
       if (group.isUntitled) return allProjectTasks;
       const config = taskStatusConfigs.find((c) => c._id === group.id);
       if (!config) return [];
       // task.status is stored as config.label (e.g. "Backlog") — match either way
-      return allProjectTasks.filter(
-        (t) => t.status === config.value
-      );
+      return allProjectTasks.filter((t) => t.status === config.value);
     }
 
-    if (groupBy === 'assignee') {
-      if (group.id === 'unassigned') return allProjectTasks.filter((t) => !t.assignee);
+    if (groupBy === "assignee") {
+      if (group.id === "unassigned")
+        return allProjectTasks.filter((t) => !t.assignee);
       const memberName = group.name;
       return allProjectTasks.filter((t) => t.assignee === memberName);
     }
 
-    if (groupBy === 'priority') {
+    if (groupBy === "priority") {
       if (group.isUntitled) return allProjectTasks.filter((t) => !t.priority);
-      const priorityId = group.id.replace('priority-', '');
-      const priorityConfig = taskPriorityConfigs.find((opt) => opt._id === priorityId);
+      const priorityId = group.id.replace("priority-", "");
+      const priorityConfig = taskPriorityConfigs.find(
+        (opt) => opt._id === priorityId,
+      );
       if (!priorityConfig) return [];
       return allProjectTasks.filter((t) => t.priority === priorityConfig.value);
     }
 
-    if (groupBy === 'dueDate') {
+    if (groupBy === "dueDate") {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (group.id === 'overdue') {
+      if (group.id === "date-overdue" || group.id === "overdue") {
         return allProjectTasks.filter((t) => {
           if (!t.endDate) return false;
           const d = new Date(t.endDate);
@@ -435,7 +467,7 @@ export function TaskGroup({
           return d < today;
         });
       }
-      if (group.id === 'today') {
+      if (group.id === "date-today" || group.id === "today") {
         return allProjectTasks.filter((t) => {
           if (!t.endDate) return false;
           const d = new Date(t.endDate);
@@ -443,7 +475,7 @@ export function TaskGroup({
           return d.getTime() === today.getTime();
         });
       }
-      if (group.id === 'upcoming') {
+      if (group.id === "date-upcoming" || group.id === "upcoming") {
         return allProjectTasks.filter((t) => {
           if (!t.endDate) return false;
           const d = new Date(t.endDate);
@@ -451,18 +483,20 @@ export function TaskGroup({
           return d > today;
         });
       }
-      if (group.id === 'no-date') {
+      if (group.id === "date-no-date" || group.id === "no-date") {
         return allProjectTasks.filter((t) => !t.endDate);
       }
       return [];
     }
 
-    if (groupBy?.startsWith('custom-')) {
-      const fieldId = groupBy.replace('custom-', '');
-      if (group.name === 'No Value') {
+    if (groupBy?.startsWith("custom-")) {
+      const fieldId = groupBy.replace("custom-", "");
+      if (group.name === "No Value") {
         return allProjectTasks.filter((t) => !t.customFieldValues?.[fieldId]);
       }
-      return allProjectTasks.filter((t) => t.customFieldValues?.[fieldId] === group.name);
+      return allProjectTasks.filter(
+        (t) => t.customFieldValues?.[fieldId] === group.name,
+      );
     }
 
     return allProjectTasks;
@@ -475,24 +509,45 @@ export function TaskGroup({
       for (const sort of activeSorts) {
         let aVal: any;
         let bVal: any;
-        if (sort.fieldId === 'task' || sort.fieldId === 'name') { aVal = a.name; bVal = b.name; }
-        else if (sort.fieldId === 'taskType') { aVal = a.taskType; bVal = b.taskType; }
-        else if (sort.fieldId === 'status') { aVal = a.status; bVal = b.status; }
-        else if (sort.fieldId === 'cycle') { aVal = a.cycleId; bVal = b.cycleId; }
-        else if (sort.fieldId === 'priority') { aVal = a.priority; bVal = b.priority; }
-        else if (sort.fieldId === 'startDate') { aVal = a.startDate; bVal = b.startDate; }
-        else if (sort.fieldId === 'endDate') { aVal = a.endDate; bVal = b.endDate; }
-        else if (sort.fieldId === 'assignee') { aVal = a.assignee; bVal = b.assignee; }
-        else { aVal = a.customFieldValues?.[sort.fieldId]; bVal = b.customFieldValues?.[sort.fieldId]; }
-        if (aVal === undefined || aVal === null) aVal = '';
-        if (bVal === undefined || bVal === null) bVal = '';
-        if (sort.fieldType === 'date') {
+        if (sort.fieldId === "task" || sort.fieldId === "name") {
+          aVal = a.name;
+          bVal = b.name;
+        } else if (sort.fieldId === "taskType") {
+          aVal = a.taskType;
+          bVal = b.taskType;
+        } else if (sort.fieldId === "status") {
+          aVal = a.status;
+          bVal = b.status;
+        } else if (sort.fieldId === "cycle") {
+          aVal = a.cycleId;
+          bVal = b.cycleId;
+        } else if (sort.fieldId === "priority") {
+          aVal = a.priority;
+          bVal = b.priority;
+        } else if (sort.fieldId === "startDate") {
+          aVal = a.startDate;
+          bVal = b.startDate;
+        } else if (sort.fieldId === "endDate") {
+          aVal = a.endDate;
+          bVal = b.endDate;
+        } else if (sort.fieldId === "assignee") {
+          aVal = a.assignee;
+          bVal = b.assignee;
+        } else {
+          aVal = a.customFieldValues?.[sort.fieldId];
+          bVal = b.customFieldValues?.[sort.fieldId];
+        }
+        if (aVal === undefined || aVal === null) aVal = "";
+        if (bVal === undefined || bVal === null) bVal = "";
+        if (sort.fieldType === "date") {
           const aDate = aVal ? new Date(aVal).getTime() : 0;
           const bDate = bVal ? new Date(bVal).getTime() : 0;
-          if (aDate !== bDate) return sort.direction === 'asc' ? aDate - bDate : bDate - aDate;
+          if (aDate !== bDate)
+            return sort.direction === "asc" ? aDate - bDate : bDate - aDate;
         } else {
           const comparison = String(aVal).localeCompare(String(bVal));
-          if (comparison !== 0) return sort.direction === 'asc' ? comparison : -comparison;
+          if (comparison !== 0)
+            return sort.direction === "asc" ? comparison : -comparison;
         }
       }
       return 0;
@@ -500,17 +555,24 @@ export function TaskGroup({
   };
 
   const applyFilters = (taskList: Task[]): Task[] => {
-    if (!filterBlock || !filterBlock.children || filterBlock.children.length === 0) return taskList;
+    if (
+      !filterBlock ||
+      !filterBlock.children ||
+      filterBlock.children.length === 0
+    )
+      return taskList;
 
     const getFieldValue = (task: Task, fieldId: string) => {
-      if (fieldId === 'dueDate') fieldId = 'endDate';
-      if (fieldId === 'labels') {
+      if (fieldId === "dueDate") fieldId = "endDate";
+      if (fieldId === "labels") {
         const labelIds = task.labelIds || [];
         const labels = task.labels || [];
-        const idsFromLabels = (labels as any[]).map(l => (typeof l === 'string' ? l : l.id || l.name));
+        const idsFromLabels = (labels as any[]).map((l) =>
+          typeof l === "string" ? l : l.id || l.name,
+        );
         return [...labelIds, ...idsFromLabels];
       }
-      if (fieldId === 'cycle') return task.cycleId;
+      if (fieldId === "cycle") return task.cycleId;
       return task.customFieldValues?.[fieldId] ?? (task as any)[fieldId];
     };
 
@@ -519,31 +581,58 @@ export function TaskGroup({
       const filterValue = criteria.value;
 
       switch (criteria.condition) {
-        case "is": return fieldValue === filterValue;
-        case "is-not": return fieldValue !== filterValue;
+        case "is":
+          return fieldValue === filterValue;
+        case "is-not":
+          return fieldValue !== filterValue;
         case "contains":
           if (Array.isArray(fieldValue)) {
-            return fieldValue.some(val => String(val).toLowerCase() === String(filterValue || '').toLowerCase());
+            return fieldValue.some(
+              (val) =>
+                String(val).toLowerCase() ===
+                String(filterValue || "").toLowerCase(),
+            );
           }
-          return String(fieldValue || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+          return String(fieldValue || "")
+            .toLowerCase()
+            .includes(String(filterValue || "").toLowerCase());
         case "does-not-contain":
           if (Array.isArray(fieldValue)) {
-            return !fieldValue.some(val => String(val).toLowerCase() === String(filterValue || '').toLowerCase());
+            return !fieldValue.some(
+              (val) =>
+                String(val).toLowerCase() ===
+                String(filterValue || "").toLowerCase(),
+            );
           }
-          return !String(fieldValue || '').toLowerCase().includes(String(filterValue || '').toLowerCase());
+          return !String(fieldValue || "")
+            .toLowerCase()
+            .includes(String(filterValue || "").toLowerCase());
         case "is-empty":
-          return !fieldValue || fieldValue === '' || (Array.isArray(fieldValue) && fieldValue.length === 0);
+          return (
+            !fieldValue ||
+            fieldValue === "" ||
+            (Array.isArray(fieldValue) && fieldValue.length === 0)
+          );
         case "is-not-empty":
-          return !!fieldValue && fieldValue !== '' && (!Array.isArray(fieldValue) || fieldValue.length > 0);
+          return (
+            !!fieldValue &&
+            fieldValue !== "" &&
+            (!Array.isArray(fieldValue) || fieldValue.length > 0)
+          );
 
         // Date conditions
         case "date-equals": {
           if (!fieldValue || !filterValue) return false;
-          return new Date(fieldValue).toDateString() === new Date(filterValue).toDateString();
+          return (
+            new Date(fieldValue).toDateString() ===
+            new Date(filterValue).toDateString()
+          );
         }
         case "date-is-today": {
           if (!fieldValue) return false;
-          return new Date(fieldValue).toDateString() === new Date().toDateString();
+          return (
+            new Date(fieldValue).toDateString() === new Date().toDateString()
+          );
         }
         case "date-is-this-week": {
           if (!fieldValue) return false;
@@ -559,7 +648,10 @@ export function TaskGroup({
           if (!fieldValue) return false;
           const today = new Date();
           const taskDate = new Date(fieldValue);
-          return taskDate.getMonth() === today.getMonth() && taskDate.getFullYear() === today.getFullYear();
+          return (
+            taskDate.getMonth() === today.getMonth() &&
+            taskDate.getFullYear() === today.getFullYear()
+          );
         }
         case "date-is-before":
           return fieldValue && new Date(fieldValue) < new Date(filterValue);
@@ -567,7 +659,7 @@ export function TaskGroup({
           return fieldValue && new Date(fieldValue) > new Date(filterValue);
         case "date-is-between": {
           if (!fieldValue || !filterValue) return false;
-          const [start, end] = String(filterValue).split(' - ');
+          const [start, end] = String(filterValue).split(" - ");
           const taskDate = new Date(fieldValue);
           return taskDate >= new Date(start) && taskDate <= new Date(end);
         }
@@ -581,15 +673,20 @@ export function TaskGroup({
         case "not-equals":
           return parseFloat(fieldValue) !== parseFloat(filterValue);
 
-        default: return true;
+        default:
+          return true;
       }
     };
 
     return taskList.filter((task) => {
-      if (filterBlock.operator === 'AND') {
-        return filterBlock.children.every((criteria: any) => matchesCriteria(task, criteria));
+      if (filterBlock.operator === "AND") {
+        return filterBlock.children.every((criteria: any) =>
+          matchesCriteria(task, criteria),
+        );
       } else {
-        return filterBlock.children.some((criteria: any) => matchesCriteria(task, criteria));
+        return filterBlock.children.some((criteria: any) =>
+          matchesCriteria(task, criteria),
+        );
       }
     });
   };
@@ -601,25 +698,31 @@ export function TaskGroup({
       return;
     }
     if (group.isUntitled) {
-      if (groupBy === 'status') {
+      if (groupBy === "status") {
         await addTaskStatusConfig(projectId, {
           label: editedName,
-          color: '#6B7280',
-          value: editedName.trim().toLowerCase().replace(/\s+/g, '_'),
+          color: "#6B7280",
+          value: editedName.trim().toLowerCase().replace(/\s+/g, "_"),
         });
       }
     } else {
-      if (groupBy === 'status') {
-        await updateTaskStatusConfig(projectId, group.id, { label: editedName });
-      } else if (groupBy === 'priority' && group.optionId) {
-        await updateTaskPriorityConfig(projectId, group.optionId, { label: editedName.trim() });
-      } else if (groupBy === 'taskType') {
-        const taskType = taskTypes.find(t => t.label === group.name);
-        if (taskType && !taskType._id.startsWith('system-')) {
+      if (groupBy === "status") {
+        await updateTaskStatusConfig(projectId, group.id, {
+          label: editedName,
+        });
+      } else if (groupBy === "priority" && group.optionId) {
+        await updateTaskPriorityConfig(projectId, group.optionId, {
+          label: editedName.trim(),
+        });
+      } else if (groupBy === "taskType") {
+        const taskType = taskTypes.find((t) => t.label === group.name);
+        if (taskType && !taskType._id.startsWith("system-")) {
           const { updateTaskTypeInProject } = useProjectsStore.getState();
-          updateTaskTypeInProject(projectId, taskType._id, { label: editedName.trim() });
+          updateTaskTypeInProject(projectId, taskType._id, {
+            label: editedName.trim(),
+          });
         } else {
-          alert('System task types cannot be renamed');
+          alert("System task types cannot be renamed");
           setEditedName(group.name);
         }
       }
@@ -628,15 +731,20 @@ export function TaskGroup({
   };
 
   const groupTasks = getFilteredTasks();
-  const totalSubtasks = groupTasks.reduce((acc, task) => acc + (task.subtasks?.length || 0), 0);
+  const totalSubtasks = groupTasks.reduce(
+    (acc, task) => acc + (task.subtasks?.length || 0),
+    0,
+  );
   const filteredGroupTasks = applyFilters(groupTasks);
   const tasksWithClosedFilter = displayOptions.closedTasks
-    ? filteredGroupTasks.filter(task => !task.completed && task.status !== 'done')
+    ? filteredGroupTasks.filter(
+        (task) => !task.completed && task.status !== "done",
+      )
     : filteredGroupTasks;
   const sortedAndFilteredTasks = sortTasks(tasksWithClosedFilter);
 
   // Determine the group accent color
-  const accentColor = group.color || '#6366f1';
+  const accentColor = group.color || "#6366f1";
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden w-full">
@@ -648,12 +756,15 @@ export function TaskGroup({
         {/* Left: chevron + dot + name + menu + count badge */}
         <div className="flex items-center gap-2">
           {/* Collapse toggle */}
-          <button data-testid={`task-group-collapse-button-${group.id}`}
+          <button
+            data-testid={`task-group-collapse-button-${group.id}`}
             className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted transition-colors text-muted-foreground"
           >
             <ChevronDown
               className="h-4 w-4 transition-transform duration-200"
-              style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              style={{
+                transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+              }}
             />
           </button>
 
@@ -665,32 +776,50 @@ export function TaskGroup({
 
           {/* Editable name */}
           {isEditingName ? (
-            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
                 className="h-7 text-xs font-semibold w-40 py-0"
                 autoFocus
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveGroupName();
-                  if (e.key === 'Escape') { setEditedName(group.name); setIsEditingName(false); }
+                  if (e.key === "Enter") handleSaveGroupName();
+                  if (e.key === "Escape") {
+                    setEditedName(group.name);
+                    setIsEditingName(false);
+                  }
                 }}
               />
-              <button onClick={handleSaveGroupName} className="text-green-600 hover:text-green-700 p-0.5">
+              <button
+                onClick={handleSaveGroupName}
+                className="text-green-600 hover:text-green-700 p-0.5"
+              >
                 <Check className="h-3.5 w-3.5" />
               </button>
-              <button onClick={() => { setEditedName(group.name); setIsEditingName(false); }} className="text-red-400 hover:text-red-600 p-0.5">
+              <button
+                onClick={() => {
+                  setEditedName(group.name);
+                  setIsEditingName(false);
+                }}
+                className="text-red-400 hover:text-red-600 p-0.5"
+              >
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
           ) : (
-            <h3 className="text-xs font-semibold text-foreground leading-none">{group.name}</h3>
+            <h3 className="text-xs font-semibold text-foreground leading-none">
+              {group.name}
+            </h3>
           )}
 
           {/* Task count badge */}
           <span className="text-xs text-muted-foreground ml-1">
-            {groupTasks.length} {groupTasks.length === 1 ? 'Task' : 'Tasks'}
-            {totalSubtasks > 0 && ` / ${totalSubtasks} subtask${totalSubtasks !== 1 ? 's' : ''}`}
+            {groupTasks.length} {groupTasks.length === 1 ? "Task" : "Tasks"}
+            {totalSubtasks > 0 &&
+              ` / ${totalSubtasks} subtask${totalSubtasks !== 1 ? "s" : ""}`}
           </span>
 
           {/* ··· menu */}
@@ -704,21 +833,34 @@ export function TaskGroup({
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="border-b-[5px] border-b-primary p-1.5">
+            <DropdownMenuContent
+              align="start"
+              className="border-b-[5px] border-b-primary p-1.5"
+            >
               {canAddGroup() && onAddNewGroup && (
-                <DropdownMenuItem onClick={onAddNewGroup} className="gap-2 text-xs">
+                <DropdownMenuItem
+                  onClick={onAddNewGroup}
+                  className="gap-2 text-xs"
+                >
                   <Plus className="h-3.5 w-3.5" />
                   Add {getGroupByLabel()}
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem data-testid={`task-group-menu-rename-${group.id}`} onClick={() => setIsEditingName(true)} className="gap-2 text-xs">
+              <DropdownMenuItem
+                data-testid={`task-group-menu-rename-${group.id}`}
+                onClick={() => setIsEditingName(true)}
+                className="gap-2 text-xs"
+              >
                 <Pencil className="h-3.5 w-3.5" />
                 Rename {getGroupByLabel()}
               </DropdownMenuItem>
 
               {/* Assign color — DropdownMenuSub stays open on hover, no cursor-leave issue */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger data-testid={`task-group-menu-color-trigger-${group.id}`} className="gap-2 text-xs">
+                <DropdownMenuSubTrigger
+                  data-testid={`task-group-menu-color-trigger-${group.id}`}
+                  className="gap-2 text-xs"
+                >
                   <Palette className="h-3.5 w-3.5" />
                   Assign color
                 </DropdownMenuSubTrigger>
@@ -727,11 +869,14 @@ export function TaskGroup({
                   sideOffset={2}
                 >
                   {/* Title row */}
-                  <p className="text-xs font-semibold mb-3">Assign color to group</p>
+                  <p className="text-xs font-semibold mb-3">
+                    Assign color to group
+                  </p>
                   {/* Color grid — 2 rows matching the image */}
                   <div className="grid grid-cols-6 gap-2">
                     {COLOR_PALETTE.map((color) => (
-                      <button data-testid={`task-group-menu-color-option-${color}-${group.id}`}
+                      <button
+                        data-testid={`task-group-menu-color-option-${color}-${group.id}`}
                         key={color}
                         onClick={() => handleColorSelect(color)}
                         className="w-6 h-6 rounded-full transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-ring ring-offset-background"
@@ -755,7 +900,11 @@ export function TaskGroup({
                 </DropdownMenuSubContent>
               </DropdownMenuSub> */}
               <DropdownMenuSeparator className="mx-2 my-0" />
-              <DropdownMenuItem data-testid={`task-group-menu-hide-${group.id}`} onClick={() => onHideGroup?.(group.id)} className="gap-2 text-xs">
+              <DropdownMenuItem
+                data-testid={`task-group-menu-hide-${group.id}`}
+                onClick={() => onHideGroup?.(group.id)}
+                className="gap-2 text-xs"
+              >
                 <Eye className="h-3.5 w-3.5" />
                 Hide {getGroupByLabel()}
               </DropdownMenuItem>
@@ -783,21 +932,39 @@ export function TaskGroup({
                     onClick={() => handlePrint()}
                     className="flex items-center gap-2.5 cursor-pointer text-xs"
                   >
-                    <Image src="/images/pdf.svg" alt="PDF" width={20} height={20} className="object-contain" />
+                    <Image
+                      src="/images/pdf.svg"
+                      alt="PDF"
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                    />
                     PDF
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleExportCSV()}
                     className="flex items-center gap-2.5 cursor-pointer text-xs"
                   >
-                    <Image src="/images/csv.svg" alt="CSV" width={20} height={20} className="object-contain" />
+                    <Image
+                      src="/images/csv.svg"
+                      alt="CSV"
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                    />
                     CSV
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleExportExcel()}
                     className="flex items-center gap-2.5 cursor-pointer text-xs"
                   >
-                    <Image src="/images/excel.svg" alt="Excel" width={20} height={20} className="object-contain" />
+                    <Image
+                      src="/images/excel.svg"
+                      alt="Excel"
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                    />
                     Excel
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
@@ -807,7 +974,8 @@ export function TaskGroup({
                 <Archive className="h-3.5 w-3.5" />
                 Archive {getGroupByLabel()}
               </DropdownMenuItem> */}
-              <DropdownMenuItem data-testid={`task-group-menu-delete-${group.id}`}
+              <DropdownMenuItem
+                data-testid={`task-group-menu-delete-${group.id}`}
                 className="gap-2 text-xs text-red-600 focus:text-red-600"
                 onClick={handleDeleteGroup}
                 disabled={!canDeleteGroup()}

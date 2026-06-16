@@ -17,6 +17,7 @@ import AddWorkItemTypeModal from "../AddWorkItemTypeModal";
 import { uploadIcon, uploadFile, deleteUpload } from '@/lib/api/uploads-api';
 import toast from 'react-hot-toast';
 import { IconData, iconComponentMap } from '@/components/ColorIconPicker';
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export interface WorkItemTypeData {
   name: string;
@@ -45,6 +46,8 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
+  const [deleteItemTypeId, setDeleteItemTypeId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const editingType = editingTypeId
     ? allTypes.find((t) => t._id === editingTypeId)
@@ -131,13 +134,20 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
     }
   };
 
-  const handleDelete = async (typeId: string) => {
-    if (window.confirm("Are you sure you want to delete this task type?")) {
-      try {
-        await deleteTaskTypeFromProject(projectId, typeId);
-      } catch (error) {
-        // Error already handled in store with toast
-      }
+  const handleDeleteClick = (typeId: string) => {
+    setDeleteItemTypeId(typeId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteItemTypeId) return;
+    setIsDeleting(true);
+    try {
+      await deleteTaskTypeFromProject(projectId, deleteItemTypeId);
+      setDeleteItemTypeId(null);
+    } catch (error) {
+      // Error already handled in store with toast
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -203,18 +213,18 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 bg-background text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Work item types</h2>
+          <h2 className="text-lg font-semibold text-foreground">Work item types</h2>
           <p className="text-sm text-muted-foreground">
             {allTypes.length} total types
           </p>
         </div>
         <Button
           onClick={() => handleCreateClick()}
-          className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md flex items-center gap-1.5 text-[12px] h-8 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           Create work item
@@ -229,42 +239,14 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
             allTypes.map((type) => (
               <div
                 key={type._id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-4 bg-card border border-border rounded-lg hover:shadow-sm transition-shadow"
               >
                 <div className="flex items-center gap-3">
-                  {/* <div
-                    className="w-8 h-8 rounded flex items-center justify-center text-sm font-medium overflow-hidden"
-                    style={{
-                      backgroundColor: type.color + '20',
-                      color: type.color,
-                    }}
-                  >
-                    {type.icon?.type === 'file' && type.icon?.presignedUrl ? (
-                      // ✅ Show uploaded image icon
-                      <img
-                        src={type.icon.presignedUrl}
-                        alt={type.label}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    ) : type.icon?.type === 'icon' && type.icon?.name ? (
-                      (() => {
-                        // ✅ use iconComponentMap — has full icon library including "person", "time" etc.
-                        const Icon = iconComponentMap[type.icon.name];
-                        return Icon
-                          ? <Icon size={16} color={type.icon.color || type.color} />
-                          : <span>{type.label.charAt(0)}</span>;
-                      })()
-                    ) : (
-                      // ✅ Fallback to first letter
-                      <span>{type.label.charAt(0)}</span>
-                    )}
-                  </div> */}
-
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center overflow-hidden shrink-0">
                     {renderWorkItemTypeIcon(type)}
                   </div>
                   <div>
-                    <div className="font-medium">{type.label}</div>
+                    <div className="font-medium text-foreground">{type.label}</div>
                     <div className="text-sm text-muted-foreground">
                       {type.description}
                     </div>
@@ -272,20 +254,20 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <Ellipsis className="w-4 h-4" />
-                    </Button>
+                    <button className="p-1 hover:bg-accent hover:text-accent-foreground rounded transition-colors cursor-pointer">
+                      <Ellipsis className="w-4 h-4 text-muted-foreground" />
+                    </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="w-32 bg-popover border border-border text-popover-foreground">
                     <DropdownMenuItem
                       onClick={() => handleEditClick(type._id)}
-                      className="text-[12px]"
+                      className="text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                     >
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleDelete(type._id)}
-                      className="text-red-600 focus:text-red-600 text-[12px]"
+                      onClick={() => handleDeleteClick(type._id)}
+                      className="text-red-600 focus:text-red-600 text-[12px] cursor-pointer hover:bg-accent hover:text-accent-foreground"
                     >
                       Delete
                     </DropdownMenuItem>
@@ -312,6 +294,17 @@ const WorkItemTypesPage: React.FC<WorkItemTypesPageProps> = ({
             color: editingType.icon.color || editingType.color,
           } : { type: 'icon', color: editingType.color },
         } : null}
+      />
+
+      <ConfirmationModal
+        open={!!deleteItemTypeId}
+        onClose={() => setDeleteItemTypeId(null)}
+        onConfirm={handleDeleteConfirm}
+        title="Are you sure want to delete this work item type?"
+        description="This action is permanent and cannot be undone."
+        confirmLabel="Delete Type"
+        loadingLabel="Deleting..."
+        loading={isDeleting}
       />
     </div>
   );

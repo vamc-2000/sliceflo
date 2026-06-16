@@ -1,12 +1,14 @@
 // components/projects/views/calendar-view/CustomDateCell.tsx
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { isWeekend } from "@/utils/timezone-utils";
+import { cn } from "@/lib/utils";
 
 interface CustomDateCellProps {
   value: Date;
   children: React.ReactNode;
   onAddTask: (date: Date) => void;
-  weekendDays: number[];
+  weekendDays?: number[];
   onDrop?: (date: Date) => void;
 }
 
@@ -14,16 +16,13 @@ export function CustomDateCell({
   value,
   children,
   onAddTask,
-  weekendDays = [0, 6],
   onDrop
 }: CustomDateCellProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Check if the date is weekend using the passed weekendDays prop
-  const dayOfWeek = value.getDay();
-  const isWeekend = weekendDays.includes(dayOfWeek);
-  // const isSunday = dayOfWeek === 0;
+  // Check if the date is weekend using the timezone-utils helper
+  const isWeekendCell = isWeekend(value);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -42,7 +41,7 @@ export function CustomDateCell({
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
-
+ 
     if (onDrop) {
       onDrop(value);
     }
@@ -50,14 +49,16 @@ export function CustomDateCell({
 
   return (
     <div
-      className="custom-date-cell-wrapper"
+      className={cn(
+        "custom-date-cell-wrapper",
+        isWeekendCell ? "rbc-weekend-bg" : "bg-transparent"
+      )}
       style={{
         position: 'relative',
         width: '100%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: isWeekend ? 'var(--muted)' : 'transparent',
         boxSizing: 'border-box'
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -86,7 +87,7 @@ export function CustomDateCell({
       />
 
       {/* Plus button - Show on non-weekend cells */}
-      {isHovered && !isWeekend && (
+      {isHovered && !isWeekendCell && (
         <button
           onClick={(e) => {
             e.stopPropagation();

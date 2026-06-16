@@ -337,6 +337,73 @@ export const useSidebarStore = create<SidebarState>()(
               href: favorite.href || `/favorites/${favorite.id}`,
             }))
           );
+
+          // Clean up pinned items for deleted resources (projects, teams, portfolios, favorites)
+          let pinnedChanged = false;
+          const currentPinnedItems = get().pinnedItems;
+          const cleanedPinnedItems = currentPinnedItems.filter((item) => {
+            // Project
+            const projectMatch = item.href.match(/^\/project\/([^/?#]+)/);
+            if (projectMatch) {
+              const projectId = projectMatch[1];
+              const exists = projectsData.some((p) => p.id === projectId);
+              if (!exists) {
+                pinnedChanged = true;
+                return false;
+              }
+            }
+
+            // Team
+            const teamMatch = item.href.match(/^\/teams\/([^/?#]+)/);
+            if (teamMatch) {
+              const teamId = teamMatch[1];
+              const exists = teamsData.some((t: any) => t.id === teamId);
+              if (!exists) {
+                pinnedChanged = true;
+                return false;
+              }
+            }
+
+            // Portfolio
+            const portfolioMatch = item.href.match(/^\/portfolio\/([^/?#]+)/);
+            if (portfolioMatch) {
+              const portfolioId = portfolioMatch[1];
+              const exists = portfoliosData.some((p: any) => p.id === portfolioId);
+              if (!exists) {
+                pinnedChanged = true;
+                return false;
+              }
+            }
+
+            // Favorite
+            const favoriteMatch = item.href.match(/^\/favorites\/([^/?#]+)/);
+            if (favoriteMatch) {
+              const favoriteId = favoriteMatch[1];
+              const exists = favoritesData.some((f: any) => f.id === favoriteId);
+              if (!exists) {
+                pinnedChanged = true;
+                return false;
+              }
+            }
+
+            return true;
+          });
+
+          if (pinnedChanged) {
+            // Also remove these items from menuItems
+            const cleanedMenuItems = get().menuItems.filter((item) => {
+              // If it's a pinned item (has sourceKey), check if it's still in the cleanedPinnedItems
+              if (item.sourceKey !== undefined) {
+                return cleanedPinnedItems.some((pinned) => pinned.href === item.href);
+              }
+              return true;
+            });
+
+            set({
+              pinnedItems: cleanedPinnedItems,
+              menuItems: cleanedMenuItems,
+            });
+          }
         } catch (error) {
           console.error('Failed to initialize dynamic sidebar data:', error);
         } finally {

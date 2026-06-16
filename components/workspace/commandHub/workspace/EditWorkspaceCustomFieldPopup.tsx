@@ -124,14 +124,14 @@ export function EditWorkspaceCustomFieldPopup({
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-[280px] p-0 flex flex-col h-[450px] border-b-[5px] border-b-[#001F3F]"
+        className="w-[280px] p-0 flex flex-col h-[450px] border border-border bg-popover text-popover-foreground border-b-[5px] border-b-primary"
         align={align}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5 border-b bg-background">
+        <div className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5 border-b border-border bg-background">
           <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-          <h3 className="font-semibold text-xs">Edit: {field.label}</h3>
+          <h3 className="font-semibold text-xs text-foreground">Edit: {field.label}</h3>
         </div>
 
         {/* Field editor fills remaining height */}

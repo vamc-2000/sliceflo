@@ -40,6 +40,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTeamStore } from "@/stores/teams-store";
 import { UpdateTargetModal } from "./UpdateTargetModal";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { toast } from "@/components/ui/sonner";
 import { useGoalsStore } from "@/stores/goals-store";
@@ -756,9 +757,7 @@ export function TargetsSection({ goalId, targets, onOpenCreateTarget, onOpenEdit
                             <span className="font-semibold text-foreground/70">
                               {(() => {
                                 if (!t.endDate) return "No date set";
-                                const d = new Date(t.endDate);
-                                if (isNaN(d.getTime())) return "Invalid date";
-                                return format(d, "MMM d, yyyy");
+                                return formatLocalDate(t.endDate);
                               })()}
                             </span>
                           </p>

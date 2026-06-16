@@ -142,10 +142,10 @@ const WorkflowsPage = () => {
     // ── Empty State ───────────────────────────────────────
     if (!isLoading && automations.length === 0 && !showCreateForm) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen bg-white">
+            <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
                 <div className="text-center max-w-2xl px-8">
-                    <h1 className="text-[32px] font-bold text-gray-900 mb-3">Workflows</h1>
-                    <p className="text-gray-500 text-[16px] mb-12">
+                    <h1 className="text-[32px] font-bold text-foreground mb-3">Workflows</h1>
+                    <p className="text-muted-foreground text-[16px] mb-12">
                         Design intelligent workflows that reason, decide, and automate how work moves across your projects.
                     </p>
                     <div className="mb-12 relative w-[500px] h-[300px] mx-auto">
@@ -158,16 +158,16 @@ const WorkflowsPage = () => {
                         />
                     </div>
                     <div className="flex flex-col items-center gap-6">
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
-                            <h2 className="text-[24px] font-semibold text-gray-900 mb-2">
+                        <div className="bg-card rounded-2xl p-8 border border-border">
+                            <h2 className="text-[24px] font-semibold text-foreground mb-2">
                                 Automate your team's work with powerful workflows
                             </h2>
-                            <p className="text-gray-600 text-[15px] mb-6">
+                            <p className="text-muted-foreground text-[15px] mb-6">
                                 Create intelligent workflows to streamline processes, set automated actions, and supercharge productivity.
                             </p>
                             <Button
                                 onClick={() => setShowCreateForm(true)}
-                                className="bg-[#001F3F] text-white hover:bg-[#002F5F] px-8 py-6 text-[15px] font-semibold rounded-lg shadow-md"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-[15px] font-semibold rounded-lg shadow-md cursor-pointer"
                             >
                                 Get started
                             </Button>
@@ -180,17 +180,17 @@ const WorkflowsPage = () => {
 
     // ── Main View ─────────────────────────────────────────
     return (
-        <div className="flex flex-col h-screen bg-[#F8F9FB]">
+        <div className="flex flex-col h-screen bg-background text-foreground">
             {/* Header */}
-            <header className="px-8 py-5 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
+            <header className="px-8 py-5 bg-card border-b border-border flex items-center justify-between shrink-0">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Workflows</h1>
-                    <p className="text-sm text-gray-500 mt-0.5">Manage and automate your team&apos;s processes</p>
+                    <h1 className="text-2xl font-bold text-foreground">Workflows</h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">Manage and automate your team&apos;s processes</p>
                 </div>
                 {!showCreateForm && (
                     <Button
                         onClick={() => setShowCreateForm(true)}
-                        className="bg-[#001F3F] text-white hover:bg-[#002F5F] px-5 h-10 rounded-lg shadow-sm font-semibold flex items-center gap-2"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 h-10 rounded-lg shadow-sm font-semibold flex items-center gap-2 cursor-pointer"
                     >
                         <Plus className="w-4.5 h-4.5" />
                         Create new
@@ -202,14 +202,14 @@ const WorkflowsPage = () => {
                 {showCreateForm ? (
                     /* ── Create Form ── */
                     <div className="w-full max-w-3xl mx-auto">
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-                            <div className="px-8 py-6 border-b border-gray-100">
-                                <h2 className="text-xl font-bold text-gray-900">New Workflow</h2>
+                        <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
+                            <div className="px-8 py-6 border-b border-border">
+                                <h2 className="text-xl font-bold text-foreground">New Workflow</h2>
                             </div>
                             <div className="px-8 py-6 space-y-6">
                                 {/* Name */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="workflow-name" className="text-sm font-medium text-gray-700">
+                                    <Label htmlFor="workflow-name" className="text-sm font-medium text-foreground">
                                         Workflow name <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
@@ -217,7 +217,7 @@ const WorkflowsPage = () => {
                                         placeholder="e.g. Auto-assign on task creation"
                                         value={workflowName}
                                         onChange={(e) => setWorkflowName(e.target.value)}
-                                        className="w-full h-11 px-4 bg-white border-gray-200 rounded-lg focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                                        className="w-full h-11 px-4 bg-background border-border rounded-lg focus:border-primary focus:ring-0 transition-all text-foreground"
                                         autoFocus
                                     />
                                 </div>
@@ -225,7 +225,7 @@ const WorkflowsPage = () => {
                                 {/* Description + Project */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="workflow-desc" className="text-sm font-medium text-gray-700">
+                                        <Label htmlFor="workflow-desc" className="text-sm font-medium text-foreground">
                                             Description
                                         </Label>
                                         <Input
@@ -233,18 +233,18 @@ const WorkflowsPage = () => {
                                             placeholder="Brief description"
                                             value={workflowDescription}
                                             onChange={(e) => setWorkflowDescription(e.target.value)}
-                                            className="w-full h-11 px-4 bg-white border-gray-200 rounded-lg focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                                            className="w-full h-11 px-4 bg-background border-border rounded-lg focus:border-primary focus:ring-0 transition-all text-foreground"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="project-id" className="text-sm font-medium text-gray-700">
+                                        <Label htmlFor="project-id" className="text-sm font-medium text-foreground">
                                             Assign to Project <span className="text-red-500">*</span>
                                         </Label>
                                         <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                                            <SelectTrigger id="project-id" className="w-full h-11 px-4 bg-white border-gray-200 rounded-lg focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all">
+                                            <SelectTrigger id="project-id" className="w-full h-11 px-4 bg-background border-border rounded-lg text-foreground focus:border-primary focus:ring-0 transition-all">
                                                 <SelectValue placeholder="Select Project" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="bg-popover border border-border text-popover-foreground">
                                                 <SelectItem value="none">— Select a project —</SelectItem>
                                                 {projects.map((p) => (
                                                     <SelectItem key={p.id} value={p.id!}>
@@ -257,21 +257,21 @@ const WorkflowsPage = () => {
                                 </div>
 
                                 {/* Visibility (local only, for UI purposes) */}
-                                <div className="space-y-3 pt-4 border-t border-gray-100">
-                                    <Label className="text-sm font-medium text-gray-700">Visibility</Label>
+                                <div className="space-y-3 pt-4 border-t border-border">
+                                    <Label className="text-sm font-medium text-foreground">Visibility</Label>
                                     <RadioGroup
                                         value={visibility}
                                         onValueChange={(v) => setVisibility(v as any)}
                                         className="space-y-3 mt-3"
                                     >
                                         {[
-                                            { value: "private", icon: <Lock className="w-4 h-4 text-gray-400" />, label: "Private" },
-                                            { value: "team", icon: <Users className="w-4 h-4 text-gray-400" />, label: "Teams" },
-                                            { value: "workspace", icon: <Building2 className="w-4 h-4 text-gray-400" />, label: "Everyone from Workspace" },
+                                            { value: "private", icon: <Lock className="w-4 h-4 text-muted-foreground" />, label: "Private" },
+                                            { value: "team", icon: <Users className="w-4 h-4 text-muted-foreground" />, label: "Teams" },
+                                            { value: "workspace", icon: <Building2 className="w-4 h-4 text-muted-foreground" />, label: "Everyone from Workspace" },
                                         ].map((opt) => (
                                             <div key={opt.value} className="flex items-center space-x-3">
                                                 <RadioGroupItem value={opt.value} id={opt.value} />
-                                                <Label htmlFor={opt.value} className="flex items-center gap-2 text-sm font-normal text-gray-700 cursor-pointer">
+                                                <Label htmlFor={opt.value} className="flex items-center gap-2 text-sm font-normal text-foreground cursor-pointer">
                                                     {opt.icon} {opt.label}
                                                 </Label>
                                             </div>
@@ -279,14 +279,14 @@ const WorkflowsPage = () => {
                                     </RadioGroup>
                                 </div>
                             </div>
-                            <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
-                                <Button variant="ghost" onClick={handleCancel} className="text-gray-500 hover:text-gray-700 font-medium">
+                            <div className="px-8 py-6 bg-secondary/30 border-t border-border flex items-center justify-end gap-3">
+                                <Button variant="ghost" onClick={handleCancel} className="text-muted-foreground hover:text-foreground hover:bg-accent font-medium cursor-pointer">
                                     Cancel
                                 </Button>
                                 <Button
                                     onClick={handleCreateWorkflow}
                                     disabled={!workflowName.trim() || selectedProjectId === "none" || isCreating}
-                                    className="bg-[#001F3F] text-white hover:bg-[#003366] shadow-lg shadow-blue-900/10 px-6 h-10 rounded-lg transition-all"
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 h-10 rounded-lg transition-all cursor-pointer"
                                 >
                                     {isCreating ? (
                                         <>
@@ -305,22 +305,22 @@ const WorkflowsPage = () => {
                         {/* Search + View Toggle */}
                         <div className="flex items-center justify-between">
                             <div className="relative w-[320px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search workflows..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 h-10 bg-white border-gray-200 rounded-lg focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                                    className="pl-10 h-10 bg-background border-border text-foreground rounded-lg focus:border-primary focus:ring-0 transition-all"
                                 />
                             </div>
-                            <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1">
+                            <div className="flex items-center bg-card border border-border rounded-lg p-1">
                                 {(["grid", "list"] as const).map((mode) => (
                                     <Button
                                         key={mode}
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => setViewMode(mode)}
-                                        className={`h-8 w-8 rounded-md transition-all ${viewMode === mode ? "bg-gray-100 text-[#001F3F]" : "text-gray-400 hover:text-gray-600"}`}
+                                        className={`h-8 w-8 rounded-md transition-all cursor-pointer ${viewMode === mode ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}
                                     >
                                         {mode === "grid" ? <LayoutGrid className="w-4 h-4" /> : <ListIcon className="w-4 h-4" />}
                                     </Button>
@@ -331,7 +331,7 @@ const WorkflowsPage = () => {
                         {/* Loading */}
                         {isLoading && (
                             <div className="flex items-center justify-center py-12">
-                                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                             </div>
                         )}
 
@@ -349,7 +349,7 @@ const WorkflowsPage = () => {
                                     return (
                                         <div
                                             key={automation.id}
-                                            className={`bg-white border border-gray-200 rounded-2xl p-6 transition-all hover:shadow-md hover:border-blue-100 group cursor-pointer ${viewMode === "list" ? "flex items-center justify-between py-4" : ""}`}
+                                            className={`bg-card border border-border rounded-2xl p-6 transition-all hover:shadow-md hover:border-primary/20 group cursor-pointer ${viewMode === "list" ? "flex items-center justify-between py-4" : ""}`}
                                             onClick={() =>
                                                 automation.id &&
                                                 router.push(`/workflows/${automation.id}?projectId=${automation.projectId}`)
@@ -358,32 +358,32 @@ const WorkflowsPage = () => {
                                             <div className={viewMode === "list" ? "flex items-center gap-6 flex-1" : "space-y-4"}>
                                                 {/* Icon + Menu */}
                                                 <div className="flex items-center justify-between">
-                                                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center transition-colors group-hover:bg-blue-100">
-                                                        <Zap className="w-6 h-6 text-[#001F3F]" />
+                                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center transition-colors group-hover:bg-primary/20">
+                                                        <Zap className="w-6 h-6 text-primary" />
                                                     </div>
                                                     {viewMode === "grid" && (
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600 rounded-full h-8 w-8">
+                                                                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground rounded-full h-8 w-8 cursor-pointer">
                                                                     <MoreHorizontal className="w-5 h-5" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border-gray-100">
+                                                            <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border border-border bg-popover text-popover-foreground p-1">
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => { e.stopPropagation(); router.push(`/workflows/${automation.id}?projectId=${automation.projectId}`); }}
-                                                                    className="cursor-pointer py-2.5"
+                                                                    className="cursor-pointer py-2.5 hover:bg-accent hover:text-accent-foreground"
                                                                 >
-                                                                    <Edit className="w-4 h-4 mr-2.5 text-gray-500" /> Edit
+                                                                    <Edit className="w-4 h-4 mr-2.5 text-muted-foreground" /> Edit
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => handleDuplicate(e, automation.id!, automation.projectId)}
-                                                                    className="cursor-pointer py-2.5"
+                                                                    className="cursor-pointer py-2.5 hover:bg-accent hover:text-accent-foreground"
                                                                 >
-                                                                    <Copy className="w-4 h-4 mr-2.5 text-gray-500" /> Duplicate
+                                                                    <Copy className="w-4 h-4 mr-2.5 text-muted-foreground" /> Duplicate
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => handleDelete(e, automation.id!, automation.projectId)}
-                                                                    className="cursor-pointer py-2.5 text-red-600 focus:text-red-600"
+                                                                    className="cursor-pointer py-2.5 text-red-600 focus:text-red-600 hover:bg-accent"
                                                                 >
                                                                     <Trash2 className="w-4 h-4 mr-2.5" /> Delete
                                                                 </DropdownMenuItem>
@@ -395,35 +395,35 @@ const WorkflowsPage = () => {
                                                 {/* Name + Project badge */}
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="font-bold text-gray-900 group-hover:text-[#001F3F] transition-colors">
+                                                        <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
                                                             {automation.name}
                                                         </h3>
                                                         {project && (
-                                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                                                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-bold text-primary uppercase tracking-wider">
                                                                 {project.name}
                                                             </span>
                                                         )}
                                                         {/* Active badge */}
                                                         <span
                                                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${automation.isActive
-                                                                ? "bg-green-50 text-green-600"
-                                                                : "bg-gray-100 text-gray-500"
+                                                                ? "bg-green-500/10 text-green-500"
+                                                                : "bg-secondary text-muted-foreground"
                                                                 }`}
                                                         >
                                                             {automation.isActive ? "Active" : "Inactive"}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 line-clamp-2">
+                                                    <p className="text-sm text-muted-foreground line-clamp-2">
                                                         {automation.description || `Trigger: ${automation.trigger}`}
                                                     </p>
                                                 </div>
 
                                                 {/* Footer */}
-                                                <div className={`flex items-center justify-between pt-4 ${viewMode === "list" ? "pt-0 border-0" : "border-t border-gray-50"}`}>
-                                                    <span className="text-xs text-gray-400 capitalize">
+                                                <div className={`flex items-center justify-between pt-4 ${viewMode === "list" ? "pt-0 border-0" : "border-t border-border"}`}>
+                                                    <span className="text-xs text-muted-foreground capitalize">
                                                         {automation.trigger?.replace(/_/g, " ")}
                                                     </span>
-                                                    <span className="text-[11px] text-gray-400 font-medium">{updatedAt}</span>
+                                                    <span className="text-[11px] text-muted-foreground font-medium">{updatedAt}</span>
                                                 </div>
                                             </div>
 
@@ -431,26 +431,26 @@ const WorkflowsPage = () => {
                                             {viewMode === "list" && (
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600 rounded-full h-8 w-8 ml-4">
+                                                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground rounded-full h-8 w-8 ml-4 cursor-pointer">
                                                             <MoreHorizontal className="w-5 h-5" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border-gray-100">
+                                                    <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border border-border bg-popover text-popover-foreground p-1">
                                                         <DropdownMenuItem
                                                             onClick={(e) => { e.stopPropagation(); router.push(`/workflows/${automation.id}?projectId=${automation.projectId}`); }}
-                                                            className="cursor-pointer py-2.5"
+                                                            className="cursor-pointer py-2.5 hover:bg-accent hover:text-accent-foreground"
                                                         >
-                                                            <Edit className="w-4 h-4 mr-2.5 text-gray-500" /> Edit
+                                                            <Edit className="w-4 h-4 mr-2.5 text-muted-foreground" /> Edit
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={(e) => handleDuplicate(e, automation.id!, automation.projectId)}
-                                                            className="cursor-pointer py-2.5"
+                                                            className="cursor-pointer py-2.5 hover:bg-accent hover:text-accent-foreground"
                                                         >
-                                                            <Copy className="w-4 h-4 mr-2.5 text-gray-500" /> Duplicate
+                                                            <Copy className="w-4 h-4 mr-2.5 text-muted-foreground" /> Duplicate
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={(e) => handleDelete(e, automation.id!, automation.projectId)}
-                                                            className="cursor-pointer py-2.5 text-red-600 focus:text-red-600"
+                                                            className="cursor-pointer py-2.5 text-red-600 focus:text-red-600 hover:bg-accent"
                                                         >
                                                             <Trash2 className="w-4 h-4 mr-2.5" /> Delete
                                                         </DropdownMenuItem>
@@ -465,13 +465,13 @@ const WorkflowsPage = () => {
 
                         {/* Empty search */}
                         {!isLoading && filteredAutomations.length === 0 && automations.length > 0 && (
-                            <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center">
-                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                                    <Search className="w-8 h-8 text-gray-300" />
+                            <div className="bg-card border border-dashed border-border rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+                                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4">
+                                    <Search className="w-8 h-8 text-muted-foreground" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900">No workflows found</h3>
-                                <p className="text-gray-500 mt-1">Try adjusting your search or create a new workflow.</p>
-                                <Button variant="outline" onClick={() => setSearchQuery("")} className="mt-6 h-9 rounded-lg">
+                                <h3 className="text-lg font-semibold text-foreground">No workflows found</h3>
+                                <p className="text-muted-foreground mt-1">Try adjusting your search or create a new workflow.</p>
+                                <Button variant="outline" onClick={() => setSearchQuery("")} className="mt-6 h-9 rounded-lg cursor-pointer">
                                     Clear search
                                 </Button>
                             </div>

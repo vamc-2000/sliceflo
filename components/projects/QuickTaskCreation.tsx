@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import {
   Avatar as UIAvatar,
   AvatarFallback,
@@ -138,9 +138,9 @@ export function QuickTaskCreation({
     if (project) {
       const projectUserIds = new Set<string>();
       if (project.members) {
-        project.members.forEach(m => projectUserIds.add(m.userId));
+        project.members.forEach((m) => projectUserIds.add(m.userId));
       }
-      return workspaceMembers.filter(m => projectUserIds.has(m.userId));
+      return workspaceMembers.filter((m) => projectUserIds.has(m.userId));
     }
     return workspaceMembers.length > 0 ? workspaceMembers : teamMembers;
   }, [project, workspaceMembers, teamMembers]);
@@ -602,11 +602,13 @@ export function QuickTaskCreation({
                     </span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(date) => {
+                <PopoverContent
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                  align="start"
+                >
+                  <CalendarPicker
+                    selectedDate={startDate}
+                    onDateSelect={(date) => {
                       if (date) {
                         setStartDate(date);
                         if (endDate && endDate < date) {
@@ -615,7 +617,6 @@ export function QuickTaskCreation({
                       }
                       setIsStartCalendarOpen(false);
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -636,11 +637,13 @@ export function QuickTaskCreation({
                     </span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={(date) => {
+                <PopoverContent
+                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                  align="start"
+                >
+                  <CalendarPicker
+                    selectedDate={endDate}
+                    onDateSelect={(date) => {
                       setEndDate(date);
                       setIsEndCalendarOpen(false);
                     }}
@@ -650,7 +653,6 @@ export function QuickTaskCreation({
                           new Date(new Date(startDate).setHours(0, 0, 0, 0))
                         : false
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

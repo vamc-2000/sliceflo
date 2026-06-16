@@ -85,9 +85,9 @@ export default function ChartWidget({ chart, projectId, projects, tasks }: Chart
     : transformSavedData();
 
   return (
-    <Card className="h-full flex flex-col shadow-sm hover:shadow-md transition-shadow duration-200 border-[#E5E5EA]">
-      <CardHeader className="py-3 px-4 border-b border-[#F2F2F7]">
-        <CardTitle className="text-sm font-semibold text-[#001F3F] truncate">
+    <Card className="h-full flex flex-col shadow-sm hover:shadow-md transition-shadow duration-200 border-[#E5E5EA] dark:border-border bg-card">
+      <CardHeader className="py-3 px-4 border-b border-[#F2F2F7] dark:border-border">
+        <CardTitle className="text-sm font-semibold text-[#001F3F] dark:text-foreground truncate">
           {chart.title}
         </CardTitle>
       </CardHeader>

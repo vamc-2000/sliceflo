@@ -162,7 +162,11 @@ export default function DocsPage() {
           const doc = row.original;
           return (
             <div className="flex items-center gap-3">
-              <span className="text-lg">{doc.icon || "📄"}</span>
+              {doc.icon && doc.icon !== "📄" ? (
+                <span className="text-lg">{doc.icon}</span>
+              ) : (
+                <img src="/images/docsidebar.svg" className="w-5 h-5 shrink-0 dark:brightness-200 dark:contrast-200" alt="Doc" />
+              )}
               <span className="font-medium cursor-pointer hover:underline" onClick={() => router.push(`/docs/${doc.id}`)}>
                 {doc.title}
               </span>
