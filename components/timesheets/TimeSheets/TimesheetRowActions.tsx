@@ -92,8 +92,8 @@ export function TimesheetRowActions({ row }: TimesheetRowActionsProps) {
             onClick={() => setOpenDeleteModal(true)}
             disabled={["Pending", "Approved"].includes(data.originalEntry.status)}
           >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Entry
+            <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+            Remove 
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -103,8 +103,8 @@ export function TimesheetRowActions({ row }: TimesheetRowActionsProps) {
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
         title="Are you sure you want to remove this entry?"
-        description="Deleting entry is permanent and cannot be undone."
-        confirmLabel="Delete"
+        description="Removing entry is permanent and cannot be undone."
+        confirmLabel="Remove"
         onConfirm={handleDelete}
       />
 

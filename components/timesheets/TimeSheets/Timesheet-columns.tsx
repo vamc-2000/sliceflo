@@ -14,6 +14,7 @@ const Center = ({ children }: { children: React.ReactNode }) => (
 type TableRow = {
   task: string;
   projectName?: string;
+  taskIdStr?: string;
   description: string;
   billable: boolean;
   tags: string[];
@@ -29,11 +30,16 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
     header: () => <Center>Task</Center>,
     cell: ({ row }) => {
       const task = row.getValue("task") as string;
-      const projectName = row.original.projectName;
+      const taskIdStr = row.original.taskIdStr;
 
       return (
         <Center>
-          <div className="flex flex-col items-start leading-tight text-left max-w-[200px] w-full">
+          <div className="flex flex-col items-start leading-tight text-left max-w-[200px] w-full gap-1">
+            {taskIdStr && (
+              <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium shrink-0">
+                {taskIdStr}
+              </span>
+            )}
             <span
               data-testid="cell-task-name"
               className="font-medium text-sm text-foreground truncate w-full"
@@ -41,14 +47,6 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
             >
               {task || "-"}
             </span>
-            {projectName && (
-              <span
-                className="text-xs text-muted-foreground truncate w-full"
-                title={projectName}
-              >
-                {projectName}
-              </span>
-            )}
           </div>
         </Center>
       );
@@ -73,6 +71,14 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
           )}
         </Center>
       );
+    },
+  },
+  {
+    accessorKey: "projectName",
+    header: () => <Center>Project</Center>,
+    cell: ({ row }) => {
+      const projectName = row.getValue("projectName") as string;
+      return <Center>{projectName || "-"}</Center>;
     },
   },
 
@@ -103,7 +109,7 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
   // },
   {
     accessorKey: "tags",
-    header: () => <Center>Tags</Center>,
+    header: () => <Center>Labels</Center>,
     cell: () => (
       <Center>
         <Button

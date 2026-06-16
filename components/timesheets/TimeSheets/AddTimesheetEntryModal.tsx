@@ -27,7 +27,7 @@ import { useProfileStore } from "@/stores/profile-store";
 import { useProjectsStore } from '@/stores/projects-store';
 import { useTasksStore } from '@/stores/tasks-store';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { format, startOfWeek } from "date-fns";
 import { useTimesheetStore } from "@/stores/timesheet-store";
 import { nanoid } from "nanoid";
@@ -36,7 +36,13 @@ import { cn } from "@/lib/utils";
 import { CreateTimesheetRequest, TimesheetWithUser } from "@/types/timesheet.types";
 import { toast } from "@/components/ui/sonner";
 import { formatTaskId } from "@/utils/task-utils";
-import { formatLocalDate } from "@/utils/timezone-utils";
+import { formatLocalDate, convertUTCToCalendarDate, convertSelectedDateToUTC } from "@/utils/timezone-utils";
+
+const parseLocalDate = (dateString: string) => {
+    const dateStr = dateString.split("T")[0];
+    const [year, month, dayPart] = dateStr.split("-");
+    return new Date(Number(year), Number(month) - 1, Number(dayPart));
+};
 
 interface AddTimesheetEntryModalProps {
     open: boolean;
@@ -99,7 +105,7 @@ export function AddTimesheetEntryModal({
             if (initialData) {
                 setSelectedProject(initialData.projectId);
                 setSelectedTask(initialData.taskId);
-                setSelectedDate(initialData.date ? new Date(initialData.date) : new Date());
+                setSelectedDate(initialData.date ? parseLocalDate(initialData.date) : new Date());
                 const hours = Math.floor((initialData.timeSpentMinutes || 0) / 60);
                 const minutes = (initialData.timeSpentMinutes || 0) % 60;
                 setLogHours(hours);
@@ -408,28 +414,28 @@ export function AddTimesheetEntryModal({
                                 <PopoverTrigger asChild>
                                     <Button
                                         data-testid="btn-select-date"
-                                        variant="outline"
-                                        className={`
-                                            h-9 px-3 bg-muted text-muted-foreground
-                                            flex items-center gap-2 justify-start
-                                            transition-all duration-200
-                                            ${selectedDate ? "w-53.75" : "w-9 px-0 justify-center"}
-                                        `}
+                                        variant="secondary"
+                                        size="sm"
+                                        className={cn(
+                                            "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
+                                            !selectedDate && "text-muted-foreground"
+                                        )}
                                     >
-                                        <Calendar className="h-4 w-4 shrink-0" />
-                                        {selectedDate && formatLocalDate(selectedDate)}
+                                        {selectedDate ? (
+                                            formatLocalDate(selectedDate)
+                                        ) : (
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                        )}
                                     </Button>
                                 </PopoverTrigger>
 
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <ShadcnCalendar
-                                        mode="single"
-                                        selected={selectedDate}
-                                        onSelect={(date) => {
+                                <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+                                    <CalendarPicker
+                                        selectedDate={selectedDate}
+                                        onDateSelect={(date) => {
                                             setSelectedDate(date);
                                             setDatePopoverOpen(false); // CLOSE popover
                                         }}
-                                        initialFocus
                                         disabled={isDateFrozen}
                                     />
                                 </PopoverContent>

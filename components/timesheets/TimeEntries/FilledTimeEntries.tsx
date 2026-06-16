@@ -20,10 +20,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTasksStore } from "@/stores/tasks-store";
 import { Task } from "@/types/task.types";
 import { TaskDetailView } from "@/components/projects/TaskDetailView";
+import { useProjectsStore } from "@/stores/projects-store";
+import { formatTaskId } from "@/utils/task-utils";
 
 export interface TimesheetEntry {
     id: string;
@@ -31,6 +33,7 @@ export interface TimesheetEntry {
     projectName: string;
     taskId: string;
     taskName: string;
+    taskIdStr?: string;
     date?: Date;
     startTime?: string;
     endTime?: string;
@@ -60,6 +63,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
     // Use `timesheets` (TimesheetWithUser[]) — the store has no `entries` field
     const storeTimesheets = useTimesheetStore((state) => state.timesheets);
     const tasks = useTasksStore((state) => state.tasks);
+    const projects = useProjectsStore((state) => state.projects);
     const { capacityType, hours } = useTimesheetSettingsStore();
     const [selectedTaskForDetail, setSelectedTaskForDetail] = useState<Task | null>(null);
     const [showTaskDetail, setShowTaskDetail] = useState(false);
@@ -71,6 +75,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
 
     // Build a taskId → taskName lookup from the tasks store
     const taskNameMap = new Map(tasks.map((t) => [t.id, t.name]));
+    const projectSlugMap = useMemo(() => new Map(projects.map((p) => [p.id!, p.slug])), [projects]);
 
     const dayNames: DayKey[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
@@ -111,6 +116,10 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
             const dayKey = dayNames[entryDate.getDay()]; // "sun" | "mon" | …
 
             if (!acc[entry.taskId]) {
+                const task = tasks.find(t => t.id === entry.taskId);
+                const projectSlug = projectSlugMap.get(entry.projectId) || "TASK";
+                const taskIdStr = task ? formatTaskId(projectSlug, task.taskNumber) : "";
+
                 acc[entry.taskId] = {
                     id: entry.id,
                     projectId: entry.projectId,
@@ -118,6 +127,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                     taskId: entry.taskId,
                     // Resolve task name from tasks store; fall back to taskId
                     taskName: taskNameMap.get(entry.taskId) ?? entry.taskId,
+                    taskIdStr: taskIdStr,
                     durationMinutes: 0,
                     durationHours: 0,
                     durationMinutesRemainder: 0,
@@ -221,7 +231,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                             }
                         `}
                     >
-                        {dayTotals[day]}h
+                        {parseFloat(dayTotals[day].toFixed(1))}h
                     </span>
 
                     {/* Indicators */}
@@ -264,7 +274,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                                 }
                             `}
                         >
-                            {value}h
+                            {parseFloat(value.toFixed(1))}h
                         </span>
                     </div>
                 );
@@ -286,7 +296,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                         }
                     `}
                 >
-                    {grandTotal}h
+                    {parseFloat(grandTotal.toFixed(1))}h
                 </span>
             </div>
         ),
@@ -301,7 +311,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                                 ${total > 0 ? "bg-[#E3EFFF] dark:bg-primary/10 text-foreground" : "bg-muted text-foreground"}
                                 `}
                     >
-                        {total}h
+                        {parseFloat(total.toFixed(1))}h
                     </span>
                 </div>
             );
@@ -316,22 +326,29 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                 <div className="group flex items-center justify-between w-full min-w-0">
                     {/* Left: Play + Task name */}
                     <div className="flex items-center pr-4 min-w-0 flex-1 max-w-[220px]">
-                        <span
-                            className="text-sm font-medium truncate w-full"
-                            title={row.original.taskName}
-                        >
-                            {row.original.taskName}
-                        </span>
+                        <div className="flex flex-col items-start leading-tight text-left w-full gap-1">
+                            {row.original.taskIdStr && (
+                                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium shrink-0">
+                                    {row.original.taskIdStr}
+                                </span>
+                            )}
+                            <span
+                                className="text-sm font-medium truncate w-full"
+                                title={row.original.taskName}
+                            >
+                                {row.original.taskName}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-0">
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             className="h-7 w-7 p-0 flex items-center justify-center"
                         >
                             <FaRegCirclePlay className="h-6 w-6 text-muted-foreground" />
-                        </Button>
+                        </Button> */}
 
                         <Button
                             variant="ghost"
@@ -381,8 +398,8 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                                     }}
                                     disabled={row.original.originalEntry.status === "Pending" || row.original.originalEntry.status === "Approved"}
                                 >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete Entry
+                                    <Trash2 className="mr-2 h-4 w-4 text-red-600" />
+                                    Remove 
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -418,8 +435,8 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                 open={openDeleteModal}
                 onClose={() => setOpenDeleteModal(false)}
                 title="Are you sure you want to remove this entry?"
-                description="Deleting entry is permanent and cannot be undone."
-                confirmLabel="Delete"
+                description="Removing entry is permanent and cannot be undone."
+                confirmLabel="Remove"
                 onConfirm={handleDelete}
             />
 

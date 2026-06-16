@@ -11,6 +11,7 @@ import { useTimesheetSettingsStore } from "@/stores/timesheet-settings.store";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useProjectsStore } from "@/stores/projects-store";
 import { formatLocalDate, getLocalDateParts } from "@/utils/timezone-utils";
+import { formatTaskId } from "@/utils/task-utils";
 
 interface TimesheetBodyProps {
   onAddEntry: (date?: Date) => void;
@@ -180,9 +181,11 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
                   data={dayEntries.map((entry) => {
                     const task = taskMap.get(entry.taskId);
                     const project = projectMap.get(entry.projectId);
+                    const taskIdStr = (task && project) ? formatTaskId(project.slug || "TASK", task.taskNumber) : "";
                     return {
                       task: task?.name ?? entry.taskId ?? "-",
                       projectName: project?.name,
+                      taskIdStr: taskIdStr,
                       description: entry.notes ?? entry.freetext ?? "",
                       billable: false,
                       tags: [],

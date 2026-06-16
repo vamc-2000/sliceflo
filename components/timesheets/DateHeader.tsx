@@ -13,6 +13,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format, getWeek } from "date-fns";
+import { formatLocalDate } from "@/utils/timezone-utils";
 
 interface DateHeaderProps {
     onAddEntry?: () => void;
@@ -144,11 +145,6 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
         return weekEntries.some(e => e.status === "Rejected" || !!e.rejectedAt);
     }, [selectedWeek, timesheets]);
 
-    const formatShortDate = (date: Date) =>
-        new Intl.DateTimeFormat('en-US', {
-            month: 'short',
-            day: 'numeric'
-        }).format(date);
 
     const shiftWeek = (direction: "prev" | "next") => {
 
@@ -187,14 +183,19 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 {/* Date text → opens calendar */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <button data-testid="btn-select-week" className="font-medium px-1 cursor-pointer ">
+                        <Button
+                            data-testid="btn-select-week"
+                            variant="secondary"
+                            size="sm"
+                            className="h-8 px-3 font-normal hover:bg-muted text-xs flex items-center justify-center rounded-xs cursor-pointer"
+                        >
                             {selectedWeek
-                                ? `${formatShortDate(selectedWeek.start)} - ${formatShortDate(selectedWeek.end)}`
+                                ? `${formatLocalDate(selectedWeek.start)} - ${formatLocalDate(selectedWeek.end)}`
                                 : "Select week"}
-                        </button>
+                        </Button>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-auto p-3 " align="start">
+                    <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
                         <WeekCalendar
                             selectedYear={currentYear}
                             selectedWeek={selectedWeek}

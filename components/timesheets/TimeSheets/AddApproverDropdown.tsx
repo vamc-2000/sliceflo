@@ -330,7 +330,7 @@ export function AddApproverDropdown({
                         </div>
 
                         <div className="flex items-center h-8 w-8 justify-center group-hover:scale-110 transition-transform">
-                          <CirclePlus className="h-5 w-5 text-foreground" strokeWidth={2.5} />
+                          <CirclePlus className="h-5 w-5 text-foreground" strokeWidth={1.5} />
                         </div>
                       </div>
                     ))
