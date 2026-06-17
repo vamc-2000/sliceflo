@@ -36,7 +36,8 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useProfileStore } from "@/stores/profile-store";
 import LogoutConfirmModal from "@/components/LogoutConfirmModal";
 
-type Theme = "light" | "dark" | "brand";
+type Theme = "light" | "dark" | "brand" | "system" | "dark-contrast" | "light-contrast";
+;
 
 const UserSettings: React.FC<{
     onClose?: () => void;
@@ -62,7 +63,12 @@ const UserSettings: React.FC<{
         setMounted(true);
         fetchUserProfile().then((fetchedUser) => {
             if (fetchedUser?.displaySettings?.theme) {
-                setTheme(fetchedUser.displaySettings.theme);
+                   const savedTheme = fetchedUser.displaySettings.theme;
+                if (savedTheme === "default") {
+                    setTheme("system");
+                } else {
+                    setTheme(savedTheme);
+                }
             }
         }).catch((err) => console.error("Failed to fetch profile theme", err));
     }, []);
@@ -136,6 +142,23 @@ const UserSettings: React.FC<{
                 <Image src="/themes/default.svg" alt="Default Theme" width={100} height={80} className={className} />
             ),
         },
+         {
+            label: "System",
+            value: "system",
+            Icon: ({ className }) => {
+                const { resolvedTheme } = useTheme();
+                const isDark = resolvedTheme === "dark" || resolvedTheme === "dark-contrast";
+                return (
+                    <Image
+                        src={isDark ? "/themes/dark.svg" : "/themes/light.svg"}
+                        alt="System Theme"
+                        width={100}
+                        height={80}
+                        className={className}
+                    />
+                );
+            },
+        }
     ];
 
     // Define MenuItem type
@@ -280,7 +303,7 @@ const UserSettings: React.FC<{
                                 <RadioGroup
                                     value={theme}
                                     onValueChange={handleThemeSelect}
-                                    className="grid grid-cols-3 gap-3 sm:gap-2"
+                                    className="grid grid-cols-4 gap-3 sm:gap-2"
                                 >
                                     {themeOptions.map(({ value, label, Icon }) => (
                                         <div

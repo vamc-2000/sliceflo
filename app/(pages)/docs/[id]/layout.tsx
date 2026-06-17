@@ -2,6 +2,7 @@
 
 "use client";
 
+import React from "react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import {
@@ -548,7 +549,7 @@ export default function DocsLayout({
     }
   };
 
-  const getProjectAvatar = (project: any) => {
+  const getProjectAvatar = (project: any): { type: "image"; src: string } | { type: "icon"; name: string; color: string } | null => {
     if (!project?.icon) return null;
     if (project.icon.type === "file") return { type: "image", src: project.icon.presignedUrl };
     if (project.icon.type === "icon") return { type: "icon", name: project.icon.name, color: project.icon.color ?? "#6B7280" };
@@ -2147,9 +2148,36 @@ export default function DocsLayout({
                             <div className="max-h-40 overflow-y-auto space-y-1">
                               {portfolios.map((p) => {
                                 const isSelected = doc?.linkedPortfolios?.includes(p.id);
+                                const avatar = getProjectAvatar(p);
                                 return (
-                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-50 cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(p.id) : handleAddPortfolio(p.id)}>
-                                    <span className="text-xs text-gray-700 truncate">{p.name}</span>
+                                  <div
+                                    key={p.id}
+                                    className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-50 cursor-pointer"
+                                    onClick={() => isSelected ? handleRemovePortfolio(p.id) : handleAddPortfolio(p.id)}
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      {/* Portfolio Icon */}
+                                      <div
+                                        className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                        style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p.color ? `${p.color}20` : "#3B82F620" }}
+                                      >
+                                        {avatar?.type === "image" ? (
+                                          <img src={avatar.src} alt={p.name} className="w-full h-full object-cover rounded" />
+                                        ) : avatar?.type === "icon" ? (
+                                          (() => {
+                                            const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                            if (iconObj) {
+                                              const IconComponent = iconObj.icon;
+                                              return <IconComponent size={10} color={avatar.color} />;
+                                            }
+                                            return <span className="text-[9px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>{p.name?.charAt(0).toUpperCase()}</span>;
+                                          })()
+                                        ) : (
+                                          <span className="text-[9px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>{p.name?.charAt(0).toUpperCase()}</span>
+                                        )}
+                                      </div>
+                                      <span className="text-xs text-gray-700 truncate">{p.name}</span>
+                                    </div>
                                     <Checkbox checked={isSelected} className="h-3.5 w-3.5" />
                                   </div>
                                 );

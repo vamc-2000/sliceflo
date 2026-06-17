@@ -31,7 +31,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     "data-testid": dataTestId,
 }) => {
     return (
-        <Card id={id} className="border rounded-lg overflow-hidden border-l-4 border-l-primary bg-card font-inter  transition-colors duration-200" data-testid={dataTestId}>
+        <Card id={id} className="border rounded-lg overflow-hidden border-l-4 border-l-foreground bg-card font-inter  transition-colors duration-200" data-testid={dataTestId}>
             <CardHeader
                 className="cursor-pointer transition-colors p-2"
                 onClick={onToggle}
@@ -59,7 +59,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
                             )}
                         </div>
                     </div>
-
+ 
                     {/* Action Button + Chevron Container */}
                     <div className="flex items-center gap-2">
                         {/* Only stop propagation on action button, not chevron */}
@@ -72,9 +72,9 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
                         {showChevron && (
                             <>
                                 {isActive ? (
-                                    <ChevronUp className="h-4 w-4 text-primary transition-colors" />
+                                    <ChevronUp className="h-4 w-4 text-foreground transition-colors" />
                                 ) : (
-                                    <ChevronDown className="h-4 w-4 text-primary transition-colors" />
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-colors" />
                                 )}
                             </>
                         )}

@@ -39,7 +39,7 @@ export const KanbanSettingsDropdown = ({ projectId }: KanbanSettingsDropdownProp
           View Settings
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 border-0 border-b-[5px] border-b-primary">
         <DropdownMenuLabel>Card Display</DropdownMenuLabel>
         <DropdownMenuCheckboxItem
           checked={settings.cardSettings.showAvatar}

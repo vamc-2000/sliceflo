@@ -7,6 +7,7 @@ import type {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
+  CollisionDetection,
 } from "@dnd-kit/core";
 import {
   closestCenter,
@@ -19,6 +20,8 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  pointerWithin,
+  rectIntersection,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -28,16 +31,53 @@ import {
   type ReactNode,
   useContext,
   useState,
+  useEffect,
+  useLayoutEffect,
 } from "react";
 import { createPortal } from "react-dom";
-import tunnel from "tunnel-rat";
 import { Card } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
-const t = tunnel();
+const useSafeLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export type { DragEndEvent } from "@dnd-kit/core";
+function createTunnel() {
+  let setChildrenFn: ((children: React.ReactNode) => void) | null = null;
+
+  function In({ children }: { children: React.ReactNode }) {
+    useSafeLayoutEffect(() => {
+      if (setChildrenFn) {
+        setChildrenFn(children);
+      }
+      return () => {
+        if (setChildrenFn) {
+          setChildrenFn(null);
+        }
+      };
+    }, [children]);
+
+    return null;
+  }
+
+  function Out() {
+    const [children, setChildren] = useState<React.ReactNode>(null);
+
+    useSafeLayoutEffect(() => {
+      setChildrenFn = setChildren;
+      return () => {
+        setChildrenFn = null;
+      };
+    }, []);
+
+    return <>{children}</>;
+  }
+
+  return { In, Out };
+}
+
+const t = createTunnel();
+
+export type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
 type KanbanItemProps = {
   id: string;
@@ -79,8 +119,13 @@ export const KanbanBoard = ({
   style,
   ...props
 }: KanbanBoardProps) => {
+  const { setNodeRef } = useDroppable({
+    id,
+  });
+
   return (
     <div
+      ref={setNodeRef}
       className={cn(
         "flex flex-col h-full min-h-40 divide-y overflow-hidden rounded-md border bg-secondary text-xs shadow-sm transition-all",
         className,
@@ -144,13 +189,13 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 
   return (
     <>
-      <div ref={setNodeRef} style={style} className="touch-none">
+      <div ref={setNodeRef} style={style} className="touch-none shrink-0">
         <Card
           {...(!disabled ? listeners : {})}
           {...(!disabled ? attributes : {})}
           onClick={handleClick}
           className={cn(
-            "cursor-pointer gap-4 rounded-md p-3 shadow-sm transition-all",
+            "cursor-pointer gap-4 rounded-md p-3 shadow-sm transition-shadow shrink-0",
             !disabled && "cursor-grab",
             isDragging && "cursor-grabbing opacity-30",
             className,
@@ -163,7 +208,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
         <t.In>
           <Card
             className={cn(
-              "cursor-grabbing gap-4 rounded-md p-3 shadow-sm ring-2 ring-primary",
+              "cursor-grabbing gap-4 rounded-md p-3 shadow-sm ring-2 ring-primary shrink-0",
               className,
             )}
           >
@@ -193,17 +238,12 @@ export const KanbanCards = <T extends KanbanItemProps = KanbanItemProps>({
   const filteredData = data.filter((item) => item.column === id);
   const items = filteredData.map((item) => item.id);
 
-  const { isOver, setNodeRef } = useDroppable({
-    id,
-  });
-
   const { over } = useDndContext();
   const isOverThisColumn =
-    isOver || (over && (over.id === id || items.includes(over.id as string)));
+    over && (over.id === id || items.includes(over.id as string));
 
   return (
     <div
-      ref={setNodeRef}
       className={cn(
         "flex-1 min-h-0 flex flex-col transition-all rounded-md",
         isOverThisColumn && "ring-2 ring-primary bg-secondary/50",
@@ -233,6 +273,23 @@ export const KanbanHeader = ({ className, ...props }: KanbanHeaderProps) => (
     {...(props as any)}
   />
 );
+
+const customCollisionDetection: CollisionDetection = (args) => {
+  // 1. Try pointerWithin first (excellent for empty columns when pointer is inside them)
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    return pointerCollisions;
+  }
+
+  // 2. Fallback to rectIntersection
+  const rectCollisions = rectIntersection(args);
+  if (rectCollisions.length > 0) {
+    return rectCollisions;
+  }
+
+  // 3. Fallback to closestCenter for general sorting
+  return closestCenter(args);
+};
 
 export type KanbanProviderProps<
   T extends KanbanItemProps = KanbanItemProps,
@@ -400,7 +457,7 @@ export const KanbanProvider = <
     <KanbanContext.Provider value={{ columns, data, activeCardId }}>
       <DndContext
         accessibility={{ announcements }}
-        collisionDetection={closestCenter}
+        collisionDetection={customCollisionDetection}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
         onDragStart={handleDragStart}

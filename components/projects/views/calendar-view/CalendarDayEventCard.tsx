@@ -11,6 +11,7 @@ import {
   Flag,
   User,
   MoreHorizontalIcon,
+  ChevronsLeftRight,
 } from "lucide-react";
 import { useTasksStore } from "@/stores/tasks-store";
 import {
@@ -18,6 +19,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { MemberAvatar } from "../../MemberAvatar";
 import { CalendarPicker } from "@/components/CalendarPicker";
 import { cn } from "@/lib/utils";
 import { Task, Subtask } from "@/types/task.types";
@@ -77,6 +86,17 @@ export const CalendarDayEventCard = ({
   const [isEndDateOpen, setIsEndDateOpen] = useState(false);
   const [hoveredRelType, setHoveredRelType] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+
+  const getFilteredMembers = () => {
+    const query = assigneeSearchQuery.trim().toLowerCase();
+    if (!query) return members;
+    return members.filter(
+      (m) =>
+        m.name?.toLowerCase().includes(query) ||
+        m.email?.toLowerCase().includes(query),
+    );
+  };
 
   useEffect(() => {
     setEditedName(liveTask.name);
@@ -203,78 +223,81 @@ export const CalendarDayEventCard = ({
   return (
     <div
       className="rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow"
-      onClick={onClick}
       style={{ borderLeftColor: getBorderColor(liveTask) }}
       data-testid={`calendar-event-card-${task.id}`}
     >
       {/* Top row */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          {/* Avatar with Popover */}
-          <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
-            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+          {/* Avatar with DropdownMenu */}
+          <DropdownMenu
+            open={isAssigneeOpen}
+            onOpenChange={(open) => {
+              setIsAssigneeOpen(open);
+              if (!open) setAssigneeSearchQuery("");
+            }}
+          >
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
               <div
                 className="cursor-pointer"
                 data-testid={`calendar-event-card-assignee-trigger-${task.id}`}
               >
-                {assignedMember ? (
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-semibold">
-                      {assignedMember.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback className="bg-muted">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+                <MemberAvatar
+                  size="md"
+                  name={assignedMember?.name}
+                  src={assignedMember?.profilePicture}
+                />
               </div>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-48 p-2"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="space-y-1">
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                  Assign to
-                </div>
-                {members.map((member) => (
-                  <button
-                    key={member.userId}
-                    onClick={() => handleAssigneeChange(member.userId)}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
-                    data-testid={`calendar-event-card-assignee-option-${member.userId}-${task.id}`}
-                  >
-                    <Avatar className="h-5 w-5">
-                      <AvatarFallback className="text-xs">
-                        {member.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{member.name}</span>
-                  </button>
-                ))}
+              <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                  placeholder="Type @ or name..."
+                  value={assigneeSearchQuery}
+                  onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                  autoFocus
+                />
               </div>
-            </PopoverContent>
-          </Popover>
+              {getFilteredMembers().length === 0 ? (
+                <div className="text-center py-2 text-xs text-muted-foreground">
+                  No members found
+                </div>
+              ) : (
+                getFilteredMembers().map((member) => (
+                  <DropdownMenuItem
+                    key={member.userId}
+                    onSelect={() => handleAssigneeChange(member.userId)}
+                    className="p-0 focus:bg-transparent"
+                  >
+                    <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                      <MemberAvatar
+                        size="sm"
+                        name={member.name}
+                        src={member.profilePicture}
+                      />
+                      <span className="truncate">{member.name}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => handleAssigneeChange("")}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+              >
+                Clear
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Task ID Badge */}
           <Badge
             variant="secondary"
             className="text-xs px-2 py-0.5 rounded-sm"
-            // style={{
-            //   backgroundColor: `${getBorderColor(liveTask)}20`,
-            //   color: getBorderColor(liveTask),
-            // }}
             data-testid={`calendar-event-card-id-badge-${task.id}`}
           >
             {formatTaskId(projectSlug, task.taskNumber)}
@@ -291,9 +314,9 @@ export const CalendarDayEventCard = ({
             </Badge>
           )}
 
-          {/* Priority with Popover */}
-          <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
-            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+          {/* Priority with DropdownMenu */}
+          <DropdownMenu open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
               <div
                 className="cursor-pointer"
                 data-testid={`calendar-event-card-priority-trigger-${task.id}`}
@@ -318,45 +341,40 @@ export const CalendarDayEventCard = ({
                   </Badge>
                 )}
               </div>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-36 p-2"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="space-y-1">
-                {taskPriorityConfigs.length === 0 ? (
-                  <p className="px-2 py-2 text-xs text-muted-foreground italic">
-                    No priorities configured
-                  </p>
-                ) : (
-                  taskPriorityConfigs.map((priority) => (
-                    <button
-                      key={priority._id}
-                      onClick={() => {
-                        handlePriorityChange(priority.value);
-                        setIsPriorityOpen(false);
+              {taskPriorityConfigs.map((priority) => (
+                <DropdownMenuItem
+                  key={priority._id}
+                  onSelect={() => handlePriorityChange(priority.value)}
+                  className="p-0 focus:bg-transparent"
+                >
+                  <div
+                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                    style={{
+                      backgroundColor: `${priority.color || "#9CA3AF"}33`,
+                    }}
+                  >
+                    <span className="truncate">{priority.label}</span>
+                    <Flag
+                      className="h-3.5 w-3.5 flex-shrink-0"
+                      style={{
+                        color: priority.color || "#9CA3AF",
                       }}
-                      style={{ color: priority.color }}
-                      className="w-full flex justify-between items-center gap-2 px-2 py-1 rounded hover:bg-muted text-xs transition-colors"
-                      data-testid={`calendar-event-card-priority-option-${priority.value}-${task.id}`}
-                    >
-                      <span>{priority.label}</span>
-                      <Badge
-                        variant="secondary"
-                        className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
-                        style={{
-                          backgroundColor: `${priority.color}20`,
-                          color: priority.color,
-                        }}
-                      >
-                        <Flag className="h-4 w-4" />
-                      </Badge>
-                    </button>
-                  ))
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
+                    />
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {taskPriorityConfigs.length === 0 && (
+                <p className="px-2 py-2 text-xs text-muted-foreground italic">
+                  No priorities configured
+                </p>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Relationship Icons */}
           {(() => {
@@ -426,9 +444,24 @@ export const CalendarDayEventCard = ({
           })()}
         </div>
 
-        {/* More Options */}
-        <div data-testid={`calendar-event-card-more-btn-${task.id}`}>
-          <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-1">
+          {/* Detail Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}
+            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+            data-testid={`calendar-event-card-detail-btn-${task.id}`}
+            title="Open Details"
+          >
+            <ChevronsLeftRight className="h-4 w-4 rotate-135" />
+          </button>
+
+          {/* More Options */}
+          <div data-testid={`calendar-event-card-more-btn-${task.id}`}>
+            <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />
+          </div>
         </div>
       </div>
 

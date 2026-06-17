@@ -303,6 +303,10 @@ export function TaskDetailView({
   // subtask state
   const [isAddingSubtask, setIsAddingSubtask] = useState(false);
   const [newSubtaskName, setNewSubtaskName] = useState("");
+  const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+  const [isTaskDetailsExpanded, setIsTaskDetailsExpanded] = useState(true);
+  const [isLabelsExpanded, setIsLabelsExpanded] = useState(true);
+  const [isCustomFieldsSectionExpanded, setIsCustomFieldsSectionExpanded] = useState(true);
 
   // checklist state
   // const [expandedChecklists, setExpandedChecklists] = useState<Set<string>>(new Set());
@@ -911,17 +915,12 @@ export function TaskDetailView({
                   <div className="flex flex-col gap-1.5 shrink-0">
                     {/* Meta row: type selector + task ID + copy — above the title */}
                     <div className="flex items-center gap-2">
-                      <Select
-                        value={currentTask.taskType || "task"}
-                        onValueChange={(value) =>
-                          handleUpdateTask({ taskType: value })
-                        }
-                      >
-                        <SelectTrigger
-                          data-testid="task-detail-type-select-trigger"
-                          className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground border-0 hover:bg-primary/90 text-xs px-2"
-                        >
-                          <SelectValue>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            data-testid="task-detail-type-select-trigger"
+                            className="h-7 w-auto min-w-[90px] bg-primary text-primary-foreground rounded hover:bg-primary/90 text-xs px-2 flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
                             {(() => {
                               const selectedType =
                                 taskTypes.find(
@@ -939,35 +938,41 @@ export function TaskDetailView({
                               }
 
                               return (
-                                <div className="flex items-center gap-1.5">
+                                <>
                                   {renderTaskTypeVisual(
                                     selectedType,
-                                    "w-3 h-3",
+                                    "w-3 h-3 text-primary-foreground",
                                   )}
                                   <span className="text-xs text-primary-foreground">
                                     {selectedType.label}
                                   </span>
-                                </div>
+                                </>
                               );
                             })()}
-                          </SelectValue>
-                        </SelectTrigger>
+                          </button>
+                        </DropdownMenuTrigger>
 
-                        <SelectContent>
+                        <DropdownMenuContent
+                          align="start"
+                          className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] bg-background"
+                        >
                           {taskTypes.map((type) => (
-                            <SelectItem
+                            <DropdownMenuItem
                               key={type._id || type.value}
-                              value={type.value}
+                              onSelect={() =>
+                                handleUpdateTask({ taskType: type.value })
+                              }
+                              className="p-0 focus:bg-transparent"
                               data-testid={`task-detail-type-option-${type.value}`}
                             >
-                              <div className="flex items-center gap-2">
-                                {renderTaskTypeVisual(type, "w-3.5 h-3.5")}
-                                <span className="text-xs">{type.label}</span>
+                              <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
+                                {renderTaskTypeVisual(type, "h-3 w-3")}
+                                <span className="truncate">{type.label}</span>
                               </div>
-                            </SelectItem>
+                            </DropdownMenuItem>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
 
                       {/* Real Task ID */}
                       <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
@@ -2070,69 +2075,105 @@ export function TaskDetailView({
                 {/* Tab Content - Scrollable */}
                 <div className="flex-1 overflow-y-auto p-4">
                   {activeTab === "properties" && (
-                    <div className="space-y-1">
-                      {/* STATUS */}
-                      <div className="flex items-center justify-between py-1">
+                    <div className="space-y-4">
+                      {/* Section Header */}
+                      <div className="flex items-center justify-between pb-1">
+                        <h3 className="text-sm font-semibold">Task Details</h3>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() =>
+                            setIsTaskDetailsExpanded(!isTaskDetailsExpanded)
+                          }
+                        >
+                          <ChevronDown
+                            className={cn(
+                              "h-4 w-4 transition-transform duration-200",
+                              isTaskDetailsExpanded ? "rotate-180" : "rotate-0",
+                            )}
+                          />
+                        </Button>
+                      </div>
+
+                      <div
+                        className={cn(
+                          "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+                          isTaskDetailsExpanded
+                            ? "max-h-[1000px] opacity-100"
+                            : "max-h-0 opacity-0 pointer-events-none !mt-0",
+                        )}
+                      >
+                        {/* STATUS */}
+                      <div className="flex items-center justify-between">
                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                           <LayoutTemplate className="h-4 w-4" />
                           Status
                         </Label>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              className={cn(
-                                "h-8 px-3 hover:bg-muted text-xs",
-                                !currentTask.status && "text-muted-foreground",
-                              )}
+                          <DropdownMenuTrigger
+                            asChild
+                            className="w-[160px] h-8"
+                          >
+                            <button
+                              className="flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3 cursor-pointer"
+                              style={{
+                                backgroundColor: (() => {
+                                  const config = taskStatusConfigs.find(
+                                    (s) =>
+                                      s.value === currentTask.status ||
+                                      s.label === currentTask.status,
+                                  );
+                                  return config?.color || "#c4c4c4";
+                                })(),
+                              }}
                               data-testid="task-detail-status-trigger"
                             >
-                              {currentTask.status
-                                ? (() => {
-                                    const config = taskStatusConfigs.find(
-                                      (s) =>
-                                        s.value === currentTask.status ||
-                                        s.label === currentTask.status,
-                                    );
-                                    return (
-                                      <span className="flex items-center gap-1.5">
-                                        {config && (
-                                          <span
-                                            className="w-2 h-2 rounded-full"
-                                            style={{
-                                              backgroundColor: config.color,
-                                            }}
-                                          />
-                                        )}
-                                        {config?.label || currentTask.status}
-                                      </span>
-                                    );
-                                  })()
-                                : "—"}
-                            </Button>
+                              <span className="truncate w-full text-center">
+                                {(() => {
+                                  const config = taskStatusConfigs.find(
+                                    (s) =>
+                                      s.value === currentTask.status ||
+                                      s.label === currentTask.status,
+                                  );
+                                  return (
+                                    config?.label || currentTask.status || "—"
+                                  );
+                                })()}
+                              </span>
+                            </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent
+                            align="end"
+                            className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] bg-background"
+                          >
                             <DropdownMenuItem
                               onSelect={() =>
                                 handleUpdateTask({ status: undefined })
                               }
+                              className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                             >
                               Clear
                             </DropdownMenuItem>
-                            <Separator className="my-1" />
+                            <DropdownMenuSeparator />
                             {taskStatusConfigs.map((config) => (
                               <DropdownMenuItem
                                 key={config._id}
                                 onSelect={() =>
                                   handleUpdateTask({ status: config.value })
                                 }
+                                className="p-0 focus:bg-transparent"
                               >
-                                <span
-                                  className="w-2 h-2 rounded-full mr-2"
-                                  style={{ backgroundColor: config.color }}
-                                />
-                                {config.label}
+                                <div
+                                  className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                  style={{
+                                    backgroundColor: config.color || "#9CA3AF",
+                                  }}
+                                >
+                                  <span className="truncate w-full text-center">
+                                    {config.label}
+                                  </span>
+                                </div>
                               </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -2140,65 +2181,97 @@ export function TaskDetailView({
                       </div>
 
                       {/* PRIORITY */}
-                      <div className="flex items-center justify-between py-1">
+                      <div className="flex items-center justify-between">
                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                           <Flag className="h-4 w-4" />
                           Priority
                         </Label>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              className={cn(
-                                "h-8 px-3 hover:bg-muted text-xs",
-                                !currentTask.priority &&
-                                  "text-muted-foreground",
-                              )}
+                          <DropdownMenuTrigger
+                            asChild
+                            className="w-[160px] h-8"
+                          >
+                            <button
+                              className="flex items-center justify-between gap-2 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2 cursor-pointer"
+                              style={{
+                                backgroundColor: (() => {
+                                  const config = taskPriorityConfigs.find(
+                                    (p) => p.value === currentTask.priority,
+                                  );
+                                  return config
+                                    ? `${config.color}33`
+                                    : "#9CA3AF33";
+                                })(),
+                              }}
                               data-testid="task-detail-priority-trigger"
                             >
-                              {currentTask.priority ? (
-                                <span className="flex items-center gap-1.5">
-                                  {getPriorityColor(currentTask.priority) && (
-                                    <span
-                                      className="w-2 h-2 rounded-full"
-                                      style={{
-                                        backgroundColor: getPriorityColor(
-                                          currentTask.priority,
-                                        ),
-                                      }}
-                                    />
-                                  )}
-                                  {currentTask.priority}
-                                </span>
-                              ) : (
-                                "—"
-                              )}
-                            </Button>
+                              <span
+                                className={cn(
+                                  "truncate text-xs font-medium",
+                                  currentTask.priority
+                                    ? "text-foreground"
+                                    : "text-muted-foreground",
+                                )}
+                              >
+                                {(() => {
+                                  const config = taskPriorityConfigs.find(
+                                    (p) => p.value === currentTask.priority,
+                                  );
+                                  return (
+                                    config?.label || currentTask.priority || "—"
+                                  );
+                                })()}
+                              </span>
+                              <Flag
+                                className="h-3.5 w-3.5 flex-shrink-0"
+                                style={{
+                                  color: (() => {
+                                    const config = taskPriorityConfigs.find(
+                                      (p) => p.value === currentTask.priority,
+                                    );
+                                    return config?.color || "#9CA3AF";
+                                  })(),
+                                }}
+                              />
+                            </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent
+                            align="end"
+                            className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] bg-background"
+                          >
                             <DropdownMenuItem
                               onSelect={() =>
                                 handleUpdateTask({ priority: undefined })
                               }
+                              className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                             >
                               Clear
                             </DropdownMenuItem>
-                            <Separator className="my-1" />
+                            <DropdownMenuSeparator />
                             {taskPriorityConfigs.map((option) => (
                               <DropdownMenuItem
                                 key={option._id}
                                 onSelect={() =>
                                   handleUpdateTask({ priority: option.value })
                                 }
+                                className="p-0 focus:bg-transparent"
                               >
-                                {option.color && (
-                                  <span
-                                    className="w-2 h-2 rounded-full mr-2"
-                                    style={{ backgroundColor: option.color }}
+                                <div
+                                  className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground cursor-pointer"
+                                  style={{
+                                    backgroundColor: `${option.color || "#9CA3AF"}33`,
+                                  }}
+                                >
+                                  <span className="truncate">
+                                    {option.label || option.value}
+                                  </span>
+                                  <Flag
+                                    className="h-3.5 w-3.5 flex-shrink-0"
+                                    style={{
+                                      color: option.color || "#9CA3AF",
+                                    }}
                                   />
-                                )}
-                                {option.value}
+                                </div>
                               </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -2206,28 +2279,28 @@ export function TaskDetailView({
                       </div>
 
                       {/* START DATE */}
-                      <div className="flex items-center justify-between py-1">
+                      <div className="flex items-center justify-between">
                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                           <CalendarIcon className="h-4 w-4" />
                           Start Date
                         </Label>
                         <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="sm"
+                          <PopoverTrigger asChild className="w-[160px] h-8">
+                            <button
                               className={cn(
-                                "h-8 px-3 font-normal hover:bg-muted text-xs",
+                                "flex items-center justify-center rounded-xs text-xs font-medium transition-colors bg-muted hover:bg-muted/85 px-3 cursor-pointer",
                                 !currentTask.startDate &&
                                   "text-muted-foreground",
                               )}
                               data-testid="task-detail-start-date-trigger"
                             >
-                              {formatLocalDate(currentTask.startDate)}
-                            </Button>
+                              {currentTask.startDate
+                                ? formatLocalDate(currentTask.startDate)
+                                : "—"}
+                            </button>
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                            className="w-auto p-2 border-0 border-b-[5px] border-b-primary z-[50]"
                             align="end"
                           >
                             <CalendarPicker
@@ -2270,27 +2343,27 @@ export function TaskDetailView({
                       </div>
 
                       {/* END DATE / DUE DATE */}
-                      <div className="flex items-center justify-between py-1">
+                      <div className="flex items-center justify-between">
                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                           <CalendarIcon className="h-4 w-4" />
                           Due Date
                         </Label>
                         <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="sm"
+                          <PopoverTrigger asChild className="w-[160px] h-8">
+                            <button
                               className={cn(
-                                "h-8 px-3 font-normal hover:bg-muted text-xs",
+                                "flex items-center justify-center rounded-xs text-xs font-medium transition-colors bg-muted hover:bg-muted/85 px-3 cursor-pointer",
                                 !currentTask.endDate && "text-muted-foreground",
                               )}
                               data-testid="task-detail-due-date-trigger"
                             >
-                              {formatLocalDate(currentTask.endDate)}
-                            </Button>
+                              {currentTask.endDate
+                                ? formatLocalDate(currentTask.endDate)
+                                : "—"}
+                            </button>
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                            className="w-auto p-2 border-0 border-b-[5px] border-b-primary z-[50]"
                             align="end"
                           >
                             <CalendarPicker
@@ -2332,256 +2405,364 @@ export function TaskDetailView({
                       </div>
 
                       {/* ASSIGNEE — uses workspaceMembers like TaskTable */}
-                      <div className="flex items-center justify-between py-1">
+                      <div className="flex items-center justify-between">
                         <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0">
                           <User className="h-4 w-4" />
                           Assignee
                         </Label>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              className={cn(
-                                "h-8 px-3 hover:bg-muted text-xs",
-                                !currentTask.assignee &&
-                                  "text-muted-foreground",
-                              )}
+                        <DropdownMenu
+                          onOpenChange={(open) => {
+                            if (!open) setAssigneeSearchQuery("");
+                          }}
+                        >
+                          <DropdownMenuTrigger
+                            asChild
+                            className="w-[160px] h-8"
+                          >
+                            <button
+                              className="flex items-center justify-center cursor-pointer bg-muted hover:bg-muted/85 transition-colors overflow-hidden rounded-xs"
                               data-testid="task-detail-assignee-trigger"
                             >
-                              {currentTask.assignee
-                                ? (() => {
-                                    const member = workspaceMembers.find(
-                                      (m) => m.userId === currentTask.assignee,
-                                    );
-                                    const name =
-                                      member?.name || currentTask.assignee;
-                                    return (
-                                      <span className="flex items-center gap-1.5">
+                              {currentTask.assignee ? (
+                                (() => {
+                                  const member = workspaceMembers.find(
+                                    (m) => m.userId === currentTask.assignee,
+                                  );
+                                  const name =
+                                    member?.name || currentTask.assignee;
+                                  return (
+                                    <MemberAvatar
+                                      size="md"
+                                      name={name}
+                                      src={
+                                        member?.avatar || member?.profilePicture
+                                      }
+                                    />
+                                  );
+                                })()
+                              ) : (
+                                <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                              )}
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] bg-background"
+                          >
+                            <div
+                              className="px-1 pb-2"
+                              onKeyDown={(e) => e.stopPropagation()}
+                            >
+                              <Input
+                                placeholder="Type @ or name..."
+                                value={assigneeSearchQuery}
+                                onChange={(e) =>
+                                  setAssigneeSearchQuery(e.target.value)
+                                }
+                                className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="max-h-60 overflow-y-auto space-y-1">
+                              {workspaceMembers
+                                .filter((wm) =>
+                                  currentProject?.members?.some(
+                                    (pm) => pm.userId === wm.userId,
+                                  ),
+                                )
+                                .filter((wm) => {
+                                  if (!assigneeSearchQuery) return true;
+                                  const query = assigneeSearchQuery
+                                    .toLowerCase()
+                                    .replace(/^@/, "");
+                                  return wm.name?.toLowerCase().includes(query);
+                                }).length === 0 ? (
+                                <div className="text-center py-2 text-xs text-muted-foreground">
+                                  No members found
+                                </div>
+                              ) : (
+                                workspaceMembers
+                                  .filter((wm) =>
+                                    currentProject?.members?.some(
+                                      (pm) => pm.userId === wm.userId,
+                                    ),
+                                  )
+                                  .filter((wm) => {
+                                    if (!assigneeSearchQuery) return true;
+                                    const query = assigneeSearchQuery
+                                      .toLowerCase()
+                                      .replace(/^@/, "");
+                                    return wm.name
+                                      ?.toLowerCase()
+                                      .includes(query);
+                                  })
+                                  .map((member) => (
+                                    <DropdownMenuItem
+                                      key={member.userId}
+                                      onSelect={() =>
+                                        handleUpdateTask({
+                                          assignee: member.userId,
+                                        })
+                                      }
+                                      className="p-0 focus:bg-transparent"
+                                    >
+                                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
                                         <MemberAvatar
-                                          name={name}
+                                          size="sm"
+                                          name={member.name}
                                           src={
-                                            member?.avatar ||
-                                            member?.profilePicture
+                                            member.avatar ||
+                                            member.profilePicture
                                           }
                                         />
-                                      </span>
-                                    );
-                                  })()
-                                : "—"}
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                                        <span className="truncate">
+                                          {member.name}
+                                        </span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                  ))
+                              )}
+                            </div>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onSelect={() =>
                                 handleUpdateTask({ assignee: undefined })
                               }
+                              className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                             >
                               Clear
                             </DropdownMenuItem>
-                            <Separator className="my-1" />
-                            {workspaceMembers
-                              .filter((wm) =>
-                                currentProject?.members?.some(
-                                  (pm) => pm.userId === wm.userId,
-                                ),
-                              )
-                              .map((member) => (
-                                <DropdownMenuItem
-                                  key={member.userId}
-                                  onSelect={() =>
-                                    handleUpdateTask({
-                                      assignee: member.userId,
-                                    })
-                                  }
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <MemberAvatar
-                                      name={member.name}
-                                      src={
-                                        member.avatar || member.profilePicture
-                                      }
-                                    />
-                                    {member.name}
-                                  </div>
-                                </DropdownMenuItem>
-                              ))}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
+                      </div>
+
+                      <Separator className="my-2" />
 
                       {/* Labels */}
                       <div className="space-y-2 pt-2">
                         <div className="flex items-center justify-between">
-                          <Label className="font-semibold">Labels</Label>
-                          <LabelPicker
-                            selectedLabelIds={currentTask.labelIds || []}
-                            onSelect={handleSelectLabel}
-                            onRemove={handleRemoveLabel}
-                          >
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              data-testid="task-detail-label-picker-trigger"
+                          <h3 className="text-sm font-semibold">Labels</h3>
+                          <div className="flex items-center gap-1">
+                            <LabelPicker
+                              selectedLabelIds={currentTask.labelIds || []}
+                              onSelect={handleSelectLabel}
+                              onRemove={handleRemoveLabel}
                             >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </LabelPicker>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {currentTask.labelIds &&
-                          currentTask.labelIds.length > 0 ? (
-                            currentTask.labelIds.map((labelId) => {
-                              const label = currentWorkspace?.labels?.find(
-                                (l) => l.id === labelId,
-                              );
-                              if (!label) return null;
-                              return (
-                                <LabelBadge
-                                  key={labelId}
-                                  label={label}
-                                  onRemove={() => handleRemoveLabel(labelId)}
-                                  removeButtonTestId={`task-detail-label-remove-${labelId}`}
-                                />
-                              );
-                            })
-                          ) : (
-                            <div className="text-xs text-muted-foreground italic">
-                              No labels assigned yet.
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* <Separator /> */}
-
-                      {/* CUSTOM FIELDS SECTION */}
-                      <>
-                        {/* Section header with Add button */}
-                        <div className="flex items-center justify-between py-1">
-                          <p className="text-xs font-semibold uppercase tracking-wide">
-                            Custom Fields
-                          </p>
-                          <Popover
-                            open={showAddFieldPopover}
-                            onOpenChange={setShowAddFieldPopover}
-                          >
-                            <PopoverTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6"
-                                title="Add custom field"
-                                data-testid="task-detail-add-custom-field-trigger"
+                                data-testid="task-detail-label-picker-trigger"
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[300px] p-0 flex flex-col"
-                              align="end"
-                              style={{ height: "480px" }}
+                            </LabelPicker>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() =>
+                                setIsLabelsExpanded(!isLabelsExpanded)
+                              }
                             >
-                              <FieldTypeSelectContent
-                                projectId={projectId}
-                                onFieldCreated={() =>
-                                  setShowAddFieldPopover(false)
-                                }
-                                onBack={() => setShowAddFieldPopover(false)}
+                              <ChevronDown
+                                className={cn(
+                                  "h-4 w-4 transition-transform duration-200",
+                                  isLabelsExpanded ? "rotate-180" : "rotate-0",
+                                )}
                               />
-                            </PopoverContent>
-                          </Popover>
+                            </Button>
+                          </div>
+                        </div>
+                        <div
+                          className={cn(
+                            "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+                            isLabelsExpanded
+                              ? "max-h-[500px] opacity-100"
+                              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+                          )}
+                        >
+                          <div className="flex flex-wrap gap-2">
+                            {currentTask.labelIds &&
+                            currentTask.labelIds.length > 0 ? (
+                              currentTask.labelIds.map((labelId) => {
+                                const label = currentWorkspace?.labels?.find(
+                                  (l) => l.id === labelId,
+                                );
+                                if (!label) return null;
+                                return (
+                                  <LabelBadge
+                                    key={labelId}
+                                    label={label}
+                                    onRemove={() => handleRemoveLabel(labelId)}
+                                    removeButtonTestId={`task-detail-label-remove-${labelId}`}
+                                  />
+                                );
+                              })
+                            ) : (
+                              <div className="text-xs text-muted-foreground italic">
+                                No labels assigned yet.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Separator className="my-2" />
+
+                      {/* CUSTOM FIELDS SECTION */}
+                      <div className="space-y-2 pt-2">
+                        {/* Section header with Add button & Collapse toggle */}
+                        <div className="flex items-center justify-between py-1">
+                          <h3 className="text-xs font-semibold uppercase tracking-wide">
+                            Custom Fields
+                          </h3>
+                          <div className="flex items-center gap-1">
+                            <Popover
+                              open={showAddFieldPopover}
+                              onOpenChange={setShowAddFieldPopover}
+                            >
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  title="Add custom field"
+                                  data-testid="task-detail-add-custom-field-trigger"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-[300px] p-0 flex flex-col"
+                                align="end"
+                                style={{ height: "480px" }}
+                              >
+                                <FieldTypeSelectContent
+                                  projectId={projectId}
+                                  onFieldCreated={() =>
+                                    setShowAddFieldPopover(false)
+                                  }
+                                  onBack={() => setShowAddFieldPopover(false)}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() =>
+                                setIsCustomFieldsSectionExpanded(!isCustomFieldsSectionExpanded)
+                              }
+                            >
+                              <ChevronDown
+                                className={cn(
+                                  "h-4 w-4 transition-transform duration-200",
+                                  isCustomFieldsSectionExpanded ? "rotate-180" : "rotate-0",
+                                )}
+                              />
+                            </Button>
+                          </div>
                         </div>
 
-                        {/* Fields list — preview or all */}
-                        {customFields.length === 0 ? (
-                          <p className="text-xs text-muted-foreground py-2">
-                            No custom fields yet
-                          </p>
-                        ) : (
-                          <>
-                            {(showAllCustomFields
-                              ? customFields
-                              : customFields.slice(
-                                  0,
-                                  CUSTOM_FIELDS_PREVIEW_COUNT,
-                                )
-                            ).map((field) => {
-                              const fieldData = getTaskCustomFieldById(
-                                projectId,
-                                field.id,
-                              );
-                              if (!fieldData) return null;
-                              const IconComponent = getCustomFieldIcon(
-                                field.type,
-                              );
-                              return (
-                                <div
-                                  key={field.id}
-                                  className="flex items-center justify-between py-1"
-                                >
-                                  <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0 max-w-[45%]">
-                                    <IconComponent className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">
-                                      {field.name}
-                                    </span>
-                                  </Label>
+                        <div
+                          className={cn(
+                            "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+                            isCustomFieldsSectionExpanded
+                              ? "max-h-[1000px] opacity-100"
+                              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+                          )}
+                        >
+                          {/* Fields list — preview or all */}
+                          {customFields.length === 0 ? (
+                            <p className="text-xs text-muted-foreground py-2">
+                              No custom fields yet
+                            </p>
+                          ) : (
+                            <>
+                              {(showAllCustomFields
+                                ? customFields
+                                : customFields.slice(
+                                    0,
+                                    CUSTOM_FIELDS_PREVIEW_COUNT,
+                                  )
+                              ).map((field) => {
+                                const fieldData = getTaskCustomFieldById(
+                                  projectId,
+                                  field.id,
+                                );
+                                if (!fieldData) return null;
+                                const IconComponent = getCustomFieldIcon(
+                                  field.type,
+                                );
+                                return (
                                   <div
-                                    className="w-[160px]"
-                                    data-testid={`task-detail-custom-field-dropdown-${field.id}`}
+                                    key={field.id}
+                                    className="flex items-center justify-between py-1"
                                   >
-                                    <CustomFieldDropdown
-                                      field={fieldData}
-                                      value={
-                                        currentTask.customFieldValues?.[
-                                          field.id
-                                        ] ||
-                                        (field.type === "select-many" ||
-                                        field.type === "label"
-                                          ? []
-                                          : "")
-                                      }
-                                      onUpdate={(value) => {
-                                        const updatedValues = {
-                                          ...currentTask.customFieldValues,
-                                          [field.id]: value,
-                                        };
-                                        handleUpdateTask({
-                                          customFieldValues: updatedValues,
-                                        });
-                                      }}
-                                      task={currentTask}
-                                    />
+                                    <Label className="text-muted-foreground flex items-center gap-2 text-xs shrink-0 max-w-[45%]">
+                                      <IconComponent className="h-3.5 w-3.5 shrink-0" />
+                                      <span className="truncate">
+                                        {field.name}
+                                      </span>
+                                    </Label>
+                                    <div
+                                      className="w-[160px]"
+                                      data-testid={`task-detail-custom-field-dropdown-${field.id}`}
+                                    >
+                                      <CustomFieldDropdown
+                                        field={fieldData}
+                                        value={
+                                          currentTask.customFieldValues?.[
+                                            field.id
+                                          ] ||
+                                          (field.type === "select-many" ||
+                                          field.type === "label"
+                                            ? []
+                                            : "")
+                                        }
+                                        onUpdate={(value) => {
+                                          const updatedValues = {
+                                            ...currentTask.customFieldValues,
+                                            [field.id]: value,
+                                          };
+                                          handleUpdateTask({
+                                            customFieldValues: updatedValues,
+                                          });
+                                        }}
+                                        task={currentTask}
+                                      />
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
 
-                            {/* Show more / Show less toggle */}
-                            {customFields.length >
-                              CUSTOM_FIELDS_PREVIEW_COUNT && (
-                              <button
-                                onClick={() =>
-                                  setShowAllCustomFields((prev) => !prev)
-                                }
-                                className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors"
-                                data-testid="task-detail-custom-field-toggle-show-all"
-                              >
-                                <ChevronDown
-                                  className={cn(
-                                    "h-3.5 w-3.5 transition-transform",
-                                    showAllCustomFields && "rotate-180",
-                                  )}
-                                />
-                                {showAllCustomFields
-                                  ? "Show less"
-                                  : `Show ${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT} more field${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT > 1 ? "s" : ""}`}
-                              </button>
-                            )}
-                          </>
-                        )}
-                      </>
+                              {/* Show more / Show less toggle */}
+                              {customFields.length >
+                                CUSTOM_FIELDS_PREVIEW_COUNT && (
+                                <button
+                                  onClick={() =>
+                                    setShowAllCustomFields((prev) => !prev)
+                                  }
+                                  className="w-full flex items-center gap-1.5 py-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                                  data-testid="task-detail-custom-field-toggle-show-all"
+                                >
+                                  <ChevronDown
+                                    className={cn(
+                                      "h-3.5 w-3.5 transition-transform",
+                                      showAllCustomFields && "rotate-180",
+                                    )}
+                                  />
+                                  {showAllCustomFields
+                                    ? "Show less"
+                                    : `Show ${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT} more field${customFields.length - CUSTOM_FIELDS_PREVIEW_COUNT > 1 ? "s" : ""}`}
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
 
                       <Separator className="my-2" />
 

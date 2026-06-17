@@ -35,11 +35,7 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
       return (
         <Center>
           <div className="flex flex-col items-start leading-tight text-left max-w-[200px] w-full gap-1">
-            {taskIdStr && (
-              <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium shrink-0">
-                {taskIdStr}
-              </span>
-            )}
+
             <span
               data-testid="cell-task-name"
               className="font-medium text-sm text-foreground truncate w-full"
@@ -47,6 +43,11 @@ export const timesheetColumns: ColumnDef<TableRow>[] = [
             >
               {task || "-"}
             </span>
+            {taskIdStr && (
+              <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium shrink-0">
+                {taskIdStr}
+              </span>
+            )}
           </div>
         </Center>
       );

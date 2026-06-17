@@ -1147,7 +1147,7 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger data-testid={`doc-sidebar-action-link-submenu-${item.id}`}>
+                    <DropdownMenuSubTrigger onClick={ensureLinkOptionsLoaded} data-testid={`doc-sidebar-action-link-submenu-${item.id}`}>
                       <Link className="w-4 h-4 mr-2" />
                       <span>Link Page to</span>
                     </DropdownMenuSubTrigger>
@@ -1377,9 +1377,36 @@ export function DocsSidebar({ onCollapse, onExpandAll, onCollapseAll }: DocsClic
                                 <div className="max-h-40 overflow-y-auto space-y-1">
                                   {portfolios.map((p) => {
                                     const isSelected = currentDoc?.pageLinkedPortfolios?.includes(p.id!);
+                                    const avatar = getProjectAvatar(p);
                                     return (
-                                      <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(item.id, p.id!) : handleAddPortfolio(item.id, p.id!)}>
-                                        <span className="text-xs text-foreground truncate">{p.name}</span>
+                                      <div
+                                        key={p.id}
+                                        className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer"
+                                        onClick={() => isSelected ? handleRemovePortfolio(item.id, p.id!) : handleAddPortfolio(item.id, p.id!)}
+                                      >
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          {/* Portfolio Icon */}
+                                          <div
+                                            className="w-5 h-5 rounded shrink-0 flex items-center justify-center overflow-hidden"
+                                            style={{ backgroundColor: avatar?.type === "icon" ? `${avatar.color}20` : p?.color ? `${p.color}20` : "#3B82F620" }}
+                                          >
+                                            {avatar?.type === "image" ? (
+                                              <img src={avatar.src} alt={p.name} className="w-full h-full object-cover rounded" />
+                                            ) : avatar?.type === "icon" ? (
+                                              (() => {
+                                                const iconObj = iconLibrary.find((i: any) => i.name?.toLowerCase() === avatar.name?.toLowerCase());
+                                                if (iconObj) {
+                                                  const IconComponent = iconObj.icon;
+                                                  return <IconComponent size={10} color={avatar.color} />;
+                                                }
+                                                return <span className="text-[9px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>{p.name?.charAt(0).toUpperCase()}</span>;
+                                              })()
+                                            ) : (
+                                              <span className="text-[9px] font-bold" style={{ color: p.color ?? "#3B82F6" }}>{p.name?.charAt(0).toUpperCase()}</span>
+                                            )}
+                                          </div>
+                                          <span className="text-xs text-foreground truncate">{p.name}</span>
+                                        </div>
                                         <Checkbox checked={isSelected} className="h-3.5 w-3.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid={`doc-sidebar-link-checkbox-portfolio-${p.id}`} />
                                       </div>
                                     );

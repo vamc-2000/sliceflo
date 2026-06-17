@@ -249,7 +249,7 @@ const ProfileSettingsPage = () => {
         icon={
           <Avatar className="w-10 h-10">
             <AvatarImage src={fullProfileUrl || undefined} alt={localProfile.name} />
-            <AvatarFallback className="bg-blue-500 text-white text-sm">
+            <AvatarFallback className="bg-muted text-muted-foreground text-sm">
               {localProfile.name
                 .split(" ")
                 .map((n) => n[0])
@@ -513,7 +513,7 @@ const ProfileSettingsPage = () => {
             <div className="md:col-span-2 space-y-3">
               <div className="flex flex-wrap gap-2 p-3 border rounded-md min-h-[42px] bg-card">
                 {selectedSkills.map((skill, idx) => (
-                  <Badge key={idx} variant="default" className="bg-primary text-white font-inter text-[12px]" data-testid={`profile-skill-badge-${skill}`}>
+                  <Badge key={idx} variant="default" className="bg-brand text-brand-foreground font-inter text-[12px]" data-testid={`profile-skill-badge-${skill}`}>
                     {skill}
                     <button
                       onClick={() => {
@@ -570,7 +570,7 @@ const ProfileSettingsPage = () => {
                         setSelectedSkills(updated);
                         handleInputChange("skills", updated);
                       }}
-                      className={`font-inter text-[12px] font-medium leading-4 ${isSelected ? "bg-primary text-primary-foreground" : "text-foreground"
+                      className={`font-inter text-[12px] font-medium leading-4 ${isSelected ? "bg-brand text-brand-foreground" : "text-foreground"
                         }`}
                       data-testid={`profile-skill-option-${skill}`}
                     >
@@ -591,7 +591,7 @@ const ProfileSettingsPage = () => {
         <Button
           onClick={handleSave}
           disabled={isSaving || !hasChanges || !!phoneError.workPhone || !!phoneError.personalPhone}
-          className="font-inter text-[14px] font-medium leading-5 px-8 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="font-inter text-[14px] font-medium leading-5 px-8 bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           style={{ letterSpacing: "0" }}
           data-testid="profile-save-btn"
         >

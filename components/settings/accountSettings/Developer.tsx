@@ -87,7 +87,7 @@ export default function Developer() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="bg-foreground text-background hover:bg-foreground/90"
                 size="sm"
                 data-testid="developer-tokens-generate-trigger"
               >
@@ -109,22 +109,22 @@ export default function Developer() {
             <Table data-testid="developer-tokens-table">
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Token
                   </TableHead>
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Secret Key
                   </TableHead>
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Created On
                   </TableHead>
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Status
                   </TableHead>
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Expiry Date & Time
                   </TableHead>
-                  <TableHead className="text-center font-semibold text-xs uppercase text-primary">
+                  <TableHead className="text-center font-semibold text-xs uppercase text-muted-foreground">
                     Action
                   </TableHead>
                 </TableRow>
@@ -134,7 +134,7 @@ export default function Developer() {
                   <TableRow key={token.id} className="hover:bg-muted" data-testid={`developer-token-row-${token.id}`}>
                     <TableCell className="text-left">
                       <div>
-                        <div className="font-semibold text-sm text-primary">
+                        <div className="font-semibold text-sm text-foreground">
                           {token.token}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -143,11 +143,11 @@ export default function Developer() {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <code className="text-sm text-primary bg-muted px-2 py-1 rounded">
+                      <code className="text-sm text-foreground bg-muted px-2 py-1 rounded">
                         {token.secretKey}
                       </code>
                     </TableCell>
-                    <TableCell className="text-center text-sm text-primary">
+                    <TableCell className="text-center text-sm text-foreground">
                       {token.createdOn}
                     </TableCell>
                     <TableCell className="text-center">
@@ -157,7 +157,7 @@ export default function Developer() {
                         {token.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center text-sm text-primary">
+                    <TableCell className="text-center text-sm text-foreground">
                       {token.expiryDate}
                     </TableCell>
                     <TableCell className="text-center">

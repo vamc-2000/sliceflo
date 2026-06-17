@@ -13,7 +13,12 @@ export const Loader = ({
   message = "Loader...",
   size = 'md'
 }: LoaderProps) => {
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const sizes = {
     sm: { width: 60, height: 15 },
@@ -21,7 +26,7 @@ export const Loader = ({
     lg: { width: 100, height: 25 },
   };
 
-  const gifSrc = theme === 'dark' ? '/Variant1.gif' : '/interchanging.gif';
+  const gifSrc = mounted && theme === 'dark' ? '/Variant1.gif' : '/interchanging.gif';
 
   return (
     <div className="flex flex-col items-center gap-4">

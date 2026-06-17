@@ -91,8 +91,8 @@
   --header-foreground: rgb(255, 255, 255);
 
   /* Brand Colors */
-  --brand: rgb(0, 31, 63);
-  --brand-foreground: rgb(255, 255, 255);
+  --brand: oklch(0.145 0 0);
+  --brand-foreground: oklch(0.985 0 0);
 
   --switch-track: #B0BAC3;
   --brand-orange: #FF8D28;
@@ -171,8 +171,8 @@
   --header-foreground: oklch(0.985 0 0);
 
   /* Brand Colors - adjusted for Dark Mode contrast */
-  --brand: rgb(40, 110, 180);
-  --brand-foreground: rgb(255, 255, 255);
+  --brand: oklch(0.985 0 0);
+  --brand-foreground: oklch(0.145 0 0);
 }
 
 /* High Contrast Light Theme */

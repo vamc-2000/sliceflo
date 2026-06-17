@@ -73,6 +73,7 @@ import { formatTaskId } from "@/utils/task-utils";
 import { formatCycleName } from "@/utils/cycle-utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { GanttFieldVisibilityPopup } from "./GanttFieldVisibilityPopup";
+import { MemberAvatar } from "@/components/projects/MemberAvatar";
 import { RelationshipDetailDialog } from "../list-view/common/RelationshipDetailDialog";
 import {
   getRelationshipIcon,
@@ -420,6 +421,17 @@ export const GanttTaskTable = React.forwardRef<
       cycleId: null as string | null,
     });
 
+    const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+    const getFilteredMembers = () => {
+      const query = assigneeSearchQuery.startsWith("@")
+        ? assigneeSearchQuery.slice(1)
+        : assigneeSearchQuery;
+      if (!query) return members;
+      return members.filter((m) =>
+        m.name?.toLowerCase().includes(query.toLowerCase()),
+      );
+    };
+
     useEffect(() => {
       if (propsExpandedTasks !== undefined) return; // Managed by parent
 
@@ -766,32 +778,38 @@ export const GanttTaskTable = React.forwardRef<
         );
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className={cellCls}>
-                <div
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: statusCfg?.color || "#e5e7eb" }}
-                />
-                <span className="text-xs truncate">
-                  {statusCfg?.label || "No Status"}
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button
+                className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 overflow-hidden px-3"
+                style={{
+                  backgroundColor: statusCfg?.color || "#c4c4c4",
+                }}
+              >
+                <span className="truncate w-full text-center">
+                  {statusCfg?.label || "—"}
                 </span>
-              </div>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="p-1.5 border-b-4 border-b-primary"
+              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
             >
               {taskStatusConfigs.map((s) => (
                 <DropdownMenuItem
                   key={s.value}
-                  onClick={() => updateFn(item.id, { status: s.value })}
-                  className="text-xs"
+                  onSelect={() => updateFn(item.id, { status: s.value })}
+                  className="p-0 focus:bg-transparent"
                 >
                   <div
-                    className="w-2 h-2 rounded-full mr-2"
-                    style={{ backgroundColor: s.color }}
-                  />
-                  {s.label}
+                    className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold text-white transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                    style={{
+                      backgroundColor: s.color || "#9CA3AF",
+                    }}
+                  >
+                    <span className="truncate w-full text-center">
+                      {s.label}
+                    </span>
+                  </div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -802,51 +820,66 @@ export const GanttTaskTable = React.forwardRef<
       if (h.key === "assignee") {
         const assignee = getMemberById(item.assignee);
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className={cellCls}>
+          <DropdownMenu
+            onOpenChange={(open) => {
+              if (!open) setAssigneeSearchQuery("");
+            }}
+          >
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden">
                 {assignee ? (
-                  <>
-                    <Avatar className="h-5 w-5 shrink-0">
-                      <AvatarImage
-                        src={assignee.profilePicture || assignee.avatar}
-                      />
-                      <AvatarFallback className="text-[10px]">
-                        {assignee.name?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </>
+                  <MemberAvatar
+                    size="md"
+                    name={assignee.name}
+                    src={assignee.profilePicture || assignee.avatar}
+                  />
                 ) : (
-                  <>
-                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </>
+                  <User className="h-4 w-4 text-muted-foreground shrink-0" />
                 )}
-              </div>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-[200px] p-1.5 border-b-4 border-b-primary"
+              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
             >
-              <DropdownMenuItem
-                onClick={() => updateFn(item.id, { assignee: undefined })}
-                className="text-xs"
-              >
-                <User className="h-4 w-4 mr-2" /> Unassigned
-              </DropdownMenuItem>
+              <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                  placeholder="Type @ or name..."
+                  value={assigneeSearchQuery}
+                  onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                  autoFocus
+                />
+              </div>
+              {getFilteredMembers().length === 0 ? (
+                <div className="text-center py-2 text-xs text-muted-foreground">
+                  No members found
+                </div>
+              ) : (
+                getFilteredMembers().map((m) => (
+                  <DropdownMenuItem
+                    key={m.userId}
+                    onSelect={() => updateFn(item.id, { assignee: m.userId })}
+                    className="p-0 focus:bg-transparent"
+                  >
+                    <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
+                      <MemberAvatar
+                        size="sm"
+                        name={m.name}
+                        src={m.profilePicture || m.avatar}
+                      />
+                      <span className="truncate">{m.name}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
               <DropdownMenuSeparator />
-              {members.map((m) => (
-                <DropdownMenuItem
-                  key={m.userId}
-                  onClick={() => updateFn(item.id, { assignee: m.userId })}
-                  className="text-xs"
-                >
-                  <Avatar className="h-5 w-5 mr-2">
-                    <AvatarImage src={m.profilePicture || m.avatar} />
-                    <AvatarFallback>{m.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  {m.name}
-                </DropdownMenuItem>
-              ))}
+              <DropdownMenuItem
+                onSelect={() => updateFn(item.id, { assignee: undefined })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
+              >
+                Clear
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -878,7 +911,7 @@ export const GanttTaskTable = React.forwardRef<
               </div>
             </PopoverTrigger>
             <PopoverContent
-              className="w-auto p-2 border-0 border-b-[5px] border-primary"
+              className="w-auto p-2 border-0 border-b-[5px] border-b-primary"
               align="start"
             >
               <CalendarPicker
@@ -923,34 +956,53 @@ export const GanttTaskTable = React.forwardRef<
         );
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className={cellCls}>
-                <Flag
-                  className="h-3.5 w-3.5 shrink-0"
-                  style={{ color: priorityCfg?.color || "#9ca3af" }}
-                />
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button
+                className="w-full h-full flex items-center justify-between gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
+                style={{
+                  backgroundColor: `${priorityCfg?.color || "#9CA3AF"}33`,
+                }}
+              >
                 <span
                   className={cn(
-                    "text-xs truncate",
-                    !priorityCfg && "text-muted-foreground",
+                    "truncate text-xs font-medium",
+                    item.priority ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {priorityCfg?.label || "—"}
                 </span>
-              </div>
+                <Flag
+                  className="h-3.5 w-3.5 flex-shrink-0"
+                  style={{
+                    color: priorityCfg?.color || "#9CA3AF",
+                  }}
+                />
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="p-1.5 border-b-4 border-b-primary"
+              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
             >
               {taskPriorityConfigs.map((p) => (
                 <DropdownMenuItem
                   key={p.value}
-                  onClick={() => updateFn(item.id, { priority: p.value })}
-                  className="text-xs"
+                  onSelect={() => updateFn(item.id, { priority: p.value })}
+                  className="p-0 focus:bg-transparent"
                 >
-                  <Flag className="h-3 w-3 mr-2" style={{ color: p.color }} />
-                  {p.label}
+                  <div
+                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground cursor-pointer"
+                    style={{
+                      backgroundColor: `${p.color || "#9CA3AF"}33`,
+                    }}
+                  >
+                    <span className="truncate">{p.label}</span>
+                    <Flag
+                      className="h-3.5 w-3.5 flex-shrink-0"
+                      style={{
+                        color: p.color || "#9CA3AF",
+                      }}
+                    />
+                  </div>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -963,28 +1015,32 @@ export const GanttTaskTable = React.forwardRef<
 
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className={cn(cellCls, "flex items-center gap-2")}>
-                {type ? renderTaskTypeVisual(type, "h-3 w-3") : null}
-                <span className="text-xs truncate">
-                  {type?.label || "Task"}
-                </span>
-              </div>
+            <DropdownMenuTrigger asChild className="w-full h-full">
+              <button className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-muted transition-colors overflow-hidden px-3 gap-2">
+                {type ? (
+                  <>
+                    {renderTaskTypeVisual(type, "w-3 h-3")}
+                    <span className="truncate">{type.label}</span>
+                  </>
+                ) : (
+                  <span>Task</span>
+                )}
+              </button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
               align="start"
-              className="p-1.5 border-b-4 border-b-primary"
+              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
             >
               {taskTypes.map((t) => (
                 <DropdownMenuItem
                   key={t._id || t.value}
-                  onClick={() => updateFn(item.id, { taskType: t.value })}
-                  className="text-xs"
+                  onSelect={() => updateFn(item.id, { taskType: t.value })}
+                  className="p-0 focus:bg-transparent"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
                     {renderTaskTypeVisual(t, "h-3 w-3")}
-                    <span>{t.label}</span>
+                    <span className="truncate">{t.label}</span>
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -997,7 +1053,7 @@ export const GanttTaskTable = React.forwardRef<
         const cycle = allCycles.find((c) => c.id === item.cycleId);
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="w-full h-full">
               <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
                 <span
                   className={cn(
@@ -1015,15 +1071,15 @@ export const GanttTaskTable = React.forwardRef<
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto"
+              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] max-h-[300px] overflow-y-auto"
             >
               {cycles.map((c) => (
                 <DropdownMenuItem
                   key={c.id}
-                  onClick={() => updateFn(item.id, { cycleId: c.id })}
+                  onSelect={() => updateFn(item.id, { cycleId: c.id })}
                   className="p-0 focus:bg-transparent"
                 >
-                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted cursor-pointer">
                     <span className="truncate w-full text-center">
                       {formatCycleName(c.name, c.cycleNumber)}
                     </span>
@@ -1037,10 +1093,10 @@ export const GanttTaskTable = React.forwardRef<
               )}
               {cycles.length > 0 && <DropdownMenuSeparator />}
               <DropdownMenuItem
-                onClick={() => updateFn(item.id, { cycleId: null })}
-                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                onSelect={() => updateFn(item.id, { cycleId: null })}
+                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
               >
-                — Clear Cycle —
+                Clear Cycle
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -1231,7 +1287,7 @@ export const GanttTaskTable = React.forwardRef<
                           <DropdownMenuPortal>
                             <DropdownMenuContent
                               align="end"
-                              className="w-[180px] p-1.5 border-b-4 border-b-primary z-[50]"
+                              className="w-[180px] p-1.5 border-0 border-b-[5px] border-b-primary z-[50]"
                             >
                               <DropdownMenuItem
                                 onClick={() => {
@@ -1357,7 +1413,7 @@ export const GanttTaskTable = React.forwardRef<
                               <DropdownMenuPortal>
                                 <DropdownMenuContent
                                   align="end"
-                                  className="w-[180px] border-b-4 border-b-primary z-[50]"
+                                  className="w-[180px] p-1.5 border-0 border-b-[5px] border-b-primary z-[50]"
                                 >
                                   <DropdownMenuItem
                                     onClick={() => deleteSubtask(subtask.id)}
@@ -1426,7 +1482,6 @@ export const GanttTaskTable = React.forwardRef<
                               }}
                               className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
                               data-testid="gantt-new-subtask-name-input"
-                              maxLength={250}
                             />
                           </div>
                         </td>
@@ -1463,20 +1518,26 @@ export const GanttTaskTable = React.forwardRef<
                                       </span>
                                     </div>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="start">
+                                  <DropdownMenuContent
+                                    align="start"
+                                    className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
+                                  >
                                     {taskTypes.map((t) => (
                                       <DropdownMenuItem
                                         key={t._id || t.value}
-                                        onClick={() =>
+                                        onSelect={() =>
                                           setNewSubtaskData((prev) => ({
                                             ...prev,
                                             taskType: t.value,
                                           }))
                                         }
+                                        className="p-0 focus:bg-transparent"
                                       >
-                                        <div className="flex items-center gap-2">
+                                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
                                           {renderTaskTypeVisual(t, "h-3 w-3")}
-                                          <span>{t.label}</span>
+                                          <span className="truncate">
+                                            {t.label}
+                                          </span>
                                         </div>
                                       </DropdownMenuItem>
                                     ))}
@@ -1517,12 +1578,12 @@ export const GanttTaskTable = React.forwardRef<
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent
                                     align="start"
-                                    className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto z-[50]"
+                                    className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] max-h-[300px] overflow-y-auto"
                                   >
                                     {cycles.map((c) => (
                                       <DropdownMenuItem
                                         key={c.id}
-                                        onClick={() =>
+                                        onSelect={() =>
                                           setNewSubtaskData((prev) => ({
                                             ...prev,
                                             cycleId: c.id,
@@ -1530,7 +1591,7 @@ export const GanttTaskTable = React.forwardRef<
                                         }
                                         className="p-0 focus:bg-transparent"
                                       >
-                                        <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                                        <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted cursor-pointer">
                                           <span className="truncate w-full text-center">
                                             {formatCycleName(
                                               c.name,
@@ -1549,13 +1610,13 @@ export const GanttTaskTable = React.forwardRef<
                                       <DropdownMenuSeparator />
                                     )}
                                     <DropdownMenuItem
-                                      onClick={() =>
+                                      onSelect={() =>
                                         setNewSubtaskData((prev) => ({
                                           ...prev,
                                           cycleId: null,
                                         }))
                                       }
-                                      className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                                      className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                                     >
                                       — Clear Cycle —
                                     </DropdownMenuItem>
@@ -1588,22 +1649,32 @@ export const GanttTaskTable = React.forwardRef<
                                       </span>
                                     </div>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="start">
+                                  <DropdownMenuContent
+                                    align="start"
+                                    className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
+                                  >
                                     {taskStatusConfigs.map((s) => (
                                       <DropdownMenuItem
                                         key={s.value}
-                                        onClick={() =>
+                                        onSelect={() =>
                                           setNewSubtaskData((prev) => ({
                                             ...prev,
                                             status: s.value,
                                           }))
                                         }
+                                        className="p-0 focus:bg-transparent"
                                       >
                                         <div
-                                          className="w-2 h-2 rounded-full mr-2"
-                                          style={{ backgroundColor: s.color }}
-                                        />
-                                        {s.label}
+                                          className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold text-white transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                          style={{
+                                            backgroundColor:
+                                              s.color || "#9CA3AF",
+                                          }}
+                                        >
+                                          <span className="truncate w-full text-center">
+                                            {s.label}
+                                          </span>
+                                        </div>
                                       </DropdownMenuItem>
                                     ))}
                                   </DropdownMenuContent>
@@ -1620,69 +1691,86 @@ export const GanttTaskTable = React.forwardRef<
                                 key={h.key}
                                 className={cn(bodyCellCls, "min-w-[150px]")}
                               >
-                                <DropdownMenu>
+                                <DropdownMenu
+                                  onOpenChange={(open) => {
+                                    if (!open) setAssigneeSearchQuery("");
+                                  }}
+                                >
                                   <DropdownMenuTrigger asChild>
                                     <div className={cellCls}>
                                       {assignee ? (
-                                        <>
-                                          <Avatar className="h-5 w-5 shrink-0">
-                                            <AvatarImage
-                                              src={
-                                                assignee.profilePicture ||
-                                                assignee.avatar
-                                              }
-                                            />
-                                            <AvatarFallback className="text-[10px]">
-                                              {assignee.name
-                                                ?.charAt(0)
-                                                .toUpperCase()}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                        </>
+                                        <MemberAvatar
+                                          size="sm"
+                                          name={assignee.name}
+                                          src={
+                                            assignee.profilePicture ||
+                                            assignee.avatar
+                                          }
+                                        />
                                       ) : (
-                                        <>
-                                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                                        </>
+                                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
                                       )}
                                     </div>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent
                                     align="start"
-                                    className="w-[200px]"
+                                    className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
                                   >
+                                    <div
+                                      className="px-1 pb-2"
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                    >
+                                      <Input
+                                        placeholder="Type @ or name..."
+                                        value={assigneeSearchQuery}
+                                        onChange={(e) =>
+                                          setAssigneeSearchQuery(e.target.value)
+                                        }
+                                        className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                                        autoFocus
+                                      />
+                                    </div>
+                                    {getFilteredMembers().length === 0 ? (
+                                      <div className="text-center py-2 text-xs text-muted-foreground">
+                                        No members found
+                                      </div>
+                                    ) : (
+                                      getFilteredMembers().map((m) => (
+                                        <DropdownMenuItem
+                                          key={m.userId}
+                                          onSelect={() =>
+                                            setNewSubtaskData((prev) => ({
+                                              ...prev,
+                                              assignee: m.userId,
+                                            }))
+                                          }
+                                          className="p-0 focus:bg-transparent"
+                                        >
+                                          <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
+                                            <MemberAvatar
+                                              size="sm"
+                                              name={m.name}
+                                              src={m.profilePicture || m.avatar}
+                                            />
+                                            <span className="truncate">
+                                              {m.name}
+                                            </span>
+                                          </div>
+                                        </DropdownMenuItem>
+                                      ))
+                                    )}
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem
-                                      onClick={() =>
+                                      onSelect={() =>
                                         setNewSubtaskData((prev) => ({
                                           ...prev,
                                           assignee: "",
                                         }))
                                       }
+                                      className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                                     >
-                                      <User className="h-4 w-4 mr-2" />{" "}
-                                      Unassigned
+                                      Clear
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    {members.map((m) => (
-                                      <DropdownMenuItem
-                                        key={m.userId}
-                                        onClick={() =>
-                                          setNewSubtaskData((prev) => ({
-                                            ...prev,
-                                            assignee: m.userId,
-                                          }))
-                                        }
-                                      >
-                                        <Avatar className="h-5 w-5 mr-2">
-                                          <AvatarImage
-                                            src={m.profilePicture || m.avatar}
-                                          />
-                                          <AvatarFallback>
-                                            {m.name?.charAt(0)}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        {m.name}
-                                      </DropdownMenuItem>
-                                    ))}
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </td>
@@ -1723,7 +1811,7 @@ export const GanttTaskTable = React.forwardRef<
                                     </div>
                                   </PopoverTrigger>
                                   <PopoverContent
-                                    className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                                    className="w-auto p-2 border-0 border-b-[5px] border-b-primary"
                                     align="start"
                                   >
                                     <CalendarPicker
@@ -1797,22 +1885,37 @@ export const GanttTaskTable = React.forwardRef<
                                       </span>
                                     </div>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="start">
+                                  <DropdownMenuContent
+                                    align="start"
+                                    className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
+                                  >
                                     {taskPriorityConfigs.map((p) => (
                                       <DropdownMenuItem
                                         key={p.value}
-                                        onClick={() =>
+                                        onSelect={() =>
                                           setNewSubtaskData((prev) => ({
                                             ...prev,
                                             priority: p.value,
                                           }))
                                         }
+                                        className="p-0 focus:bg-transparent"
                                       >
-                                        <Flag
-                                          className="h-3 w-3 mr-2"
-                                          style={{ color: p.color }}
-                                        />
-                                        {p.label}
+                                        <div
+                                          className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground cursor-pointer"
+                                          style={{
+                                            backgroundColor: `${p.color || "#9CA3AF"}33`,
+                                          }}
+                                        >
+                                          <span className="truncate">
+                                            {p.label}
+                                          </span>
+                                          <Flag
+                                            className="h-3.5 w-3.5 flex-shrink-0"
+                                            style={{
+                                              color: p.color || "#9CA3AF",
+                                            }}
+                                          />
+                                        </div>
                                       </DropdownMenuItem>
                                     ))}
                                   </DropdownMenuContent>
@@ -2016,7 +2119,6 @@ export const GanttTaskTable = React.forwardRef<
                         }}
                         className="h-8 text-xs focus-visible:ring-0 border-0 bg-transparent shadow-none p-0 w-full"
                         data-testid="gantt-new-task-name-input"
-                        maxLength={250}
                       />
                     </div>
                   </td>
@@ -2050,21 +2152,24 @@ export const GanttTaskTable = React.forwardRef<
                                 </span>
                               </div>
                             </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="start">
+                            <DropdownMenuContent
+                              align="start"
+                              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
+                            >
                               {taskTypes.map((t) => (
                                 <DropdownMenuItem
                                   key={t._id || t.value}
-                                  onClick={() =>
+                                  onSelect={() =>
                                     setNewTaskData((prev) => ({
                                       ...prev,
                                       taskType: t.value,
                                     }))
                                   }
+                                  className="p-0 focus:bg-transparent"
                                 >
-                                  <div className="flex items-center gap-2">
+                                  <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
                                     {renderTaskTypeVisual(t, "h-3 w-3")}
-                                    <span>{t.label}</span>
+                                    <span className="truncate">{t.label}</span>
                                   </div>
                                 </DropdownMenuItem>
                               ))}
@@ -2105,12 +2210,12 @@ export const GanttTaskTable = React.forwardRef<
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="start"
-                              className="p-2 w-[200px] space-y-1 border-b-4 border-b-primary max-h-[300px] overflow-y-auto z-[50]"
+                              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50] max-h-[300px] overflow-y-auto"
                             >
                               {cycles.map((c) => (
                                 <DropdownMenuItem
                                   key={c.id}
-                                  onClick={() =>
+                                  onSelect={() =>
                                     setNewTaskData((prev) => ({
                                       ...prev,
                                       cycleId: c.id,
@@ -2118,7 +2223,7 @@ export const GanttTaskTable = React.forwardRef<
                                   }
                                   className="p-0 focus:bg-transparent"
                                 >
-                                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                                  <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted cursor-pointer">
                                     <span className="truncate w-full text-center">
                                       {formatCycleName(c.name, c.cycleNumber)}
                                     </span>
@@ -2132,13 +2237,13 @@ export const GanttTaskTable = React.forwardRef<
                               )}
                               {cycles.length > 0 && <DropdownMenuSeparator />}
                               <DropdownMenuItem
-                                onClick={() =>
+                                onSelect={() =>
                                   setNewTaskData((prev) => ({
                                     ...prev,
                                     cycleId: null,
                                   }))
                                 }
-                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                               >
                                 — Clear Cycle —
                               </DropdownMenuItem>
@@ -2173,23 +2278,29 @@ export const GanttTaskTable = React.forwardRef<
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="start"
-                              className="z-[50]"
+                              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
                             >
                               {taskStatusConfigs.map((s) => (
                                 <DropdownMenuItem
                                   key={s.value}
-                                  onClick={() =>
+                                  onSelect={() =>
                                     setNewTaskData((prev) => ({
                                       ...prev,
                                       status: s.value,
                                     }))
                                   }
+                                  className="p-0 focus:bg-transparent"
                                 >
                                   <div
-                                    className="w-2 h-2 rounded-full mr-2"
-                                    style={{ backgroundColor: s.color }}
-                                  />
-                                  {s.label}
+                                    className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold text-white transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                    style={{
+                                      backgroundColor: s.color || "#9CA3AF",
+                                    }}
+                                  >
+                                    <span className="truncate w-full text-center">
+                                      {s.label}
+                                    </span>
+                                  </div>
                                 </DropdownMenuItem>
                               ))}
                             </DropdownMenuContent>
@@ -2206,66 +2317,83 @@ export const GanttTaskTable = React.forwardRef<
                           key={h.key}
                           className={cn(bodyCellCls, "min-w-[150px]")}
                         >
-                          <DropdownMenu>
+                          <DropdownMenu
+                            onOpenChange={(open) => {
+                              if (!open) setAssigneeSearchQuery("");
+                            }}
+                          >
                             <DropdownMenuTrigger asChild>
                               <div className={cellCls}>
                                 {assignee ? (
-                                  <>
-                                    <Avatar className="h-5 w-5 shrink-0">
-                                      <AvatarImage
-                                        src={
-                                          assignee.profilePicture ||
-                                          assignee.avatar
-                                        }
-                                      />
-                                      <AvatarFallback className="text-[10px]">
-                                        {assignee.name?.charAt(0).toUpperCase()}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                  </>
+                                  <MemberAvatar
+                                    size="sm"
+                                    name={assignee.name}
+                                    src={
+                                      assignee.profilePicture || assignee.avatar
+                                    }
+                                  />
                                 ) : (
-                                  <>
-                                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                                  </>
+                                  <User className="h-4 w-4 text-muted-foreground shrink-0" />
                                 )}
                               </div>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="start"
-                              className="w-[200px]"
+                              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
                             >
+                              <div
+                                className="px-1 pb-2"
+                                onKeyDown={(e) => e.stopPropagation()}
+                              >
+                                <Input
+                                  placeholder="Type @ or name..."
+                                  value={assigneeSearchQuery}
+                                  onChange={(e) =>
+                                    setAssigneeSearchQuery(e.target.value)
+                                  }
+                                  className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                                  autoFocus
+                                />
+                              </div>
+                              {getFilteredMembers().length === 0 ? (
+                                <div className="text-center py-2 text-xs text-muted-foreground">
+                                  No members found
+                                </div>
+                              ) : (
+                                getFilteredMembers().map((m) => (
+                                  <DropdownMenuItem
+                                    key={m.userId}
+                                    onSelect={() =>
+                                      setNewTaskData((prev) => ({
+                                        ...prev,
+                                        assignee: m.userId,
+                                      }))
+                                    }
+                                    className="p-0 focus:bg-transparent"
+                                  >
+                                    <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground cursor-pointer">
+                                      <MemberAvatar
+                                        size="sm"
+                                        name={m.name}
+                                        src={m.profilePicture || m.avatar}
+                                      />
+                                      <span className="truncate">{m.name}</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                ))
+                              )}
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={() =>
+                                onSelect={() =>
                                   setNewTaskData((prev) => ({
                                     ...prev,
                                     assignee: "",
                                   }))
                                 }
+                                className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs cursor-pointer"
                               >
-                                <User className="h-4 w-4 mr-2" /> Unassigned
+                                Clear
                               </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              {members.map((m) => (
-                                <DropdownMenuItem
-                                  key={m.userId}
-                                  onClick={() =>
-                                    setNewTaskData((prev) => ({
-                                      ...prev,
-                                      assignee: m.userId,
-                                    }))
-                                  }
-                                >
-                                  <Avatar className="h-5 w-5 mr-2">
-                                    <AvatarImage
-                                      src={m.profilePicture || m.avatar}
-                                    />
-                                    <AvatarFallback>
-                                      {m.name?.charAt(0)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  {m.name}
-                                </DropdownMenuItem>
-                              ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </td>
@@ -2304,7 +2432,7 @@ export const GanttTaskTable = React.forwardRef<
                               </div>
                             </PopoverTrigger>
                             <PopoverContent
-                              className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                              className="w-auto p-2 border-0 border-b-[5px] border-b-primary"
                               align="start"
                             >
                               <CalendarPicker
@@ -2374,22 +2502,35 @@ export const GanttTaskTable = React.forwardRef<
                                 </span>
                               </div>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
+                            <DropdownMenuContent
+                              align="start"
+                              className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary z-[50]"
+                            >
                               {taskPriorityConfigs.map((p) => (
                                 <DropdownMenuItem
                                   key={p.value}
-                                  onClick={() =>
+                                  onSelect={() =>
                                     setNewTaskData((prev) => ({
                                       ...prev,
                                       priority: p.value,
                                     }))
                                   }
+                                  className="p-0 focus:bg-transparent"
                                 >
-                                  <Flag
-                                    className="h-3 w-3 mr-2"
-                                    style={{ color: p.color }}
-                                  />
-                                  {p.label}
+                                  <div
+                                    className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground cursor-pointer"
+                                    style={{
+                                      backgroundColor: `${p.color || "#9CA3AF"}33`,
+                                    }}
+                                  >
+                                    <span className="truncate">{p.label}</span>
+                                    <Flag
+                                      className="h-3.5 w-3.5 flex-shrink-0"
+                                      style={{
+                                        color: p.color || "#9CA3AF",
+                                      }}
+                                    />
+                                  </div>
                                 </DropdownMenuItem>
                               ))}
                             </DropdownMenuContent>

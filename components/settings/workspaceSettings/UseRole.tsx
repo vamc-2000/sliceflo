@@ -28,7 +28,7 @@ export default function UseRole() {
                         data-testid={`user-role-item-${role.id}`}
                     >
                         <div className="flex flex-col">
-                            <span className="text-[14px] font-medium text-foreground group-hover:text-primary transition-colors">
+                            <span className="text-[14px] font-medium text-foreground group-hover:text-brand transition-colors">
                                 {role.name}
                             </span>
                         </div>

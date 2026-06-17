@@ -94,12 +94,12 @@ export default function CleanUp() {
       {/* Header */}
       <div>
         <h2
-          className="text-lg font-semibold text-[var(--primary)] tracking-tight"
+          className="text-lg font-semibold text-brand tracking-tight"
           data-testid="cleanup-title"
         >
           Clean Up
         </h2>
-        <p className="text-xs text-[#8E8E93]">
+        <p className="text-xs text-muted-foreground">
           Manage archived and deleted items
         </p>
       </div>
@@ -129,20 +129,20 @@ export default function CleanUp() {
             data-testid="cleanup-archive-table"
           >
             <thead>
-              <tr className="bg-[#F6FAFF]">
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+              <tr className="bg-muted/50">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Item
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Creator
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Last Updated
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Created
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Action
                 </th>
               </tr>
@@ -154,7 +154,7 @@ export default function CleanUp() {
                   className="hover:bg-muted"
                   data-testid={`cleanup-archive-row-${index}`}
                 >
-                  <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                  <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                     {item.name}
                   </td>
                   <td className="border border-border px-3 py-2 text-center">
@@ -166,17 +166,17 @@ export default function CleanUp() {
                       />
                     </div>
                   </td>
-                  <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                  <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                     {formatLocalDate(item.updated)}
                   </td>
-                  <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                  <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                     {formatLocalDate(item.created)}
                   </td>
                   <td className="border border-border px-3 py-2">
                     <div className="flex justify-center gap-1">
                       <Button
                         size="sm"
-                        className="bg-[var(--primary)] hover:bg-[var(--primary)] text-white h-7 px-3 text-xs"
+                        className="bg-brand hover:bg-brand/90 text-brand-foreground h-7 px-3 text-xs"
                         onClick={() =>
                           toast("info", {
                             title: "Info",
@@ -190,7 +190,7 @@ export default function CleanUp() {
                       </Button>
                       <Button
                         size="sm"
-                        className="bg-[var(--primary)] hover:bg-[var(--primary)] text-white h-7 px-3 text-xs"
+                        className="bg-brand hover:bg-brand/90 text-brand-foreground h-7 px-3 text-xs"
                         onClick={() =>
                           toast("success", {
                             title: "Success",
@@ -236,20 +236,20 @@ export default function CleanUp() {
             data-testid="cleanup-deleted-table"
           >
             <thead>
-              <tr className="bg-[#F6FAFF]">
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+              <tr className="bg-muted/50">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Item
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Creator
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Last Updated
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Created
                 </th>
-                <th className="border border-border px-3 py-2 text-xs font-semibold text-[var(--primary)] text-center whitespace-nowrap">
+                <th className="border border-border px-3 py-2 text-xs font-semibold text-brand text-center whitespace-nowrap">
                   Action
                 </th>
               </tr>
@@ -267,7 +267,7 @@ export default function CleanUp() {
                     className="hover:bg-muted"
                     data-testid={`cleanup-deleted-row-${index}`}
                   >
-                    <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                    <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                       {project.name}
                     </td>
                     <td className="border border-border px-3 py-2 text-center">
@@ -282,10 +282,10 @@ export default function CleanUp() {
                         />
                       </div>
                     </td>
-                    <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                    <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                       {formatLocalDate(project.updatedAt)}
                     </td>
-                    <td className="border border-border px-3 py-2 text-xs text-[var(--primary)] text-center whitespace-nowrap">
+                    <td className="border border-border px-3 py-2 text-xs text-foreground text-center whitespace-nowrap">
                       {formatLocalDate(project.deletedAt || project.createdAt)}
                     </td>
                     <td className="border border-border px-3 py-2">

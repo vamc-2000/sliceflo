@@ -157,7 +157,8 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
                 <div
                   className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${capacityStyles}`}
                 >
-                  {formatDuration(totalMinutes)} / {dailyCapacityHours}H
+                  {/* {formatDuration(totalMinutes)} / {dailyCapacityHours}h */}
+                  {formatDuration(totalMinutes)} / 8h
                 </div>
 
                 <ChevronDown

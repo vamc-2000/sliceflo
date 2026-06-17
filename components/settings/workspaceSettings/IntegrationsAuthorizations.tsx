@@ -222,7 +222,7 @@ export default function IntegrationsAuthorizations() {
             <button
               className={cn(
                 "text-[13px] font-medium underline underline-offset-4 hover:opacity-80 transition-opacity",
-                isExpiring ? "text-[#D04545]" : "text-[#007AFF]"
+                isExpiring ? "text-[#D04545]" : "text-foreground"
               )}
               onClick={() => toast("success", { title: "Success", description: isExpiring ? "Renewal process started" : "Subscription details" })}
             >
@@ -243,7 +243,7 @@ export default function IntegrationsAuthorizations() {
             <button
               className={cn(
                 "text-[13px] font-medium underline underline-offset-4 hover:opacity-80 transition-opacity",
-                isExpiring ? "text-[var(--logout-button)]" : "text-[#007AFF]"
+                isExpiring ? "text-[var(--logout-button)]" : "text-foreground"
               )}
               onClick={() => toast("success", { title: "Success", description: isExpiring ? "Update process started" : "Update details" })}
             >
@@ -317,7 +317,7 @@ export default function IntegrationsAuthorizations() {
     <div className="w-full space-y-1">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight">Integrations &amp; Authorizations</h2>
+        <h2 className="text-lg font-semibold text-brand tracking-tight">Integrations &amp; Authorizations</h2>
         <p className="text-xs text-muted-foreground">
           Manage your app integrations and their authorization settings
         </p>
@@ -332,7 +332,7 @@ export default function IntegrationsAuthorizations() {
         toolbarActions={
           <Button
             size="sm"
-            className="bg-primary hover:bg-primary/90 h-10 px-6 text-primary-foreground font-medium rounded-md"
+            className="bg-brand hover:bg-brand/90 h-10 px-6 text-brand-foreground font-medium rounded-md"
             onClick={() => setView("explore")}
           >
             Explore Apps

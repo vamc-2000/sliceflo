@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useDndContext } from "@dnd-kit/core";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +30,7 @@ import {
   CircleArrowRight,
   SkipBack,
   SkipForward,
+  ChevronsLeftRight,
 } from "lucide-react";
 import { useTasksStore } from "@/stores/tasks-store";
 import { Task, Subtask } from "@/types/task.types";
@@ -37,6 +39,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { MemberAvatar } from "../../MemberAvatar";
 import { CalendarPicker } from "@/components/CalendarPicker";
 import {
   formatLocalDate,
@@ -127,6 +137,18 @@ export const CustomKanbanCard = ({
   const [isEndDateOpen, setIsEndDateOpen] = useState(false);
   const [hoveredRelType, setHoveredRelType] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+
+  const getFilteredMembers = () => {
+    if (!assigneeSearchQuery) return members;
+    return members.filter((m) =>
+      m.name?.toLowerCase().includes(assigneeSearchQuery.toLowerCase()),
+    );
+  };
+
+  const dndContext = useDndContext();
+  const isCurrentlyDragging = dndContext?.active?.id === task.id;
+  const isDraggingOrPreview = isHoverPreview || isCurrentlyDragging;
 
   // ✅ Add new state for subtask input
   const [newSubtaskName, setNewSubtaskName] = useState("");
@@ -282,13 +304,12 @@ export const CustomKanbanCard = ({
   return (
     <div
       onClick={(e) => {
-        e.stopPropagation(); // ✅ prevent bubbling to KanbanCard wrapper
-        if (!isEditingName) onClick?.();
+        e.stopPropagation();
       }}
       data-testid={`kanban-card-${task.id}`}
       className={cn(
-        "group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow cursor-pointer",
-        isHoverPreview && "pointer-events-none hover:shadow-sm",
+        "group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 hover:shadow-md transition-shadow cursor-default shrink-0",
+        isDraggingOrPreview && "pointer-events-none hover:shadow-sm",
       )}
       style={{ borderLeftColor: statusColor }}
     >
@@ -296,73 +317,83 @@ export const CustomKanbanCard = ({
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           {/* Avatar with dropdown */}
-          <Popover open={isAssigneeOpen} onOpenChange={setIsAssigneeOpen}>
-            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <div
-                className={cn(
-                  "cursor-pointer",
-                  isHoverPreview && "pointer-events-none",
-                )}
-                data-testid={`kanban-card-assignee-trigger-${task.id}`}
-              >
-                {showAvatar &&
-                  (assignedMember ? (
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage
-                        src={
-                          assignedMember.profilePicture || assignedMember.avatar
-                        }
-                      />
-                      <AvatarFallback className="text-xs bg-blue-100">
-                        {assignedMember.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted transition-colors">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  ))}
-              </div>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-56 p-2"
-              align="start"
-              onClick={(e) => e.stopPropagation()}
+          {!isDraggingOrPreview ? (
+            <DropdownMenu
+              open={isAssigneeOpen}
+              onOpenChange={(open) => {
+                setIsAssigneeOpen(open);
+                if (!open) setAssigneeSearchQuery("");
+              }}
             >
-              <div className="space-y-1">
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                  Assign to
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="cursor-pointer"
+                  data-testid={`kanban-card-assignee-trigger-${task.id}`}
+                >
+                  {showAvatar && (
+                    <MemberAvatar
+                      size="md"
+                      name={assignedMember?.name}
+                      src={assignedMember?.profilePicture}
+                    />
+                  )}
                 </div>
-                {members.map((member) => (
-                  <button
-                    key={member.userId}
-                    onClick={() => handleAssigneeChange(member.userId)}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
-                  >
-                    <Avatar className="h-5 w-5">
-                      {" "}
-                      {/* ✅ Avatar wrapper */}
-                      <AvatarImage
-                        src={member.profilePicture || member.avatar}
-                      />
-                      <AvatarFallback className="text-xs bg-blue-100">
-                        {member.name
-                          ?.split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{member.name}</span>
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                  <Input
+                    placeholder="Type @ or name..."
+                    value={assigneeSearchQuery}
+                    onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                    className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                    autoFocus
+                  />
+                </div>
+                {getFilteredMembers().length === 0 ? (
+                  <div className="text-center py-2 text-xs text-muted-foreground">
+                    No members found
+                  </div>
+                ) : (
+                  getFilteredMembers().map((member) => (
+                    <DropdownMenuItem
+                      key={member.userId}
+                      onSelect={() => handleAssigneeChange(member.userId)}
+                      className="p-0 focus:bg-transparent"
+                    >
+                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                        <MemberAvatar
+                          size="sm"
+                          name={member.name}
+                          src={member.profilePicture}
+                        />
+                        <span className="truncate">{member.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => handleAssigneeChange("")}
+                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                >
+                  Clear
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div>
+              {showAvatar && (
+                <MemberAvatar
+                  size="md"
+                  name={assignedMember?.name}
+                  src={assignedMember?.profilePicture}
+                />
+              )}
+            </div>
+          )}
 
           <Badge
             variant="secondary"
@@ -387,16 +418,65 @@ export const CustomKanbanCard = ({
           )}
 
           {/* Priority with dropdown */}
-          <Popover open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
-            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <div
-                className={cn(
-                  "cursor-pointer",
-                  isHoverPreview && "pointer-events-none",
-                )}
-                data-testid={`kanban-card-priority-trigger-${task.id}`}
+          {!isDraggingOrPreview ? (
+            <DropdownMenu open={isPriorityOpen} onOpenChange={setIsPriorityOpen}>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="cursor-pointer"
+                  data-testid={`kanban-card-priority-trigger-${task.id}`}
+                >
+                  {showPriority && (
+                    priorityOption ? (
+                      <Badge
+                        variant="secondary"
+                        className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: `${priorityOption.color}20`,
+                          color: priorityOption.color,
+                        }}
+                      >
+                        <Flag className="h-4 w-4" />
+                      </Badge>
+                    ) : (
+                      <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted transition-colors">
+                        <Flag className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )
+                  )}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
+                onClick={(e) => e.stopPropagation()}
               >
-                {showPriority && priorityOption ? (
+                {taskPriorityConfigs.map((priority) => (
+                  <DropdownMenuItem
+                    key={priority._id}
+                    onSelect={() => handlePriorityChange(priority.value)}
+                    className="p-0 focus:bg-transparent"
+                  >
+                    <div
+                      className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                      style={{
+                        backgroundColor: `${priority.color || "#9CA3AF"}33`,
+                      }}
+                    >
+                      <span className="truncate">{priority.label}</span>
+                      <Flag
+                        className="h-3.5 w-3.5 flex-shrink-0"
+                        style={{
+                          color: priority.color || "#9CA3AF",
+                        }}
+                      />
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div>
+              {showPriority && (
+                priorityOption ? (
                   <Badge
                     variant="secondary"
                     className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
@@ -408,46 +488,13 @@ export const CustomKanbanCard = ({
                     <Flag className="h-4 w-4" />
                   </Badge>
                 ) : (
-                  <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted transition-colors">
+                  <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted">
                     <Flag className="h-4 w-4 text-muted-foreground" />
                   </div>
-                )}
-              </div>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-36 p-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="space-y-1">
-                {taskPriorityConfigs.length === 0 ? (
-                  <p className="px-2 py-2 text-xs text-muted-foreground italic">
-                    No priorities configured
-                  </p>
-                ) : (
-                  taskPriorityConfigs.map((priority) => (
-                    <button
-                      key={priority._id}
-                      onClick={() => handlePriorityChange(priority.value)}
-                      style={{ color: priority.color }}
-                      className="w-full flex justify-between items-center gap-2 px-2 py-1 rounded hover:bg-muted text-xs"
-                    >
-                      <span>{priority.label}</span>
-                      <Badge
-                        variant="secondary"
-                        className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
-                        style={{
-                          backgroundColor: `${priority.color}20`,
-                          color: priority.color,
-                        }}
-                      >
-                        <Flag className="h-4 w-4" />
-                      </Badge>
-                    </button>
-                  ))
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
+                )
+              )}
+            </div>
+          )}
 
           {/* Relationship Icons */}
           {!isHoverPreview &&
@@ -516,8 +563,23 @@ export const CustomKanbanCard = ({
               });
             })()}
         </div>
-        <div>
-          {!isHoverPreview && <MoreHorizontalIcon className="h-4 w-4" />}
+        <div className="flex items-center gap-1">
+          {!isHoverPreview && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick?.();
+              }}
+              className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+              data-testid={`kanban-card-detail-btn-${task.id}`}
+              title="Open Details"
+            >
+              <ChevronsLeftRight className="h-4 w-4 rotate-135" />
+            </button>
+          )}
+          <div>
+            {!isHoverPreview && <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />}
+          </div>
         </div>
       </div>
 
@@ -564,47 +626,62 @@ export const CustomKanbanCard = ({
                 </div> */}
 
         {/* Start Date with picker */}
-        <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
-          <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <div
-              className={cn(
-                "cursor-pointer",
-                isHoverPreview && "pointer-events-none",
-              )}
-              data-testid={`kanban-card-startdate-trigger-${task.id}`}
+        {!isDraggingOrPreview ? (
+          <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
+            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div
+                className="cursor-pointer"
+                data-testid={`kanban-card-startdate-trigger-${task.id}`}
+              >
+                {showDates && startDateStr ? (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted"
+                  >
+                    <CalendarIcon className="h-3 w-3" />
+                    <span className="mt-0.5">{startDateStr}</span>
+                  </Badge>
+                ) : (
+                  <div
+                    className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted transition-colors hover:bg-muted"
+                    title="Add start date"
+                  >
+                    <CalendarIcon className="h-3 w-3" />
+                  </div>
+                )}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-2 border-0 border-b-[5px] border-primary"
+              onClick={(e) => e.stopPropagation()}
             >
-              {showDates && startDateStr ? (
-                <Badge
-                  variant="secondary"
-                  className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted"
-                >
-                  <CalendarIcon className="h-3 w-3" />
-                  <span className="mt-0.5">{startDateStr}</span>
-                </Badge>
-              ) : (
-                <div
-                  className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted transition-colors hover:bg-muted"
-                  title="Add start date"
-                >
-                  <CalendarIcon className="h-3 w-3" />
-                </div>
-              )}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-2 border-0 border-b-[5px] border-primary"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CalendarPicker
-              selectedDate={
-                task.startDate
-                  ? convertUTCToCalendarDate(task.startDate)
-                  : undefined
-              }
-              onDateSelect={handleStartDateChange}
-            />
-          </PopoverContent>
-        </Popover>
+              <CalendarPicker
+                selectedDate={
+                  task.startDate
+                    ? convertUTCToCalendarDate(task.startDate)
+                    : undefined
+                }
+                onDateSelect={handleStartDateChange}
+              />
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <div>
+            {showDates && startDateStr ? (
+              <Badge
+                variant="secondary"
+                className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground"
+              >
+                <CalendarIcon className="h-3 w-3" />
+                <span className="mt-0.5">{startDateStr}</span>
+              </Badge>
+            ) : (
+              <div className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted">
+                <CalendarIcon className="h-3 w-3" />
+              </div>
+            )}
+          </div>
+        )}
 
         {startDateStr && endDateStr && (
           <span className="text-muted-foreground text-xs font-bold px-0">
@@ -613,53 +690,68 @@ export const CustomKanbanCard = ({
         )}
 
         {/* End Date with picker */}
-        <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
-          <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <div
-              className={cn(
-                "cursor-pointer",
-                isHoverPreview && "pointer-events-none",
-              )}
-              data-testid={`kanban-card-enddate-trigger-${task.id}`}
+        {!isDraggingOrPreview ? (
+          <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
+            <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div
+                className="cursor-pointer"
+                data-testid={`kanban-card-enddate-trigger-${task.id}`}
+              >
+                {showDates && endDateStr ? (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted"
+                  >
+                    <CalendarIcon className="h-3 w-3" />
+                    <span className="mt-0.5">{endDateStr}</span>
+                  </Badge>
+                ) : (
+                  <div
+                    className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted transition-colors hover:bg-muted"
+                    title="Add end date"
+                  >
+                    <CalendarIcon className="h-3 w-3" />
+                  </div>
+                )}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-2 border-0 border-b-[5px] border-primary"
+              onClick={(e) => e.stopPropagation()}
             >
-              {showDates && endDateStr ? (
-                <Badge
-                  variant="secondary"
-                  className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground hover:bg-muted"
-                >
-                  <CalendarIcon className="h-3 w-3" />
-                  <span className="mt-0.5">{endDateStr}</span>
-                </Badge>
-              ) : (
-                <div
-                  className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted transition-colors hover:bg-muted"
-                  title="Add end date"
-                >
-                  <CalendarIcon className="h-3 w-3" />
-                </div>
-              )}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-2 border-0 border-b-[5px] border-primary"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CalendarPicker
-              selectedDate={
-                task.endDate
-                  ? convertUTCToCalendarDate(task.endDate)
-                  : undefined
-              }
-              onDateSelect={handleEndDateChange}
-              disabled={(dt) => {
-                const startLocal = convertUTCToCalendarDate(task.startDate);
-                return startLocal
-                  ? dt < new Date(startLocal.setHours(0, 0, 0, 0))
-                  : false;
-              }}
-            />
-          </PopoverContent>
-        </Popover>
+              <CalendarPicker
+                selectedDate={
+                  task.endDate
+                    ? convertUTCToCalendarDate(task.endDate)
+                    : undefined
+                }
+                onDateSelect={handleEndDateChange}
+                disabled={(dt) => {
+                  const startLocal = convertUTCToCalendarDate(task.startDate);
+                  return startLocal
+                    ? dt < new Date(startLocal.setHours(0, 0, 0, 0))
+                    : false;
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <div>
+            {showDates && endDateStr ? (
+              <Badge
+                variant="secondary"
+                className="text-xs font-normal h-6 px-2 py-0.5 flex items-center gap-1 bg-muted text-muted-foreground"
+              >
+                <CalendarIcon className="h-3 w-3" />
+                <span className="mt-0.5">{endDateStr}</span>
+              </Badge>
+            ) : (
+              <div className="h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground bg-muted">
+                <CalendarIcon className="h-3 w-3" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Bottom section: Add Subtask Button OR Subtasks Count */}

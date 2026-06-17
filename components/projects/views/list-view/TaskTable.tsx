@@ -1786,7 +1786,6 @@ export function TaskTable({
                                     }}
                                     className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400"
                                     autoFocus
-                                    maxLength={250}
                                   />
                                 ) : displayOptions.wrapText ? (
                                   /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
@@ -1929,7 +1928,7 @@ export function TaskTable({
                                     })()}
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                   {taskTypes.map((type) => (
                                     <DropdownMenuItem
                                       key={type._id}
@@ -1983,7 +1982,7 @@ export function TaskTable({
                                     </span>
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                   {taskStatusConfigs.map((config) => (
                                     <DropdownMenuItem
                                       key={config._id}
@@ -2110,7 +2109,7 @@ export function TaskTable({
                                     </span>
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                   {activeOrUpcomingCycles.map((c) => (
                                     <DropdownMenuItem
                                       key={c.id}
@@ -2187,7 +2186,7 @@ export function TaskTable({
                                     })()}
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                   <div
                                     className="px-1 pb-2"
                                     onKeyDown={(e) => e.stopPropagation()}
@@ -2413,7 +2412,7 @@ export function TaskTable({
                                     />
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                   {taskPriorityConfigs.map((option) => (
                                     <DropdownMenuItem
                                       key={option._id}
@@ -2874,7 +2873,6 @@ export function TaskTable({
                               }
                               className="border-0 pl-0 shadow-none focus-visible:ring-0 h-8 text-xs bg-transparent w-full"
                               autoFocus
-                              maxLength={250}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter")
                                   handleSaveSubtask(task.id);
@@ -2934,7 +2932,7 @@ export function TaskTable({
                                       )}
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                     {taskTypes.map((type) => (
                                       <DropdownMenuItem
                                         key={type._id}
@@ -2994,7 +2992,7 @@ export function TaskTable({
                                       </span>
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                     {taskStatusConfigs.map((config) => (
                                       <DropdownMenuItem
                                         key={config._id}
@@ -3057,7 +3055,7 @@ export function TaskTable({
                                       </span>
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                     {activeOrUpcomingCycles.map((c) => (
                                       <DropdownMenuItem
                                         key={c.id}
@@ -3135,7 +3133,7 @@ export function TaskTable({
                                       />
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                     <div
                                       className="px-1 pb-2"
                                       onKeyDown={(e) => e.stopPropagation()}
@@ -3399,7 +3397,7 @@ export function TaskTable({
                                       />
                                     </button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                                  <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                                     {taskPriorityConfigs.map((option) => (
                                       <DropdownMenuItem
                                         key={option._id}
@@ -3652,7 +3650,6 @@ export function TaskTable({
                       }
                       className="border-0 pl-0 shadow-none focus-visible:ring-0 h-8 text-xs bg-transparent w-full"
                       autoFocus
-                      maxLength={250}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleSaveTask();
                         if (e.key === "Escape") {
@@ -3714,7 +3711,7 @@ export function TaskTable({
                                 )}
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                               {taskTypes.map((type) => (
                                 <DropdownMenuItem
                                   key={type._id}
@@ -3771,7 +3768,7 @@ export function TaskTable({
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                               {taskStatusConfigs.map((config) => (
                                 <DropdownMenuItem
                                   key={config._id}
@@ -3834,7 +3831,7 @@ export function TaskTable({
                                 </span>
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                               {activeOrUpcomingCycles.map((c) => (
                                 <DropdownMenuItem
                                   key={c.id}
@@ -3909,7 +3906,7 @@ export function TaskTable({
                                 />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                               <div
                                 className="px-1 pb-2"
                                 onKeyDown={(e) => e.stopPropagation()}
@@ -4163,7 +4160,7 @@ export function TaskTable({
                                 />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+                            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
                               {taskPriorityConfigs.map((option) => (
                                 <DropdownMenuItem
                                   key={option._id}
@@ -4316,7 +4313,6 @@ export function TaskTable({
                 value={convertSubtaskData.name}
                 onChange={(e) => setConvertSubtaskData({ ...convertSubtaskData, name: e.target.value })}
                 placeholder="Subtask name…"
-                maxLength={250}
               />
             </div>
             <DialogFooter>
@@ -4858,7 +4854,6 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 }}
                 className="h-7 w-full flex-1 py-1 px-2 text-xs focus-visible:ring-1 focus-visible:ring-blue-400 min-w-0"
                 autoFocus
-                maxLength={250}
               />
             ) : displayOptions.wrapText ? (
               /* ── SINGLE-LINE (TRUNCATE) MODE: flex with icons at the right ── */
@@ -5011,7 +5006,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 })()}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
               {taskTypes.map((type) => (
                 <DropdownMenuItem
                   key={type._id}
@@ -5051,7 +5046,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 </span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
               {taskStatusConfigs.map((config) => (
                 <DropdownMenuItem
                   key={config._id}
@@ -5139,7 +5134,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 </span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
               {activeOrUpcomingCycles.map((c) => (
                 <DropdownMenuItem
                   key={c.id}
@@ -5195,7 +5190,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 })()}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
               <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
                 <Input
                   placeholder="Type @ or name..."
@@ -5368,7 +5363,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 w-[200px] space-y-1">
+            <DropdownMenuContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
               {taskPriorityConfigs.map((option) => (
                 <DropdownMenuItem
                   key={option._id}

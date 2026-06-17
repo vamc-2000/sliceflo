@@ -44,7 +44,7 @@ export const DeleteWorkspaceDialog = ({
 
           <div className="flex-1 space-y-3">
             <DialogHeader className="p-0">
-              <DialogTitle className="text-[18px] font-semibold text-[#1a1a1a]">
+              <DialogTitle className="text-[18px] font-semibold text-foreground">
                 Are you sure you want to delete this workspace?
               </DialogTitle>
             </DialogHeader>
@@ -57,23 +57,23 @@ export const DeleteWorkspaceDialog = ({
             {/* Inputs are grouped tightly to keep height low */}
             <div className="space-y-4 pt-1">
               <div className="space-y-1.5">
-                <p className="text-[13px] font-medium text-gray-600">Type in this workspace's name to continue.</p>
+                <p className="text-[13px] font-medium text-muted-foreground">Type in this workspace's name to continue.</p>
                 <Input
                   placeholder={workspaceName}
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
-                  className="h-9 bg-white border-gray-200 rounded-md focus-visible:ring-1"
+                  className="h-9 bg-background border-border rounded-md focus-visible:ring-1"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <p className="text-[13px] font-medium text-gray-600">
-                  For final confirmation, type <span className="font-bold text-black">delete my workspace</span> below.
+                <p className="text-[13px] font-medium text-muted-foreground">
+                  For final confirmation, type <span className="font-bold text-foreground">delete my workspace</span> below.
                 </p>
                 <Input
                   value={phraseInput}
                   onChange={(e) => setPhraseInput(e.target.value)}
-                  className="h-9 bg-white border-gray-200 rounded-md focus-visible:ring-1"
+                  className="h-9 bg-background border-border rounded-md focus-visible:ring-1"
                 />
               </div>
             </div>
@@ -84,7 +84,7 @@ export const DeleteWorkspaceDialog = ({
           <Button 
             variant="ghost" 
             onClick={onClose}
-            className="h-9 px-4 text-gray-500 hover:bg-gray-100"
+            className="h-9 px-4 text-muted-foreground hover:bg-muted"
           >
             Cancel
           </Button>

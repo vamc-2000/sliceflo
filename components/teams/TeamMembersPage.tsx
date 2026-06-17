@@ -420,7 +420,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
   // };
 
   return (
-    <div     
+    <div
       data-testid="team-members-page"
       className="w-full h-full bg-background overflow-y-auto"
     >
@@ -458,7 +458,7 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
                 </button>
 
                 <button
-                  data-testid="btn-create-goal" 
+                  data-testid="btn-create-goal"
                   className="flex items-center gap-2 w-full text-left px-1 py-2 text-foreground text-sm hover:bg-muted rounded transition-colors cursor-pointer"
                   onClick={() => router.push(`/teams/${teamId}/create-goal`)}
                 >

@@ -32,7 +32,7 @@ function Toggle({ checked, onChange }: ToggleProps) {
       aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-        checked ? "bg-[var(--primary)]" : "bg-muted-foreground/30"
+        checked ? "bg-brand" : "bg-muted-foreground/30"
       }`}
     >
       <span
@@ -101,7 +101,7 @@ export default function GitLabConfigure({
       {/* ── Connection Status card ─────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-border bg-card">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center flex-shrink-0">
             <Image
               src="/images/settings/gitlab.svg"
               alt="GitLab"

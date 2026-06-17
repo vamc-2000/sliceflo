@@ -16,6 +16,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useKanbanSettingsStore } from "@/stores/kanban-settings-store";
 import { CustomKanbanCard } from "@/components/projects/views/kanban-view/KanbanCard";
+import { MemberAvatar } from "@/components/projects/MemberAvatar";
 import { KanbanSettingsDropdown } from "@/components/projects/views/kanban-view/KanbanSettingsDropdown";
 import { Eye, MoreHorizontalIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -241,6 +242,19 @@ const KanbanView = ({
     endDate: undefined as Date | undefined,
     priority: "" as string,
   });
+
+  const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+  const [isAddTaskAssigneeOpen, setIsAddTaskAssigneeOpen] = useState(false);
+  const [isAddTaskPriorityOpen, setIsAddTaskPriorityOpen] = useState(false);
+  const [isAddSubtaskAssigneeOpen, setIsAddSubtaskAssigneeOpen] = useState(false);
+  const [isAddSubtaskPriorityOpen, setIsAddSubtaskPriorityOpen] = useState(false);
+
+  const getFilteredMembers = () => {
+    if (!assigneeSearchQuery) return members;
+    return members.filter((m) =>
+      m.name?.toLowerCase().includes(assigneeSearchQuery.toLowerCase()),
+    );
+  };
 
   // ✅ State for inline editing column name
   const [editingColumnName, setEditingColumnName] = useState<string | null>(
@@ -989,6 +1003,7 @@ const KanbanView = ({
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(
     new Set(projectTasks.map((task) => task.id)),
   );
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -1503,61 +1518,77 @@ const KanbanView = ({
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {/* Assignee */}
-              <Popover>
-                <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+              {/* Assignee */}
+              <DropdownMenu
+                open={isAddTaskAssigneeOpen}
+                onOpenChange={(open) => {
+                  setIsAddTaskAssigneeOpen(open);
+                  if (!open) setAssigneeSearchQuery("");
+                }}
+              >
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <div className="cursor-pointer">
-                    {selAssignee ? (
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs bg-blue-100">
-                          {selAssignee.name
-                            ?.split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted transition-colors">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    )}
+                    <MemberAvatar
+                      size="md"
+                      name={selAssignee?.name}
+                      src={selAssignee?.profilePicture}
+                    />
                   </div>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-56 p-2"
-                  align="start"
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="space-y-1">
-                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                      Assign to
+                  <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                    <Input
+                      placeholder="Type @ or name..."
+                      value={assigneeSearchQuery}
+                      onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                      className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                      autoFocus
+                    />
+                  </div>
+                  {getFilteredMembers().length === 0 ? (
+                    <div className="text-center py-2 text-xs text-muted-foreground">
+                      No members found
                     </div>
-                    {members.map((member) => (
-                      <button
+                  ) : (
+                    getFilteredMembers().map((member) => (
+                      <DropdownMenuItem
                         key={member.userId}
-                        onClick={() =>
+                        onSelect={() =>
                           setNewTaskData((prev) => ({
                             ...prev,
                             assignee: member.userId,
                           }))
                         }
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                        className="p-0 focus:bg-transparent"
                       >
-                        <Avatar className="h-5 w-5">
-                          <AvatarFallback className="text-xs bg-blue-100">
-                            {member.name
-                              ?.split(" ")
-                              .map((n: string) => n[0])
-                              .join("")
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{member.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                          <MemberAvatar
+                            size="sm"
+                            name={member.name}
+                            src={member.profilePicture}
+                          />
+                          <span className="truncate">{member.name}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      setNewTaskData((prev) => ({
+                        ...prev,
+                        assignee: "",
+                      }))
+                    }
+                    className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                  >
+                    Clear
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Task ID placeholder */}
               <Badge
@@ -1568,8 +1599,8 @@ const KanbanView = ({
               </Badge>
 
               {/* Priority */}
-              <Popover>
-                <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu open={isAddTaskPriorityOpen} onOpenChange={setIsAddTaskPriorityOpen}>
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <div className="cursor-pointer">
                     {selPriority ? (
                       <Badge
@@ -1588,41 +1619,40 @@ const KanbanView = ({
                       </div>
                     )}
                   </div>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-36 p-2"
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="space-y-1">
-                    {taskPriorityConfigs.map((priority) => (
-                      <button
-                        key={priority._id}
-                        onClick={() =>
-                          setNewTaskData((prev) => ({
-                            ...prev,
-                            priority: priority.value,
-                          }))
-                        }
-                        className="w-full flex justify-between items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                  {taskPriorityConfigs.map((priority) => (
+                    <DropdownMenuItem
+                      key={priority._id}
+                      onSelect={() =>
+                        setNewTaskData((prev) => ({
+                          ...prev,
+                          priority: priority.value,
+                        }))
+                      }
+                      className="p-0 focus:bg-transparent"
+                    >
+                      <div
+                        className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                        style={{
+                          backgroundColor: `${priority.color || "#9CA3AF"}33`,
+                        }}
                       >
-                        <span style={{ color: priority.color }}>
-                          {priority.label}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
+                        <span className="truncate">{priority.label}</span>
+                        <Flag
+                          className="h-3.5 w-3.5 flex-shrink-0"
                           style={{
-                            backgroundColor: `${priority.color}20`,
-                            color: priority.color,
+                            color: priority.color || "#9CA3AF",
                           }}
-                        >
-                          <Flag className="h-4 w-4" />
-                        </Badge>
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <MoreHorizontalIcon className="w-4 h-4 text-muted-foreground" />
@@ -1638,7 +1668,6 @@ const KanbanView = ({
             onKeyDown={handleKeyDown}
             className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
             data-testid="kanban-add-task-name-input"
-            maxLength={250}
           />
 
           {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}
@@ -1805,68 +1834,84 @@ const KanbanView = ({
 
     return (
       <div
-        className="ml-6 mt-2 group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 border-l-border hover:shadow-md transition-shadow"
+        className="ml-6 mt-2 group relative rounded-lg bg-card p-2 shadow-sm border border-border border-l-4 border-l-border hover:shadow-md transition-shadow shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top row: Assignee | Subtask ID placeholder | Priority */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {/* Assignee */}
-            <Popover>
-              <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+            {/* Assignee */}
+            <DropdownMenu
+              open={isAddSubtaskAssigneeOpen}
+              onOpenChange={(open) => {
+                setIsAddSubtaskAssigneeOpen(open);
+                if (!open) setAssigneeSearchQuery("");
+              }}
+            >
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <div className="cursor-pointer">
-                  {selAssignee ? (
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback className="text-xs bg-blue-100">
-                        {selAssignee.name
-                          ?.split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted transition-colors">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  )}
+                  <MemberAvatar
+                    size="md"
+                    name={selAssignee?.name}
+                    src={selAssignee?.profilePicture}
+                  />
                 </div>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-56 p-2"
-                align="start"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="space-y-1">
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                    Assign to
+                <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                  <Input
+                    placeholder="Type @ or name..."
+                    value={assigneeSearchQuery}
+                    onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                    className="h-8 text-xs placeholder:text-muted-foreground bg-background border border-border"
+                    autoFocus
+                  />
+                </div>
+                {getFilteredMembers().length === 0 ? (
+                  <div className="text-center py-2 text-xs text-muted-foreground">
+                    No members found
                   </div>
-                  {members.map((member) => (
-                    <button
+                ) : (
+                  getFilteredMembers().map((member) => (
+                    <DropdownMenuItem
                       key={member.userId}
-                      onClick={() =>
+                      onSelect={() =>
                         setNewSubtaskData((prev) => ({
                           ...prev,
                           assignee: member.userId,
                         }))
                       }
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                      className="p-0 focus:bg-transparent"
                     >
-                      <Avatar className="h-5 w-5">
-                        <AvatarFallback className="text-xs bg-blue-100">
-                          {member.name
-                            ?.split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{member.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+                      <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
+                        <MemberAvatar
+                          size="sm"
+                          name={member.name}
+                          src={member.profilePicture}
+                        />
+                        <span className="truncate">{member.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() =>
+                    setNewSubtaskData((prev) => ({
+                      ...prev,
+                      assignee: "",
+                    }))
+                  }
+                  className="p-0 h-9 text-xs justify-center bg-muted focus:bg-muted rounded-xs"
+                >
+                  Clear
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Subtask ID placeholder */}
             <Badge
@@ -1877,8 +1922,8 @@ const KanbanView = ({
             </Badge>
 
             {/* Priority */}
-            <Popover>
-              <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu open={isAddSubtaskPriorityOpen} onOpenChange={setIsAddSubtaskPriorityOpen}>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <div className="cursor-pointer">
                   {selPriority ? (
                     <Badge
@@ -1889,7 +1934,7 @@ const KanbanView = ({
                         color: selPriority.color,
                       }}
                     >
-                      <Flag className="h-3 w-3" />
+                      <Flag className="h-3.5 w-3.5" />
                     </Badge>
                   ) : (
                     <div className="h-6 w-6 rounded-full flex items-center justify-center bg-muted hover:bg-muted transition-colors">
@@ -1897,41 +1942,40 @@ const KanbanView = ({
                     </div>
                   )}
                 </div>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-36 p-2"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="space-y-1">
-                  {taskPriorityConfigs.map((priority) => (
-                    <button
-                      key={priority._id}
-                      onClick={() =>
-                        setNewSubtaskData((prev) => ({
-                          ...prev,
-                          priority: priority.value,
-                        }))
-                      }
-                      className="w-full flex justify-between items-center gap-2 px-2 py-1.5 rounded hover:bg-muted text-xs"
+                {taskPriorityConfigs.map((priority) => (
+                  <DropdownMenuItem
+                    key={priority._id}
+                    onSelect={() =>
+                      setNewSubtaskData((prev) => ({
+                        ...prev,
+                        priority: priority.value,
+                      }))
+                    }
+                    className="p-0 focus:bg-transparent"
+                  >
+                    <div
+                      className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3 text-foreground"
+                      style={{
+                        backgroundColor: `${priority.color || "#9CA3AF"}33`,
+                      }}
                     >
-                      <span style={{ color: priority.color }}>
-                        {priority.label}
-                      </span>
-                      <Badge
-                        variant="secondary"
-                        className="h-6 w-6 p-0 rounded-full flex items-center justify-center"
+                      <span className="truncate">{priority.label}</span>
+                      <Flag
+                        className="h-3.5 w-3.5 flex-shrink-0"
                         style={{
-                          backgroundColor: `${priority.color}20`,
-                          color: priority.color,
+                          color: priority.color || "#9CA3AF",
                         }}
-                      >
-                        <Flag className="h-4 w-4" />
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+                      />
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />
@@ -1946,7 +1990,6 @@ const KanbanView = ({
           onKeyDown={handleKeyDown}
           className="text-xs border-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 mb-3"
           data-testid="kanban-add-subtask-name-input"
-          maxLength={250}
         />
 
         {/* Bottom row: MessageSquare | Due Date | Save/Cancel */}
@@ -3103,7 +3146,11 @@ const KanbanView = ({
               <KanbanProvider
                 data={kanbanTasks}
                 columns={columns}
-                onDragEnd={handleDragEnd}
+                onDragStart={(event) => setActiveDragId(event.active.id as string)}
+                onDragEnd={(event) => {
+                  setActiveDragId(null);
+                  handleDragEnd(event);
+                }}
               >
                 {(column) => (
                   <KanbanBoard
@@ -3467,10 +3514,11 @@ const KanbanView = ({
                             {/* Subtasks nested under parent - Only show when expanded and global collapse is off */}
                             {!displayOptions.collapsedSubtasks &&
                               expandedTasks.has(fullTask.id) &&
+                              activeDragId !== fullTask.id &&
                               taskSubtasks.map((subtask) => (
                                 <div
                                   key={subtask.id}
-                                  className={cn("ml-6")}
+                                  className={cn("ml-6 shrink-0")}
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   {/* <CustomKanbanCard

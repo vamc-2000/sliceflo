@@ -59,20 +59,14 @@ const languages = [
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const themeOptions = [
-    { theme: "brand", label: "System Default", imageSrc: "/themes/default.svg" },
+     { theme: "system", label: "System Default", imageSrc: "/themes/default.svg" },
+    { theme: "brand", label: "Default", imageSrc: "/themes/default.svg" },
     { theme: "light", label: "Light Mode", imageSrc: "/themes/light.svg" },
     { theme: "dark", label: "Dark Mode", imageSrc: "/themes/dark.svg" },
     { theme: "dark-contrast", label: "Dark high contrast", imageSrc: "/themes/darkhighContrast.svg" },
     { theme: "light-contrast", label: "Light high contrast", imageSrc: "/themes/lightContrast.svg" },
 ];
 
-const fontSizes = [
-    { label: "Aa", size: "xs", fontSize: 12 },
-    { label: "Aa", size: "sm", fontSize: 14 },
-    { label: "Aa", size: "base", fontSize: 16 },
-    { label: "Aa", size: "lg", fontSize: 18 },
-    { label: "Aa", size: "xl", fontSize: 20 },
-];
 
 export default function PreferencesPage() {
     const { user: profile, fetchUserProfile, updateUserProfile, isLoading } = useProfileStore();
@@ -134,8 +128,14 @@ export default function PreferencesPage() {
 
         // Sync theme
         if (profile?.displaySettings?.theme) {
-            setSelectedTheme(profile.displaySettings.theme);
-            setInitialTheme(profile.displaySettings.theme);
+            const savedTheme = profile.displaySettings.theme;
+            if (savedTheme === "default") {
+                setSelectedTheme("system");
+                setInitialTheme("system");
+            } else {
+                setSelectedTheme(savedTheme);
+                setInitialTheme(savedTheme);
+            }
         }
     }, [profile]);
 
@@ -247,7 +247,7 @@ export default function PreferencesPage() {
                     isActive={activeSection === "themes"}
                     onToggle={() => setActiveSection((prev) => (prev === "themes" ? null : "themes"))}
                 >
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {themeOptions.map((option) => (
                              <ThemeOptionCard
                                  key={option.theme}
@@ -476,51 +476,7 @@ export default function PreferencesPage() {
                             />
                         </div>
 
-                        {/*  Keyboard Shortcuts Toggle */}
-                        <div className="flex items-start gap-4">
-                            <div className="flex-1">
-                                <h4 className="font-inter text-[14px] font-medium leading-[100%] text-foreground">
-                                    Keyboard Shortcuts
-                                </h4>
-                                <p className="font-inter text-[12px] font-normal leading-4 text-muted-foreground mt-1">
-                                    Use keyboard shortcuts to quickly navigate and take action through SliceFlo without using your mouse.
-                                </p>
-                            </div>
-                            <Switch
-                                checked={localPreferences.keyboardShortcuts}
-                                onCheckedChange={(checked) => handleChange("keyboardShortcuts", checked)}
-                                data-testid="preferences-keyboard-shortcuts-switch"
-                            />
-                        </div>
-
-                        {/* Font Size Row */}
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                            <div className="flex-1">
-                                <h4 className="font-inter text-[14px] font-medium leading-[100%] text-foreground">
-                                    Font Size
-                                </h4>
-                                <p className="font-inter text-[12px] font-normal leading-4 text-muted-foreground mt-1">
-                                    Adjust the size of text across the app
-                                </p>
-                            </div>
-                            <div className="flex gap-2.5 flex-wrap">
-                                {fontSizes.map(({ label, size, fontSize }) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedFontSize(size)}
-                                        className={
-                                            selectedFontSize === size
-                                                ? "w-12 h-12 flex items-center justify-center font-inter font-normal rounded-lg cursor-pointer leading-none transition-all duration-200 bg-primary text-primary-foreground shadow-sm border-b-[3px] border-b-primary"
-                                                : "w-12 h-12 flex items-center justify-center font-inter font-normal rounded-lg cursor-pointer leading-none transition-all duration-200 bg-muted text-muted-foreground border-b-[3px] border-b-transparent hover:bg-muted/80"
-                                        }
-                                        style={{ fontSize: `${fontSize}px` }}
-                                        data-testid={`preferences-fontsize-btn-${size}`}
-                                    >
-                                        {label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                      
                     </div>
                 </SettingsCard>
 
@@ -529,7 +485,7 @@ export default function PreferencesPage() {
                     <Button
                         onClick={handleSave}
                         disabled={isSaving || !isChanged}
-                        className="font-inter text-[14px] font-medium leading-5 px-8 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                        className="font-inter text-[14px] font-medium leading-5 px-8 bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                         data-testid="preferences-save-btn"
                     >
                         {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}

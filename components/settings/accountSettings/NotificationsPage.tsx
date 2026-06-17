@@ -425,7 +425,7 @@ const NotificationsPage = () => {
   return (
     <div className="w-full space-y-4">
       {/* Mute Notifications Card */}
-      <Card className="border border-border rounded-lg overflow-hidden shadow-sm border-l-[4px] border-l-primary bg-card">
+      <Card className="border border-border rounded-lg overflow-hidden shadow-sm border-l-[4px] border-l-brand bg-card">
         <div className="flex items-start gap-4 p-1">
           {/* Left: Icon */}
           <div className="flex-shrink-0 pt-1">
@@ -464,7 +464,7 @@ const NotificationsPage = () => {
                     variant="outline"
                     size="sm"
                     className={`h-8 px-5 text-[12px] font-semibold transition-all rounded-lg border border-border ${selected === opt.value
-                      ? "bg-primary text-primary-foreground border-b-[4px] border-b-primary shadow-sm translate-y-[1px]"
+                      ? "bg-brand text-brand-foreground border-b-[4px] border-b-brand shadow-sm translate-y-[1px]"
                       : "bg-background text-foreground hover:bg-muted hover:border-border"
                       }`}
                   >
@@ -494,7 +494,7 @@ const NotificationsPage = () => {
       <Dialog open={customDatePickerOpen} onOpenChange={setCustomDatePickerOpen}>
         <DialogContent className="sm:max-w-[700px] bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-primary font-semibold">
+            <DialogTitle className="text-brand font-semibold">
               Select Date and Time
             </DialogTitle>
           </DialogHeader>
@@ -502,7 +502,7 @@ const NotificationsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
             {/* Left: Date Picker */}
             <div className="flex flex-col items-center">
-              <h4 className="text-sm font-medium mb-3 text-primary">Select Date</h4>
+              <h4 className="text-sm font-medium mb-3 text-brand">Select Date</h4>
               <Calendar
                 mode="single"
                 selected={customDate}
@@ -510,7 +510,7 @@ const NotificationsPage = () => {
                 disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                 className="rounded-md border bg-card"
                 classNames={{
-                  day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                  day_selected: "bg-brand text-brand-foreground hover:bg-brand hover:text-brand-foreground focus:bg-brand focus:text-brand-foreground",
                   day_today: "bg-accent text-accent-foreground",
                 }}
               />
@@ -518,12 +518,12 @@ const NotificationsPage = () => {
 
             {/* Right: Time Picker */}
             <div className="flex flex-col items-center">
-              <h4 className="text-sm font-medium mb-3 text-primary">Select Time</h4>
+              <h4 className="text-sm font-medium mb-3 text-brand">Select Time</h4>
 
               {customDate && (
                 <div className="flex flex-col items-center space-y-4 w-full">
                   <div className="text-center">
-                    <div className="text-2xl font-semibold text-primary">
+                    <div className="text-2xl font-semibold text-brand">
                       {String(customTime.hours).padStart(2, '0')}:{String(customTime.minutes).padStart(2, '0')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -540,7 +540,7 @@ const NotificationsPage = () => {
                       max="23"
                       value={customTime.hours}
                       onChange={(e) => setCustomTime(prev => ({ ...prev, hours: parseInt(e.target.value) }))}
-                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-brand"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                       <span>00</span>
@@ -558,7 +558,7 @@ const NotificationsPage = () => {
                       max="59"
                       value={customTime.minutes}
                       onChange={(e) => setCustomTime(prev => ({ ...prev, minutes: parseInt(e.target.value) }))}
-                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-brand"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                       <span>00</span>
@@ -613,7 +613,7 @@ const NotificationsPage = () => {
             <Button
               onClick={handleCustomDateConfirm}
               disabled={!customDate || isLoading}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-foreground text-background hover:bg-foreground/90"
             >
               {isLoading && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
               Confirm
@@ -839,7 +839,7 @@ const NotificationsPage = () => {
             className={
               integrations.slack.isConnected
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                : "bg-foreground text-background hover:bg-foreground/90"
             }
             size="sm"
           >
@@ -902,7 +902,7 @@ const NotificationsPage = () => {
             className={
               integrations.teams.isConnected
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                : "bg-foreground text-background hover:bg-foreground/90"
             }
             size="sm"
           >

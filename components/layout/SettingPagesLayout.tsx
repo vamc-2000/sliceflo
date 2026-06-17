@@ -50,12 +50,12 @@ const SettingsLayout = ({
             className={cn(
               "w-full text-left px-4 py-3 font-inter text-[14px] font-normal leading-5 transition-all relative bg-card dark:bg-neutral-900 tracking-[0px]",
               activeSection === item.id
-                ? "text-primary font-medium"
+                ? "text-foreground font-semibold"
                 : "text-foreground hover:bg-muted dark:hover:bg-neutral-800"
             )}
           >
             {activeSection === item.id && (
-              <span className="absolute left-0 top-0 bottom-0 w-1 rounded-r bg-primary" />
+              <span className="absolute left-0 top-0 bottom-0 w-1 rounded-r bg-foreground" />
             )}
             <span className={cn(activeSection === item.id ? "ml-2" : "")}>
               {item.text}
@@ -92,7 +92,7 @@ const SettingsLayout = ({
                 className={cn(
                   "px-4 py-1 font-inter text-[14px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-md",
                   activeTab === "account"
-                    ? "text-brand-foreground shadow-sm bg-brand"
+                    ? "bg-white text-black shadow-sm font-semibold"
                     : "text-muted-foreground hover:text-foreground bg-transparent"
                 )}
               >
@@ -103,7 +103,7 @@ const SettingsLayout = ({
                 className={cn(
                   "px-4 py-1 font-inter text-[14px] font-medium leading-5 transition-all whitespace-nowrap tracking-[0px] rounded-md",
                   activeTab === "workspace"
-                    ? "text-brand-foreground shadow-sm bg-brand"
+                    ? "bg-white text-black shadow-sm font-semibold"
                     : "text-muted-foreground hover:text-foreground bg-transparent"
                 )}
               >

@@ -176,8 +176,6 @@ export function ProjectHeader({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  
-
   const handleCopyProjectLink = async () => {
     try {
       const url = `${window.location.origin}/project/${projectId}`;
@@ -394,216 +392,256 @@ export function ProjectHeader({
   //     return <div>Loading project...</div>;
   // }
 
+  // ── Impler import callback ──────────────────────────────────────────────────
+  const { addImportRecord } = useImportStore();
+  const { addProject } = useProjectsStore();
+  const { addTask } = useTasksStore();
+  const formatImportDate = (d: Date) =>
+    d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-      // ── Impler import callback ──────────────────────────────────────────────────
-    const { addImportRecord } = useImportStore();
-    const { addProject } = useProjectsStore();
-   const { addTask } = useTasksStore();
-    const formatImportDate = (d: Date) =>
-        d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  // const onDataImported = useCallback(async (uploadData: any) => {
+  //     const uploadId = uploadData?._id ?? uploadData?.id;
+  //     const validRecords = uploadData?.validRecords ?? 0;
+  //     const totalRecords = uploadData?.totalRecords ?? 0;
 
-    // const onDataImported = useCallback(async (uploadData: any) => {
-    //     const uploadId = uploadData?._id ?? uploadData?.id;
-    //     const validRecords = uploadData?.validRecords ?? 0;
-    //     const totalRecords = uploadData?.totalRecords ?? 0;
+  //     if (!uploadId || validRecords === 0) {
+  //         toast('error', { title: "No valid records found in the imported file." });
+  //         return;
+  //     }
 
-    //     if (!uploadId || validRecords === 0) {
-    //         toast('error', { title: "No valid records found in the imported file." });
-    //         return;
-    //     }
+  //     try {
+  //         const response = await fetch(
+  //             `/api/impler/rows?uploadId=${uploadId}`
+  //         );
+  //         const result = await response.json();
+  //         const rows: Record<string, any>[] = result?.data ?? result?.records ?? result ?? [];
 
-    //     try {
-    //         const response = await fetch(
-    //             `/api/impler/rows?uploadId=${uploadId}`
-    //         );
-    //         const result = await response.json();
-    //         const rows: Record<string, any>[] = result?.data ?? result?.records ?? result ?? [];
+  //         if (!rows.length) {
+  //             addImportRecord({
+  //                 type: "Spreadsheet",
+  //                 status: "Completed",
+  //                 statusColor: "success",
+  //                 importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
+  //                 expiryDate: formatImportDate(new Date()),
+  //                 projectIds: [],
+  //             });
+  //             toast('success', { title: `${validRecords} records uploaded!` });
+  //             return;
+  //         }
 
-    //         if (!rows.length) {
-    //             addImportRecord({
-    //                 type: "Spreadsheet",
-    //                 status: "Completed",
-    //                 statusColor: "success",
-    //                 importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
-    //                 expiryDate: formatImportDate(new Date()),
-    //                 projectIds: [],
-    //             });
-    //             toast('success', { title: `${validRecords} records uploaded!` });
-    //             return;
-    //         }
+  //         const now = new Date();
+  //         const importedProjectIds: string[] = [];
+  //         let successCount = 0;
 
-    //         const now = new Date();
-    //         const importedProjectIds: string[] = [];
-    //         let successCount = 0;
+  //         for (const row of rows) {
+  //             try {
+  //                 const rawName = row.name || row.Name || row["Project Name"] || `Imported-${Date.now()}`;
+  //                 const projectPayload = {
+  //                     name: rawName,
+  //                     description: row.description || row.Description || "",
+  //                     status: (row.status || "active").toLowerCase(),
+  //                     priority: (row.priority || "medium").toLowerCase(),
+  //                     slug: rawName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 50),
+  //                 };
+  //                 const pid = await addProject(projectPayload as any);
+  //                 importedProjectIds.push(pid);
+  //                 successCount++;
+  //             } catch (err) {
+  //                 console.error("Failed row:", row, err);
+  //             }
+  //         }
 
-    //         for (const row of rows) {
-    //             try {
-    //                 const rawName = row.name || row.Name || row["Project Name"] || `Imported-${Date.now()}`;
-    //                 const projectPayload = {
-    //                     name: rawName,
-    //                     description: row.description || row.Description || "",
-    //                     status: (row.status || "active").toLowerCase(),
-    //                     priority: (row.priority || "medium").toLowerCase(),
-    //                     slug: rawName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 50),
-    //                 };
-    //                 const pid = await addProject(projectPayload as any);
-    //                 importedProjectIds.push(pid);
-    //                 successCount++;
-    //             } catch (err) {
-    //                 console.error("Failed row:", row, err);
-    //             }
-    //         }
+  //         addImportRecord({
+  //             type: "Spreadsheet",
+  //             status: successCount === rows.length ? "Completed" : successCount > 0 ? "Ongoing" : "Failed",
+  //             statusColor: successCount === rows.length ? "success" : successCount > 0 ? "warning" : "error",
+  //             importedNumber: `${successCount} of ${rows.length} projects imported`,
+  //             expiryDate: formatImportDate(now),
+  //             projectIds: importedProjectIds,
+  //         });
 
-    //         addImportRecord({
-    //             type: "Spreadsheet",
-    //             status: successCount === rows.length ? "Completed" : successCount > 0 ? "Ongoing" : "Failed",
-    //             statusColor: successCount === rows.length ? "success" : successCount > 0 ? "warning" : "error",
-    //             importedNumber: `${successCount} of ${rows.length} projects imported`,
-    //             expiryDate: formatImportDate(now),
-    //             projectIds: importedProjectIds,
-    //         });
+  //         if (successCount > 0) {
+  //             toast('success', { title: `${successCount} project${successCount > 1 ? "s" : ""} imported successfully!` });
+  //         } else {
+  //             toast('error', { title: "No projects created. Check column names in your file." });
+  //         }
+  //     } catch (err) {
+  //         console.error("Failed to fetch rows from Impler:", err);
+  //         addImportRecord({
+  //             type: "Spreadsheet",
+  //             status: "Completed",
+  //             statusColor: "success",
+  //             importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
+  //             expiryDate: formatImportDate(new Date()),
+  //             projectIds: [],
+  //         });
+  //         toast('success', { title: `${validRecords} records uploaded successfully!` });
+  //     }
+  // }, [addProject, addImportRecord]);
 
-    //         if (successCount > 0) {
-    //             toast('success', { title: `${successCount} project${successCount > 1 ? "s" : ""} imported successfully!` });
-    //         } else {
-    //             toast('error', { title: "No projects created. Check column names in your file." });
-    //         }
-    //     } catch (err) {
-    //         console.error("Failed to fetch rows from Impler:", err);
-    //         addImportRecord({
-    //             type: "Spreadsheet",
-    //             status: "Completed",
-    //             statusColor: "success",
-    //             importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
-    //             expiryDate: formatImportDate(new Date()),
-    //             projectIds: [],
-    //         });
-    //         toast('success', { title: `${validRecords} records uploaded successfully!` });
-    //     }
-    // }, [addProject, addImportRecord]);
+  // ── Impler hook ─────────────────────────────────────────────────────────────
 
-    // ── Impler hook ─────────────────────────────────────────────────────────────
-    
-    
-        const onDataImported = useCallback(async (uploadData: any) => {
-        const uploadId = uploadData?._id ?? uploadData?.id;
-        const validRecords = uploadData?.validRecords ?? 0;
-        const totalRecords = uploadData?.totalRecords ?? 0;
+  const onDataImported = useCallback(
+    async (uploadData: any) => {
+      const uploadId = uploadData?._id ?? uploadData?.id;
+      const validRecords = uploadData?.validRecords ?? 0;
+      const totalRecords = uploadData?.totalRecords ?? 0;
 
-        if (!uploadId || validRecords === 0) {
-            toast('error', { title: "No valid records found in the imported file." });
-            return;
+      if (!uploadId || validRecords === 0) {
+        toast("error", {
+          title: "No valid records found in the imported file.",
+        });
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `https://api.impler.io/v1/upload/${uploadId}/rows?limit=1000&page=1`,
+          {
+            headers: {
+              "x-access-token": process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
+            },
+          },
+        );
+        const result = await response.json();
+        const rows: Record<string, any>[] =
+          result?.data ?? result?.records ?? result ?? [];
+
+        if (!rows.length) {
+          addImportRecord({
+            type: "Spreadsheet",
+            status: "Completed",
+            statusColor: "success",
+            importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
+            expiryDate: formatImportDate(new Date()),
+            projectIds: [projectId],
+          });
+          toast("success", { title: `${validRecords} records uploaded!` });
+          return;
         }
 
-        try {
-            const response = await fetch(
-                `https://api.impler.io/v1/upload/${uploadId}/rows?limit=1000&page=1`,
-                {
-                    headers: {
-                        "x-access-token": process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
-                    },
-                }
+        const now = new Date();
+        let successCount = 0;
+
+        const getRowValue = (row: any, keys: string[]) => {
+          for (const key of keys) {
+            if (row[key] !== undefined) return row[key];
+            const foundKey = Object.keys(row).find(
+              (k) => k.trim().toLowerCase() === key.trim().toLowerCase(),
             );
-            const result = await response.json();
-            const rows: Record<string, any>[] = result?.data ?? result?.records ?? result ?? [];
+            if (foundKey && row[foundKey] !== undefined) return row[foundKey];
+          }
+          return undefined;
+        };
 
-            if (!rows.length) {
-                addImportRecord({
-                    type: "Spreadsheet",
-                    status: "Completed",
-                    statusColor: "success",
-                    importedNumber: `${validRecords} of ${totalRecords} records uploaded`,
-                    expiryDate: formatImportDate(new Date()),
-                    projectIds: [projectId],
-                });
-                toast('success', { title: `${validRecords} records uploaded!` });
-                return;
-            }
+        for (const row of rows) {
+          try {
+            // Fuzzy lookup to match headers like "TASK", "Description content", "STATUS", "PRIORITY "
+            const rawName =
+              getRowValue(row, ["task", "title", "name"]) ||
+              `Imported Task-${Date.now()}`;
+            const rawDesc =
+              getRowValue(row, [
+                "description",
+                "description content",
+                "desc",
+              ]) || "";
+            const rawStatus = getRowValue(row, ["status", "state"]) || "todo";
+            const rawPriority = getRowValue(row, ["priority"]) || "medium";
+            const rawType =
+              getRowValue(row, ["type", "taskType", "task type"]) || "task";
+            const rawStartDate =
+              getRowValue(row, ["startDate", "start date"]) || null;
+            const rawEndDate =
+              getRowValue(row, [
+                "endDate",
+                "end date",
+                "dueDate",
+                "due date",
+              ]) || null;
+            const rawAssignee =
+              getRowValue(row, ["assignee", "assigneeId"]) || "";
 
-            const now = new Date();
-            let successCount = 0;
-
-            const getRowValue = (row: any, keys: string[]) => {
-                for (const key of keys) {
-                    if (row[key] !== undefined) return row[key];
-                    const foundKey = Object.keys(row).find(
-                        (k) => k.trim().toLowerCase() === key.trim().toLowerCase()
-                    );
-                    if (foundKey && row[foundKey] !== undefined) return row[foundKey];
-                }
-                return undefined;
+            const taskPayload = {
+              projectId: projectId,
+              name: rawName,
+              description: rawDesc,
+              status: String(rawStatus).toLowerCase(),
+              priority: String(rawPriority).toLowerCase(),
+              taskType: String(rawType).toLowerCase(),
+              startDate: rawStartDate,
+              endDate: rawEndDate,
+              assignee: rawAssignee,
+              customFieldValues: {},
             };
 
-            for (const row of rows) {
-                try {
-                    // Fuzzy lookup to match headers like "TASK", "Description content", "STATUS", "PRIORITY "
-                    const rawName = getRowValue(row, ["task", "title", "name"]) || `Imported Task-${Date.now()}`;
-                    const rawDesc = getRowValue(row, ["description", "description content", "desc"]) || "";
-                    const rawStatus = getRowValue(row, ["status", "state"]) || "todo";
-                    const rawPriority = getRowValue(row, ["priority"]) || "medium";
-                    const rawType = getRowValue(row, ["type", "taskType", "task type"]) || "task";
-                    const rawStartDate = getRowValue(row, ["startDate", "start date"]) || null;
-                    const rawEndDate = getRowValue(row, ["endDate", "end date", "dueDate", "due date"]) || null;
-                    const rawAssignee = getRowValue(row, ["assignee", "assigneeId"]) || "";
+            console.log("Importing Task Payload:", taskPayload);
 
-                    const taskPayload = {
-                        projectId: projectId,
-                        name: rawName,
-                        description: rawDesc,
-                        status: String(rawStatus).toLowerCase(),
-                        priority: String(rawPriority).toLowerCase(),
-                        taskType: String(rawType).toLowerCase(),
-                        startDate: rawStartDate,
-                        endDate: rawEndDate,
-                        assignee: rawAssignee,
-                        customFieldValues: {},
-                    };
-
-                    console.log("Importing Task Payload:", taskPayload);
-
-                    // 2. Call addTask to save in the store & DB
-                    await addTask(taskPayload as any);
-                    successCount++;
-                } catch (err) {
-                    console.error("Failed row:", row, err);
-                }
-            }
-
-            addImportRecord({
-                type: "Spreadsheet",
-                status: successCount === rows.length ? "Completed" : successCount > 0 ? "Ongoing" : "Failed",
-                statusColor: successCount === rows.length ? "success" : successCount > 0 ? "warning" : "error",
-                importedNumber: `${successCount} of ${rows.length} tasks imported`,
-                expiryDate: formatImportDate(now),
-                projectIds: [projectId],
-            });
-
-            if (successCount > 0) {
-                toast('success', { title: `${successCount} task${successCount > 1 ? "s" : ""} imported successfully!` });
-            } else {
-                toast('error', { title: "No tasks created. Check column names in your file." });
-            }
-        } catch (err) {
-            console.error("Failed to fetch rows from Impler:", err);
-            addImportRecord({
-                type: "Spreadsheet",
-                status: "Failed",
-                statusColor: "error",
-                importedNumber: `0 of ${totalRecords} tasks imported`,
-                expiryDate: formatImportDate(new Date()),
-                projectIds: [projectId],
-            });
-            toast('error', { title: "Import failed to fetch parsed rows." });
+            // 2. Call addTask to save in the store & DB
+            await addTask(taskPayload as any);
+            successCount++;
+          } catch (err) {
+            console.error("Failed row:", row, err);
+          }
         }
-    }, [projectId, addTask, addImportRecord]);
 
-    const { showWidget, isImplerInitiated } = useImpler({
-        projectId:        process.env.NEXT_PUBLIC_IMPLER_PROJECT_ID!,
-        templateId:       process.env.NEXT_PUBLIC_IMPLER_TEMPLATE_ID!,
-        accessToken:      process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
-        onUploadComplete: onDataImported,
-        onWidgetClose:    () => console.log("Impler widget closed"),
-    });
+        addImportRecord({
+          type: "Spreadsheet",
+          status:
+            successCount === rows.length
+              ? "Completed"
+              : successCount > 0
+                ? "Ongoing"
+                : "Failed",
+          statusColor:
+            successCount === rows.length
+              ? "success"
+              : successCount > 0
+                ? "warning"
+                : "error",
+          importedNumber: `${successCount} of ${rows.length} tasks imported`,
+          expiryDate: formatImportDate(now),
+          projectIds: [projectId],
+        });
+
+        if (successCount > 0) {
+          toast("success", {
+            title: `${successCount} task${successCount > 1 ? "s" : ""} imported successfully!`,
+          });
+        } else {
+          toast("error", {
+            title: "No tasks created. Check column names in your file.",
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch rows from Impler:", err);
+        addImportRecord({
+          type: "Spreadsheet",
+          status: "Failed",
+          statusColor: "error",
+          importedNumber: `0 of ${totalRecords} tasks imported`,
+          expiryDate: formatImportDate(new Date()),
+          projectIds: [projectId],
+        });
+        toast("error", { title: "Import failed to fetch parsed rows." });
+      }
+    },
+    [projectId, addTask, addImportRecord],
+  );
+
+  const { showWidget, isImplerInitiated } = useImpler({
+    projectId: process.env.NEXT_PUBLIC_IMPLER_PROJECT_ID!,
+    templateId: process.env.NEXT_PUBLIC_IMPLER_TEMPLATE_ID!,
+    accessToken: process.env.NEXT_PUBLIC_IMPLER_ACCESS_TOKEN!,
+    onUploadComplete: onDataImported,
+    onWidgetClose: () => console.log("Impler widget closed"),
+  });
 
   if (!project) {
     return <div>Project not found</div>;
@@ -799,15 +837,26 @@ export function ProjectHeader({
                                 </DropdownMenuContent>
                             </DropdownMenu> */}
               <div
-                className="h-8 w-8 rounded-full flex items-center justify-center"
+                className={cn(
+                  "h-8 flex items-center justify-center text-xs font-medium",
+                  currentPriorityConfig
+                    ? "px-2.5 rounded-md gap-1.5"
+                    : "w-8 rounded-full",
+                )}
                 style={{
                   backgroundColor:
                     (currentPriorityConfig?.color || "#6b7280") + "15",
+                  color: currentPriorityConfig?.color || "#6b7280",
                 }}
                 data-testid="project-header-priority"
               >
+                {currentPriorityConfig && (
+                  <span className="capitalize">
+                    {currentPriorityConfig.label}
+                  </span>
+                )}
                 <Flag
-                  className="h-4 w-4"
+                  className="h-3.5 w-3.5"
                   style={{
                     color: currentPriorityConfig
                       ? currentPriorityConfig.color
@@ -861,10 +910,11 @@ export function ProjectHeader({
                                 </PopoverContent>
                             </Popover> */}
               <div
-                className={`h-8 bg-muted-foreground/20 text-xs px-2 flex items-center gap-1 ${project.startDate && project.endDate
+                className={`h-8 bg-muted-foreground/20 text-xs px-2 flex items-center gap-1 ${
+                  project.startDate && project.endDate
                     ? "rounded-md"
                     : "rounded-full"
-                  }`}
+                }`}
                 data-testid="project-header-dates"
               >
                 <Calendar className="h-4 w-4" />
@@ -929,9 +979,9 @@ export function ProjectHeader({
                 style={
                   displayUpdateConfig
                     ? {
-                      backgroundColor: displayUpdateConfig.color + "15",
-                      color: displayUpdateConfig.color,
-                    }
+                        backgroundColor: displayUpdateConfig.color + "15",
+                        color: displayUpdateConfig.color,
+                      }
                     : undefined
                 }
                 data-testid="project-header-update"
@@ -1185,7 +1235,10 @@ export function ProjectHeader({
                 <DropdownMenuSeparator className="mx-2 my-0" />
 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="text-xs" data-testid="project-header-menu-import-export">
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    data-testid="project-header-menu-import-export"
+                  >
                     <Upload className="mr-2 h-3.5 w-3.5" />
                     Import / Export
                   </DropdownMenuSubTrigger>
@@ -1200,35 +1253,61 @@ export function ProjectHeader({
                       {isImplerInitiated ? "Import" : "Loading..."}
                     </DropdownMenuItem>
                     <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="cursor-pointer text-xs" data-testid="project-header-menu-export">
+                      <DropdownMenuSubTrigger
+                        className="cursor-pointer text-xs"
+                        data-testid="project-header-menu-export"
+                      >
                         Export
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent className="border-b-4 border-b-primary min-w-[140px]">
                         <DropdownMenuItem
-                          onClick={() => { onPrint?.(); }}
+                          onClick={() => {
+                            onPrint?.();
+                          }}
                           className="flex items-center gap-2.5 cursor-pointer text-xs"
                           data-testid="project-header-menu-export-pdf"
                         >
-                          <Image src="/images/pdf.svg" alt="PDF" width={16} height={16} className="object-contain" />
+                          <Image
+                            src="/images/pdf.svg"
+                            alt="PDF"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
                           PDF
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => { onExportCSV?.(); }}
+                          onClick={() => {
+                            onExportCSV?.();
+                          }}
                           className="flex items-center gap-2.5 cursor-pointer text-xs"
                           data-testid="project-header-menu-export-csv"
                         >
-                          <Image src="/images/csv.svg" alt="CSV" width={16} height={16} className="object-contain" />
+                          <Image
+                            src="/images/csv.svg"
+                            alt="CSV"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
                           CSV
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => { onExportExcel?.(); }}
+                          onClick={() => {
+                            onExportExcel?.();
+                          }}
                           className="flex items-center gap-2.5 cursor-pointer text-xs"
                           data-testid="project-header-menu-export-excel"
                         >
-                          <Image src="/images/excel.svg" alt="Excel" width={16} height={16} className="object-contain" />
+                          <Image
+                            src="/images/excel.svg"
+                            alt="Excel"
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                          />
                           Excel
                         </DropdownMenuItem>
-
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
                   </DropdownMenuSubContent>

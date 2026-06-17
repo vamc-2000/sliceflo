@@ -54,9 +54,9 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="brand"
+          defaultTheme="system"
           themes={["light", "dark", "brand", "dark-contrast", "light-contrast"]}
-          enableSystem={false}
+          enableSystem={true}
           disableTransitionOnChange
         >
           <AuthProvider>

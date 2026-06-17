@@ -102,7 +102,7 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
             className="p-1 hover:bg-muted rounded transition-colors"
             onClick={() => toast.success('Downloading invoice...')}
           >
-            <Download className="h-4 w-4 text-primary" />
+            <Download className="h-4 w-4 text-brand" />
           </button>
         </div>
       ),
@@ -126,7 +126,7 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
     <div className="w-full space-y-6">
       {/* Header */}
       <div>
-        <h2 className="font-inter text-[20px] font-semibold leading-[100%] text-primary tracking-[0px]">
+        <h2 className="font-inter text-[20px] font-semibold leading-[100%] text-brand tracking-[0px]">
           Payments & Subscriptions
         </h2>
         <p className="font-inter text-[10px] font-medium text-muted-foreground mt-1">
@@ -139,8 +139,8 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
         {/* Plan Card */}
         <Card className="w-[450px] border shadow-sm bg-card">
           <CardContent className="p-6">
-            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Zap className="h-5 w-5 text-primary" />
+            <div className="w-5 h-5 rounded-full bg-brand/10 flex items-center justify-center mb-4">
+              <Zap className="h-5 w-5 text-brand" />
             </div>
             <h3 className="font-inter text-[16px] font-medium leading-[100%] text-foreground mb-2 tracking-[0px]">
               Basic plan
@@ -152,7 +152,7 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
               Billed annually.
             </p>
             <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-inter text-[14px] font-medium leading-5 tracking-[0px]"
+              className="w-full bg-foreground text-background hover:bg-foreground/90 font-inter text-[14px] font-medium leading-5 tracking-[0px]"
               onClick={() => {
                 router.push('/dashboard');
                 onClose?.();
@@ -173,7 +173,7 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
             'Basic chat and email support',
           ].map((feature) => (
             <div key={feature} className="flex items-center gap-2 mb-3">
-              <Check className="h-5 w-5 text-primary" />
+              <Check className="h-5 w-5 text-brand" />
               <span className="font-inter text-[14px] font-normal leading-5 text-foreground tracking-[0px]">
                 {feature}
               </span>
@@ -253,7 +253,7 @@ const PaymentsSubscriptionsPage: React.FC<PaymentsSubscriptionsPageProps> = ({ o
       {/* Save Button */}
       <div className="flex justify-end">
         <Button
-          className="bg-primary hover:bg-primary/90 text-primary-foreground font-inter text-[14px] font-medium leading-5 tracking-[0px]"
+          className="bg-foreground text-background hover:bg-foreground/90 font-inter text-[14px] font-medium leading-5 tracking-[0px]"
           onClick={() => toast.success('Settings saved')}
         >
           Save

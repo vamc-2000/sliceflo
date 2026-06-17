@@ -76,7 +76,7 @@ export default function MicrosoftTeamsConfigure({
       {/* ── Connection Status card ─────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-border bg-card">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center flex-shrink-0">
             <Image
               src="/images/settings/teams.svg"
               alt="Microsoft Teams"
@@ -200,8 +200,8 @@ export default function MicrosoftTeamsConfigure({
                 className="flex items-center justify-between px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-foreground">
                       {tenant[0]}
                     </span>
                   </div>

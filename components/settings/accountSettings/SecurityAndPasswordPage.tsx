@@ -38,11 +38,57 @@ import {
 const SecurityAndPasswordPage = () => {
     const [activeSection, setActiveSection] = useState<"2fa" | "sso" | null>(null);
     const [smsTfa, setSmsTfa] = useState(true);
-    const [appTfa, setAppTfa] = useState(true);
+    const [appTfa, setAppTfa] = useState(false);
     const [ssoProvider, setSsoProvider] = useState("no-sso");
     const [ssoPolicyName, setSsoPolicyName] = useState("");
     const [identityProvider, setIdentityProvider] = useState("");
     const [isAddSSOOpen, setIsAddSSOOpen] = useState(false);
+
+    const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+    const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+
+    const handleChange = (index: number, value: string) => {
+        const digit = value.replace(/\D/g, "").slice(-1);
+        const newOtp = [...otp];
+        newOtp[index] = digit;
+        setOtp(newOtp);
+
+        if (digit !== "" && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        }
+    };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Backspace") {
+            if (otp[index] !== "") {
+                const newOtp = [...otp];
+                newOtp[index] = "";
+                setOtp(newOtp);
+            } else if (index > 0) {
+                const newOtp = [...otp];
+                newOtp[index - 1] = "";
+                setOtp(newOtp);
+                inputRefs.current[index - 1]?.focus();
+            }
+        }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData("text");
+        const digits = pastedData.replace(/\D/g, "").slice(0, 6);
+
+        if (digits.length > 0) {
+            const newOtp = [...otp];
+            for (let j = 0; j < 6; j++) {
+                newOtp[j] = digits[j] || "";
+            }
+            setOtp(newOtp);
+
+            const focusIndex = Math.min(digits.length, 5);
+            inputRefs.current[focusIndex]?.focus();
+        }
+    };
 
     const handleSave2FA = () => {
         toast.success("2FA settings saved successfully");
@@ -71,7 +117,7 @@ const SecurityAndPasswordPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Left Section - Description */}
                         <div className="md:col-span-1 md:border-r md:pr-4 border-border">
-                            <h4 className="font-semibold text-sm text-[var(--primary)] mb-2">Two-factor authentication (2FA)</h4>
+                            <h4 className="font-semibold text-sm text-brand mb-2">Two-factor authentication (2FA)</h4>
                             <p className="text-xs text-[#8E8E93]">
                                 Keep your account secure by enabling 2FA via SMS or using a temporary one-time
                                 passcode (TOTP) from an authenticator app.
@@ -83,13 +129,16 @@ const SecurityAndPasswordPage = () => {
                             {/* Authenticator App (TOTP) */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="app-2fa" className="text-sm font-semibold text-[var(--primary)]">
+                                    <Label htmlFor="app-2fa" className="text-sm font-semibold text-brand">
                                         Authenticator App (TOTP)
                                     </Label>
                                     <Switch
                                         id="app-2fa"
                                         checked={appTfa}
-                                        onCheckedChange={setAppTfa}
+                                        onCheckedChange={(checked) => {
+                                            setAppTfa(checked);
+                                            if (!checked) setOtp(Array(6).fill(""));
+                                        }}
                                     />
                                 </div>
                                 <p className="text-xs text-[#8E8E93]">
@@ -102,13 +151,12 @@ const SecurityAndPasswordPage = () => {
                     {/* 2FA Setup UI - Moved outside grid for full width */}
                     {appTfa && (
                         <div
-                            className="p-5 rounded-xl shadow-sm space-y-4"
-                            style={{ backgroundColor: "#F68C1F26" }}
+                            className="p-5 rounded-xl shadow-sm space-y-4 border border-orange-200/50 dark:border-zinc-800/80 bg-[#F68C1F26] dark:bg-zinc-900/50"
                         >
                             <div className="flex flex-col md:flex-row gap-8">
                                 {/* QR Code Section */}
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className="bg-card p-3 rounded-xl shadow-sm border border-orange-100 flex items-center justify-center">
+                                    <div className="bg-white p-3 rounded-xl shadow-sm border border-orange-100 flex items-center justify-center">
                                         <div className="w-[110px] h-[110px] relative">
                                             <Image
                                                 src="/images/scanner.svg"
@@ -119,7 +167,7 @@ const SecurityAndPasswordPage = () => {
                                         </div>
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-[12px] font-semibold text-[#1E1E1E]">Can't scan?</p>
+                                        <p className="text-[12px] font-semibold text-foreground">Can't scan?</p>
                                         <button className="text-[12px] font-semibold text-[#FF8D28] hover:underline cursor-pointer">
                                             Copy setup key
                                         </button>
@@ -135,7 +183,7 @@ const SecurityAndPasswordPage = () => {
                                         </div>
                                         <div className="space-y-0.5">
                                             <h5 className="text-[12px] font-semibold text-foreground">Install an Authenticator App</h5>
-                                            <p className="text-[12px] text-muted-foreground leading-tight">
+                                            <p className="text-[12px] text-muted-foreground dark:text-gray-300 leading-tight">
                                                 Install Google Authenticator or Duo Mobile from your store.
                                             </p>
                                         </div>
@@ -148,7 +196,7 @@ const SecurityAndPasswordPage = () => {
                                         </div>
                                         <div className="space-y-0.5">
                                             <h5 className="text-[12px] font-semibold text-foreground">Scan the QR Code</h5>
-                                            <p className="text-[12px] text-muted-foreground leading-tight">
+                                            <p className="text-[12px] text-muted-foreground dark:text-gray-300 leading-tight">
                                                 Use your app to scan the above QR code.
                                             </p>
                                         </div>
@@ -160,8 +208,8 @@ const SecurityAndPasswordPage = () => {
                                             3
                                         </div>
                                         <div className="space-y-0.5">
-                                            <h5 className="text-[12 px] font-semibold text-foreground">Enter the 6-digit Code</h5>
-                                            <p className="text-[11px] text-muted-foreground leading-tight">
+                                            <h5 className="text-[12px] font-semibold text-foreground">Enter the 6-digit Code</h5>
+                                            <p className="text-[11px] text-muted-foreground dark:text-gray-300 leading-tight">
                                                 Enter the code from your authenticator app.
                                             </p>
                                         </div>
@@ -169,12 +217,17 @@ const SecurityAndPasswordPage = () => {
 
                                     {/* Code Inputs */}
                                     <div className="flex gap-2 pt-1">
-                                        {[...Array(6)].map((_, i) => (
+                                        {otp.map((value, i) => (
                                             <input
                                                 key={i}
+                                                ref={(el) => { inputRefs.current[i] = el; }}
                                                 type="text"
                                                 maxLength={1}
-                                                className="w-10 h-12 border border-orange-200 rounded-lg text-center text-lg font-bold bg-card focus:border-[#F68C1F] focus:ring-1 focus:ring-[#F68C1F] outline-none transition-all shadow-inner"
+                                                value={value}
+                                                onChange={(e) => handleChange(i, e.target.value)}
+                                                onKeyDown={(e) => handleKeyDown(i, e)}
+                                                onPaste={handlePaste}
+                                                className="w-10 h-12 border border-orange-200 rounded-lg text-center text-lg font-bold bg-white text-black focus:border-[#F68C1F] focus:ring-1 focus:ring-[#F68C1F] outline-none transition-all shadow-inner"
                                             />
                                         ))}
                                     </div>
@@ -185,16 +238,20 @@ const SecurityAndPasswordPage = () => {
                             <div className="flex justify-center gap-4 pt-4">
                                 <Button
                                     variant="outline"
-                                    onClick={() => setAppTfa(false)}
-                                    className="px-8 h-12 rounded-xl border-[#d1d5db] bg-[#edf2f7] text-[#718096] font-bold text-[14px] hover:bg-[#e2e8f0]"
+                                    onClick={() => {
+                                        setAppTfa(false);
+                                        setOtp(Array(6).fill(""));
+                                    }}
+                                    className="px-8 h-12 rounded-xl border border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold text-[14px] hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
-                                    className="px-8 h-12 rounded-xl bg-[#001F3F] hover:bg-[#001F3F]/90 text-white font-bold text-[14px]"
+                                    className="px-8 h-12 rounded-xl bg-[#001F3F] dark:bg-white text-white dark:text-black hover:bg-[#001F3F]/90 dark:hover:bg-zinc-200 font-bold text-[14px] transition-all shadow-sm"
                                     onClick={() => {
                                         toast.success("2FA Setup Complete!");
                                         setAppTfa(false);
+                                        setOtp(Array(6).fill(""));
                                     }}
                                 >
                                     Register

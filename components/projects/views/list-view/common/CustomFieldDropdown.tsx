@@ -454,7 +454,7 @@ export function CustomFieldDropdown({
             )}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent data-testid={`custom-field-people-content-${field.id}`} className="p-4 w-[200px] space-y-1">
+        <DropdownMenuContent data-testid={`custom-field-people-content-${field.id}`} className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary">
           {/* ✅ Show guests message */}
           {field.showGuests && (
             <div data-testid="custom-field-people-no-guests" className="text-center py-4 text-xs text-muted-foreground bg-muted rounded-xs">
@@ -1443,7 +1443,7 @@ export function CustomFieldDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           data-testid={`custom-field-label-content-${field.id}`}
-          className="p-4 w-[200px] space-y-1"
+          className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary"
           align="center"
         >
           {options.map(option => {
@@ -1516,7 +1516,7 @@ export function CustomFieldDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           data-testid={`custom-field-select-one-content-${field.id}`}
-          className="p-4 w-[200px] space-y-1"
+          className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary"
           align="center"
         >
           {options.map(option => {
@@ -1593,7 +1593,7 @@ export function CustomFieldDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           data-testid={`custom-field-select-many-content-${field.id}`}
-          className="p-4 w-[200px] space-y-1"
+          className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-b-primary"
           align="center"
         >
           {options.map(option => {

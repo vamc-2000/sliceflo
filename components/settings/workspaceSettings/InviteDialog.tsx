@@ -327,11 +327,11 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[650px] border-b-[5px] border-b-[var(--primary)] p-0" data-testid="invite-dialog-content">
+      <DialogContent className="sm:max-w-[650px] border-b-[5px] border-b-brand p-0" data-testid="invite-dialog-content">
         {/* Header */}
         <DialogHeader className="px-10 pt-6 pb-0">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-[var(--primary)]" data-testid="invite-dialog-title">
+            <DialogTitle className="text-lg font-semibold text-brand" data-testid="invite-dialog-title">
               {heading}
             </DialogTitle>
             <Button
@@ -349,7 +349,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
         <div className="px-10 py-4 space-y-6">
           {/* Shareable Link Section */}
           <div className="space-y-2">
-            <Label className="text-base font-medium text-[var(--primary)]">
+            <Label className="text-base font-medium text-brand">
               Invite with Shareable link
             </Label>
             <div className="flex items-center gap-2 bg-gray-100 border border-[#8E8E93] rounded-lg p-3">
@@ -370,7 +370,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
 
           {/* Email Section */}
           <div className="space-y-2">
-            <Label className="text-base font-medium text-[var(--primary)]">
+            <Label className="text-base font-medium text-brand">
               Invite with email
             </Label>
             <div className="border border-[#8E8E93] rounded-lg p-3 space-y-2">
@@ -386,7 +386,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                       {email}
                       <button
                         onClick={() => handleRemoveEmail(email)}
-                        className="ml-2 hover:text-[var(--primary)]"
+                        className="ml-2 hover:text-brand"
                         data-testid={`invite-dialog-email-chip-delete-${email}`}
                       >
                         <X className="h-3 w-3" />
@@ -425,12 +425,12 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                   <RadioGroupItem
                     value="member"
                     id="member"
-                    className="border-[#B0BAC3] text-[var(--primary)]"
+                    className="border-[#B0BAC3] text-brand"
                     data-testid="invite-dialog-role-member"
                   />
                   <Label
                     htmlFor="member"
-                    className="text-sm text-[var(--primary)] font-normal cursor-pointer"
+                    className="text-sm text-foreground font-normal cursor-pointer"
                   >
                     Member
                   </Label>
@@ -439,12 +439,12 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
                   <RadioGroupItem
                     value="viewer"
                     id="viewer"
-                    className="border-[#B0BAC3] text-[var(--primary)]"
+                    className="border-[#B0BAC3] text-brand"
                     data-testid="invite-dialog-role-viewer"
                   />
                   <Label
                     htmlFor="viewer"
-                    className="text-sm text-[var(--primary)] font-normal cursor-pointer"
+                    className="text-sm text-foreground font-normal cursor-pointer"
                   >
                     Viewer (Read-only)
                   </Label>
@@ -466,7 +466,7 @@ const InviteDialog: React.FC<InviteDialogProps> = ({
           <Button
             onClick={handleSendInvite}
             disabled={inviteLoading}
-            className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 w-[150px] h-[50px]"
+            className="bg-brand hover:bg-brand/90 text-brand-foreground w-[150px] h-[50px]"
             data-testid="invite-dialog-send-btn"
           >
             {inviteLoading ? (

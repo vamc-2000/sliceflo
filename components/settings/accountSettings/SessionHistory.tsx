@@ -221,7 +221,7 @@ export default function SessionHistory() {
           <div className="flex items-center gap-2" data-testid={`session-history-device-${row.original.id}`}>
             {getDeviceIcon(row.getValue("deviceType"))}
             <div>
-              <div className="text-[14px] font-medium text-[var(--primary)]">{browser}</div>
+              <div className="text-[14px] font-medium text-foreground">{browser}</div>
               <div className="text-[12px] text-[var(--muted-foreground)]">{os}</div>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function SessionHistory() {
       accessorKey: "ipAddress",
       header: "IP Address",
       cell: ({ row }) => (
-        <code className="text-[12px] bg-[var(--muted)] px-2 py-1 rounded-md text-[var(--primary)] font-medium" data-testid={`session-history-ip-${row.original.id}`}>
+        <code className="text-[12px] bg-[var(--muted)] px-2 py-1 rounded-md text-foreground font-medium" data-testid={`session-history-ip-${row.original.id}`}>
           {row.getValue("ipAddress")}
         </code>
       ),
@@ -316,7 +316,7 @@ export default function SessionHistory() {
     <div className="w-full space-y-2 ">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-[var(--primary)] tracking-tight" data-testid="session-history-title">
+          <h2 className="text-[16px] font-semibold text-brand tracking-tight" data-testid="session-history-title">
             Session History
           </h2>
           <p className="text-[12px] text-[var(--muted-foreground)] leading-relaxed">
@@ -369,7 +369,7 @@ export default function SessionHistory() {
                   variant="default"
                   size="sm"
                   onClick={handleLogoutAll}
-                  className="h-8 px-4 rounded-lg bg-[var(--primary)] text-white hover:bg-[var(--primary)] hover:opacity-90 text-xs font-medium shadow-none transition-all focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                  className="h-8 px-4 rounded-lg bg-brand text-brand-foreground hover:bg-brand/90 hover:opacity-90 text-xs font-medium shadow-none transition-all focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                   data-testid="session-history-logout-all-btn"
                 >
                   Logout from All
@@ -390,7 +390,7 @@ export default function SessionHistory() {
               </div>
             </div>
             <DialogHeader className="space-y-1">
-              <DialogTitle className="text-xl font-bold tracking-tight text-[var(--primary)] text-center">Log out of this device?</DialogTitle>
+              <DialogTitle className="text-xl font-bold tracking-tight text-foreground text-center">Log out of this device?</DialogTitle>
               <DialogDescription className="text-[13px] text-[var(--muted-foreground)] leading-tight px-4 pb-2 text-center">
                 You'll be signed out from this device only. You can log back in anytime.
               </DialogDescription>
@@ -426,7 +426,7 @@ export default function SessionHistory() {
               </div>
             </div>
             <DialogHeader className="space-y-1">
-              <DialogTitle className="text-xl font-bold tracking-tight text-[var(--primary)] text-center">Log out from all devices?</DialogTitle>
+              <DialogTitle className="text-xl font-bold tracking-tight text-foreground text-center">Log out from all devices?</DialogTitle>
               <DialogDescription className="text-[13px] text-[var(--muted-foreground)] leading-tight px-4 pb-2 text-center">
                 You'll be signed out from all active sessions across devices. You'll need to log in again on each device.
               </DialogDescription>

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, ChevronDown, CirclePlay, Clock, Clock7, Loader2 } from "lucide-react";
-import { RichTextEditor } from "@/components/rich-text-editor";
+import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
 import { Checkbox } from "@/components/ui/checkbox";
 import React, { useState } from "react";
 import { useProfileStore } from "@/stores/profile-store";
@@ -264,7 +264,7 @@ export function AddTimesheetEntryModal({
             <DialogContent data-testid="add-timesheet-modal" className="sm:max-w-lg border-0 border-b-[5px] border-primary rounded-lg ">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
+                        <Avatar className="h-8 w-8">
                             <AvatarImage
                                 src={user?.profilePictureUrl || ""}
                                 alt={user?.name || "User"}
@@ -286,9 +286,9 @@ export function AddTimesheetEntryModal({
                                 <Button
                                     data-testid="btn-select-task-modal"
                                     variant="outline"
-                                    className="w-full justify-between bg-muted min-w-0 max-w-[calc(100vw-80px)] sm:max-w-[464px] overflow-hidden whitespace-normal flex items-center shrink"
+                                    className="w-full justify-between bg-muted min-w-0 max-w-[calc(100vw-80px)] sm:max-w-[464px] text-sm overflow-hidden whitespace-normal flex items-center shrink"
                                 >
-                                    <span className="truncate text-left flex-1 min-w-0 mr-2 flex items-center gap-1.5" title={
+                                    <span className="truncate text-left text-xs flex-1 min-w-0 mr-2 flex items-center gap-1.5" title={
                                         selectedTask
                                             ? tasks.find(t => t.id === selectedTask)?.name
                                             : "Select project & task"
@@ -304,7 +304,7 @@ export function AddTimesheetEntryModal({
                                                             {/* <span className="text-xs text-muted-foreground font-medium bg-muted px-1.5 py-0.5 rounded shrink-0">
                                                                 {formatTaskId(p?.slug || "TASK", t.taskNumber)}
                                                             </span> */}
-                                                            <span className="truncate">{t.name}</span>
+                                                            <span className="truncate text-xs">{t.name}</span>
                                                         </>
                                                     );
                                                 })()}
@@ -337,10 +337,10 @@ export function AddTimesheetEntryModal({
                         </Popover>
                     </div>
 
-                    <div className="rounded-md border border-input bg-muted p-3">
-                        <div className="mb-3 flex items-center justify-between rounded-md bg-muted px-2 py-1">
+                    <div className="rounded-md border border-input bg-muted py-1 px-2">
+                        <div className="mb-1 flex items-center justify-between rounded-md bg-muted px-1 py-1">
                             {/* Left */}
-                            <Label className="whitespace-nowrap text-muted-foreground">
+                            <Label className="whitespace-nowrap text-muted-foreground text-xs">
                                 Log Time
                             </Label>
 
@@ -359,7 +359,7 @@ export function AddTimesheetEntryModal({
                                     data-testid="input-log-hours"
                                     type="number"
                                     min={0}
-                                    className="h-8 w-25 border-muted-foreground bg-background"
+                                    className="h-6 w-25 border-muted-foreground bg-background placeholder:text-xs text-xs"
                                     placeholder="Hours"
                                     value={logHours === 0 ? "" : logHours}
                                     onFocus={() => {
@@ -382,7 +382,7 @@ export function AddTimesheetEntryModal({
                                     type="number"
                                     min={0}
                                     max={59}
-                                    className="h-8 w-25 border-muted-foreground bg-background"
+                                    className="h-6 w-25 border-muted-foreground bg-background placeholder:text-xs text-xs"
                                     placeholder="Mins"
                                     value={logMinutes === 0 ? "" : logMinutes}
                                     onBlur={() => {
@@ -398,33 +398,34 @@ export function AddTimesheetEntryModal({
                                 />
 
 
-                                <Button
+                                {/* <Button
                                     variant="outline"
                                     className="h-8 w-9 p-0 bg-background"
                                 >
                                     <CirclePlay className="h-4 w-4 text-muted-foreground" />
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
 
-                        <Separator className="bg-border h-1.5 my-2" />
+                        <Separator className="bg-border h-1.5 my-1" />
 
-                        <div className="mt-3 flex items-center gap-2 text-muted-foreground">
+                        <div className="mt-2 flex items-center gap-2 text-muted-foreground">
                             <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                         data-testid="btn-select-date"
-                                        variant="secondary"
+                                        variant="outline"
                                         size="sm"
                                         className={cn(
-                                            "h-8 px-3 font-normal hover:bg-muted text-xs w-[150px] flex items-center justify-center rounded-xs cursor-pointer",
+                                            "h-7 px-3 font-normal hover:bg-muted text-xs flex items-center justify-start gap-2 rounded-md cursor-pointer",
                                             !selectedDate && "text-muted-foreground"
                                         )}
                                     >
+                                        <Calendar className="h-4 w-4 text-muted-foreground" />
                                         {selectedDate ? (
                                             formatLocalDate(selectedDate)
                                         ) : (
-                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            "Select date"
                                         )}
                                     </Button>
                                 </PopoverTrigger>
@@ -447,13 +448,13 @@ export function AddTimesheetEntryModal({
                                         data-testid="btn-select-time-range"
                                         variant="outline"
                                         className={`
-                                            h-9 bg-muted text-muted-foreground
+                                            h-7 bg-muted text-muted-foreground
                                             flex items-center gap-2 justify-start
                                             transition-all duration-200
-                                            ${hasTimeSelected ? "w-53.75 px-3" : "w-9 p-0 justify-center"}
+                                            ${hasTimeSelected ? "w-53.75 px-3" : "w-7 p-0 justify-center"}
                                         `}
                                     >
-                                        <Clock className="h-4 w-4 shrink-0" />
+                                        <Clock className="h-3 w-3 shrink-0" />
                                         {hasTimeSelected && (
                                             <span className="truncate">
                                                 {formatTime(startHour, startMinute, startPeriod)} -{" "}
@@ -551,44 +552,43 @@ export function AddTimesheetEntryModal({
                     </div>
                     <div className="space-y-1">
                         <Label>Notes</Label>
-                        {/* <RichTextEditor placeholder="Enter your note here...." /> */}
-                        <RichTextEditor
-                            value={notes}
-                            onChange={setNotes}
+                        {/* <Separator className="bg-border h-1.5 my-1" /> */}
+                        <ProseMirrorEditor
+                            initialContent={notes}
+                            onBlur={setNotes}
                             placeholder="Enter your note here...."
-                            className="min-h-[40px]"
+                            className="min-h-[10px] border border-input rounded-md bg-background px-3 py-2 text-sm"
+                            editable={true}
                         />
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                    {/* Left side */}
-                    {/* <div className="flex items-center gap-2">
-                        <Checkbox
-                            data-testid="checkbox-billable"
-                            checked={billable}
-                            onCheckedChange={(value) => setBillable(Boolean(value))}
-                            className="border-primary border-2"
-                        />
-                        <Label className="text-sm text-foreground">
-                            Billable
-                        </Label>
-                    </div> */}
-
-                    {/* Right side */}
+                <div className="flex items-center justify-end -mb-2">
                     <Button
                         data-testid="btn-submit-timesheet-entry"
                         variant="outline"
-                        disabled={!selectedProject || !selectedTask || (logHours * 60 + logMinutes) === 0 || isSubmitting}
+                        disabled={
+                            !selectedProject ||
+                            !selectedTask ||
+                            (logHours * 60 + logMinutes) === 0 ||
+                            isSubmitting
+                        }
                         onClick={handleEntry}
-                        className={`px-10 py-5 transition-colors cursor-pointer
+                        className={`px-10 py-1 transition-colors cursor-pointer text-sm
                             ${selectedProject
                                 ? "bg-primary text-primary-foreground border-primary hover:bg-primary hover:text-primary-foreground"
                                 : "bg-muted text-muted-foreground border-muted-foreground"
                             }
-                        `}>
+                        `}
+                    >
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isSubmitting ? (initialData ? "Updating..." : "Adding...") : (initialData ? "Update Entry" : "Add Entry")}
+                        {isSubmitting
+                            ? initialData
+                                ? "Updating..."
+                                : "Adding..."
+                            : initialData
+                                ? "Update Entry"
+                                : "Add Entry"}
                     </Button>
                 </div>
             </DialogContent>

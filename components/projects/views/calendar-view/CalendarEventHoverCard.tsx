@@ -312,9 +312,9 @@ export const CalendarEventHoverCard = ({
             })()}
           </div>
 
-          <div>
+          {/* <div>
             <MoreHorizontalIcon className="h-4 w-4" />
-          </div>
+          </div> */}
         </div>
 
         {/* Task Name - ALWAYS show */}

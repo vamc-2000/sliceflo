@@ -85,11 +85,11 @@ export default function ExploreApps({ onBack, onConfigureApp }: ExploreAppsProps
             placeholder="Search Apps"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-10 pl-9 pr-4 rounded-full border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+            className="w-full h-10 pl-9 pr-4 rounded-full border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/30 transition"
           />
         </div>
         <Button
-          className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-primary-foreground h-10 px-5 rounded-md font-medium text-sm flex items-center gap-2"
+          className="bg-brand hover:bg-brand/90 text-brand-foreground h-10 px-5 rounded-md font-medium text-sm flex items-center gap-2"
           onClick={onBack}
         >
           <Plug className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function ExploreApps({ onBack, onConfigureApp }: ExploreAppsProps
             <div
               key={app.id}
               className="flex items-center justify-between gap-4 px-5 py-4 rounded-lg border border-border bg-card hover:bg-muted/30 transition-colors"
-              style={{ borderLeft: "4px solid var(--primary)" }}
+              style={{ borderLeft: "4px solid var(--brand)" }}
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
@@ -127,7 +127,7 @@ export default function ExploreApps({ onBack, onConfigureApp }: ExploreAppsProps
                 </div>
               </div>
               <Button
-                className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-primary-foreground h-9 px-5 rounded-md font-medium text-sm flex-shrink-0"
+                className="bg-brand hover:bg-brand/90 text-brand-foreground h-9 px-5 rounded-md font-medium text-sm flex-shrink-0"
                 onClick={() => onConfigureApp(app.id)}
               >
                 Configure

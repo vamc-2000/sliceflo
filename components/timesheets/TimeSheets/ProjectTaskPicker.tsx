@@ -110,9 +110,9 @@ export default function ProjectTaskPicker({
                           h-4 w-4 rounded-full border-2 flex items-center justify-center
                           transition-colors
                           ${selectedProjectId === project.id
-                              ? "border-primary"
-                              : "border-muted-foreground"
-                            }
+                            ? "border-primary"
+                            : "border-muted-foreground"
+                          }
                         `}
                       >
                         {selectedProjectId === project.id && (
@@ -120,7 +120,7 @@ export default function ProjectTaskPicker({
                         )}
                       </div>
 
-                      <span className="text-base">
+                      <span className="text-xs">
                         {project.name}
                       </span>
                     </div>
@@ -159,9 +159,9 @@ export default function ProjectTaskPicker({
                               h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0
                               transition-colors
                               ${selectedTaskId === task.id
-                                                      ? "border-primary"
-                                                      : "border-muted-foreground"
-                                                    }
+                                ? "border-primary"
+                                : "border-muted-foreground"
+                              }
                             `}
                           >
                             {selectedTaskId === task.id && (
@@ -176,7 +176,7 @@ export default function ProjectTaskPicker({
 
                           {/* Task Name Column */}
                           <div
-                            className="truncate text-sm text-foreground"
+                            className="truncate text-xs text-foreground"
                             title={task.name}
                           >
                             {task.name}

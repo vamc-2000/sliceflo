@@ -17,12 +17,12 @@ interface ThemeStepProps {
     showDots?: boolean;
 }
 
-export type ThemeType = "light" | "dark" | "default";
+export type ThemeType = "light" | "dark" | "system";
 
 const themeOptions = [
     { value: "light", label: "Light Mode", image: "/themes/light.svg" },
     { value: "dark", label: "Dark Mode", image: "/themes/dark.svg" },
-    { value: "default", label: "Default", image: "/themes/default.svg" },
+    { value: "system", label: "System Default", image: "/themes/default.svg" },
 ];
 
 export default function ThemeStep({
@@ -36,7 +36,7 @@ export default function ThemeStep({
     const { user, updateUserProfile } = useProfileStore();
 
     // Local state management - initialize from store if exists
-    const [selectedTheme, setSelectedTheme] = useState<ThemeType>("default");
+    const [selectedTheme, setSelectedTheme] = useState<ThemeType>("system");
 
     const isFormValid = !!selectedTheme;
 
@@ -61,7 +61,7 @@ export default function ThemeStep({
     const handleSkip = async () => {
         try {
             await updateUserProfile({
-                displaySettings: { theme: "default" },
+                displaySettings: { theme: "system" },
             });
 
             onNext();

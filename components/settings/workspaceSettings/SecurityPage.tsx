@@ -237,7 +237,7 @@ export default function SecurityPage() {
   return (
     <div className="w-full space-y-3">
       <div className="mb-2">
-        <h1 className="text-xl font-semibold text-[var(--primary)] tracking-tight" data-testid="security-page-title">Security</h1>
+        <h1 className="text-xl font-semibold text-brand tracking-tight" data-testid="security-page-title">Security</h1>
         <p className="text-sm text-muted-foreground">Manage your workspace security settings</p>
       </div>
 
@@ -335,7 +335,7 @@ export default function SecurityPage() {
                   <Button
                     size="sm"
                     onClick={handleInitiateVerification}
-                    className="bg-primary text-white"
+                    className="bg-brand hover:bg-brand/90 text-brand-foreground"
                     data-testid="security-domains-save-btn"
                   >
                     Add Domain
@@ -358,7 +358,7 @@ export default function SecurityPage() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[var(--primary)]">{domain.name}</p>
+                      <p className="text-sm font-medium text-foreground">{domain.name}</p>
                       <p className="text-xs text-muted-foreground">Added on: {domain.addedOn}</p>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function SecurityPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEditDomain(domain)}
-                      className="h-8 w-8 text-gray-400 hover:text-primary hover:bg-gray-100"
+                      className="h-8 w-8 text-gray-400 hover:text-brand hover:bg-muted"
                       data-testid={`security-domain-edit-btn-${domain.id}`}
                     >
                       <Pencil size={14} />
@@ -405,7 +405,7 @@ export default function SecurityPage() {
                 placeholder="000000"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
-                className="tracking-[1em] text-center font-mono text-2xl h-14 border-2 focus-visible:ring-primary"
+                className="tracking-[1em] text-center font-mono text-2xl h-14 border-2 focus-visible:ring-brand"
                 data-testid="security-verification-code-input"
               />
             </div>
@@ -416,7 +416,7 @@ export default function SecurityPage() {
               </Button>
               <Button
                 onClick={handleVerifyAndSave}
-                className="bg-primary text-white px-8 h-10"
+                className="bg-brand hover:bg-brand/90 text-brand-foreground px-8 h-10"
                 data-testid="security-verification-verify-btn"
               >
                 Verify

@@ -354,7 +354,6 @@ export function DraftDetailView({
                                                                             else if (e.key === "Escape") { setIsAddingSubDraft(false); setNewSubDraftTitle(""); }
                                                                         }}
                                                                         autoFocus
-                                                                        maxLength={250}
                                                                     />
                                                                 </td>
                                                                 <td colSpan={4} className="p-3 text-xs text-muted-foreground opacity-50">—</td>

@@ -258,7 +258,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
     switch (type.toLowerCase()) {
       case "document":    return <FileText className="w-5 h-5 text-gray-600" />;
       case "spreadsheet": return <TableIcon className="w-5 h-5 text-gray-600" />;
-      case "csv":         return <TableIcon className="w-5 h-5 text-blue-500" />;
+      case "csv":         return <TableIcon className="w-5 h-5 text-gray-600" />;
       default:
         return (
           <NextImage
@@ -281,8 +281,8 @@ const onDataImported = useCallback(async (uploadData: any) => {
     <div className="w-full space-y-2">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[var(--primary)] tracking-tight" data-testid="import-auth-title">Import &amp; Authorization</h2>
-        <p className="text-xs text-[#8E8E93]">Manage your imports and app authorization</p>
+        <h2 className="text-lg font-semibold text-brand tracking-tight" data-testid="import-auth-title">Import &amp; Authorization</h2>
+        <p className="text-xs text-muted-foreground">Manage your imports and app authorization</p>
       </div>
 
       {/* My Imports */}
@@ -296,7 +296,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
         actionButton={
           <div className="flex flex-col items-end gap-2">
             <Button
-              className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white"
+              className="bg-brand hover:bg-brand/90 text-brand-foreground"
               onClick={() => showWidget({})}
               disabled={!isImplerInitiated}
               data-testid="import-auth-import-btn"
@@ -310,12 +310,12 @@ const onDataImported = useCallback(async (uploadData: any) => {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-border rounded-lg" data-testid="import-auth-imports-table">
             <thead>
-              <tr className="bg-[#F6FAFF]">
-                <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Type of import</th>
-                <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Import Status</th>
-                <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Imported number</th>
-                <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Expiry Date &amp; Time</th>
-                <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Action</th>
+              <tr className="bg-muted/50">
+                <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Type of import</th>
+                <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Import Status</th>
+                <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Imported number</th>
+                <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Expiry Date &amp; Time</th>
+                <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -324,14 +324,14 @@ const onDataImported = useCallback(async (uploadData: any) => {
                   <td className="border border-border px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 flex items-center justify-center">{getTypeIcon(item.type)}</div>
-                      <span className="text-sm text-[var(--primary)]">{item.type}</span>
+                      <span className="text-sm text-foreground">{item.type}</span>
                     </div>
                   </td>
                   <td className="border border-border px-4 py-3 text-center">
                     {getStatusBadge(item.status, item.statusColor)}
                   </td>
-                  <td className="border border-border px-4 py-3 text-sm text-[var(--primary)]">{item.importedNumber}</td>
-                  <td className="border border-border px-4 py-3 text-sm text-[var(--primary)]">{item.expiryDate}</td>
+                  <td className="border border-border px-4 py-3 text-sm text-foreground">{item.importedNumber}</td>
+                  <td className="border border-border px-4 py-3 text-sm text-foreground">{item.expiryDate}</td>
                   <td className="border border-border px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
                       <button
@@ -339,7 +339,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                         onClick={() => toast("info", { title: "Info", description: item.importedNumber })}
                         data-testid={`import-auth-import-view-btn-${item.id}`}
                       >
-                        <Eye className="w-4 h-4 text-[var(--primary)]" />
+                        <Eye className="w-4 h-4 text-brand" />
                       </button>
                       <button
                         className="p-2 hover:bg-gray-100 rounded transition-colors"
@@ -419,7 +419,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
           
           <div className="flex justify-end pt-2">
              <Button 
-               className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white px-8 h-10 rounded-md font-medium"
+               className="bg-brand hover:bg-brand/90 text-brand-foreground px-8 h-10 rounded-md font-medium"
                onClick={handleExportData}
                disabled={isExporting}
                data-testid="import-auth-export-submit-btn"
@@ -432,10 +432,10 @@ const onDataImported = useCallback(async (uploadData: any) => {
           {activeSection === "exports" && (
             <div className="mt-6 space-y-3 pt-4 border-t border-border">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-[var(--primary)]">Recent Exports</h4>
+                <h4 className="text-sm font-semibold text-brand">Recent Exports</h4>
                 <button
                   onClick={() => fetchExports({ limit: 50, offset: 0 })}
-                  className="p-1.5 hover:bg-gray-150 rounded transition-colors text-slate-500"
+                  className="p-1.5 hover:bg-muted rounded transition-colors text-muted-foreground"
                   disabled={isLoadingExports}
                   title="Refresh Exports"
                   data-testid="import-auth-exports-refresh-btn"
@@ -448,21 +448,21 @@ const onDataImported = useCallback(async (uploadData: any) => {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse border border-border rounded-lg" data-testid="import-auth-exports-table">
                     <thead>
-                      <tr className="bg-[#F6FAFF]">
-                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-left">Project Name</th>
-                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Format</th>
-                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Status</th>
-                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Requested At</th>
-                        <th className="border border-border px-4 py-3 text-xs font-semibold text-[var(--primary)] text-center">Actions</th>
+                      <tr className="bg-muted/50">
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-left">Project Name</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Format</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Status</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Requested At</th>
+                        <th className="border border-border px-4 py-3 text-xs font-semibold text-brand text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {exports.map((item) => (
                         <tr key={item.id} className="hover:bg-slate-50 transition-colors" data-testid={`import-auth-export-row-${item.id}`}>
-                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] font-medium">
+                          <td className="border border-border px-4 py-3 text-sm text-foreground font-medium">
                             {item.projectName}
                           </td>
-                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] text-center font-medium">
+                          <td className="border border-border px-4 py-3 text-sm text-foreground text-center font-medium">
                             {item.format.toUpperCase()}
                           </td>
                           <td className="border border-border px-4 py-3 text-center">
@@ -476,7 +476,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                               <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Failed</Badge>
                             )}
                           </td>
-                          <td className="border border-border px-4 py-3 text-sm text-[var(--primary)] text-center">
+                          <td className="border border-border px-4 py-3 text-sm text-foreground text-center">
                             {formatDate(new Date(item.requestedAt))}
                           </td>
                           <td className="border border-border px-4 py-3">

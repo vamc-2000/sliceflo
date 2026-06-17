@@ -259,8 +259,8 @@ export default function GeneralPage() {
       <div className="space-y-2">
         <h3 className="text-base font-semibold text-foreground" data-testid="general-org-title">Organization</h3>
         <div className="flex items-center gap-3 p-4 bg-muted border border-border rounded-lg transition-colors" data-testid="general-org-box">
-          <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">SF</span>
+          <div className="w-10 h-10 rounded-md bg-brand flex items-center justify-center">
+            <span className="text-brand-foreground font-bold text-sm">SF</span>
           </div>
           <span className="font-medium text-sm text-foreground">SliceFlo</span>
         </div>
@@ -298,14 +298,14 @@ export default function GeneralPage() {
                       {/* Render the Owner first */}
                       {workspaceOwner && (
                         <Avatar 
-                          className="inline-block h-6 w-6 rounded-full ring-2 ring-background border border-primary cursor-pointer hover:opacity-80 transition-opacity"
+                          className="inline-block h-6 w-6 rounded-full ring-2 ring-background border border-brand cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => handleOpenProfile(workspaceOwner)}
                         >
                           <AvatarImage
                             src={workspaceOwner.profilePictureUrl}
                             alt={workspaceOwner.email}
                           />
-                          <AvatarFallback className="text-[10px] bg-primary text-primary-foreground">
+                          <AvatarFallback className="text-[10px] bg-muted text-muted-foreground">
                             {workspaceOwner.email?.charAt(0).toUpperCase() || 'O'}
                           </AvatarFallback>
                         </Avatar>
@@ -359,7 +359,7 @@ export default function GeneralPage() {
                   value={editData[ws.id!]?.name ?? ws.name}
                   onChange={(e) => handleInputChange(ws.id!, 'name', e.target.value)}
                   placeholder="e.g. Marketing"
-                  className="w-full h-10 px-3 bg-card border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground transition-colors"
+                  className="w-full h-10 px-3 bg-card border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand text-foreground transition-colors"
                   data-testid={`general-workspace-name-input-${ws.id}`}
                 />
               </div>
@@ -380,7 +380,7 @@ export default function GeneralPage() {
                   maxLength={10}
                   className={`w-full h-10 px-3 border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none font-medium transition-colors ${ws.slug
                     ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-70'
-                    : 'bg-card text-foreground focus:ring-2 focus:ring-primary focus:border-primary'
+                    : 'bg-card text-foreground focus:ring-2 focus:ring-brand focus:border-brand'
                     }`}
                   data-testid={`general-workspace-slug-input-${ws.id}`}
                 />
@@ -432,7 +432,7 @@ export default function GeneralPage() {
               </button>
               <Button
                 onClick={() => handleUpdateWorkspace(ws.id!)}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                className="bg-brand hover:bg-brand/90 text-brand-foreground px-8"
                 data-testid={`general-workspace-update-btn-${ws.id}`}
               >
                 Update workspace
@@ -470,11 +470,11 @@ export default function GeneralPage() {
                             <>
                               {owner && (
                                 <Avatar 
-                                  className="inline-block h-6 w-6 rounded-full ring-2 ring-background border border-primary cursor-pointer hover:opacity-80 transition-opacity"
+                                  className="inline-block h-6 w-6 rounded-full ring-2 ring-background border border-brand cursor-pointer hover:opacity-80 transition-opacity"
                                   onClick={() => handleOpenProfile(owner)}
                                 >
                                   <AvatarImage src={owner.profilePictureUrl} alt={owner.email} />
-                                  <AvatarFallback className="text-[10px] bg-primary text-primary-foreground">
+                                  <AvatarFallback className="text-[10px] bg-muted text-muted-foreground">
                                     {owner.email?.charAt(0).toUpperCase() || "O"}
                                   </AvatarFallback>
                                 </Avatar>
@@ -556,7 +556,7 @@ export default function GeneralPage() {
                   <div className="flex justify-end items-center px-6 py-4 border-t border-border">
                     <Button
                       onClick={() => handleUpdateWorkspace(ws.id!)}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                      className="bg-brand hover:bg-brand/90 text-brand-foreground px-8"
                       data-testid={`general-shared-workspace-update-btn-${ws.id}`}
                     >
                       Update workspace

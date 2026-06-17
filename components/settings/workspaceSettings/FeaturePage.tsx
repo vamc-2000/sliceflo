@@ -46,7 +46,7 @@ export default function FeaturePage() {
         <div className="w-full space-y-1">
             {/* Header section */}
             <div className="space-y-1">
-                <h2 className="text-lg font-semibold text-[var(--primary)] dark:text-white tracking-tight">
+                <h2 className="text-lg font-semibold text-brand tracking-tight">
                     Features
                 </h2>
                 <p className="text-[14px] text-muted-foreground font-medium">
@@ -61,18 +61,18 @@ export default function FeaturePage() {
                         key={feature.id}
                         className={cn(
                             "group relative flex items-center justify-between p-4 bg-card rounded-lg border border-border shadow-sm transition-all",
-                            "border-l-[4px] border-l-[var(--primary)]"
+                            "border-l-[4px] border-l-brand"
                         )}
                     >
                         <div className="flex items-center gap-5">
                             {/* Icon Box */}
-                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border/50 text-muted-foreground group-hover:text-[var(--primary)] transition-colors">
+                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border/50 text-muted-foreground group-hover:text-brand transition-colors">
                                 <LayoutGrid className="w-4 h-4" />
                             </div>
 
                             {/* Text Content */}
                             <div className="space-y-1">
-                                <h3 className="text-[12px] font-semibold text-[var(--primary)] dark:text-white leading-tight">
+                                <h3 className="text-[12px] font-semibold text-brand leading-tight">
                                     {feature.title}
                                 </h3>
                                 <p className="text-[10px] text-muted-foreground font-medium max-w-2xl leading-relaxed">

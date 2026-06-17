@@ -65,7 +65,6 @@ const DuplicateDraftTaskDialog: React.FC<DuplicateDraftTaskDialogProps> = ({
                                     setNewName(e.target.value);
                                     setHasNameChanged(e.target.value !== originalTaskName);
                                 }}
-                                maxLength={250}
                                 className="h-10"
                             />
                         </div>

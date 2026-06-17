@@ -326,7 +326,7 @@ export default function TeamAllWork() {
   if (!activeTeam) {
     if (isLoading) {
       return (
-        <div 
+        <div
           data-testid="team-all-work-loading"
           className="flex h-full items-center justify-center text-muted-foreground"
         >
@@ -335,7 +335,7 @@ export default function TeamAllWork() {
       );
     }
     return (
-      <div 
+      <div
         data-testid="team-all-work-no-team"
         className="flex h-full items-center justify-center text-muted-foreground"
       >
@@ -398,9 +398,9 @@ export default function TeamAllWork() {
           {/* Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
+              <Button
                 data-testid="btn-allwork-filter-trigger"
-                variant="outline" 
+                variant="outline"
                 className="flex items-center gap-2 bg-muted text-muted-foreground hover:bg-muted/85 hover:text-foreground"
               >
                 <Filter className="h-4 w-4" />
@@ -660,8 +660,8 @@ export default function TeamAllWork() {
           const memberStatusStats = getMemberStatusStats(member.tasks);
 
           return (
-            <Card 
-              key={member.id} 
+            <Card
+              key={member.id}
               data-testid={`member-card-${member.id}`}
               className="border-l-4 border-l-primary overflow-hidden py-3!"
             >

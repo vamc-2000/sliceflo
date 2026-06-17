@@ -74,12 +74,12 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
         const weekStartStr = format(selectedWeek.start, "yyyy-MM-dd");
         const weekEntries = timesheets.filter(t => t.weekStart === weekStartStr);
         if (weekEntries.length === 0) return "Draft";
-        
+
         // Priority: Approved > Pending > Rejected > Draft
         if (weekEntries.some(e => e.status === "Approved")) return "Approved";
         if (weekEntries.some(e => e.status === "Pending")) return "Pending";
         if (weekEntries.some(e => e.status === "Rejected")) return "Rejected";
-        
+
         return "Draft";
     }, [selectedWeek, timesheets]);
 
@@ -88,9 +88,9 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
         const weekStartStr = format(selectedWeek.start, "yyyy-MM-dd");
         const weekEntries = timesheets.filter(t => t.weekStart === weekStartStr);
         if (weekEntries.length === 0) return false;
-        
+
         // Disable buttons ONLY if every entry in the week is either "Pending" (without rejectedAt) or "Approved"
-        return weekEntries.every(e => 
+        return weekEntries.every(e =>
             (e.status === "Pending" && !e.rejectedAt) || e.status === "Approved"
         );
     }, [selectedWeek, timesheets]);
@@ -221,7 +221,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 </button>
 
                 {weekNumber && (
-                    <span className="text-[15px] font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         Week {weekNumber}
                     </span>
                 )}
@@ -237,11 +237,11 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                             data-testid="btn-approvers"
                             variant="ghost"
                             // disabled={isFrozen}
-                            className="bg-muted text-foreground hover:bg-muted/80 h-10 px-4 flex items-center gap-3 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-muted text-foreground hover:bg-muted/80 h-10 py-3 px-4 flex items-center gap-3 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Users className="h-5 w-5 text-foreground" strokeWidth={2} />
-                            <span className="text-[15px] font-medium text-foreground">Approvers</span>
-                            <span className="text-[15px] font-medium text-foreground ml-1">{approversCount}</span>
+                            <span className="text-sm font-medium text-foreground">Approvers</span>
+                            <span className="text-sm font-medium text-foreground ml-1">{approversCount}</span>
                         </Button>
                     }
                 />
@@ -250,7 +250,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 {myView === "timesheet" && (
                     <Button
                         data-testid="btn-add-entry"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 py-5 px-5! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-primary text-primary-foreground text-sm hover:bg-primary/90 py-3 px-4! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={onAddEntry}
                         disabled={isFrozen}
                     >
@@ -262,7 +262,7 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                 {myView === "clipboard" && (
                     <Button
                         data-testid="btn-send-approval"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 py-5 px-5! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-primary text-primary-foreground text-sm hover:bg-primary/90 py-3 px-4! cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => setOpenApproval(true)}
                         disabled={isFrozen}
                     >

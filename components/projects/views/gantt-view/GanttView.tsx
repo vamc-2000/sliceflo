@@ -1306,7 +1306,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
-                      className={`p-0 transition-all duration-200 border-b-5 border-b-primary ${hasSelectedSortFields ? "w-[620px]" : "w-[420px]"}`}
+                      className={`p-0 transition-all duration-200 border-0 border-b-[5px] border-b-primary ${hasSelectedSortFields ? "w-[620px]" : "w-[420px]"}`}
                     >
                       <div className="flex items-center justify-between px-4 py-3">
                         <h3 className="text-xs font-semibold text-primary">
@@ -1477,7 +1477,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
-                      className="px-2 py-2 border-b-5 border-b-primary w-50 "
+                      className="px-2 py-2 border-0 border-b-[5px] border-b-primary w-50 "
                     >
                       {/* Quick Filters */}
                       <div className="space-y-1 mb-1 ">
@@ -1624,7 +1624,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-auto p-2 border-0 border-b-[5px] border-primary">
+                          <DropdownMenuSubContent className="w-auto p-2 border-0 border-b-[5px] border-b-primary">
                             <CalendarPicker
                               selectedDate={(() => {
                                 const existing = filterConfig.find(
@@ -1771,7 +1771,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         Display
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-64 p-2 border-b-5 border-b-primary">
+                    <DropdownMenuContent className="w-64 p-2 border-0 border-b-[5px] border-b-primary">
                       {/* Collapsed Subtasks */}
                       <div className="flex items-center justify-between py-2">
                         <Label
@@ -1915,7 +1915,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-2 border-0 border-b-[5px] border-primary"
+                  className="w-auto p-2 border-0 border-b-[5px] border-b-primary"
                   align="center"
                 >
                   <CalendarPicker

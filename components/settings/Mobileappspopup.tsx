@@ -21,17 +21,17 @@ const MobileAppPopup: React.FC<Props> = ({ open, onClose }) => {
 
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-center justify-center w-full bg-black/50">
-      <div className="bg-card dark:bg-gray-900 text-[var(--primary)] dark:text-white rounded-xl shadow-lg w-full max-w-4xl p-6 relative mx-4 border-b-4 border-[var(--primary)]">
+      <div className="bg-card dark:bg-gray-900 text-foreground dark:text-white rounded-xl shadow-lg w-full max-w-4xl p-6 relative mx-4 border-b-4 border-brand">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-[var(--primary)] dark:hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-brand dark:hover:text-white transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <h2 className="text-xl font-semibold mb-6 text-[var(--primary)] dark:text-white">
+        <h2 className="text-xl font-semibold mb-6 text-brand dark:text-white">
           Download App
         </h2>
 
@@ -73,7 +73,7 @@ const MobileAppPopup: React.FC<Props> = ({ open, onClose }) => {
               OR
             </div>
 
-            <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white py-2 px-6 rounded-md text-sm transition-colors">
+            <Button className="bg-brand hover:bg-brand/90 text-brand-foreground py-2 px-6 rounded-md text-sm transition-colors">
               Email me the download link
             </Button>
           </div>

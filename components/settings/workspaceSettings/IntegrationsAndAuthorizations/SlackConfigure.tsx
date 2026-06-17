@@ -69,7 +69,7 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
       {/* ── Connection Status card ─────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-border bg-card">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center flex-shrink-0">
             <Image
               src="/images/settings/Slack.svg"
               alt="Slack"
@@ -102,8 +102,8 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Overview ───────────────────────────────────────────── */}
       <div className="px-5 py-5 rounded-xl border border-border bg-card space-y-2">
-        <p className="text-lg font-semibold text-[#1E1E1E]">Overview</p>
-        <p className="text-sm text-[#757575] leading-relaxed">
+        <p className="text-lg font-semibold text-foreground">Overview</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
           The Slack integration makes it easy to create, update, and view SliceFlo tasks from Slack.
           Notifications and synced threads keep colleagues in the loop on projects and tasks.
           {showFullOverview && (
@@ -123,8 +123,8 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Personal Slack account ─────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-3.5 rounded-xl border border-border bg-card">
-        <p className="text-lg text-[#1E1E1E]">Personal Slack account not connected</p>
-        <button className="flex items-center gap-1 text-xs text-[#B3B3B3] hover:text-foreground transition-colors font-medium">
+        <p className="text-lg text-foreground">Personal Slack account not connected</p>
+        <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
           Connected accounts
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -132,7 +132,7 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Connection Status section ──────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Connection Status
         </p>
         <ConnectedWorkspaceRow label="Connected workspaces" onAdd={addWorkspace} />
@@ -140,10 +140,10 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Settings section ───────────────────────────────────── */}
       <div className="space-y-1.5">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Settings
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           To better keep your team aware of changes in Linear, you can connect Linear teams to
           specific Slack channels. Go to &quot;Notifications&quot; in team&apos;s settings to set
           up Slack notifications.
@@ -152,10 +152,10 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Linkbacks section ──────────────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Linkbacks
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Automatically reply in a thread with a link to the Linear issue when its issue identifier
           is mentioned in a Slack channel the Linear bot is a member of. We&apos;ll only link the
           issue once every 60 minutes per Slack thread. Issues in private teams will not be linked.
@@ -165,10 +165,10 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Unfurls section ────────────────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Unfurls
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Show expanded previews of issues, comments, documents and more when shared in Slack.
           Allow taking actions from issue unfurl menus in Slack when people are reading threads,
           commenting or assigning to yourself. Links from private teams will not be unfurled.
@@ -179,10 +179,10 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Issue templates section ────────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Issue templates available in Slack
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Add team or workspace issue templates to make them available in Slack
         </p>
         <ConnectedWorkspaceRow label="No Slack workspaces connected" onAdd={addWorkspace} />
@@ -193,10 +193,10 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Project channels section ───────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Project channels
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Automatically create a Slack channel when a new project is created. Project members will
           be invited to the channel and receive project updates.
         </p>
@@ -208,40 +208,40 @@ export default function SlackConfigure({ onBack, onBackToIntegrations }: SlackCo
 
       {/* ── Linear Agent section ───────────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Linear Agent
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Linear Agent uses AI to create issues from Slack messages. Once enabled, you can mention
           @Linear in channels or threads, or DM it directly to search issues, create new ones, and
           get help with your workspace.
         </p>
 
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Code Intelligence
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Allow Linear Agent to analyze code and answer questions about your repositories when triggered in the Slack workspace.
         </p>
 
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Slack workflow access
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Allow Linear Agent to act with workspace-wide access to non-private team data when triggered by Slack workflows.
         </p>
 
-        <p className="text-lg font-semibold text-[#B0B0B0]">
+        <p className="text-lg font-semibold text-foreground">
           Workspace guidance
         </p>
-        <p className="text-sm text-[#B3B3B3] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Guide how Linear Agent creates issues by providing instructions or examples. You can also @mention teams, people, or link to docs for reference.
         </p>
 
         {/* Separator */}
         <div className="border-t border-border pt-2" />
 
-        <p className="text-sm text-[#B3B3B3]">
+        <p className="text-sm text-muted-foreground">
           Linear Agent is not enabled for any workspace.
         </p>
       </div>

@@ -310,7 +310,7 @@ export default function UserManagementPage() {
             variant={role === "owner" ? "default" : "secondary"}
             className={
               role === "owner"
-                ? "bg-primary/10 text-primary hover:bg-primary/20 border-none shadow-none"
+                ? "bg-brand/10 text-brand hover:bg-brand/20 border-none shadow-none"
                 : "bg-muted text-muted-foreground border-none shadow-none"
             }
           >
@@ -422,7 +422,7 @@ export default function UserManagementPage() {
           <>
             <Button
               size="sm"
-              className="bg-primary hover:bg-primary/90 h-8 text-primary-foreground"
+              className="bg-brand hover:bg-brand/90 h-8 text-brand-foreground"
               onClick={() => setOpenInviteDialog(true)}
               data-testid="user-management-invite-btn"
             >

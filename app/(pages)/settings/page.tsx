@@ -9,7 +9,7 @@ import ProfileSettingsPage from "@/components/settings/accountSettings/ProfileSe
 import SettingsLayout from "@/components/layout/SettingPagesLayout";
 import Preference from "@/components/settings/accountSettings/Preferences";
 import NotificationsPage from "@/components/settings/accountSettings/NotificationsPage";
-import SocialLinksPage from "@/components/settings/accountSettings/SocialLinksPage";
+// import SocialLinksPage from "@/components/settings/accountSettings/SocialLinksPage";
 import SecurityAndPasswordPage from "@/components/settings/accountSettings/SecurityAndPasswordPage";
 import Developer from "@/components/settings/accountSettings/Developer";
 import SessionHistory from "@/components/settings/accountSettings/SessionHistory";
@@ -24,7 +24,7 @@ import CleanUp from "@/components/settings/workspaceSettings/CleanUpPage";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import SecurityPage from "@/components/settings/workspaceSettings/SecurityPage";
 import UseRole from "@/components/settings/workspaceSettings/UseRole";
-import PermissionPage from "@/components/settings/workspaceSettings/PermissionPage";
+// import PermissionPage from "@/components/settings/workspaceSettings/PermissionPage";
 import FeaturePage from "@/components/settings/workspaceSettings/FeaturePage";
 
 //iduweiufhruihfr
@@ -38,11 +38,11 @@ const accountMenuItems: MenuItem[] = [
   { id: "profile", text: "Profile" },
   { id: "preferences", text: "Preferences" },
   { id: "notifications", text: "Notifications" },
-  { id: "socialLinks", text: "Social links" },
+  // { id: "socialLinks", text: "Social links" },
   { id: "billingsubscriptions", text: "Billing & Subscription" },
   { id: "security", text: "Security" },
   { id: "userrole", text: "User Roles" },
-  { id: "permissions", text: "Permissions" },
+  // { id: "permissions", text: "Permissions" },
   { id: "sessionhistory", text: "Session History" },
   { id: "acitvitylog", text: "Activity log" },
   { id: "accountmanagement", text: "Account Management" },
@@ -121,14 +121,14 @@ const SettingsPage = () => {
           return <Preference />;
         case "notifications":
           return <NotificationsPage />;
-        case "socialLinks":
-          return <SocialLinksPage />;
+        // case "socialLinks":
+        //   return <SocialLinksPage />;
         case "billingsubscriptions":
           return <PaymentsSubscriptionsPage />;
         case "security":
           return <SecurityAndPasswordPage />;
-        case "permissions":
-          return <PermissionPage />;
+        // case "permissions":
+        //   return <PermissionPage />;
         case "userrole":
           return <UseRole />;
         case "sessionhistory":

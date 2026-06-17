@@ -246,7 +246,7 @@ export function DataTableForTeams<
 
                 {/* User Submenu */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger 
+                  <DropdownMenuSubTrigger
                     data-testid="btn-filter-user"
                     className="flex items-center relative text-foreground"
                   >
@@ -296,7 +296,7 @@ export function DataTableForTeams<
 
                 {/* Project Submenu */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger 
+                  <DropdownMenuSubTrigger
                     data-testid="filter-submenu-project"
                     className="flex items-center relative text-foreground"
                   >
@@ -340,7 +340,7 @@ export function DataTableForTeams<
 
                 {/* Role Submenu */}
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger 
+                  <DropdownMenuSubTrigger
                     data-testid="filter-submenu-role"
                     className="flex items-center relative text-foreground"
                   >

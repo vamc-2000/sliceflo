@@ -1701,10 +1701,37 @@ export function CalendarView({ projectId }: CalendarViewProps) {
         ) : (
           // Calendar
           <div
-            className="flex-1 relative overflow-auto"
+            className={cn(
+              "flex-1 relative overflow-auto",
+              view === Views.DAY && "calendar-day-view",
+              view === Views.WEEK && "calendar-week-view"
+            )}
             onDragOver={(e) => {
               e.preventDefault(); // Allow drop
               e.dataTransfer.dropEffect = "move";
+            }}
+            onDrop={(e) => {
+              if (view === Views.DAY) {
+                const taskId = (window as any).draggedTaskId;
+                if (taskId) {
+                  const { updateTask, updateSubtask, tasks, subtasks } = useTasksStore.getState();
+                  const task = tasks.find((t) => t.id === taskId);
+                  const subtask = !task ? subtasks.find((s) => s.id === taskId) : null;
+                  
+                  const updates = {
+                    startDate: convertSelectedDateToUTC(date!),
+                    endDate: convertSelectedDateToUTC(date!),
+                  };
+
+                  if (subtask) {
+                    updateSubtask(taskId, updates);
+                  } else {
+                    updateTask(taskId, updates);
+                  }
+                  
+                  (window as any).draggedTaskId = null;
+                }
+              }
             }}
           >
             <DnDCalendar
@@ -1825,9 +1852,9 @@ export function CalendarView({ projectId }: CalendarViewProps) {
               // // Enable drag and drop
               onEventDrop={handleEventDrop}
               onEventResize={handleEventResize}
-              draggableAccessor={() => true}
-              resizable
-              resizableAccessor={() => true}
+              draggableAccessor={(event) => view !== Views.DAY}
+              resizable={view !== Views.DAY}
+              resizableAccessor={(event) => view !== Views.DAY}
             />
           </div>
         )}
@@ -1984,6 +2011,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
         .rbc-time-view .rbc-event {
           position: relative !important;
           margin: 4px !important;
+          width: auto !important;
           border-radius: 4px;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
@@ -1996,7 +2024,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
         }
 
         /* ===== DAY VIEW - TRANSPARENT WRAPPER FOR CUSTOM CARD ===== */
-        .rbc-time-view-day .rbc-event {
+        .calendar-day-view .rbc-time-view .rbc-event {
           background: transparent !important;
           border: none !important;
           padding: 0 !important;
@@ -2005,7 +2033,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
           overflow: visible !important;
         }
 
-        .rbc-time-view-day .rbc-event-content {
+        .calendar-day-view .rbc-time-view .rbc-event-content {
           background: transparent !important;
           border: none !important;
           padding: 0 !important;
@@ -2160,6 +2188,17 @@ export function CalendarView({ projectId }: CalendarViewProps) {
           opacity: 0.7 !important;
         }
 
+        /* Disable drag cursors and set default cursor in day view */
+        .calendar-day-view .rbc-event,
+        .calendar-day-view .rbc-event:hover,
+        .calendar-day-view .rbc-event-content,
+        .calendar-day-view .rbc-addons-dnd-drag-source,
+        .calendar-day-view .rbc-addons-dnd-dragging,
+        .calendar-day-view .rbc-addons-dnd-dragging .rbc-event,
+        .calendar-day-view [draggable="true"] {
+          cursor: default !important;
+        }
+
         /* ===== SHOW MORE LINK STYLING ===== */
 
         .rbc-show-more {
@@ -2275,18 +2314,18 @@ export function CalendarView({ projectId }: CalendarViewProps) {
 
         /* Ensure events are hoverable in week/month */
         .rbc-month-view .rbc-event,
-        .rbc-time-view-week .rbc-event {
+        .calendar-week-view .rbc-time-view .rbc-event {
           overflow: visible !important;
         }
 
         .rbc-month-view .rbc-event-content,
-        .rbc-time-view-week .rbc-event-content {
+        .calendar-week-view .rbc-time-view .rbc-event-content {
           overflow: hidden;
         }
 
         /* Day view events need visible overflow for custom card */
-        .rbc-time-view-day .rbc-event,
-        .rbc-time-view-day .rbc-event-content {
+        .calendar-day-view .rbc-time-view .rbc-event,
+        .calendar-day-view .rbc-time-view .rbc-event-content {
           overflow: visible !important;
         }
       `}</style>
