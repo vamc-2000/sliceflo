@@ -593,7 +593,7 @@ export default function ThreadCard({
         <Card
             className={`rounded-xl border bg-background mt-2 mb-2 ml-2 shadow-sm ${collapsed ? "p-0 overflow-hidden" : "px-2 pt-2 pb-1 gap-2"}`}
         >
-            <CardHeader className={`p-0 m-0 ${collapsed ? "" : "-mt-2 -mx-2 mb-2"}`}>
+            <CardHeader className={`p-0 m-0 ${collapsed ? "" : "-mt-2 -mx-2 mb-0.5"}`}>
                 <div className={`p-3 sticky top-0 z-10 ${collapsed ? "" : "border-b border-border rounded-t-xl"} ${isPinned ? "bg-orange-500/10" : "bg-background"}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -656,8 +656,8 @@ export default function ThreadCard({
             </CardHeader>
 
             {!collapsed && (
-                <CardContent className="p-0 pt-1 m-0">
-                    <div className="rounded-md px-3 py-2 border border-border w-[80%] flex flex-col gap-2">
+                <CardContent className="p-0 pt-0 m-0">
+                    <div className="bg-muted rounded-lg px-3 py-2 w-[80%] flex flex-col gap-2">
                         {thread.text && (
                             <p className="text-[0.75rem] text-muted-foreground">
                                 {thread.text}
@@ -742,7 +742,7 @@ export default function ThreadCard({
                                 {[1, 2].map((i) => (
                                     <div
                                         key={i}
-                                        className="ml-auto h-14 w-[80%] rounded-lg bg-muted animate-pulse"
+                                        className="ml-auto h-14 w-[90%] rounded-lg bg-muted animate-pulse"
                                     />
                                 ))}
                             </div>
@@ -758,7 +758,7 @@ export default function ThreadCard({
                                     }}
                                     className={`relative flex justify-end mt-1 group ${reply.pending ? "opacity-80" : ""}`}
                                 >
-                                    <div className="relative bg-muted rounded-lg px-4 py-2 w-[80%] ">
+                                    <div className="relative bg-muted rounded-lg px-4 py-2 w-[90%] ">
                                         {hoveredReplyId === getReplyId(reply) && (
                                             <div className="absolute top-1/2 -left-6 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {/* 👇 THIS is the anchor */}
@@ -885,7 +885,7 @@ export default function ThreadCard({
 
                                         <div className="bg-muted rounded-lg px-2 py-1 flex items-start gap-2">
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
+                                                <div className="flex items-center gap-2 mb-0.5">
                                                     {(() => {
                                                         const avatarUrl = getAuthorAvatar(reply.authorId);
                                                         const initials = getAuthorInitials(reply.authorId);
@@ -913,7 +913,7 @@ export default function ThreadCard({
                                                 </div>
 
                                                 {editId === getReplyId(reply) && editingThreadId === thread.id ? (
-                                                    <div className="flex flex-col flex-1 mt-1 relative">
+                                                    <div className="flex flex-col flex-1 mt-0.5 relative">
                                                         <div className="flex items-center gap-2">
                                                             <div className="relative flex-1 min-w-0">
                                                                 <div
@@ -1082,7 +1082,7 @@ export default function ThreadCard({
                                                                 reply.text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}\u200d]/gu, '').trim() === '';
 
                                                             return (
-                                                                <p className={`text-muted-foreground mt-1 ${isOnlyEmoji ? 'text-2xl py-1' : 'text-[0.75rem]'}`}>
+                                                                <p className={`text-muted-foreground mt-0.5 ${isOnlyEmoji ? 'text-2xl py-1' : 'text-[0.75rem]'}`}>
                                                                     {renderMessageText(reply.text, reply.mentions)}
                                                                 </p>
                                                             );

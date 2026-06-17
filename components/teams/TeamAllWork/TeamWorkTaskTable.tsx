@@ -108,6 +108,7 @@ import { CustomFieldDropdown } from "@/components/projects/views/list-view/commo
 import { TaskDetailView } from "@/components/projects/TaskDetailView";
 import { ListFieldVisibilityPopup } from "@/components/projects/views/list-view/common/ListFieldVisibilityPopup";
 import { useProjectsStore, TaskTypeConfig } from "@/stores/projects-store";
+import { useTeamStore } from "@/stores/teams-store";
 import { formatTaskId } from "@/utils/task-utils";
 import { formatCycleName } from "@/utils/cycle-utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -274,6 +275,31 @@ export function TeamWorkTaskTable({
         getTaskPriorityConfigs,
         addTaskPriorityConfig,
     } = useProjectsStore();
+    const { teams, activeTeamId } = useTeamStore();
+
+    const activeTeam = React.useMemo(() => {
+        return teams.find((t) => t.id === activeTeamId) || null;
+    }, [teams, activeTeamId]);
+
+    const allowedProjectIds = React.useMemo(() => {
+        if (!activeTeam) return [];
+        if (Array.isArray(activeTeam.projectIds) && activeTeam.projectIds.length > 0) {
+            return activeTeam.projectIds.map(String);
+        }
+        if (Array.isArray((activeTeam as any).projects) && (activeTeam as any).projects.length > 0) {
+            return (activeTeam as any).projects
+                .map((p: any) => String(p?.id || p?.projectId || ""))
+                .filter(Boolean);
+        }
+        return [];
+    }, [activeTeam]);
+
+    const teamProjects = React.useMemo(() => {
+        if (isTeamView && activeTeam) {
+            return projects.filter((p) => p.id && allowedProjectIds.includes(String(p.id)));
+        }
+        return projects;
+    }, [projects, activeTeam, allowedProjectIds, isTeamView]);
     const {
         tasks,
         subtasks: storeSubtasks,
@@ -974,7 +1000,7 @@ export function TeamWorkTaskTable({
         let priority = newTaskData.priority || undefined;
         if (groupBy === "priority" && groupName && groupName !== "Untitled")
             priority = groupName;
-        let assignee = newTaskData.assignee || undefined;
+        let assignee = newTaskData.assignee || groupId || undefined;
         if (groupBy === "assginee" && groupName && groupName !== "Unassigned") {
             // ✅ Find member by name and use their userId
             const member = members.find((m) => m.name === groupName);
@@ -1108,7 +1134,7 @@ export function TeamWorkTaskTable({
         let priority = newSubtaskData.priority || undefined;
         if (groupBy === "priority" && groupName && groupName !== "Untitled")
             priority = groupName;
-        let assignee = newSubtaskData.assignee || undefined;
+        let assignee = newSubtaskData.assignee || groupId || undefined;
         if (groupBy === "assginee" && groupName && groupName !== "Unassigned") {
             // ✅ Find member by name and use their userId
             const member = members.find((m) => m.name === groupName);
@@ -1361,11 +1387,9 @@ export function TeamWorkTaskTable({
                 boxShadow: "inset -1px 0 0 var(--border)",
             };
 
-            // ← The drag cell carries the group-color left accent border
-            if (columnId === "drag" && rowGroupColor) {
-                // baseStyle.boxShadow = `inset 4px 0 0 0 ${rowGroupColor}`;
-                const offset = isSubtask ? 12 : 0;
-                baseStyle.boxShadow = `inset -1px 0 0 var(--border), inset 4px 0 0 ${offset}px ${rowGroupColor}`;
+            // ← The checkbox cell carries the group-color left accent border
+            if (columnId === "checkbox" && rowGroupColor) {
+                baseStyle.boxShadow = `inset -1px 0 0 var(--border), inset 4px 0 0 0 ${rowGroupColor}`;
             }
 
             return baseStyle;
@@ -1512,7 +1536,7 @@ export function TeamWorkTaskTable({
     const headerCellCls =
         "!h-9 font-semibold text-muted-foreground uppercase tracking-wide px-3 py-0 select-none";
     const bodyCellCls = "!h-9 px-3 py-0";
-    const DRAG_COL_WIDTH = 40;
+    const DRAG_COL_WIDTH = 0;
     const CHECKBOX_COL_WIDTH = 62;
     const ID_COL_WIDTH = 120;
     const taskCheckboxClass =
@@ -1612,15 +1636,10 @@ export function TeamWorkTaskTable({
                                 className="bg-card hover:bg-card border-b border-border"
                             // style={{ borderLeft: `4px solid ${groupColor}` }}
                             >
-                                {/* Drag handle */}
-                                <TableHead
-                                    className={headerCellCls}
-                                    style={getColumnStyle("drag", true, groupColor)}
-                                />
                                 {/* Checkbox */}
                                 <TableHead
                                     className={cn(headerCellCls, "!px-0")}
-                                    style={getColumnStyle("checkbox", true)}
+                                    style={getColumnStyle("checkbox", true, groupColor)}
                                 >
                                     <div className="flex h-9 w-full items-center pl-6">
                                         <div className="flex h-4 w-4 items-center justify-center shrink-0">
@@ -1662,10 +1681,12 @@ export function TeamWorkTaskTable({
                                 )}
                                 {isTeamView && (
                                     <TableHead
-                                        className={`${headerCellCls} text-center`}
+                                        className={cn(headerCellCls, "text-center")}
                                         style={getColumnStyle("project", true)}
                                     >
-                                        Project
+                                        <div className="flex items-center justify-center">
+                                            <span>Project</span>
+                                        </div>
                                     </TableHead>
                                 )}
                                 {/* Dynamic columns */}
@@ -1823,12 +1844,8 @@ export function TeamWorkTaskTable({
                                                         className="group bg-card hover:bg-card border-b border-border transition-colors"
                                                     >
                                                         <TableCell
-                                                            className={bodyCellCls}
-                                                            style={getColumnStyle("drag", false, groupColor)}
-                                                        />
-                                                        <TableCell
                                                             className={cn(bodyCellCls, "!px-0")}
-                                                            style={getColumnStyle("checkbox", false)}
+                                                            style={getColumnStyle("checkbox", false, groupColor, true)}
                                                         >
                                                             {renderCheckboxColumnContent(
                                                                 <Checkbox
@@ -1904,7 +1921,7 @@ export function TeamWorkTaskTable({
                                                                                 }
                                                                                 title={subtask.name}
                                                                             >
-                                                                                {subtask.name}
+                                                                                {subtask.name && subtask.name.length > 24 ? `${subtask.name.slice(0, 24)}...` : subtask.name}
                                                                             </span>
 
                                                                             {/* Subtask actions & icons container pushed to the right */}
@@ -1952,7 +1969,7 @@ export function TeamWorkTaskTable({
                                                                                 )
                                                                             }
                                                                         >
-                                                                            <span>{subtask.name}</span>
+                                                                            <span title={subtask.name}>{subtask.name && subtask.name.length > 24 ? `${subtask.name.slice(0, 24)}...` : subtask.name}</span>
 
                                                                             {/* hover action to open subtask detail inline */}
                                                                             {renamingId !== subtask.id && (
@@ -1988,6 +2005,14 @@ export function TeamWorkTaskTable({
                                                                 </div>
                                                             </div>
                                                         </TableCell>
+                                                        {isTeamView && (
+                                                            <TableCell
+                                                                className={cn(bodyCellCls, "text-center font-medium")}
+                                                                style={getColumnStyle("project", false)}
+                                                            >
+                                                                {subtaskProject?.name || "No Project"}
+                                                            </TableCell>
+                                                        )}
 
                                                         {/* Subtask Task Type Cell */}
                                                         {shouldShowField("taskType", "Type") && (
@@ -2933,15 +2958,8 @@ export function TeamWorkTaskTable({
                                             /* INPUT state — shown after clicking "Add Subtask" */
                                             <TableRow className="bg-card hover:bg-card border-b border-border">
                                                 <TableCell
-                                                    style={getColumnStyle(
-                                                        "drag",
-                                                        false,
-                                                        `${groupColor}44`,
-                                                    )}
-                                                />
-                                                <TableCell
                                                     className={cn(bodyCellCls, "!px-0")}
-                                                    style={getColumnStyle("checkbox", false)}
+                                                    style={getColumnStyle("checkbox", false, `${groupColor}44`, true)}
                                                 >
                                                     {renderCheckboxColumnContent(
                                                         <div className="size-4 shrink-0 rounded border-2 border-input" />,
@@ -2998,12 +3016,28 @@ export function TeamWorkTaskTable({
                                                         />
                                                     </div>
                                                 </TableCell>
+                                                {isTeamView && (
+                                                    <TableCell
+                                                        className={cn(bodyCellCls, "text-center font-medium")}
+                                                        style={getColumnStyle("project", false)}
+                                                    >
+                                                        {project?.name || "No Project"}
+                                                    </TableCell>
+                                                )}
 
                                                 {/* ✅ Inline field pickers for subtask add row */}
                                                 {headers.map((h) => {
+                                                    const subtaskProjectId = task.projectId || "";
+                                                    const subtaskConfigs = getTaskConfigs(subtaskProjectId);
+                                                    const currentSubtaskTaskTypes = isTeamView ? subtaskConfigs.types : taskTypes;
+                                                    const currentSubtaskStatusConfigs = isTeamView ? subtaskConfigs.statusConfigs : taskStatusConfigs;
+                                                    const currentSubtaskCycles = isTeamView ? getActiveOrUpcomingCycles(subtaskConfigs.project) : activeOrUpcomingCycles;
+                                                    const currentSubtaskPriorityConfigs = isTeamView ? subtaskConfigs.priorityConfigs : taskPriorityConfigs;
+                                                    const currentSubtaskPriorityColor = getPriorityColor(newSubtaskData.priority, subtaskProjectId);
+
                                                     // ── Task Type ────────────────────────────────────────────
                                                     if (h.key === "taskType") {
-                                                        const selType = taskTypes.find(
+                                                        const selType = currentSubtaskTaskTypes.find(
                                                             (t) => t.value === newSubtaskData.taskType,
                                                         );
                                                         return (
@@ -3037,7 +3071,7 @@ export function TeamWorkTaskTable({
                                                                         </button>
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                                        {taskTypes.map((type) => (
+                                                                        {currentSubtaskTaskTypes.map((type) => (
                                                                             <DropdownMenuItem
                                                                                 key={type._id}
                                                                                 onSelect={() =>
@@ -3067,7 +3101,7 @@ export function TeamWorkTaskTable({
 
                                                     // ── Status ───────────────────────────────────────────────
                                                     if (h.key === "status") {
-                                                        const selStatus = taskStatusConfigs.find(
+                                                        const selStatus = currentSubtaskStatusConfigs.find(
                                                             (s) => s.value === newSubtaskData.status,
                                                         );
                                                         return (
@@ -3097,7 +3131,7 @@ export function TeamWorkTaskTable({
                                                                         </button>
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                                        {taskStatusConfigs.map((config) => (
+                                                                        {currentSubtaskStatusConfigs.map((config) => (
                                                                             <DropdownMenuItem
                                                                                 key={config._id}
                                                                                 onSelect={() =>
@@ -3129,7 +3163,8 @@ export function TeamWorkTaskTable({
 
                                                     // ── Cycle ────────────────────────────────────────────────
                                                     if (h.key === "cycle") {
-                                                        const selCycle = project?.cycles?.find(
+                                                        const subtaskProjectObj = isTeamView ? subtaskConfigs.project : project;
+                                                        const selCycle = subtaskProjectObj?.cycles?.find(
                                                             (c) => c.id === newSubtaskData.cycleId,
                                                         );
                                                         return (
@@ -3160,7 +3195,7 @@ export function TeamWorkTaskTable({
                                                                         </button>
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                                        {activeOrUpcomingCycles.map((c) => (
+                                                                        {(currentSubtaskCycles as any[]).map((c) => (
                                                                             <DropdownMenuItem
                                                                                 key={c.id}
                                                                                 onSelect={() =>
@@ -3181,12 +3216,12 @@ export function TeamWorkTaskTable({
                                                                                 </div>
                                                                             </DropdownMenuItem>
                                                                         ))}
-                                                                        {activeOrUpcomingCycles.length === 0 && (
+                                                                        {currentSubtaskCycles.length === 0 && (
                                                                             <div className="p-2 text-xs text-muted-foreground text-center">
                                                                                 No cycles available
                                                                             </div>
                                                                         )}
-                                                                        {activeOrUpcomingCycles.length > 0 && (
+                                                                        {currentSubtaskCycles.length > 0 && (
                                                                             <DropdownMenuSeparator />
                                                                         )}
                                                                         <DropdownMenuItem
@@ -3209,7 +3244,7 @@ export function TeamWorkTaskTable({
                                                     // ── Assignee ─────────────────────────────────────────────
                                                     if (h.key === "assignee") {
                                                         const selectedMember = members.find(
-                                                            (m) => m.userId === newSubtaskData.assignee,
+                                                            (m) => (m.userId && String(m.userId) === String(newSubtaskData.assignee || groupId)) || (m.id && String(m.id) === String(newSubtaskData.assignee || groupId)) || (m._id && String(m._id) === String(newSubtaskData.assignee || groupId)),
                                                         );
                                                         return (
                                                             <TableCell
@@ -3220,7 +3255,8 @@ export function TeamWorkTaskTable({
                                                                     height: "1px",
                                                                 }}
                                                             >
-                                                                <DropdownMenu
+                                                                {/* DropdownMenu commented out as requested since task automatically assigns to owner/member */}
+                                                                {/* <DropdownMenu
                                                                     onOpenChange={(open) => {
                                                                         if (!open) setAssigneeSearchQuery("");
                                                                     }}
@@ -3294,7 +3330,14 @@ export function TeamWorkTaskTable({
                                                                             Clear
                                                                         </DropdownMenuItem>
                                                                     </DropdownMenuContent>
-                                                                </DropdownMenu>
+                                                                </DropdownMenu> */}
+                                                                <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                                                                    <MemberAvatar
+                                                                        size="md"
+                                                                        name={selectedMember?.name}
+                                                                        src={selectedMember?.profilePicture}
+                                                                    />
+                                                                </div>
                                                             </TableCell>
                                                         );
                                                     }
@@ -3474,7 +3517,7 @@ export function TeamWorkTaskTable({
                                                                         <button
                                                                             className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                                                             style={{
-                                                                                backgroundColor: `${getPriorityColor(newSubtaskData.priority) || "#9CA3AF"}33`,
+                                                                                backgroundColor: `${currentSubtaskPriorityColor || "#9CA3AF"}33`,
                                                                             }}
                                                                         >
                                                                             <span
@@ -3485,7 +3528,7 @@ export function TeamWorkTaskTable({
                                                                                         : "text-muted-foreground",
                                                                                 )}
                                                                             >
-                                                                                {taskPriorityConfigs.find(
+                                                                                {currentSubtaskPriorityConfigs.find(
                                                                                     (p) =>
                                                                                         p.value === newSubtaskData.priority,
                                                                                 )?.label || "—"}
@@ -3494,15 +3537,13 @@ export function TeamWorkTaskTable({
                                                                                 className="h-3.5 w-3.5 flex-shrink-0"
                                                                                 style={{
                                                                                     color:
-                                                                                        getPriorityColor(
-                                                                                            newSubtaskData.priority,
-                                                                                        ) || "#9CA3AF",
+                                                                                        currentSubtaskPriorityColor || "#9CA3AF",
                                                                                 }}
                                                                             />
                                                                         </button>
                                                                     </DropdownMenuTrigger>
                                                                     <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                                        {taskPriorityConfigs.map((option) => (
+                                                                        {currentSubtaskPriorityConfigs.map((option) => (
                                                                             <DropdownMenuItem
                                                                                 key={option._id}
                                                                                 onSelect={() =>
@@ -3614,10 +3655,7 @@ export function TeamWorkTaskTable({
                                     onMouseEnter={() => setIsAddTaskRowHovered(true)}
                                     onMouseLeave={() => setIsAddTaskRowHovered(false)}
                                 >
-                                    <TableCell
-                                        style={getColumnStyle("drag", false, `${groupColor}44`)}
-                                    />
-                                    <TableCell style={getColumnStyle("checkbox", false)} />
+                                    <TableCell style={getColumnStyle("checkbox", false, `${groupColor}44`)} />
                                     <TableCell style={getColumnStyle("id", false)} />
                                     <TableCell
                                         style={getColumnStyle("task", false)}
@@ -3626,9 +3664,9 @@ export function TeamWorkTaskTable({
                                         <div className="flex items-center gap-1 pl-4">
                                             <div
                                                 className={cn(
-                                                    "flex items-center rounded-sm transition-all group",
+                                                    "flex items-center rounded-sm transition-all",
                                                     isAddTaskRowHovered || showTaskTypeMenu
-                                                        ? "border border-primary/30"
+                                                        ? "border border-primary/30 dark:border-white/30"
                                                         : "border border-transparent",
                                                 )}
                                             >
@@ -3637,13 +3675,14 @@ export function TeamWorkTaskTable({
                                                     className={cn(
                                                         "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs",
                                                         isAddTaskRowHovered || showTaskTypeMenu
-                                                            ? "text-primary/60"
+                                                            ? "text-primary/60 dark:text-white"
                                                             : "text-muted-foreground",
                                                     )}
                                                     onClick={() => {
                                                         setNewTaskData((prev) => ({
                                                             ...prev,
                                                             ...getGroupPrefillData(),
+                                                            projectId: prev.projectId || (isTeamView ? (teamProjects[0]?.id || "") : ""),
                                                         }));
                                                         setShowAddTask(true);
                                                         setShowTaskTypeMenu(false);
@@ -3653,15 +3692,12 @@ export function TeamWorkTaskTable({
                                                         className={cn(
                                                             "h-3 w-3",
                                                             isAddTaskRowHovered || showTaskTypeMenu
-                                                                ? "text-primary/60"
+                                                                ? "text-primary/60 dark:text-white"
                                                                 : "text-muted-foreground",
                                                         )}
                                                     />
                                                     Add Task
                                                 </button>
-
-                                                {/* Dropdown Menu for Task Type Selection */}
-                                                {/* Dropdown Menu for Task Type Selection */}
                                                 <DropdownMenu
                                                     open={showTaskTypeMenu}
                                                     onOpenChange={setShowTaskTypeMenu}
@@ -3669,7 +3705,7 @@ export function TeamWorkTaskTable({
                                                     <DropdownMenuTrigger asChild>
                                                         <button
                                                             className={cn(
-                                                                "px-1 py-0.5 border-l border-primary/30 text-muted-foreground group-hover:text-primary/60 transition-colors outline-none",
+                                                                "px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors outline-none",
                                                                 !(isAddTaskRowHovered || showTaskTypeMenu) &&
                                                                 "invisible",
                                                             )}
@@ -3684,21 +3720,25 @@ export function TeamWorkTaskTable({
                                                             side="top"
                                                             className="bg-card border border-border border-b-[5px] border-b-primary rounded-md shadow-lg min-w-[140px] z-[9999]"
                                                         >
-                                                            {taskTypes.map((type) => (
+                                                            {(isTeamView
+                                                                ? (newTaskData.projectId ? getTaskConfigs(newTaskData.projectId).types : (teamProjects[0]?.id ? getTaskConfigs(teamProjects[0].id).types : []))
+                                                                : taskTypes
+                                                            ).filter((t: any) => t.value !== "subtask").map((type) => (
                                                                 <DropdownMenuItem
-                                                                    key={type._id}
+                                                                    key={type._id || type.value}
                                                                     onClick={() => {
                                                                         const prefill = getGroupPrefillData();
                                                                         setSelectedAddTaskType(type.value);
                                                                         setNewTaskData((prev) => ({
                                                                             ...prev,
                                                                             ...prefill,
+                                                                            projectId: prev.projectId || (isTeamView ? (teamProjects[0]?.id || "") : ""),
                                                                             taskType: type.value,
                                                                         }));
                                                                         setShowTaskTypeMenu(false);
                                                                         setShowAddTask(true);
                                                                     }}
-                                                                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                                                                    className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer"
                                                                 >
                                                                     {renderTaskTypeVisual(type, "w-4 h-4")}
                                                                     <span>{type.label}</span>
@@ -3710,19 +3750,19 @@ export function TeamWorkTaskTable({
                                             </div>
                                         </div>
                                     </TableCell>
+                                    {isTeamView && (
+                                        <TableCell
+                                            style={getColumnStyle("project", false)}
+                                        />
+                                    )}
                                 </TableRow>
                             ) : (
                                 /* ── Add Task Input Row (replaces button row in same spot) ── */
                                 <TableRow className="bg-card hover:bg-card border-b border-border">
-                                    {/* Color accent bar — same as task rows */}
-                                    <TableCell
-                                        style={getColumnStyle("drag", false, `${groupColor}44`)}
-                                    />
-
                                     {/* Checkbox placeholder — mirrors subtask row exactly */}
                                     <TableCell
                                         className={cn(bodyCellCls, "!px-0")}
-                                        style={getColumnStyle("checkbox", false)}
+                                        style={getColumnStyle("checkbox", false, `${groupColor}44`)}
                                     >
                                         {renderCheckboxColumnContent(
                                             <div className="size-4 shrink-0 rounded border-2 border-input" />,
@@ -3777,13 +3817,53 @@ export function TeamWorkTaskTable({
                                             }}
                                         />
                                     </TableCell>
+                                    {isTeamView && (
+                                        <TableCell
+                                            className={cn(bodyCellCls, "text-center")}
+                                            style={getColumnStyle("project", false)}
+                                        >
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger
+                                                    asChild
+                                                    className="w-full h-full"
+                                                >
+                                                    <button className="w-full h-full flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:bg-muted overflow-hidden px-3">
+                                                        <span className="truncate w-full text-center">
+                                                            {teamProjects.find((p) => p.id === newTaskData.projectId)?.name || "—"}
+                                                        </span>
+                                                    </button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="p-4 w-[200px] z-[9999] space-y-1">
+                                                    {teamProjects.map((p) => (
+                                                        <DropdownMenuItem
+                                                            key={p.id}
+                                                            onSelect={() =>
+                                                                setNewTaskData((prev) => ({
+                                                                    ...prev,
+                                                                    projectId: p.id || "",
+                                                                }))
+                                                            }
+                                                            className="p-0 focus:bg-transparent"
+                                                        >
+                                                            <div className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-medium transition-opacity hover:opacity-90 px-3 bg-muted hover:bg-muted">
+                                                                <span className="truncate w-full text-center">
+                                                                    {p.name}
+                                                                </span>
+                                                            </div>
+                                                        </DropdownMenuItem>
+                                                    ))}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    )}
 
                                     {/* ✅ Inline field pickers for system fields in add-task row */}
                                     {headers.map((h) => {
                                         // ── Task Type ────────────────────────────────────────────
                                         if (h.key === "taskType") {
+                                            const currentTypes = (isTeamView ? (newTaskData.projectId ? getTaskConfigs(newTaskData.projectId).types : []) : taskTypes).filter((t: any) => t.value !== "subtask");
                                             const selectedType =
-                                                taskTypes.find(
+                                                currentTypes.find(
                                                     (t) => t.value === (newTaskData.taskType || "task"),
                                                 ) || null;
 
@@ -3818,7 +3898,7 @@ export function TeamWorkTaskTable({
                                                             </button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                            {taskTypes.map((type) => (
+                                                            {currentTypes.map((type) => (
                                                                 <DropdownMenuItem
                                                                     key={type._id}
                                                                     onSelect={() =>
@@ -3845,7 +3925,8 @@ export function TeamWorkTaskTable({
 
                                         // ── Status ───────────────────────────────────────────────
                                         if (h.key === "status") {
-                                            const selectedStatus = taskStatusConfigs.find(
+                                            const currentStatusConfigs = isTeamView ? (newTaskData.projectId ? getTaskConfigs(newTaskData.projectId).statusConfigs : []) : taskStatusConfigs;
+                                            const selectedStatus = currentStatusConfigs.find(
                                                 (s) => s.value === newTaskData.status,
                                             );
                                             return (
@@ -3875,7 +3956,7 @@ export function TeamWorkTaskTable({
                                                             </button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                            {taskStatusConfigs.map((config) => (
+                                                            {currentStatusConfigs.map((config) => (
                                                                 <DropdownMenuItem
                                                                     key={config._id}
                                                                     onSelect={() =>
@@ -3907,7 +3988,9 @@ export function TeamWorkTaskTable({
 
                                         // ── Cycle ────────────────────────────────────────────────
                                         if (h.key === "cycle") {
-                                            const selCycle = project?.cycles?.find(
+                                            const currentProject = isTeamView ? (newTaskData.projectId ? getTaskConfigs(newTaskData.projectId).project : null) : project;
+                                            const currentCycles = isTeamView ? (currentProject ? getActiveOrUpcomingCycles(currentProject) : []) : activeOrUpcomingCycles;
+                                            const selCycle = currentProject?.cycles?.find(
                                                 (c) => c.id === newTaskData.cycleId,
                                             );
                                             return (
@@ -3938,7 +4021,7 @@ export function TeamWorkTaskTable({
                                                             </button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                            {activeOrUpcomingCycles.map((c) => (
+                                                            {(currentCycles as any[]).map((c) => (
                                                                 <DropdownMenuItem
                                                                     key={c.id}
                                                                     onSelect={() =>
@@ -3956,12 +4039,12 @@ export function TeamWorkTaskTable({
                                                                     </div>
                                                                 </DropdownMenuItem>
                                                             ))}
-                                                            {activeOrUpcomingCycles.length === 0 && (
+                                                            {currentCycles.length === 0 && (
                                                                 <div className="p-2 text-xs text-muted-foreground text-center">
                                                                     No cycles available
                                                                 </div>
                                                             )}
-                                                            {activeOrUpcomingCycles.length > 0 && (
+                                                            {currentCycles.length > 0 && (
                                                                 <DropdownMenuSeparator />
                                                             )}
                                                             <DropdownMenuItem
@@ -3984,7 +4067,7 @@ export function TeamWorkTaskTable({
                                         // ── Assignee ─────────────────────────────────────────────
                                         if (h.key === "assignee") {
                                             const selectedMember = members.find(
-                                                (m) => m.userId === newTaskData.assignee,
+                                                (m) => (m.userId && String(m.userId) === String(newTaskData.assignee || groupId)) || (m.id && String(m.id) === String(newTaskData.assignee || groupId)) || (m._id && String(m._id) === String(newTaskData.assignee || groupId)),
                                             );
                                             return (
                                                 <TableCell
@@ -3995,7 +4078,8 @@ export function TeamWorkTaskTable({
                                                         height: "1px",
                                                     }}
                                                 >
-                                                    <DropdownMenu
+                                                    {/* DropdownMenu commented out as requested since task automatically assigns to owner/member */}
+                                                    {/* <DropdownMenu
                                                         onOpenChange={(open) => {
                                                             if (!open) setAssigneeSearchQuery("");
                                                         }}
@@ -4016,7 +4100,7 @@ export function TeamWorkTaskTable({
                                                             <div
                                                                 className="px-1 pb-2"
                                                                 onKeyDown={(e) => e.stopPropagation()}
-                                                            >
+                                                             >
                                                                 <Input
                                                                     placeholder="Type @ or name..."
                                                                     value={assigneeSearchQuery}
@@ -4069,7 +4153,14 @@ export function TeamWorkTaskTable({
                                                                 Clear
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                    </DropdownMenu> */}
+                                                    <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                                                        <MemberAvatar
+                                                            size="md"
+                                                            name={selectedMember?.name}
+                                                            src={selectedMember?.profilePicture}
+                                                        />
+                                                    </div>
                                                 </TableCell>
                                             );
                                         }
@@ -4224,6 +4315,8 @@ export function TeamWorkTaskTable({
 
                                         // ── Priority ─────────────────────────────────────────────
                                         if (h.key === "priority") {
+                                            const currentPriorityConfigs = isTeamView ? (newTaskData.projectId ? getTaskConfigs(newTaskData.projectId).priorityConfigs : []) : taskPriorityConfigs;
+                                            const currentPriorityColor = getPriorityColor(newTaskData.priority, newTaskData.projectId);
                                             return (
                                                 <TableCell
                                                     key={h.key}
@@ -4241,7 +4334,7 @@ export function TeamWorkTaskTable({
                                                             <button
                                                                 className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                                                 style={{
-                                                                    backgroundColor: `${getPriorityColor(newTaskData.priority) || "#9CA3AF"}33`,
+                                                                    backgroundColor: `${currentPriorityColor || "#9CA3AF"}33`,
                                                                 }}
                                                             >
                                                                 <span
@@ -4252,7 +4345,7 @@ export function TeamWorkTaskTable({
                                                                             : "text-muted-foreground",
                                                                     )}
                                                                 >
-                                                                    {taskPriorityConfigs.find(
+                                                                    {currentPriorityConfigs.find(
                                                                         (p) => p.value === newTaskData.priority,
                                                                     )?.label || "—"}
                                                                 </span>
@@ -4260,14 +4353,14 @@ export function TeamWorkTaskTable({
                                                                     className="h-3.5 w-3.5 flex-shrink-0"
                                                                     style={{
                                                                         color:
-                                                                            getPriorityColor(newTaskData.priority) ||
+                                                                            currentPriorityColor ||
                                                                             "#9CA3AF",
                                                                     }}
                                                                 />
                                                             </button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent className="p-4 w-[200px] space-y-1">
-                                                            {taskPriorityConfigs.map((option) => (
+                                                            {currentPriorityConfigs.map((option) => (
                                                                 <DropdownMenuItem
                                                                     key={option._id}
                                                                     onSelect={() =>
@@ -4296,7 +4389,7 @@ export function TeamWorkTaskTable({
                                                                     </div>
                                                                 </DropdownMenuItem>
                                                             ))}
-                                                            {taskPriorityConfigs.length > 0 && (
+                                                            {currentPriorityConfigs.length > 0 && (
                                                                 <DropdownMenuSeparator />
                                                             )}
                                                             <DropdownMenuItem
@@ -4754,7 +4847,7 @@ interface DraggableTaskRowProps {
     formatDate: (dateStr?: string) => string | null;
     convertSelectedDateToUTC: (date: Date) => string;
     taskPriorityConfigs: any[];
-    getPriorityColor: (priorityValue?: string) => string | undefined;
+    getPriorityColor: (priorityValue?: string, pId?: string) => string | undefined;
     isAddingPriority: boolean;
     newPriorityName: string;
     setNewPriorityName: React.Dispatch<React.SetStateAction<string>>;
@@ -4904,19 +4997,10 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                 "bg-primary/10 border-t border-b border-dashed border-primary",
             )}
         >
-            {/* Drag handle */}
-            <TableCell
-                ref={dragRef as any}
-                className={cn(bodyCellCls, "w-10 cursor-grab active:cursor-grabbing")}
-                style={getColumnStyle("drag", false, groupColor)}
-            >
-                <GripVertical className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
-            </TableCell>
-
             {/* Checkbox + expand */}
             <TableCell
                 className={cn(bodyCellCls, "!px-0")}
-                style={getColumnStyle("checkbox", false)}
+                style={getColumnStyle("checkbox", false, groupColor)}
             >
                 {renderCheckboxColumnContent(
                     <Checkbox
@@ -4987,7 +5071,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                                     }
                                     title={task.name}
                                 >
-                                    {task.name}
+                                    {task.name && task.name.length > 24 ? `${task.name.slice(0, 24)}...` : task.name}
                                 </span>
 
                                 {/* Actions & Icons container pushed to the right */}
@@ -5035,65 +5119,78 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                                 </div>
                             </div>
                         ) : (
-                            /* ── MULTI-LINE (WRAP) MODE: inline flow with icons at sentence end ── */
-                            <div
-                                className={cn(
-                                    "text-xs text-foreground whitespace-normal break-words w-full overflow-hidden",
-                                    task.completed && "line-through text-muted-foreground",
-                                )}
-                                onDoubleClick={() =>
-                                    handleRenameStart(task.id, task.name || "")
-                                }
-                            >
-                                <span>{task.name}</span>
-
-                                {/* Hover actions inline */}
-                                {renamingId !== task.id && (
-                                    <span className="inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5 align-middle">
-                                        <button
-                                            className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded inline-flex items-center gap-0.5"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setNewSubtaskData((prev: any) => ({
-                                                    ...prev,
-                                                    status: task.status || "",
-                                                    startDate: new Date(),
-                                                    endDate: task.endDate
-                                                        ? new Date(task.endDate)
-                                                        : undefined,
-                                                    cycleId: task.cycleId ?? undefined,
-                                                }));
-                                                setAddingSubtaskToTask(task.id);
-                                                if (!isExpanded) toggleTaskExpansion(task.id);
-                                            }}
-                                        >
-                                            <Plus className="h-2.5 w-2.5" />
-                                            Sub Task
-                                        </button>
-                                        <button
-                                            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground inline-flex"
-                                            onClick={async (e) => {
-                                                e.stopPropagation();
-                                                setSelectedTaskForDetail(task);
-                                                setShowTaskDetail(true);
-                                                setIsDetailLoading(true);
-                                                const fresh = await fetchTaskById(task.id);
-                                                if (fresh) setSelectedTaskForDetail(fresh);
-                                                setIsDetailLoading(false);
-                                            }}
-                                        >
-                                            <ChevronsLeftRight className="h-4 w-4 rotate-135" />
-                                        </button>
-                                    </span>
-                                )}
-
-                                {/* Relationship Icons inline */}
-                                <span className="inline-flex items-center gap-1 ml-1.5 align-middle">
-                                    {renderRelationshipIcons(task, false)}
+                            /* ── MULTI-LINE (WRAP) MODE: flex with icons at the right ── */
+                            <div className="flex items-center justify-between w-full min-w-0 gap-1.5">
+                                <span
+                                    className={cn(
+                                        "text-xs text-foreground min-w-0 flex-1 whitespace-normal break-words",
+                                        task.completed && "line-through text-muted-foreground",
+                                    )}
+                                    onDoubleClick={() =>
+                                        handleRenameStart(task.id, task.name || "")
+                                    }
+                                    title={task.name}
+                                >
+                                    {task.name && task.name.length > 24 ? `${task.name.slice(0, 24)}...` : task.name}
                                 </span>
+
+                                {/* Actions & Icons container pushed to the right */}
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    {/* Hover actions */}
+                                    {renamingId !== task.id && (
+                                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                className="px-1.5 py-0.5 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-0.5"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setNewSubtaskData((prev: any) => ({
+                                                        ...prev,
+                                                        status: task.status || "",
+                                                        startDate: new Date(),
+                                                        endDate: task.endDate
+                                                            ? new Date(task.endDate)
+                                                            : undefined,
+                                                        cycleId: task.cycleId ?? undefined,
+                                                    }));
+                                                    setAddingSubtaskToTask(task.id);
+                                                    if (!isExpanded) toggleTaskExpansion(task.id);
+                                                }}
+                                            >
+                                                <Plus className="h-2.5 w-2.5" />
+                                                Sub Task
+                                            </button>
+                                            <button
+                                                className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-muted-foreground"
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedTaskForDetail(task);
+                                                    setShowTaskDetail(true);
+                                                    setIsDetailLoading(true);
+                                                    const fresh = await fetchTaskById(task.id);
+                                                    if (fresh) setSelectedTaskForDetail(fresh);
+                                                    setIsDetailLoading(false);
+                                                }}
+                                            >
+                                                <ChevronsLeftRight className="h-4 w-4 rotate-135" />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Relationship Icons */}
+                                    {renderRelationshipIcons(task, false)}
+                                </div>
                             </div>
                         )}
                     </div>
+                </TableCell>
+            )}
+
+            {isTeamView && (
+                <TableCell
+                    className={cn(bodyCellCls, "text-center font-medium")}
+                    style={getColumnStyle("project", false)}
+                >
+                    {project?.name || "No Project"}
                 </TableCell>
             )}
 
@@ -5462,7 +5559,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                             <button
                                 className="w-full h-full flex items-center justify-center gap-8 rounded-xs transition-opacity hover:opacity-90 overflow-hidden px-2"
                                 style={{
-                                    backgroundColor: `${getPriorityColor(task.priority) || "#9CA3AF"}33`,
+                                    backgroundColor: `${getPriorityColor(task.priority, projectId) || "#9CA3AF"}33`,
                                 }}
                             >
                                 <span
@@ -5477,7 +5574,7 @@ const DraggableTaskRow: React.FC<DraggableTaskRowProps> = ({
                                 <Flag
                                     className="h-3.5 w-3.5 flex-shrink-0"
                                     style={{
-                                        color: getPriorityColor(task.priority) || "#9CA3AF",
+                                        color: getPriorityColor(task.priority, projectId) || "#9CA3AF",
                                     }}
                                 />
                             </button>

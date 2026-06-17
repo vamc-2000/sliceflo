@@ -405,12 +405,11 @@ export default function TeamAllWork() {
               >
                 <Filter className="h-4 w-4" />
                 <span className="text-sm">Filter</span>
-                {/* <Badge variant="secondary" className="rounded-full px-2 py-0 h-5 text-xs">
-                  {activeFilterCount}
-                </Badge> */}
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                  {activeFilterCount}
-                </span>
+                {activeFilterCount > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">

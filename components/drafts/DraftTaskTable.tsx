@@ -1326,8 +1326,9 @@ export function DraftTaskTable({
                               // drafts have no completed state
                               displayOptions.wrapText ? "truncate" : "whitespace-normal break-words"
                             )}
+                            title={task.name}
                           >
-                            {task.name}
+                            {task.name && task.name.length > 24 ? `${task.name.slice(0, 24)}...` : task.name}
                           </span>
                           {/* Hover actions */}
                           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -1672,8 +1673,8 @@ export function DraftTaskTable({
                           <TableCell className={bodyCellCls} style={getColumnStyle('task', false)}>
                             <div className="flex items-center gap-2 min-w-0 group/sub">
                               <div className="flex flex-col min-w-0 flex-1">
-                                <span className={cn("text-sm text-foreground")}>
-                                  {subtask.name}
+                                <span className={cn("text-sm text-foreground")} title={subtask.name}>
+                                  {subtask.name && subtask.name.length > 24 ? `${subtask.name.slice(0, 24)}...` : subtask.name}
                                 </span>
                               </div>
 

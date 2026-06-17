@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Phone, Mail, MapPin, Users, X, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, Users, X, Send, MessageCircle } from 'lucide-react';
 
 const getAvatarColor = (id: string) => {
   if (!id) return 'bg-blue-500';
@@ -93,7 +93,7 @@ const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
               {member.role || 'No Role'}
             </p>
           </div>
-          <Separator className='bg-[#C7C7CC] h-px'/>
+          <Separator className='bg-[#C7C7CC] h-px' />
         </DialogHeader>
 
         {/* Contact Details */}
@@ -133,7 +133,7 @@ const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
               onClick={handleSendEmail}
               className="w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300 ml-2"
             >
-              <Send className="h-4 w-4 text-[#0A2540]" />
+              <MessageCircle className="h-4 w-4 text-[#0A2540]" />
             </Button>
           </div>
 
