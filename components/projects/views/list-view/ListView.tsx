@@ -549,7 +549,7 @@ export function ListView({
       >
         {/* <div className="flex items-center gap-2"> */}
         <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-        <span className="text-xs font-medium text-primary">
+        <span className="text-xs font-medium text-primary-text">
           {field.fieldName}
         </span>
         {/* </div> */}
@@ -590,7 +590,7 @@ export function ListView({
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "asc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -601,7 +601,7 @@ export function ListView({
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "desc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -1748,7 +1748,7 @@ export function ListView({
                 <div className="grid grid-cols-2 gap-2 mb-2 items-start">
                   {/* Title aligned with radios */}
                   <div className="pr-3 ">
-                    <h3 className="text-xs font-semibold text-primary px-2 py-0">
+                    <h3 className="text-xs font-semibold text-primary-text px-2 py-0">
                       Group tasks by
                     </h3>
                   </div>
@@ -1812,7 +1812,7 @@ export function ListView({
                 {remainingCount > 0 && !showAllGroupOptions && (
                   <button
                     onClick={() => setShowAllGroupOptions(true)}
-                    className="w-full text-center text-xs text-primary hover:text-foreground font-semibold"
+                    className="w-full text-center text-xs text-primary-text hover:text-foreground font-semibold"
                   >
                     +{remainingCount} More
                   </button>
@@ -1935,7 +1935,7 @@ export function ListView({
                     >
                       {/* Header with title and save button */}
                       <div className="flex items-center justify-between px-4 py-3">
-                        <h3 className="text-sm font-semibold text-primary">
+                        <h3 className="text-sm font-semibold text-primary-text">
                           Sort fields by
                         </h3>
                         {/* <Button
@@ -1988,7 +1988,7 @@ export function ListView({
                                   )}
                                 </div>
 
-                                <span className="text-xs font-medium text-primary">
+                                <span className="text-xs font-medium text-primary-text">
                                   {field.fieldName}
                                 </span>
                                 {/* </div> */}
@@ -2032,7 +2032,7 @@ export function ListView({
                                       </svg>
                                     )}
                                   </div>
-                                  <span className="text-xs font-medium text-primary">
+                                  <span className="text-xs font-medium text-primary-text">
                                     {field.fieldName}
                                   </span>
                                   {/* </div> */}
@@ -2130,7 +2130,7 @@ export function ListView({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Assignee
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2178,7 +2178,7 @@ export function ListView({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Priority
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2234,7 +2234,9 @@ export function ListView({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">Status</span>
+                            <span className="text-primary-text text-xs">
+                              Status
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {taskStatusConfigs.map((cfg) => (
@@ -2288,7 +2290,7 @@ export function ListView({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2346,7 +2348,9 @@ export function ListView({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">Labels</span>
+                            <span className="text-primary-text text-xs">
+                              Labels
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {(currentWorkspace?.labels || []).map((label) => (
@@ -2406,13 +2410,13 @@ export function ListView({
                           setShowAdvancedFilters(true);
                         }}
                       >
-                        <span className="text-primary text-xs">
+                        <span className="text-primary-text text-xs">
                           Advanced Filters
                         </span>
                       </DropdownMenuItem>
 
                       {/* <DropdownMenuItem className="text-xs cursor-pointer" onSelect={() => { }}>
-                                                <span className="text-primary text-xs">Saved Filters ({savedFilters.length})</span>
+                                                <span className="text-primary-text text-xs">Saved Filters ({savedFilters.length})</span>
                                             </DropdownMenuItem> */}
 
                       {filterConfig.length > 0 && (
@@ -2449,7 +2453,7 @@ export function ListView({
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="center" className="p-4 w-[400px] border-b-[5px] border-b-primary">
-                                            <h3 className="text-sm font-bold text-primary">Choose Fields to Freeze</h3>
+                                            <h3 className="text-sm font-bold text-primary-text">Choose Fields to Freeze</h3>
                                             <p className="text-xs font-medium text-muted-foreground mb-3">
                                                 Freeze fields to keep them fixed in project view
                                             </p>
@@ -2465,11 +2469,11 @@ export function ListView({
                                                                 onClick={() => handleFreezeToggle(column.id)}
                                                                 className="flex items-center justify-between px-1 py-1.5 hover:bg-muted rounded cursor-pointer min-w-[180px]"
                                                             >
-                                                                <Label className="text-xs cursor-pointer flex-1 truncate text-primary">
+                                                                <Label className="text-xs cursor-pointer flex-1 truncate text-primary-text">
                                                                     {column.fieldName}
                                                                 </Label>
                                                                 {column.columnFreezed ? (
-                                                                    <Pin className="h-4 w-4 text-primary -rotate-315 shrink-0" />
+                                                                    <Pin className="h-4 w-4 text-primary-text -rotate-315 shrink-0" />
                                                                 ) : (
                                                                     <Pin className="h-4 w-4 text-muted-foreground -rotate-315 shrink-0" />
                                                                 )}
@@ -2516,7 +2520,7 @@ export function ListView({
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="center" className="px-4 py-3 border-b-[5px] border-b-primary">
-                                            <h3 className="text-sm font-semibold text-primary">Choose Fields to Hide</h3>
+                                            <h3 className="text-sm font-semibold text-primary-text">Choose Fields to Hide</h3>
                                             <p className="text-xs text-muted-foreground mb-3">
                                                 Hide fields you don't want to see in Project view
                                             </p>
@@ -2545,7 +2549,7 @@ export function ListView({
                                                     }}
                                                     className="h-4 w-4 border-input"
                                                 />
-                                                <Label htmlFor="hide-select-all" className="text-xs cursor-pointer font-medium text-primary">
+                                                <Label htmlFor="hide-select-all" className="text-xs cursor-pointer font-medium text-primary-text">
                                                     {columnConfigs.every(c => c.pinned) ? 'Hide All' : 'Show All'}
                                                     Select All
                                                 </Label>
@@ -2574,7 +2578,7 @@ export function ListView({
                                                                     />
                                                                     <Label
                                                                         htmlFor={`hide-${column.id}`}
-                                                                        className="text-xs cursor-pointer flex items-center gap-2 text-primary"
+                                                                        className="text-xs cursor-pointer flex items-center gap-2 text-primary-text"
                                                                     >
                                                                         {column.fieldName}
                                                                     </Label>
@@ -2607,7 +2611,7 @@ export function ListView({
                                                                     />
                                                                     <Label
                                                                         htmlFor={`hide-${column.id}`}
-                                                                        className="text-xs cursor-pointer flex items-center gap-2 text-primary"
+                                                                        className="text-xs cursor-pointer flex items-center gap-2 text-primary-text"
                                                                     >
                                                                         {column.fieldName}
                                                                     </Label>
@@ -2659,7 +2663,7 @@ export function ListView({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="collapsed-subtasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Collapsed Subtasks
                         </Label>
@@ -2680,7 +2684,7 @@ export function ListView({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="closed-tasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Closed Tasks
                         </Label>
@@ -2701,7 +2705,7 @@ export function ListView({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="wrap-text"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Wrap Text
                         </Label>
@@ -2722,7 +2726,7 @@ export function ListView({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="subtask-parent-id"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Subtask parent ID
                         </Label>

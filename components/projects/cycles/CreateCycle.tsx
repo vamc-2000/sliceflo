@@ -443,7 +443,7 @@ export function CreateCycle({
         <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
           <div className="space-y-3">
             <div>
-              <h1 className="font-semibold text-sm text-primary">
+              <h1 className="font-semibold text-sm text-primary-text">
                 Cycle description
               </h1>
               <p className="font-medium text-xs text-muted-foreground leading-relaxed">

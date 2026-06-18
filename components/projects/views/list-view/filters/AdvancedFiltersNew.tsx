@@ -373,21 +373,28 @@ export default function AdvancedFiltersNew({
     const options = getValueOptionsForField(criteria.field);
     if (options.length > 0) {
       return (
-        <select
-          value={criteria.value}
-          onChange={(e) =>
-            updateCriteria(criteria.id, { value: e.target.value })
-          }
-          className="w-full px-3 py-2 text-xs border-b border-input bg-transparent focus:outline-none"
-          data-testid={`advanced-filters-value-input-${criteria.id}`}
+        <Select
+          value={criteria.value || undefined}
+          onValueChange={(val) => updateCriteria(criteria.id, { value: val })}
         >
-          <option value="">Select value</option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger
+            className="w-full px-3 py-2 text-xs border-0 border-b border-input bg-transparent rounded-none shadow-none focus:ring-0"
+            data-testid={`advanced-filters-value-input-${criteria.id}`}
+          >
+            <SelectValue placeholder="Select value" />
+          </SelectTrigger>
+          <SelectContent className="border-0 border-b-[5px] border-primary">
+            {options.map((opt) => (
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                data-testid={`advanced-filters-value-option-${criteria.id}-${opt.value}`}
+              >
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       );
     }
 
@@ -484,7 +491,7 @@ export default function AdvancedFiltersNew({
               className="
                                 bg-transparent px-0 pb-1 text-xs font-medium rounded-none border-0 border-b-2 border-transparent
                                 data-[state=active]:border-primary
-                                text-primary
+                                text-primary-text
 
                                 shadow-none ring-0 outline-none
 
@@ -508,7 +515,7 @@ export default function AdvancedFiltersNew({
                             className="
                                 bg-transparent px-0 pb-1 text-xs font-medium rounded-none border-0 border-b-2 border-transparent
                                 data-[state=active]:border-primary
-                                text-primary
+                                text-primary-text
 
                                 shadow-none ring-0 outline-none
 
@@ -570,7 +577,7 @@ export default function AdvancedFiltersNew({
                           <SelectValue />
                         </SelectTrigger>
 
-                        <SelectContent className="min-w-12">
+                        <SelectContent className="min-w-12 border-0 border-b-[5px] border-primary">
                           <SelectItem
                             value="AND"
                             className="justify-center text-xs"
@@ -652,7 +659,7 @@ export default function AdvancedFiltersNew({
                     <SelectValue placeholder="Condition" />
                   </SelectTrigger>
 
-                  <SelectContent>
+                  <SelectContent className="border-0 border-b-[5px] border-primary">
                     {getConditionsForField(criteria.field).map((cond) => (
                       <SelectItem
                         key={cond}
@@ -691,11 +698,11 @@ export default function AdvancedFiltersNew({
               className="
                                 w-full justify-start gap-2 px-0 text-muted-foreground text-xs
                                 hover:bg-transparent
-                                hover:text-primary
+                                hover:text-primary-text
                                 underline-offset-4 hover:underline
                             "
             >
-              <Plus className="h-4 w-4 text-primary" />
+              <Plus className="h-4 w-4 text-primary-text" />
               Add Nested Filter
             </Button>
           </TabsContent>

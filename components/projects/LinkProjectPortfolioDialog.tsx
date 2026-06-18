@@ -1,22 +1,27 @@
-'use client'
+"use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
-import { useProjectsStore } from '@/stores/projects-store'
-import { usePortfoliosStore } from '@/stores/portfolios-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
-import { useRouter } from 'next/navigation'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { useProjectsStore } from "@/stores/projects-store";
+import { usePortfoliosStore } from "@/stores/portfolios-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
+import { useRouter } from "next/navigation";
 
 interface Props {
-  open: boolean
-  onClose: () => void
-  projectId: string
-  existingPortfolioIds: string[]
+  open: boolean;
+  onClose: () => void;
+  projectId: string;
+  existingPortfolioIds: string[];
 }
 
 export default function LinkProjectPortfolioDialog({
@@ -25,57 +30,57 @@ export default function LinkProjectPortfolioDialog({
   projectId,
   existingPortfolioIds,
 }: Props) {
-  const { attachPortfoliosToProject } = useProjectsStore()
-  const { portfolios, fetchPortfolios } = usePortfoliosStore()
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [query, setQuery] = useState('')
-  const router = useRouter()
+  const { attachPortfoliosToProject } = useProjectsStore();
+  const { portfolios, fetchPortfolios } = usePortfoliosStore();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
+  const router = useRouter();
 
-  const { workspaceMembers, currentWorkspace } = useWorkspaceStore()
+  const { workspaceMembers, currentWorkspace } = useWorkspaceStore();
 
   useEffect(() => {
     if (open) {
-      fetchPortfolios(currentWorkspace?.id)
-      setSelectedIds(new Set())
-      setQuery('')
+      fetchPortfolios(currentWorkspace?.id);
+      setSelectedIds(new Set());
+      setQuery("");
     }
-  }, [open, currentWorkspace?.id])
+  }, [open, currentWorkspace?.id]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   // Filter out already-linked portfolios
   const availablePortfolios = portfolios
     .filter((p) => p.id && !existingPortfolioIds.includes(p.id))
-    .filter((p) =>
-      (p.name ?? '').toLowerCase().includes(query.toLowerCase())
-    )
+    .filter((p) => (p.name ?? "").toLowerCase().includes(query.toLowerCase()));
 
   const allSelected =
     availablePortfolios.length > 0 &&
-    availablePortfolios.every((p) => selectedIds.has(p.id!))
+    availablePortfolios.every((p) => selectedIds.has(p.id!));
 
   const someSelected =
-    availablePortfolios.some((p) => selectedIds.has(p.id!)) && !allSelected
+    availablePortfolios.some((p) => selectedIds.has(p.id!)) && !allSelected;
 
   const toggleSelectAll = () => {
     if (allSelected) {
-      setSelectedIds(new Set())
+      setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(availablePortfolios.map((p) => p.id!)))
+      setSelectedIds(new Set(availablePortfolios.map((p) => p.id!)));
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg w-full border-b-[5px] border-b-primary">
         <DialogHeader>
-          <DialogTitle className="text-sm font-bold">Link Project to Portfolios</DialogTitle>
+          <DialogTitle className="text-sm font-bold">
+            Link Project to Portfolios
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-2 w-full">
@@ -96,11 +101,17 @@ export default function LinkProjectPortfolioDialog({
           {/* Table */}
           <div className="w-full border border-border rounded-md relative">
             {/* Table Header */}
-            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary border-b border-border">
+            <div className="grid grid-cols-[40px_1fr_60px] px-3 py-2 text-xs font-semibold items-center text-primary-text border-b border-border">
               <div className="flex items-center">
                 <Checkbox
                   checked={allSelected}
-                  data-state={someSelected ? 'indeterminate' : allSelected ? 'checked' : 'unchecked'}
+                  data-state={
+                    someSelected
+                      ? "indeterminate"
+                      : allSelected
+                        ? "checked"
+                        : "unchecked"
+                  }
                   onCheckedChange={toggleSelectAll}
                   disabled={availablePortfolios.length === 0}
                   data-testid="link-portfolio-select-all-checkbox"
@@ -135,18 +146,21 @@ export default function LinkProjectPortfolioDialog({
                     </div>
                     <div className="grid place-items-center pl-2">
                       {(() => {
-                        const leaderId = portfolio.owner || portfolio.leaders?.[0]
-                        const leader = leaderId ? workspaceMembers.find(m => m.userId === leaderId) : null
+                        const leaderId =
+                          portfolio.owner || portfolio.leaders?.[0];
+                        const leader = leaderId
+                          ? workspaceMembers.find((m) => m.userId === leaderId)
+                          : null;
                         return (
                           <Avatar className="h-6 w-6">
                             {leader?.profilePicture ? (
                               <AvatarImage src={leader.profilePicture} />
                             ) : null}
                             <AvatarFallback>
-                              {leader?.name?.charAt(0)?.toUpperCase() || '—'}
+                              {leader?.name?.charAt(0)?.toUpperCase() || "—"}
                             </AvatarFallback>
                           </Avatar>
-                        )
+                        );
                       })()}
                     </div>
                   </div>
@@ -159,8 +173,10 @@ export default function LinkProjectPortfolioDialog({
         <div className="flex justify-between pt-4">
           <Button
             variant="outline"
-            className='border-input text-muted-foreground w-40 h-9 text-xs hover:bg-primary hover:text-primary-foreground'
-            onClick={() => router.push(`/project/${projectId}/create-portfolio`)}
+            className="border-input text-muted-foreground w-40 h-9 text-xs hover:bg-primary hover:text-primary-foreground"
+            onClick={() =>
+              router.push(`/project/${projectId}/create-portfolio`)
+            }
             data-testid="link-portfolio-create-btn"
           >
             Create new portfolio
@@ -169,8 +185,8 @@ export default function LinkProjectPortfolioDialog({
           <Button
             disabled={selectedIds.size === 0}
             onClick={() => {
-              attachPortfoliosToProject(projectId, Array.from(selectedIds))
-              onClose()
+              attachPortfoliosToProject(projectId, Array.from(selectedIds));
+              onClose();
             }}
             className="bg-primary text-primary-foreground w-40 h-9 text-xs"
             data-testid="link-portfolio-assign-btn"
@@ -180,5 +196,5 @@ export default function LinkProjectPortfolioDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

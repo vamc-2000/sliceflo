@@ -621,7 +621,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "asc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -632,7 +632,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "desc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -677,7 +677,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
         className="grid grid-cols-[20px_1fr_20px] items-center px-2 py-1 mr-3 hover:bg-muted rounded"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-        <span className="text-xs font-medium text-primary">
+        <span className="text-xs font-medium text-primary-text">
           {field.fieldName}
         </span>
         {getSortIcon(field)}
@@ -1309,7 +1309,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       className={`p-0 transition-all duration-200 border-0 border-b-[5px] border-b-primary ${hasSelectedSortFields ? "w-[620px]" : "w-[420px]"}`}
                     >
                       <div className="flex items-center justify-between px-4 py-3">
-                        <h3 className="text-xs font-semibold text-primary">
+                        <h3 className="text-xs font-semibold text-primary-text">
                           Sort fields by
                         </h3>
                       </div>
@@ -1348,7 +1348,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                       <Check className="h-3 w-3 text-primary-foreground" />
                                     )}
                                   </div>
-                                  <span className="text-xs font-medium text-primary">
+                                  <span className="text-xs font-medium text-primary-text">
                                     {field.fieldName}
                                   </span>
                                 </div>
@@ -1404,7 +1404,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                                         <Check className="h-3 w-3 text-primary-foreground" />
                                       )}
                                     </div>
-                                    <span className="text-xs font-medium text-primary truncate">
+                                    <span className="text-xs font-medium text-primary-text truncate">
                                       {field.fieldName}
                                     </span>
                                   </div>
@@ -1483,7 +1483,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       <div className="space-y-1 mb-1 ">
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Assignee
                             </span>
                           </DropdownMenuSubTrigger>
@@ -1524,7 +1524,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         {/* Priority Filter */}
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Priority
                             </span>
                           </DropdownMenuSubTrigger>
@@ -1573,7 +1573,9 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         {/* Status Filter */}
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">Status</span>
+                            <span className="text-primary-text text-xs">
+                              Status
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {taskStatusConfigs.map((cfg) => (
@@ -1620,7 +1622,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         {/* Due Date Filter */}
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
@@ -1671,7 +1673,9 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         {/* Labels Filter */}
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">Labels</span>
+                            <span className="text-primary-text text-xs">
+                              Labels
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {(currentWorkspace?.labels || []).map((label) => (
@@ -1725,7 +1729,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                         }}
                         className="text-xs"
                       >
-                        <span className="text-primary text-xs">
+                        <span className="text-primary-text text-xs">
                           Advanced Filters
                         </span>
                       </DropdownMenuItem>
@@ -1776,7 +1780,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="collapsed-subtasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Collapsed Subtasks
                         </Label>
@@ -1797,7 +1801,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="closed-tasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Closed Tasks
                         </Label>
@@ -1818,7 +1822,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="wrap-text"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Wrap Text
                         </Label>
@@ -1839,7 +1843,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="subtask-parent-id"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Subtask parent ID
                         </Label>
@@ -1869,7 +1873,7 @@ export function GanttView({ projectId, initialFilters }: GanttViewProps) {
               className={cn(
                 "flex items-center gap-1.5 h-8 px-2 rounded border transition-colors duration-150 cursor-pointer select-none",
                 showConnectors
-                  ? "border-primary bg-primary/10 text-primary dark:border-primary-foreground/30 dark:bg-primary-foreground/10 dark:text-primary-foreground"
+                  ? "border-primary bg-primary/10 text-primary-text dark:border-primary-foreground/30 dark:bg-primary-foreground/10"
                   : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border",
               )}
               data-testid="gantt-connectors-toggle"

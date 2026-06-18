@@ -255,7 +255,7 @@ export function TaskTable({
     const Icon = active.direction === "asc" ? ArrowUp : ArrowDown;
     return (
       <Icon
-        className="h-5 w-5 cursor-pointer text-primary rounded-md p-0.5 bg-primary/10"
+        className="h-5 w-5 cursor-pointer text-primary-text rounded-md p-0.5 bg-primary/10"
         onClick={() => onSortChange?.(fieldId, fieldType)}
       />
     );
@@ -3524,7 +3524,7 @@ export function TaskTable({
                         className={cn(
                           "flex items-center rounded-sm transition-all group",
                           isAddTaskRowHovered || showTaskTypeMenu
-                            ? "border border-primary/30"
+                            ? "border border-primary-text"
                             : "border border-transparent",
                         )}
                       >
@@ -3533,7 +3533,7 @@ export function TaskTable({
                           className={cn(
                             "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs",
                             isAddTaskRowHovered || showTaskTypeMenu
-                              ? "text-primary/60"
+                              ? "text-primary-text"
                               : "text-muted-foreground",
                           )}
                           onClick={() => {
@@ -3549,7 +3549,7 @@ export function TaskTable({
                             className={cn(
                               "h-3 w-3",
                               isAddTaskRowHovered || showTaskTypeMenu
-                                ? "text-primary/60"
+                                ? "text-primary-text"
                                 : "text-muted-foreground",
                             )}
                           />
@@ -3565,7 +3565,7 @@ export function TaskTable({
                           <DropdownMenuTrigger asChild>
                             <button
                               className={cn(
-                                "px-1 py-0.5 border-l border-primary/30 text-muted-foreground group-hover:text-primary/60 transition-colors outline-none",
+                                "px-1 py-0.5 border-l border-primary-text text-muted-foreground group-hover:text-primary-text transition-colors outline-none",
                                 !(isAddTaskRowHovered || showTaskTypeMenu) &&
                                   "invisible",
                               )}

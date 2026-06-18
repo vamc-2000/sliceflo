@@ -82,9 +82,9 @@ export function CycleCard({
     active: {
       bg: "bg-primary/10",
       border: "border-primary/20",
-      text: "text-primary font-semibold",
-      icon: "text-primary",
-      dots: "text-primary",
+      text: "text-primary-text font-semibold",
+      icon: "text-primary-text",
+      dots: "text-primary-text",
     },
     upcoming: {
       bg: "bg-muted",
@@ -174,7 +174,9 @@ export function CycleCard({
               variant="ghost"
               className={cn(
                 "h-7 w-7 p-0 transition-opacity flex items-center justify-center",
-                type === "active" ? "text-primary" : "text-muted-foreground",
+                type === "active"
+                  ? "text-primary-text"
+                  : "text-muted-foreground",
                 type === "completed" &&
                   "text-emerald-600 dark:text-emerald-400",
               )}

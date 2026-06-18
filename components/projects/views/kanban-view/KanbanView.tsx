@@ -246,8 +246,10 @@ const KanbanView = ({
   const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
   const [isAddTaskAssigneeOpen, setIsAddTaskAssigneeOpen] = useState(false);
   const [isAddTaskPriorityOpen, setIsAddTaskPriorityOpen] = useState(false);
-  const [isAddSubtaskAssigneeOpen, setIsAddSubtaskAssigneeOpen] = useState(false);
-  const [isAddSubtaskPriorityOpen, setIsAddSubtaskPriorityOpen] = useState(false);
+  const [isAddSubtaskAssigneeOpen, setIsAddSubtaskAssigneeOpen] =
+    useState(false);
+  const [isAddSubtaskPriorityOpen, setIsAddSubtaskPriorityOpen] =
+    useState(false);
 
   const getFilteredMembers = () => {
     if (!assigneeSearchQuery) return members;
@@ -495,7 +497,7 @@ const KanbanView = ({
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "asc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -506,7 +508,7 @@ const KanbanView = ({
           disabled={!isSelected}
           className={`p-1 rounded hover:bg-muted ${
             direction === "desc"
-              ? "bg-muted text-primary"
+              ? "bg-muted text-primary-text"
               : "text-muted-foreground"
           } ${!isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -550,7 +552,7 @@ const KanbanView = ({
         className="grid grid-cols-[20px_1fr_20px] items-center px-2 py-1 mr-3 hover:bg-muted rounded"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-        <span className="text-xs font-medium text-primary">
+        <span className="text-xs font-medium text-primary-text">
           {field.fieldName}
         </span>
         {getSortIcon(field)}
@@ -1526,7 +1528,10 @@ const KanbanView = ({
                   if (!open) setAssigneeSearchQuery("");
                 }}
               >
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuTrigger
+                  asChild
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="cursor-pointer">
                     <MemberAvatar
                       size="md"
@@ -1539,7 +1544,10 @@ const KanbanView = ({
                   className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                  <div
+                    className="px-1 pb-2"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  >
                     <Input
                       placeholder="Type @ or name..."
                       value={assigneeSearchQuery}
@@ -1599,8 +1607,14 @@ const KanbanView = ({
               </Badge>
 
               {/* Priority */}
-              <DropdownMenu open={isAddTaskPriorityOpen} onOpenChange={setIsAddTaskPriorityOpen}>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu
+                open={isAddTaskPriorityOpen}
+                onOpenChange={setIsAddTaskPriorityOpen}
+              >
+                <DropdownMenuTrigger
+                  asChild
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="cursor-pointer">
                     {selPriority ? (
                       <Badge
@@ -1862,7 +1876,10 @@ const KanbanView = ({
                 className="p-4 w-[200px] space-y-1 z-[100] border-0 border-b-[5px] border-b-primary"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="px-1 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                <div
+                  className="px-1 pb-2"
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
                   <Input
                     placeholder="Type @ or name..."
                     value={assigneeSearchQuery}
@@ -1922,7 +1939,10 @@ const KanbanView = ({
             </Badge>
 
             {/* Priority */}
-            <DropdownMenu open={isAddSubtaskPriorityOpen} onOpenChange={setIsAddSubtaskPriorityOpen}>
+            <DropdownMenu
+              open={isAddSubtaskPriorityOpen}
+              onOpenChange={setIsAddSubtaskPriorityOpen}
+            >
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <div className="cursor-pointer">
                   {selPriority ? (
@@ -2288,7 +2308,7 @@ const KanbanView = ({
                 {remainingCount > 0 && !showAllGroupOptions && (
                   <button
                     onClick={() => setShowAllGroupOptions(true)}
-                    className="w-full text-center text-xs text-primary hover:text-foreground font-semibold"
+                    className="w-full text-center text-xs text-primary-text font-semibold"
                   >
                     +{remainingCount} More
                   </button>
@@ -2392,7 +2412,7 @@ const KanbanView = ({
                       className={`p-0 transition-all duration-200 border-b-5 border-b-primary ${hasSelectedSortFields ? "w-155" : "w-105"}`}
                     >
                       <div className="flex items-center justify-between px-4 py-3">
-                        <h3 className="text-xs font-semibold text-primary">
+                        <h3 className="text-xs font-semibold text-primary-text">
                           Sort fields by
                         </h3>
                       </div>
@@ -2431,7 +2451,7 @@ const KanbanView = ({
                                       <Check className="h-3 w-3 text-primary-foreground" />
                                     )}
                                   </div>
-                                  <span className="text-xs font-medium text-primary">
+                                  <span className="text-xs font-medium text-primary-text">
                                     {field.fieldName}
                                   </span>
                                 </div>
@@ -2439,7 +2459,7 @@ const KanbanView = ({
                           </div>
                         </div>
                         <div className="p-2">
-                          <h4 className="text-xs font-semibold text-[#6E7C87] mb-2 px-2">
+                          <h4 className="text-xs font-semibold text-primary-text mb-2 px-2">
                             Custom fields
                           </h4>
                           {sortFields.filter(
@@ -2486,7 +2506,7 @@ const KanbanView = ({
                                         <Check className="h-3 w-3 text-primary-foreground" />
                                       )}
                                     </div>
-                                    <span className="text-xs font-medium text-primary">
+                                    <span className="text-xs font-medium text-primary-text">
                                       {field.fieldName}
                                     </span>
                                   </div>
@@ -2578,7 +2598,7 @@ const KanbanView = ({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Assignee
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2625,7 +2645,7 @@ const KanbanView = ({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Priority
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2680,7 +2700,9 @@ const KanbanView = ({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">Status</span>
+                            <span className="text-primary-text text-xs">
+                              Status
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {taskStatusConfigs.map((cfg) => (
@@ -2733,7 +2755,7 @@ const KanbanView = ({
                                 "opacity-50 cursor-not-allowed",
                             )}
                           >
-                            <span className="text-primary text-xs">
+                            <span className="text-primary-text text-xs">
                               Due Date
                             </span>
                           </DropdownMenuSubTrigger>
@@ -2775,7 +2797,9 @@ const KanbanView = ({
 
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger className="flex items-center justify-between text-xs">
-                            <span className="text-primary text-xs">Labels</span>
+                            <span className="text-primary-text text-xs">
+                              Labels
+                            </span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent className="w-48 p-2">
                             {(currentWorkspace?.labels || []).map((label) => (
@@ -2822,7 +2846,7 @@ const KanbanView = ({
 
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className="text-primary font-semibold cursor-pointer text-xs"
+                          className="text-primary-text font-semibold cursor-pointer text-xs"
                           onSelect={() => setShowAdvancedFilters(true)}
                         >
                           Advanced Filters
@@ -2890,7 +2914,7 @@ const KanbanView = ({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="collapsed-subtasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Collapsed Subtasks
                         </Label>
@@ -2911,7 +2935,7 @@ const KanbanView = ({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="closed-tasks"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Closed Tasks
                         </Label>
@@ -2932,7 +2956,7 @@ const KanbanView = ({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="wrap-text"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Wrap Text
                         </Label>
@@ -2953,7 +2977,7 @@ const KanbanView = ({
                       <div className="flex items-center justify-between py-2">
                         <Label
                           htmlFor="subtask-parent-id"
-                          className="text-xs cursor-pointer text-primary"
+                          className="text-xs cursor-pointer text-primary-text"
                         >
                           Subtask parent ID
                         </Label>
@@ -3119,7 +3143,7 @@ const KanbanView = ({
                                   backgroundColor: group.color || "#6366f1",
                                 }}
                               />
-                              <span className="text-primary">
+                              <span className="text-primary-text">
                                 {group.label}
                               </span>
                             </div>
@@ -3146,7 +3170,9 @@ const KanbanView = ({
               <KanbanProvider
                 data={kanbanTasks}
                 columns={columns}
-                onDragStart={(event) => setActiveDragId(event.active.id as string)}
+                onDragStart={(event) =>
+                  setActiveDragId(event.active.id as string)
+                }
                 onDragEnd={(event) => {
                   setActiveDragId(null);
                   handleDragEnd(event);
