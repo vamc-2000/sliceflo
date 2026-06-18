@@ -167,7 +167,7 @@ export function AddApproverDropdown({
       <PopoverContent
         data-testid="add-approver-popover"
         align="end"
-        className="z-60 w-95 px-4 py-3 border-0 border-b-[5px] border-primary bg-background"
+        className="z-60 w-[320px] p-2 border border-b-[5px] border-b-primary bg-background"
         onWheel={(e) => e.stopPropagation()}
       >
         {/* ---------------- LIST VIEW ---------------- */}
@@ -207,42 +207,45 @@ export function AddApproverDropdown({
                 No matching approvers
               </div>
             ) : (
-              <div className="space-y-4 mb-4 max-h-[300px] overflow-y-auto pr-2">
+              <div className="space-y-0.5 mb-4 max-h-[300px] overflow-y-auto pr-1">
                 {filteredSelectedUsers.map((member) => (
                   <div
                     data-testid={`selected-approver-${member.userId}`}
                     key={member.userId}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between py-1 px-1.5 hover:bg-accent/50 rounded transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Avatar className="h-7 w-7 shrink-0">
                         <AvatarImage src={member.profilePicture || undefined} />
-                        <AvatarFallback className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-medium text-sm">
+                        <AvatarFallback className="text-xs bg-yellow-100 text-yellow-700 font-medium">
                           {getInitials(member.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col">
-                        <p className="text-[15px] font-medium text-foreground leading-tight mb-0.5">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate text-primary leading-tight">
                           {member.name}
                         </p>
-                        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 uppercase font-medium">
-                          <Users className="w-3.5 h-3.5" />
-                          {member.role || "MEMBER"}
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-[10px] text-muted-foreground truncate">
+                            {member.role || "MEMBER"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {/* <div className="h-8 w-[2px] bg-gradient-to-b from-gray-200 via-[#001F3F] to-gray-200 rounded-full opacity-70" /> */}
+                    <div className="flex items-center">
                       <div className="h-6 w-0.5 bg-linear-to-b from-[#D1D1D6] via-[#000000] to-[#D1D1D6] rounded-md" />
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         data-testid={`btn-remove-approver-${member.userId}`}
                         onClick={() => setApproverToRemove(member.userId)}
                         disabled={isAdding}
-                        className="text-gray-400 hover:text-red-500 disabled:opacity-50 transition-colors p-1"
+                        className="ml-0 text-muted-foreground hover:text-destructive shrink-0 h-8 w-8 rounded-none"
                       >
                         <Trash2 className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -293,17 +296,17 @@ export function AddApproverDropdown({
                     placeholder="Search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 border-gray-200 focus-visible:ring-primary"
+                    className="pl-9 h-8 rounded-md text-xs"
                   />
                 </div>
 
                 <div
-                  className="max-h-[200px] overflow-y-auto pr-1"
+                  className="max-h-[200px] overflow-y-auto pr-1 space-y-0.5"
                   onWheel={(e) => e.stopPropagation()}
                   onTouchMove={(e) => e.stopPropagation()}
                 >
                   {filteredMembers.length === 0 ? (
-                    <div className="text-center py-6 text-sm text-muted-foreground">
+                    <div className="text-center py-6 text-xs text-muted-foreground">
                       No matching members
                     </div>
                   ) : (
@@ -311,27 +314,42 @@ export function AddApproverDropdown({
                       <div
                         data-testid={`available-approver-${member.userId}`}
                         key={member.userId}
-                        className={`flex items-center justify-between p-2 hover:bg-primary/10/30 rounded-md transition-colors group ${isAdding ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                        className={`flex items-center justify-between py-1 px-1.5 hover:bg-accent/50 rounded-md transition-colors group cursor-pointer ${isAdding ? 'cursor-not-allowed opacity-50' : ''}`}
                         onClick={() => {
                           if (!isAdding) handleSelectApprover(member.userId);
                         }}
                       >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9 border border-gray-100">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <Avatar className="h-7 w-7 shrink-0">
                             <AvatarImage src={member.profilePicture || undefined} />
-                            <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                            <AvatarFallback className="text-xs bg-yellow-100 text-yellow-700 font-medium">
                               {getInitials(member.name)}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex flex-col">
-                            <p className="text-sm font-semibold text-foreground leading-tight">{member.name}</p>
-                            <p className="text-[10px] text-gray-500 uppercase font-medium">{member.role || "Member"}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium truncate text-foreground leading-tight">{member.name}</p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                              <span className="text-[10px] text-muted-foreground truncate">
+                                {member.role || "Member"}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center h-8 w-8 justify-center group-hover:scale-110 transition-transform">
-                          <CirclePlus className="h-5 w-5 text-foreground" strokeWidth={1.5} />
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isAdding) handleSelectApprover(member.userId);
+                          }}
+                          disabled={isAdding}
+                          className="shrink-0 h-8 w-8 group-hover:opacity-100 transition-opacity"
+                          data-testid={`project-members-add-member-btn-${member.userId}`}
+                        >
+                          <Plus className="h-5 w-5 border-2 border-current rounded-full p-0.5" />
+                        </Button>
                       </div>
                     ))
                   )}

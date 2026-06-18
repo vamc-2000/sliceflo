@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WeekCalendar } from "./DateHeader/WeekCalendar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Users } from "lucide-react";
 import { MyTimesheetView } from "@/app/(pages)/timesheet/create/page";
 import { AddApproverDropdown } from "./TimeSheets/AddApproverDropdown";
@@ -234,14 +235,19 @@ export function DateHeader({ onAddEntry, selectedWeek, setSelectedWeek, myView }
                     userId={userId}
                     trigger={
                         <Button
-                            data-testid="btn-approvers"
-                            variant="ghost"
+                            data-testid="list-members-trigger"
+                            variant="secondary"
+                            size="sm"
                             // disabled={isFrozen}
-                            className="bg-muted text-foreground hover:bg-muted/80 h-10 py-3 px-4 flex items-center gap-3 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="rounded cursor-pointer gap-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <Users className="h-5 w-5 text-foreground" strokeWidth={2} />
-                            <span className="text-sm font-medium text-foreground">Approvers</span>
-                            <span className="text-sm font-medium text-foreground ml-1">{approversCount}</span>
+                            <Users className="h-4 w-4 text-foreground" />
+                            <span className="text-foreground">Approvers</span>
+                            {approversCount > 0 && (
+                                <Badge variant="secondary" className="ml-1">
+                                    {approversCount}
+                                </Badge>
+                            )}
                         </Button>
                     }
                 />
