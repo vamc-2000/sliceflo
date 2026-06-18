@@ -963,7 +963,7 @@ export default function AboutProject({
                               </span>
                             </div>
                             {isLeader && (
-                              <Check className="h-3.5 w-3.5 text-primary" />
+                              <Check className="h-3.5 w-3.5 text-primary-text" />
                             )}
                           </div>
                         </DropdownMenuItem>

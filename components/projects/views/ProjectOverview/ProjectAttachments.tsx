@@ -9,7 +9,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Download, Trash2, ChevronDown, ChevronUp, Maximize2 } from "lucide-react";
+import {
+  Download,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  Maximize2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { toast } from "@/components/ui/sonner";
@@ -65,7 +71,6 @@ export function ProjectAttachments({
   return (
     <>
       <div className="flex items-center justify-between gap-3 p-3 border border-input rounded-md bg-card hover:shadow-sm transition">
-
         {/* LEFT SECTION */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Image
@@ -82,10 +87,13 @@ export function ProjectAttachments({
                 <TooltipTrigger asChild>
                   <p
                     onClick={() => setExpanded(!expanded)}
-                    className={`text-xs font-medium cursor-pointer hover:text-primary transition-colors ${expanded ? "break-all" : "truncate"
-                      }`}
+                    className={`text-xs font-medium cursor-pointer hover:text-primary-text transition-colors ${
+                      expanded ? "break-all" : "truncate"
+                    }`}
                   >
-                    {file.name.length > 10 ? file.name.substring(0, 10) + "..." : file.name}
+                    {file.name.length > 10
+                      ? file.name.substring(0, 10) + "..."
+                      : file.name}
                   </p>
                 </TooltipTrigger>
 
@@ -97,9 +105,7 @@ export function ProjectAttachments({
               </Tooltip>
             </TooltipProvider>
 
-            <p className="text-xs text-muted-foreground">
-              {file.size}
-            </p>
+            <p className="text-xs text-muted-foreground">{file.size}</p>
           </div>
         </div>
 
@@ -128,7 +134,9 @@ export function ProjectAttachments({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onView ? onView(file.id) : setExpanded(!expanded)}
+                  onClick={() =>
+                    onView ? onView(file.id) : setExpanded(!expanded)
+                  }
                   className="bg-muted rounded-full"
                 >
                   <Maximize2 className="h-3 w-3 text-muted-foreground" />
@@ -156,7 +164,6 @@ export function ProjectAttachments({
             </Tooltip>
           </TooltipProvider>
         </div>
-
       </div>
       <ConfirmationModal
         open={isDeleteModalOpen}

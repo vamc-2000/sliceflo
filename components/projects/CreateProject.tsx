@@ -602,7 +602,7 @@ export const CreateProject = ({
             <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-primary">
+                  <h1 className="font-semibold text-sm text-primary-text">
                     Project Lead
                   </h1>
                   <p className="font-medium text-xs text-muted-foreground leading-relaxed">
@@ -696,7 +696,7 @@ export const CreateProject = ({
             <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-primary">
+                  <h1 className="font-semibold text-sm text-primary-text">
                     Priority
                   </h1>
                   <p className="font-medium text-xs text-muted-foreground leading-relaxed">
@@ -782,7 +782,7 @@ export const CreateProject = ({
             <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-primary">
+                  <h1 className="font-semibold text-sm text-primary-text">
                     Lifecycle Stage
                   </h1>
                   <p className="font-medium text-xs text-muted-foreground leading-relaxed">
@@ -865,7 +865,7 @@ export const CreateProject = ({
             <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-start">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-primary">
+                  <h1 className="font-semibold text-sm text-primary-text">
                     Privacy
                   </h1>
                   <p className="font-medium text-xs text-muted-foreground leading-relaxed">
@@ -928,7 +928,7 @@ export const CreateProject = ({
             <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-start">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-primary">
+                  <h1 className="font-semibold text-sm text-primary-text">
                     Portfolios
                   </h1>
                   <p className="font-medium text-xs text-muted-foreground leading-relaxed">

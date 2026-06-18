@@ -486,7 +486,7 @@ export const CalendarDayEventCard = ({
         />
       ) : (
         <h4
-          className="text-sm text-foreground mb-3 line-clamp-2 hover:text-primary transition-colors cursor-pointer"
+          className="text-sm text-foreground mb-3 line-clamp-2 hover:text-primary-text transition-colors cursor-pointer"
           onClick={handleStartEditName}
           data-testid={`calendar-event-card-name-text-${task.id}`}
         >

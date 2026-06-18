@@ -53,7 +53,7 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
         <button
           type="button"
           onClick={toggleAll}
-          className="flex items-center gap-1.5 text-xs font-medium text-primary"
+          className="flex items-center gap-1.5 text-xs font-medium text-primary-text"
           data-testid="duplicate-project-fields-toggle-all"
         >
           <div
@@ -61,12 +61,18 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
               "flex h-4 w-4 items-center justify-center rounded border",
               allSelected
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-muted-foreground bg-card"
+                : "border-muted-foreground bg-card",
             )}
           >
             {allSelected && (
               <svg viewBox="0 0 10 8" className="h-2.5 w-2.5 fill-current">
-                <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                <path
+                  d="M1 4l3 3 5-6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeLinecap="round"
+                />
               </svg>
             )}
           </div>
@@ -92,12 +98,21 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
                       "flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border",
                       checked
                         ? "border-primary bg-primary text-primary-foreground"
-                        : "border-muted-foreground bg-card"
+                        : "border-muted-foreground bg-card",
                     )}
                   >
                     {checked && (
-                      <svg viewBox="0 0 10 8" className="h-2.5 w-2.5 fill-current">
-                        <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                      <svg
+                        viewBox="0 0 10 8"
+                        className="h-2.5 w-2.5 fill-current"
+                      >
+                        <path
+                          d="M1 4l3 3 5-6"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          fill="none"
+                          strokeLinecap="round"
+                        />
                       </svg>
                     )}
                   </div>
@@ -112,7 +127,10 @@ const CustomizeFieldsPanel: React.FC<CustomizeFieldsPanelProps> = ({
   );
 };
 
-type DuplicateMode = "structure" | "structure_items" | "structure_items_updates";
+type DuplicateMode =
+  | "structure"
+  | "structure_items"
+  | "structure_items_updates";
 
 interface DuplicateProjectDialogProps {
   open: boolean;
@@ -123,7 +141,7 @@ interface DuplicateProjectDialogProps {
   onDuplicate: (
     newName: string,
     mode: DuplicateMode,
-    selectedFieldIds?: string[] // (used only in "structure" mode)
+    selectedFieldIds?: string[], // (used only in "structure" mode)
   ) => Promise<void>;
 }
 
@@ -132,22 +150,22 @@ const DUPLICATE_OPTIONS: {
   label: string;
   description: string;
 }[] = [
-    {
-      value: "structure_items_updates",
-      label: "Everything",
-      description: "Project structure, items & updates",
-    },
-    {
-      value: "structure_items",
-      label: "Tasks Only",
-      description: "All properties, fields, and settings will not be duplicated.",
-    },
-    {
-      value: "structure",
-      label: "Customize",
-      description: "Select the fields you want to duplicate",
-    },
-  ];
+  {
+    value: "structure_items_updates",
+    label: "Everything",
+    description: "Project structure, items & updates",
+  },
+  {
+    value: "structure_items",
+    label: "Tasks Only",
+    description: "All properties, fields, and settings will not be duplicated.",
+  },
+  {
+    value: "structure",
+    label: "Customize",
+    description: "Select the fields you want to duplicate",
+  },
+];
 
 const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
   open,
@@ -179,7 +197,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
 
   const toggleField = (id: string) => {
     setSelectedFieldIds((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id],
     );
   };
 
@@ -198,7 +216,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
       await onDuplicate(
         newName.trim(),
         mode,
-        mode === "structure" ? selectedFieldIds : undefined  // ← pass only in customize mode
+        mode === "structure" ? selectedFieldIds : undefined, // ← pass only in customize mode
       );
       onClose();
     } finally {
@@ -255,7 +273,7 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
                           "h-8 rounded-md px-3 text-xs font-medium transition-colors",
                           isActive
                             ? "bg-primary text-primary-foreground"
-                            : "bg-transparent text-muted-foreground hover:bg-muted"
+                            : "bg-transparent text-muted-foreground hover:bg-muted",
                         )}
                         data-testid={`duplicate-project-option-${opt.value}`}
                       >
@@ -268,7 +286,10 @@ const DuplicateProjectDialog: React.FC<DuplicateProjectDialogProps> = ({
                 {/* Description line for Everything & Tasks Only */}
                 {mode !== "structure" && (
                   <p className="mt-2 px-1 text-xs text-muted-foreground">
-                    {DUPLICATE_OPTIONS.find((opt) => opt.value === mode)?.description}
+                    {
+                      DUPLICATE_OPTIONS.find((opt) => opt.value === mode)
+                        ?.description
+                    }
                   </p>
                 )}
 

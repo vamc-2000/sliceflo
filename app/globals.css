@@ -46,6 +46,7 @@
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-orange: var(--brand-orange);
   --color-logout-button: var(--logout-button);
+  --color-primary-text: var(--primary-text);
 }
 
 :root,
@@ -97,6 +98,7 @@
   --switch-track: #B0BAC3;
   --brand-orange: #FF8D28;
   --logout-button: #D04545;
+  --primary-text: #001F3F;
 
   --step-completed: rgb(16, 185, 129);
   /* Emerald 500 */
@@ -173,6 +175,7 @@
   /* Brand Colors - adjusted for Dark Mode contrast */
   --brand: oklch(0.985 0 0);
   --brand-foreground: oklch(0.145 0 0);
+  --primary-text: #FFFFFF;
 }
 
 /* High Contrast Light Theme */

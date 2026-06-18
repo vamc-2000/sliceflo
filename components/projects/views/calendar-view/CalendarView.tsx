@@ -469,7 +469,7 @@ const CustomToolbar = ({
               "bg-transparent text-xs mt-0.5 px-1.5",
               showUnscheduled
                 ? "bg-brand-orange text-foreground"
-                : "text-primary",
+                : "text-primary-text",
             )}
           >
             {unscheduledCount}
@@ -640,7 +640,10 @@ const CustomHeader = ({
       className="flex flex-col items-center py-1 w-full h-full justify-center"
     >
       <span
-        className={cn("font-medium text-xs", isWeekendDay && "text-primary")}
+        className={cn(
+          "font-medium text-xs",
+          isWeekendDay && "text-primary-text",
+        )}
       >
         {label}
       </span>
@@ -937,7 +940,7 @@ const SprintView = ({
               <div
                 className={cn(
                   "text-xs font-medium whitespace-nowrap",
-                  isToday && "text-primary font-bold",
+                  isToday && "text-primary-text font-bold",
                 )}
               >
                 {format(currentDate, "dd EEE")}
@@ -1704,7 +1707,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
             className={cn(
               "flex-1 relative overflow-auto",
               view === Views.DAY && "calendar-day-view",
-              view === Views.WEEK && "calendar-week-view"
+              view === Views.WEEK && "calendar-week-view",
             )}
             onDragOver={(e) => {
               e.preventDefault(); // Allow drop
@@ -1714,10 +1717,13 @@ export function CalendarView({ projectId }: CalendarViewProps) {
               if (view === Views.DAY) {
                 const taskId = (window as any).draggedTaskId;
                 if (taskId) {
-                  const { updateTask, updateSubtask, tasks, subtasks } = useTasksStore.getState();
+                  const { updateTask, updateSubtask, tasks, subtasks } =
+                    useTasksStore.getState();
                   const task = tasks.find((t) => t.id === taskId);
-                  const subtask = !task ? subtasks.find((s) => s.id === taskId) : null;
-                  
+                  const subtask = !task
+                    ? subtasks.find((s) => s.id === taskId)
+                    : null;
+
                   const updates = {
                     startDate: convertSelectedDateToUTC(date!),
                     endDate: convertSelectedDateToUTC(date!),
@@ -1728,7 +1734,7 @@ export function CalendarView({ projectId }: CalendarViewProps) {
                   } else {
                     updateTask(taskId, updates);
                   }
-                  
+
                   (window as any).draggedTaskId = null;
                 }
               }

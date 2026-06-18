@@ -1,5 +1,5 @@
-import React from 'react';
-import { formatLocalDate } from '@/utils/timezone-utils';
+import React from "react";
+import { formatLocalDate } from "@/utils/timezone-utils";
 import {
   GitMerge,
   ChevronRight,
@@ -10,11 +10,11 @@ import {
   CircleArrowLeft,
   CircleArrowRight,
   SkipBack,
-  SkipForward
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Task, Subtask } from '@/types/task.types';
-import { formatTaskId } from '@/utils/task-utils';
+  SkipForward,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Task, Subtask } from "@/types/task.types";
+import { formatTaskId } from "@/utils/task-utils";
 
 interface RelationshipDetailDialogProps {
   sourceTask: Task | Subtask;
@@ -24,23 +24,50 @@ interface RelationshipDetailDialogProps {
 }
 
 export const RELATIONSHIP_TYPES = [
-  { value: "relates-to", label: "Relates to", icon: Link2, color: "text-blue-500" },
-  { value: "duplicate-of", label: "Duplicate of", icon: Copy, color: "text-purple-500" },
-  { value: "blocked-by", label: "Blocked by", icon: Ban, color: "text-red-500" },
-  { value: "blocking", label: "Blocking", icon: XOctagon, color: "text-orange-500" },
-  { value: "starts-before", label: "Starts Before", icon: CircleArrowLeft, color: "text-green-500" },
-  { value: "starts-after", label: "Starts After", icon: CircleArrowRight, color: "text-teal-500" },
+  {
+    value: "relates-to",
+    label: "Relates to",
+    icon: Link2,
+    color: "text-blue-500",
+  },
+  {
+    value: "duplicate-of",
+    label: "Duplicate of",
+    icon: Copy,
+    color: "text-purple-500",
+  },
+  {
+    value: "blocked-by",
+    label: "Blocked by",
+    icon: Ban,
+    color: "text-red-500",
+  },
+  {
+    value: "blocking",
+    label: "Blocking",
+    icon: XOctagon,
+    color: "text-orange-500",
+  },
+  {
+    value: "starts-before",
+    label: "Starts Before",
+    icon: CircleArrowLeft,
+    color: "text-green-500",
+  },
+  {
+    value: "starts-after",
+    label: "Starts After",
+    icon: CircleArrowRight,
+    color: "text-teal-500",
+  },
   // { value: "finishes-before", label: "Finishes Before", icon: SkipBack, color: "text-yellow-600" },
   // { value: "finishes-after", label: "Finishes After", icon: SkipForward, color: "text-lime-600" },
 ];
 
-export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> = ({
-  sourceTask,
-  relType,
-  targetTask,
-  projectSlug,
-}) => {
-  const rel = RELATIONSHIP_TYPES.find(r => r.value === relType);
+export const RelationshipDetailDialog: React.FC<
+  RelationshipDetailDialogProps
+> = ({ sourceTask, relType, targetTask, projectSlug }) => {
+  const rel = RELATIONSHIP_TYPES.find((r) => r.value === relType);
   const RelIcon = rel?.icon || Link2;
   const relColor = rel?.color || "text-muted-foreground";
   const relLabel = rel?.label || relType;
@@ -51,7 +78,9 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
       data-testid="relationship-detail-dialog"
     >
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold leading-none tracking-tight text-primary">Relationship</h3>
+        <h3 className="text-sm font-semibold leading-none tracking-tight text-primary-text">
+          Relationship
+        </h3>
         <p className="text-xs text-muted-foreground">
           See what this task depends on and what depends on it.
         </p>
@@ -64,7 +93,9 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
           <span className="text-[10px] text-muted-foreground shrink-0 font-medium">
             {formatTaskId(projectSlug, sourceTask.taskNumber)}
           </span>
-          <span className="text-xs font-medium truncate block flex-1 min-w-0">{sourceTask.name}</span>
+          <span className="text-xs font-medium truncate block flex-1 min-w-0">
+            {sourceTask.name}
+          </span>
           {sourceTask.startDate && (
             <span className="text-[10px] text-muted-foreground shrink-0">
               {formatLocalDate(sourceTask.startDate)}
@@ -95,7 +126,9 @@ export const RelationshipDetailDialog: React.FC<RelationshipDetailDialogProps> =
             <span className="text-[10px] text-muted-foreground shrink-0 font-medium">
               {formatTaskId(projectSlug, targetTask.taskNumber)}
             </span>
-            <span className="text-xs font-medium truncate block flex-1 min-w-0">{targetTask.name}</span>
+            <span className="text-xs font-medium truncate block flex-1 min-w-0">
+              {targetTask.name}
+            </span>
           </span>
           <div className="flex items-center gap-1 shrink-0 ml-1">
             {targetTask.startDate && (

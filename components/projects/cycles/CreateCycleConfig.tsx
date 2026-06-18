@@ -318,7 +318,7 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
         <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
           <div className="space-y-3">
             <div>
-              <h1 className="font-semibold text-sm text-primary">
+              <h1 className="font-semibold text-sm text-primary-text">
                 Cycle description
               </h1>
               <p className="font-medium text-xs text-muted-foreground leading-relaxed">
@@ -341,7 +341,9 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
         <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
           <div className="flex justify-between items-start">
             <div className="flex-1 pr-6">
-              <h1 className="font-semibold text-sm text-primary">Labels</h1>
+              <h1 className="font-semibold text-sm text-primary-text">
+                Labels
+              </h1>
               <p className="font-medium text-xs text-muted-foreground leading-relaxed">
                 Create and manage labels to categorize and organize cycles,
                 making it easier for your team to filter and track work.
@@ -387,7 +389,7 @@ export function CreateCycleConfig({ projectId }: CreateCycleConfigProps) {
         <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
           <div className="space-y-4">
             <div className="flex-1">
-              <h1 className="font-semibold text-sm text-primary">
+              <h1 className="font-semibold text-sm text-primary-text">
                 Recur cycles
               </h1>
               <p className="font-medium text-xs text-muted-foreground leading-relaxed">

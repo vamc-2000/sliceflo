@@ -1978,7 +1978,7 @@ export const GanttTaskTable = React.forwardRef<
                         className={cn(
                           "flex items-center rounded-sm transition-all group",
                           isAddTaskRowHovered || showTaskTypeMenu
-                            ? "border border-primary/30"
+                            ? "border border-primary-text"
                             : "border border-transparent",
                         )}
                       >
@@ -1986,7 +1986,7 @@ export const GanttTaskTable = React.forwardRef<
                           className={cn(
                             "flex items-center gap-1 px-2 py-0.5 transition-colors text-xs",
                             isAddTaskRowHovered || showTaskTypeMenu
-                              ? "text-primary/60"
+                              ? "text-primary-text"
                               : "text-muted-foreground",
                           )}
                           onClick={() => {
@@ -2004,7 +2004,7 @@ export const GanttTaskTable = React.forwardRef<
                             className={cn(
                               "h-3 w-3",
                               isAddTaskRowHovered || showTaskTypeMenu
-                                ? "text-primary/60"
+                                ? "text-primary-text"
                                 : "text-muted-foreground",
                             )}
                           />
@@ -2017,13 +2017,13 @@ export const GanttTaskTable = React.forwardRef<
                           <DropdownMenuTrigger asChild>
                             <button
                               className={cn(
-                                "px-1 py-0.5 border-l border-primary/30 text-muted-foreground hover:text-primary/60 transition-colors outline-none",
+                                "px-1 py-0.5 border-l border-primary-text text-muted-foreground hover:text-primary/60 transition-colors outline-none",
                                 !(isAddTaskRowHovered || showTaskTypeMenu) &&
                                   "invisible",
                               )}
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <ChevronUp className="h-3 w-3 text-primary/60" />
+                              <ChevronUp className="h-3 w-3 text-primary-text" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuPortal>
