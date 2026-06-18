@@ -17,6 +17,18 @@ interface MailListProps {
 
 dayjs.extend(isBetween);
 
+const stripHtml = (html: string) => {
+  if (!html) return "";
+  const cleanText = html.replace(/<[^>]*>/g, "");
+  return cleanText
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+};
+
 const MailList: React.FC<MailListProps> = ({
   emails,
   onEmailSelect,
@@ -107,70 +119,51 @@ const MailList: React.FC<MailListProps> = ({
                 : "bg-background border-r-transparent border-border text-foreground font-semibold hover:bg-primary/10"
               }`}
           >
-            {/* Email content */}
-            <div data-testid={`mail-list-item-content-${email._id}`} className="flex-1 min-w-0">
-              <div className="flex justify-between items-center">
-                {/* LEFT SIDE */}
-                <div data-testid={`mail-list-item-sender-${email._id}`} className="flex items-center gap-2 min-w-0">
-                  {/* <Avatar
-                    className="h-7 w-7 shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openProfileModal({
-                        name: email.eventData?.updatedBy?.name ?? "Unknown",
-                        email: email.eventData?.updatedBy?.email,
-                        profilePicture: email.eventData?.updatedBy?.profilePicture,
-                      });
-                    }}
-                  >
-                    <AvatarImage
-                      src={email.eventData?.updatedBy?.profilePicture ?? ""}
-                      alt={email.eventData?.updatedBy?.name ?? "User"}
-                    />
-                    <AvatarFallback>
-                      {email.eventData?.updatedBy?.name?.[0]?.toUpperCase() ?? "U"}
-                    </AvatarFallback>
-                  </Avatar> */}
-                  <Avatar
-                    data-testid={`mail-list-item-avatar-${email._id}`}
-                    className="h-7 w-7 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openProfileModal({
-                        name: email.eventData?.updatedBy?.name ?? "Unknown",
-                        email: email.eventData?.updatedBy?.email,
-                        profilePicture: email.eventData?.updatedBy?.profilePicture,
-                        profilePictureUrl: email.eventData?.updatedBy?.profilePictureUrl, // ✅ pass this too if ProfileModal uses it
-                      });
-                    }}
-                  >
-                    {/* ✅ Add src here */}
-                    <AvatarImage
-                      src={email.eventData?.updatedBy?.profilePictureUrl ?? undefined}
-                      alt={email.eventData?.updatedBy?.name ?? "User"}
-                    />
-                    <AvatarFallback>
-                      {email.eventData?.updatedBy?.name?.[0]?.toUpperCase() ?? "U"}
-                    </AvatarFallback>
-                  </Avatar>
+            {/* Left Side: Avatar */}
+            <Avatar
+              data-testid={`mail-list-item-avatar-${email._id}`}
+              className="h-7 w-7 cursor-pointer shrink-0 mt-0.5"
+              onClick={(e) => {
+                e.stopPropagation();
+                openProfileModal({
+                  name: email.eventData?.updatedBy?.name ?? "Unknown",
+                  email: email.eventData?.updatedBy?.email,
+                  profilePicture: email.eventData?.updatedBy?.profilePicture,
+                  profilePictureUrl: email.eventData?.updatedBy?.profilePictureUrl,
+                });
+              }}
+            >
+              <AvatarImage
+                src={email.eventData?.updatedBy?.profilePictureUrl ?? undefined}
+                alt={email.eventData?.updatedBy?.name ?? "User"}
+              />
+              <AvatarFallback>
+                {email.eventData?.updatedBy?.name?.[0]?.toUpperCase() ?? "U"}
+              </AvatarFallback>
+            </Avatar>
 
-                  <p data-testid={`mail-list-item-sender-name-${email._id}`} className="truncate font-semibold text-sm">{email.eventData?.updatedBy?.name ?? "Unknown"}</p>
-                </div>
-
-                {/* RIGHT SIDE */}
-                <div data-testid={`mail-list-item-date-${email._id}`} className="flex items-center gap-0 shrink-0">
+            {/* Right Side: Mail Info */}
+            <div data-testid={`mail-list-item-content-${email._id}`} className="flex-1 min-w-0 flex flex-col gap-0.5">
+              <div className="flex justify-between items-baseline gap-2">
+                <p
+                  data-testid={`mail-list-item-subject-${email._id}`}
+                  className="truncate font-medium text-sm text-foreground flex-1 min-w-0"
+                >
+                  {email.subject ?? "(No Subject)"}
+                </p>
+                <div data-testid={`mail-list-item-date-${email._id}`} className="flex items-center shrink-0">
                   {email.createdAt && (
                     <span className="text-xs text-muted-foreground">
-                      {/* {dayjs(email.createdAt).format("DD MMM, hh:mm A")} */}
-                      {formatLocalDate(email.createdAt)},{formatLocalTime(email.createdAt)}
+                      {formatLocalDate(email.createdAt)}, {formatLocalTime(email.createdAt)}
                     </span>
                   )}
                 </div>
               </div>
-
-              {/* Subject */}
-              <p data-testid={`mail-list-item-subject-${email._id}`} className="text-xs truncate font-medium">
-                {email.subject ?? "(No Subject)"}
+              <p
+                data-testid={`mail-list-item-body-preview-${email._id}`}
+                className="text-xs text-muted-foreground truncate"
+              >
+                {stripHtml(email.body || "")}
               </p>
             </div>
           </div>
