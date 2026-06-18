@@ -31,21 +31,47 @@ interface NewThreadInputProps {
     files?: File[];
   }) => Promise<void>;
   mentionableMembers: MentionableMember[];
+  initialText?: string;
   'data-testid'?: string;
 }
 
-export default function NewThreadInput({ onNewThread, mentionableMembers, 'data-testid': testId, }: NewThreadInputProps) {
+export default function NewThreadInput({
+  onNewThread,
+  mentionableMembers,
+  initialText = '',
+  'data-testid': testId,
+}: NewThreadInputProps) {
   const { user } = useAuthStore();
 
   const profilePictureUrl = useProfileStore((state) => state.user?.profilePictureUrl);
 
-  const [newThreadText, setNewThreadText] = useState('');
+  const [newThreadText, setNewThreadText] = useState(initialText);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [showAttachFile, setShowAttachFile] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (initialText) {
+      setNewThreadText(initialText);
+      // Focus textarea and position cursor at end
+      if (inputRef.current) {
+        inputRef.current.focus();
+        const len = initialText.length;
+        // Small delay to ensure render is completed
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.setSelectionRange(len, len);
+            // trigger auto-resize
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+          }
+        }, 50);
+      }
+    }
+  }, [initialText]);
 
   const {
     showMentionList,

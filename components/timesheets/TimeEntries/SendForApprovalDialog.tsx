@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { OctagonAlert, X, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { RichTextEditor } from "@/components/rich-text-editor";
+import { ProseMirrorEditor } from "@/components/proseMirror/ProseMirrorEditor";
 import { useState, useMemo, useEffect } from "react";
 import { format, getWeek } from "date-fns";
 import { useTimesheetStore } from "@/stores/timesheet-store";
@@ -66,6 +66,12 @@ export default function SendForApprovalDialog({
         }
     }, [userId, open, fetchUserApprovers]);
 
+    useEffect(() => {
+        if (!open) {
+            setContent("");
+        }
+    }, [open]);
+
     const approvers = useMemo(() => {
         if (!selectedWeek) return [];
 
@@ -109,10 +115,6 @@ export default function SendForApprovalDialog({
 
         return [];
     }, [selectedWeek, timesheets, workspaceMembers, selectedUserApprovers, userId]);
-
-    const handleContentChange = (value: string) => {
-        setContent(value);
-    };
 
     const handleSendForApproval = async () => {
         if (!selectedWeek || !userId) return;
@@ -173,7 +175,7 @@ export default function SendForApprovalDialog({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent data-testid="send-for-approval-dialog" className="w-[38vw] sm:max-w-6xl max-w-none p-0 gap-0">
+            <DialogContent data-testid="send-for-approval-dialog" className="w-[38vw] sm:max-w-6xl max-w-none p-0 gap-0 ">
                 {/* Header */}
                 <VisuallyHidden>
                     <DialogTitle>Send Timesheet for Approval</DialogTitle>
@@ -332,12 +334,12 @@ export default function SendForApprovalDialog({
                         </h3>
 
                         <div data-testid="approval-note-editor" className="rounded-md border overflow-hidden w-full">
-                            <RichTextEditor
-                                data-testid="approval-note-editor"
-                                value={content}
-                                onChange={handleContentChange}
+                            <ProseMirrorEditor
+                                initialContent={content}
+                                onBlur={setContent}
                                 placeholder="Enter your message here..."
-                                className="w-full min-h-[80px]!"
+                                className="border-none bg-background text-sm"
+                                editable={true}
                             />
                         </div>
                     </div>

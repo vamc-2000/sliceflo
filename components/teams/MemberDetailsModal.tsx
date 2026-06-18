@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Phone, Mail, MapPin, Users, X, Send, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Users, X, Send, MessageSquare } from 'lucide-react';
 
 const getAvatarColor = (id: string) => {
   if (!id) return 'bg-blue-500';
@@ -46,19 +46,22 @@ interface Props {
   open: boolean;
   onClose: () => void;
   member: Member | null;
+  onStartDiscussion?: (member: Member) => void;
 }
 
-const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
+const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member, onStartDiscussion }) => {
   if (!member) return null;
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const handleSendEmail = () => {
-    if (member.email) {
-      window.location.href = `mailto:${member.email}`;
-    }
+  const handleStartDiscussion = () => {
+    if (!member) return;
+
+    onStartDiscussion?.(member);
+    onClose();
+
   };
 
   return (
@@ -127,13 +130,13 @@ const MemberDetailsModal: React.FC<Props> = ({ open, onClose, member }) => {
               </p>
             </div>
             <Button
-              data-testid={`btn-send-email-${member.id}`}
+              //data-testid={`btn-send-email-${member.id}`}
               variant="ghost"
               size="icon"
-              onClick={handleSendEmail}
+              onClick={handleStartDiscussion}
               className="w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300 ml-2"
             >
-              <MessageCircle className="h-4 w-4 text-[#0A2540]" />
+              <MessageSquare className="h-4 w-4 text-[#0A2540]" />
             </Button>
           </div>
 

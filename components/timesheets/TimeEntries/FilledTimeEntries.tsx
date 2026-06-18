@@ -267,7 +267,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                 return (
                     <div className="flex justify-center">
                         <span
-                            className={`rounded-md px-9 py-3 text-xs font-medium transition-colors
+                            className={`rounded-md px-8 py-1.5 text-xs font-medium transition-colors
                                 ${hasHours
                                     ? "bg-[#E3EFFF] dark:bg-primary/10 text-foreground"
                                     : "bg-muted text-foreground"
@@ -307,7 +307,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
             return (
                 <div className="flex justify-center">
                     <span
-                        className={`rounded-md px-11 py-3 text-xs font-semibold
+                        className={`rounded-md px-20 py-1.5 text-xs font-semibold 
                                 ${total > 0 ? "bg-[#E3EFFF] dark:bg-primary/10 text-foreground" : "bg-muted text-foreground"}
                                 `}
                     >
@@ -399,7 +399,7 @@ export default function FilledTimeEntries({ selectedWeek }: Props) {
                                     disabled={row.original.originalEntry.status === "Pending" || row.original.originalEntry.status === "Approved"}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-                                    Remove 
+                                    Remove
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

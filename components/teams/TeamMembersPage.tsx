@@ -37,7 +37,13 @@ import { Loader } from "../Loader";
 
 import { getAvatarColor, getInitials } from "@/utils/avatar-utils";
 
-export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
+export default function TeamMembersPage({
+  teamMembers,
+  onStartDiscussion
+}: {
+  teamMembers: any;
+  onStartDiscussion?: (member: any) => void;
+}) {
   const {
     teams,
     removeMember,
@@ -490,11 +496,17 @@ export default function TeamMembersPage({ teamMembers }: { teamMembers: any }) {
         existingMembers={members}
       />
 
-      <MemberDetailsModal
+      {/* <MemberDetailsModal
         data-testid="modal-member-details"
         open={openModal}
         onClose={() => setOpenModal(false)}
         member={selectedMember}
+      /> */}
+      <MemberDetailsModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        member={selectedMember}
+        onStartDiscussion={onStartDiscussion}
       />
 
       <ConfirmationModal

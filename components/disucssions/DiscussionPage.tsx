@@ -71,6 +71,13 @@ export default function DiscussionPage({
     const searchParams = useSearchParams();
     const router = useRouter();
     const queryThreadId = searchParams?.get("threadId") ?? null;
+    const prefillMemberId = searchParams?.get("prefillMemberId") ?? null;
+
+    const initialText = React.useMemo(() => {
+        if (!prefillMemberId || !mentionableMembers) return "";
+        const member = mentionableMembers.find((m) => m.id === prefillMemberId);
+        return member ? `@${member.name} ` : "";
+    }, [prefillMemberId, mentionableMembers]);
 
     const handleClearThreadView = () => {
         if (typeof window !== "undefined") {
@@ -220,6 +227,15 @@ export default function DiscussionPage({
         if (newId) {
             setCollapsedThreads((prev) => prev.filter((id) => id !== newId));
             setScrollTargetId(newId.startsWith("pending-") ? "__latest__" : newId);
+
+            // Clean up prefillMemberId parameter from URL once thread is successfully created
+            if (typeof window !== "undefined") {
+                const url = new URL(window.location.href);
+                if (url.searchParams.has("prefillMemberId")) {
+                    url.searchParams.delete("prefillMemberId");
+                    router.replace(url.pathname + url.search, { scroll: false });
+                }
+            }
         }
     };
 
@@ -279,6 +295,7 @@ export default function DiscussionPage({
                                     data-testid="new-thread-input-task-empty"
                                     onNewThread={handleNewThreadFromInput}
                                     mentionableMembers={mentionableMembers}
+                                    initialText={initialText}
                                 />
                             </div>
                         </div>
@@ -352,6 +369,7 @@ export default function DiscussionPage({
                         data-testid="new-thread-input-main"
                         onNewThread={handleNewThreadFromInput}
                         mentionableMembers={mentionableMembers}
+                        initialText={initialText}
                     />
                 </div>
             )}

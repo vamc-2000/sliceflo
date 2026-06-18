@@ -59,6 +59,7 @@ export const TeamsDashboard: React.FC = () => {
     setActiveTab(tab)
     const params = new URLSearchParams(searchParams.toString())
     params.set('tab', tab)
+    params.delete('prefillMemberId')
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }
   const teamIdFromUrl = decodeURIComponent(pathname.split("/").pop() ?? "") as string;
@@ -433,7 +434,18 @@ export const TeamsDashboard: React.FC = () => {
               )
             )}
 
-            {activeTab === 'Team Members' && <TeamMembersPage teamMembers={displayTeam} />}
+            {activeTab === 'Team Members' && (
+              <TeamMembersPage
+                teamMembers={displayTeam}
+                onStartDiscussion={(member) => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('tab', 'Discussions');
+                  params.set('prefillMemberId', member.id);
+                  router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+                  setActiveTab('Discussions');
+                }}
+              />
+            )}
             {activeTab === 'StandupCall' && <TeamStandUpCall />}
             {activeTab === 'All Work' && <TeamAllWork />}
           </>
