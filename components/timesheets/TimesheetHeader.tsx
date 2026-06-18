@@ -127,9 +127,18 @@ export function TimesheetHeader({ activeTab, onTabChange, myView, onMyViewChange
                     </div>
                 )}
 
-                <div className="ml-2">
-                    <TimeSheetsSettings />
-                </div>
+                {activeTab === "my" && (
+                    <div className="ml-2">
+                        <TimeSheetsSettings />
+                    </div>
+                )}
+                {/* Commented out settings icon for My Team's Timesheets and Approvals tabs
+                {(activeTab === "teams" || activeTab === "approvals") && (
+                    <div className="ml-2">
+                        <TimeSheetsSettings />
+                    </div>
+                )}
+                */}
             </div>
         </div>
     );
