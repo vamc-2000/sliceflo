@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 interface EmptyTimesheetEntriesProps {
-    onAddEntry?: () => void;
+    onAddEntry?: (mode?: "task" | "freetext") => void;
 }
 
 export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps) {
@@ -63,7 +63,7 @@ export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps
                     <Button
                         data-testid="btn-add-task-empty"
                         className="flex-1 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg"
-                        onClick={onAddEntry}
+                        onClick={() => onAddEntry?.("task")}
                     >
                         + Add Task
                     </Button>
@@ -71,7 +71,7 @@ export function EmptyTimesheetEntries({ onAddEntry }: EmptyTimesheetEntriesProps
                     <Button
                         data-testid="btn-add-freetext-empty"
                         className="flex-1 rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg"
-                        onClick={onAddEntry}
+                        onClick={() => onAddEntry?.("freetext")}
                     >
                         <Plus className="mr-1 h-4 w-4" />
                         Add free Text

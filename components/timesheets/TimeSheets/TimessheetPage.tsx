@@ -13,11 +13,15 @@ export default function TimessheetPage({
   setOpen,
   selectedWeek,
   prefillDate: externalPrefillDate,
+  mode,
+  setMode,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
   selectedWeek: { start: Date; end: Date };
   prefillDate?: Date;
+  mode?: "task" | "freetext";
+  setMode?: (mode: "task" | "freetext") => void;
 }) {
   const {
     timesheets,
@@ -68,13 +72,17 @@ export default function TimessheetPage({
   return (
     <div data-testid="timesheet-page-container" className="h-full min-h-0 flex flex-col overflow-hidden">
       {!hasEntries ? (
-        <EmptyTimesheetEntries onAddEntry={() => setOpen(true)} />
+        <EmptyTimesheetEntries onAddEntry={(m) => {
+          setMode?.(m || "task");
+          setOpen(true);
+        }} />
       ) : (
         <div data-testid="timesheet-entries-container" className="flex-1 min-h-0 overflow-y-auto p-2">
           <TimesheetBody
             entries={filteredTimesheets}
             onAddEntry={(date) => {
               setPrefillDate(date);
+              setMode?.("task");
               setOpen(true);
             }}
           />
@@ -86,8 +94,10 @@ export default function TimessheetPage({
         onClose={() => {
           setOpen(false);
           setPrefillDate(undefined);
+          setMode?.("task");
         }}
         prefillDate={resolvedPrefillDate}
+        mode={mode}
       />
     </div>
   );

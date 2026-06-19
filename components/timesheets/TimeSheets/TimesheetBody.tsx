@@ -82,7 +82,7 @@ export function TimesheetBody({ onAddEntry, entries }: TimesheetBodyProps) {
   }, [groupedByDate]);
 
   if (entries.length === 0) {
-    return <EmptyTimesheetEntries onAddEntry={onAddEntry} />;
+    return <EmptyTimesheetEntries onAddEntry={() => onAddEntry(undefined)} />;
   }
 
   return (

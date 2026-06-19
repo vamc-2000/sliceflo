@@ -25,6 +25,7 @@ export default function TimesheetCreatePage() {
   const [teamFilter, setTeamFilter] = useState<TeamFilter>("all");
   const [open, setOpen] = useState(false);
   const [prefillDate, setPrefillDate] = useState<Date | undefined>(undefined);
+  const [modalMode, setModalMode] = useState<"task" | "freetext">("task");
 
   const [selectedWeek, setSelectedWeek] = useState({
     start: startOfWeek(new Date(), { weekStartsOn: 1 }), // Monday — matches backend weekStart
@@ -80,6 +81,7 @@ export default function TimesheetCreatePage() {
             <DateHeader
               onAddEntry={() => {
                 setPrefillDate(selectedWeek.start);
+                setModalMode("task");
                 setOpen(true);
               }}
               selectedWeek={selectedWeek}
@@ -109,10 +111,15 @@ export default function TimesheetCreatePage() {
                 open={open}
                 setOpen={(v) => {
                   setOpen(v);
-                  if (!v) setPrefillDate(undefined);
+                  if (!v) {
+                    setPrefillDate(undefined);
+                    setModalMode("task");
+                  }
                 }}
                 selectedWeek={selectedWeek}
                 prefillDate={prefillDate}
+                mode={modalMode}
+                setMode={setModalMode}
               />
             : <TimeEntriesBody selectedWeek={selectedWeek} />
         )}

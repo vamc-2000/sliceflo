@@ -103,8 +103,7 @@ export default function TeamAllWork() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const router = useRouter();
 
   const teamId = activeTeamId || (teams.length > 0 ? teams[0].id : null);
@@ -239,15 +238,17 @@ export default function TeamAllWork() {
   const filterOptions = useMemo(() => {
     const projectIds = new Set<string>();
     const userIds = new Set<string>();
-    const statuses = new Set<string>();
-    const priorities = new Set<string>();
+    const roles = new Set<string>();
 
     teamScopedTasks.forEach((t) => {
       if (t.projectId) projectIds.add(String(t.projectId));
       if (t.assignee) userIds.add(String(t.assignee));
       if ((t as any).assigneeId) userIds.add(String((t as any).assigneeId));
-      if (t.status) statuses.add(t.status);
-      if (t.priority) priorities.add(t.priority);
+    });
+
+    activeTeam?.teamMembers?.forEach((member: any) => {
+      const r = member.role || "Member";
+      roles.add(r);
     });
 
     return {
@@ -256,8 +257,7 @@ export default function TeamAllWork() {
         activeTeam?.teamMembers?.filter(
           (member: any) => !!member.id && userIds.has(String(member.id))
         ) || [],
-      statuses: Array.from(statuses),
-      priorities: Array.from(priorities),
+      roles: Array.from(roles),
     };
   }, [teamScopedTasks, teamProjects, activeTeam]);
 
@@ -266,8 +266,6 @@ export default function TeamAllWork() {
       let mTasks = m.tasks;
 
       if (selectedProjectId) mTasks = mTasks.filter(t => t.projectId === selectedProjectId);
-      if (selectedStatus) mTasks = mTasks.filter(t => t.status === selectedStatus);
-      if (selectedPriority) mTasks = mTasks.filter(t => t.priority === selectedPriority);
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         mTasks = mTasks.filter(t => t.name.toLowerCase().includes(q) || t.description?.toLowerCase().includes(q));
@@ -276,10 +274,14 @@ export default function TeamAllWork() {
       return { ...m, tasks: mTasks };
     });
 
-    const isAnyFilterActive = !!(selectedProjectId || selectedStatus || selectedPriority || searchQuery || selectedUserId);
+    const isAnyFilterActive = !!(selectedProjectId || selectedRole || searchQuery || selectedUserId);
 
     if (selectedUserId) {
       result = result.filter(m => m.id === selectedUserId);
+    }
+
+    if (selectedRole) {
+      result = result.filter(m => (m.role || "Member").toLowerCase() === selectedRole.toLowerCase());
     }
 
     if (isAnyFilterActive) {
@@ -287,9 +289,9 @@ export default function TeamAllWork() {
     }
 
     return result;
-  }, [membersWithTasks, selectedProjectId, selectedUserId, selectedStatus, selectedPriority, searchQuery]);
+  }, [membersWithTasks, selectedProjectId, selectedUserId, selectedRole, searchQuery]);
 
-  const activeFilterCount = [selectedProjectId, selectedUserId, selectedStatus, selectedPriority].filter(Boolean).length;
+  const activeFilterCount = [selectedProjectId, selectedUserId, selectedRole].filter(Boolean).length;
 
   const toggleMember = (memberId: string) => {
     const newExpanded = new Set(expandedMembers);
@@ -526,106 +528,53 @@ export default function TeamAllWork() {
                 </DropdownMenuPortal>
               </DropdownMenuSub>
 
-              {/* Status Submenu */}
+              {/* Role Submenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
-                  data-testid="filter-allwork-submenu-status"
+                  data-testid="filter-allwork-submenu-role"
                   className={`
                     relative flex items-center gap-2 pl-3 text-foreground
-                    ${selectedStatus !== null ? 'bg-muted' : ''}
+                    ${selectedRole !== null ? 'bg-muted' : ''}
                   `}
                 >
                   {/* ✅ Left indicator for active filter */}
-                  {selectedStatus !== null && (
+                  {selectedRole !== null && (
                     <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
                   )}
-                  <span>Status</span>
+                  <span>Role</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
                     <DropdownMenuItem
-                      data-testid="filter-allwork-status-all"
-                      onClick={() => setSelectedStatus(null)}
+                      data-testid="filter-allwork-role-all"
+                      onClick={() => setSelectedRole(null)}
                       className={`
                         relative flex items-center gap-2 pl-3
-                        ${selectedStatus === null ? 'bg-muted' : ''}
+                        ${selectedRole === null ? 'bg-muted' : ''}
                       `}
                     >
                       {/* ✅ Left indicator */}
-                      {selectedStatus === null && (
+                      {selectedRole === null && (
                         <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
                       )}
-                      All status
+                      All Roles
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {filterOptions.statuses.map(status => (
+                    {filterOptions.roles.map(role => (
                       <DropdownMenuItem
-                        key={status}
-                        data-testid={`filter-allwork-status-${status.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={() => setSelectedStatus(status)}
+                        key={role}
+                        data-testid={`filter-allwork-role-${role.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={() => setSelectedRole(role)}
                         className={`
                           relative flex items-center gap-2 pl-3
-                          ${selectedStatus === status ? 'bg-muted' : ''}
+                          ${selectedRole === role ? 'bg-muted' : ''}
                         `}
                       >
                         {/* ✅ Left indicator */}
-                        {selectedStatus === status && (
+                        {selectedRole === role && (
                           <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
                         )}
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-
-              {/* Priority Submenu */}
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger
-                  data-testid="filter-allwork-submenu-priority"
-                  className={`
-                    relative flex items-center gap-2 pl-3 text-foreground
-                    ${selectedPriority !== null ? 'bg-muted' : ''}
-                  `}
-                >
-                  {/* ✅ Left indicator for active filter */}
-                  {selectedPriority !== null && (
-                    <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
-                  )}
-                  <span>Priority</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="bg-popover text-popover-foreground border-0 border-b-[5px] border-primary">
-                    <DropdownMenuItem
-                      data-testid="filter-allwork-priority-all"
-                      onClick={() => setSelectedPriority(null)}
-                      className={`
-                        relative flex items-center gap-2 pl-3
-                        ${selectedPriority === null ? 'bg-muted' : ''}
-                      `}
-                    >
-                      {/* ✅ Left indicator */}
-                      {selectedPriority === null && (
-                        <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
-                      )}
-                      All Priority
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {filterOptions.priorities.map(priority => (
-                      <DropdownMenuItem
-                        key={priority}
-                        data-testid={`filter-allwork-priority-${priority.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={() => setSelectedPriority(priority)}
-                        className={`
-                          relative flex items-center gap-2 pl-3 capitalize
-                          ${selectedPriority === priority ? 'bg-muted' : ''}
-                        `}
-                      >
-                        {/* ✅ Left indicator */}
-                        {selectedPriority === priority && (
-                          <span className="absolute left-0 top-0 h-full w-[3px] bg-primary rounded-r-sm transition-all duration-200" />
-                        )}
-                        {priority}
+                        <span>{role}</span>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuSubContent>
@@ -640,8 +589,7 @@ export default function TeamAllWork() {
                     onClick={() => {
                       setSelectedProjectId(null);
                       setSelectedUserId(null);
-                      setSelectedStatus(null);
-                      setSelectedPriority(null);
+                      setSelectedRole(null);
                     }}
                   >
                     Clear all filters
