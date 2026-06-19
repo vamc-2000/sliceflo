@@ -19,7 +19,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,12 +45,12 @@ type Priority = "low" | "medium" | "high" | "urgent";
 
 const priorityConfig: Record<
   Priority,
-  { label: string; iconColor: string; badgeColor: string }
+  { label: string; iconColor: string; badgeColor: string; hexColor: string }
 > = {
-  low: { label: "Low", iconColor: "text-green-500", badgeColor: "bg-green-100" },
-  medium: { label: "Medium", iconColor: "text-yellow-500", badgeColor: "bg-yellow-100" },
-  high: { label: "High", iconColor: "text-orange-500", badgeColor: "bg-orange-100" },
-  urgent: { label: "Urgent", iconColor: "text-red-500", badgeColor: "bg-red-100" },
+  low: { label: "Low", iconColor: "text-green-500", badgeColor: "bg-green-100", hexColor: "#22C55E" },
+  medium: { label: "Medium", iconColor: "text-yellow-500", badgeColor: "bg-yellow-100", hexColor: "#EAB308" },
+  high: { label: "High", iconColor: "text-orange-500", badgeColor: "bg-orange-100", hexColor: "#F97316" },
+  urgent: { label: "Urgent", iconColor: "text-red-500", badgeColor: "bg-red-100", hexColor: "#EF4444" },
 };
 
 interface CreatePortfolioProps {
@@ -343,12 +343,11 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                         {startDate ? formatLocalDate(startDate) : "Select date"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={startDate ? convertUTCToCalendarDate(startDate) : undefined}
-                        onSelect={(date) => {
-                          const newDate = date ? convertSelectedDateToUTC(date) : "";
+                    <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+                      <CalendarPicker
+                        selectedDate={startDate ? convertUTCToCalendarDate(startDate) : undefined}
+                        onDateSelect={(date) => {
+                          const newDate = convertSelectedDateToUTC(date);
                           setStartDate(newDate);
                           // If there's an end date and the new start date is after it, clear the end date
                           if (endDate && date && new Date(endDate) < date) {
@@ -360,7 +359,6 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                           const endDateCal = endDate ? convertUTCToCalendarDate(endDate) : undefined;
                           return endDateCal ? date > endDateCal : false;
                         }}
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -381,19 +379,17 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                         {endDate ? formatLocalDate(endDate) : "Select date"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={endDate ? convertUTCToCalendarDate(endDate) : undefined}
-                        onSelect={(date) => {
-                          setEndDate(date ? convertSelectedDateToUTC(date) : "");
+                    <PopoverContent className="w-auto p-2 border-0 border-b-[5px] border-primary" align="start">
+                      <CalendarPicker
+                        selectedDate={endDate ? convertUTCToCalendarDate(endDate) : undefined}
+                        onDateSelect={(date) => {
+                          setEndDate(convertSelectedDateToUTC(date));
                           setIsEndDatePopoverOpen(false);
                         }}
                         disabled={(date) => {
                           const startDateCal = startDate ? convertUTCToCalendarDate(startDate) : undefined;
                           return startDateCal ? date < startDateCal : false;
                         }}
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -410,21 +406,27 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="lg" className="w-xs rounded-sm flex justify-between items-center px-2">
-                      <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-xs focus-ring-none rounded-sm flex justify-between items-center px-2"
+                    >
+                      <div className="border-dashed border-border rounded-full flex items-center gap-2 min-w-0">
                         {selectedLeader ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
                             {selectedLeader?.profilePicture ? (
                               <img
                                 src={selectedLeader.profilePicture}
-                                className="w-6 h-6 rounded-full object-cover"
+                                className="w-6 h-6 rounded-full object-cover shrink-0"
                               />
                             ) : (
-                              <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                              <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs shrink-0">
                                 {selectedLeader?.name?.charAt(0)?.toUpperCase()}
                               </span>
                             )}
-                            <span className="text-muted-foreground">{selectedLeader?.name}</span>
+                            <span className="text-muted-foreground truncate max-w-[150px]">
+                              {selectedLeader?.name}
+                            </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
@@ -436,24 +438,30 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                       <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-xs border border-border bg-popover text-popover-foreground shadow-md">
+                  <DropdownMenuContent align="start" className="p-4 w-xs space-y-1 border-0 border-b-[5px] border-primary bg-background shadow-md">
                     {workspaceMembers.map((member) => (
-                      <DropdownMenuItem key={member.userId} onClick={() => setPortfolioLeader(member.userId)} className="cursor-pointer">
-                        <div className="flex items-center gap-2 w-full">
+                      <DropdownMenuItem
+                        key={member.userId}
+                        onSelect={() => setPortfolioLeader(member.userId)}
+                        className="p-0 focus:bg-transparent cursor-pointer"
+                      >
+                        <div className="w-full h-9 flex items-center gap-3 rounded-xs text-xs font-medium hover:bg-muted transition-colors px-3 bg-muted text-foreground">
                           {member.profilePicture ? (
                             <img
                               src={member.profilePicture}
                               alt={member.name}
-                              className="w-6 h-6 rounded-full object-cover"
+                              className="w-6 h-6 rounded-full object-cover shrink-0"
                             />
                           ) : (
-                            <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                            <span className="w-6 h-6 rounded-full bg-background flex items-center justify-center text-xs shrink-0">
                               {member.name.charAt(0).toUpperCase()}
                             </span>
                           )}
-                          <div className="flex flex-col">
-                            <span>{member.name}</span>
-                            <span className="text-xs text-muted-foreground">{member.email}</span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="truncate">{member.name}</span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {member.email}
+                            </span>
                           </div>
                         </div>
                       </DropdownMenuItem>
@@ -472,28 +480,57 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="lg" className={cn("w-xs rounded-sm flex justify-start items-center px-2", priority ? priorityConfig[priority].badgeColor : "bg-gray-100")}>
-                      {priority ? (
-                        <>
-                          <div className={cn("h-6 w-6 rounded-full flex items-center justify-center", priorityConfig[priority].badgeColor)}>
-                            <Flag className={cn("h-4 w-4", priorityConfig[priority].iconColor)} />
-                          </div>
-                          <span className="capitalize">{priority}</span>
-                        </>
-                      ) : (
-                        <div className="flex justify-between items-center w-full px-2">
-                          <span className="text-muted-foreground">Create or select a priority</span>
-                          <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </Button>
+                    <button
+                      className="w-xs h-10 flex items-center justify-between gap-2 rounded-xs px-3 overflow-hidden border border-border transition-opacity hover:opacity-90 bg-card text-foreground"
+                      style={{
+                        backgroundColor: priority
+                          ? `${priorityConfig[priority].hexColor}33`
+                          : "hsl(var(--muted))",
+                      }}
+                    >
+                      <span
+                        className="truncate text-xs font-medium"
+                        style={{
+                          color: priority
+                            ? priorityConfig[priority].hexColor
+                            : "hsl(var(--muted-foreground))",
+                        }}
+                      >
+                        {priority ? priorityConfig[priority].label : "Select priority"}
+                      </span>
+                      <Flag
+                        className="h-3.5 w-3.5 flex-shrink-0"
+                        style={{
+                          color: priority
+                            ? priorityConfig[priority].hexColor
+                            : "hsl(var(--muted-foreground))",
+                        }}
+                      />
+                    </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-xs border border-border bg-popover text-popover-foreground shadow-md">
+                  <DropdownMenuContent align="start" className="w-xs p-4 space-y-1 border-0 border-b-[5px] border-primary bg-background shadow-md">
                     {(["low", "medium", "high", "urgent"] as Priority[]).map((p) => (
-                      <DropdownMenuItem key={p} className="justify-between" onClick={() => setPriority(p)}>
-                        <span className="capitalize">{p}</span>
-                        <div className={cn("h-6 w-6 rounded-full flex items-center justify-center p-0.5", priorityConfig[p].badgeColor)}>
-                          <Flag className={cn("h-2.5 w-2.5", priorityConfig[p].iconColor)} />
+                      <DropdownMenuItem
+                        key={p}
+                        className="p-0 focus:bg-transparent cursor-pointer"
+                        onSelect={() => setPriority(p)}
+                      >
+                        <div
+                          className="w-full h-9 flex items-center justify-between gap-2 rounded-xs text-xs font-medium transition-opacity hover:opacity-90 px-3"
+                          style={{
+                            backgroundColor: `${priorityConfig[p].hexColor}33`,
+                          }}
+                        >
+                          <span
+                            className="truncate"
+                            style={{ color: priorityConfig[p].hexColor }}
+                          >
+                            {priorityConfig[p].label}
+                          </span>
+                          <Flag
+                            className="h-3.5 w-3.5 flex-shrink-0"
+                            style={{ color: priorityConfig[p].hexColor }}
+                          />
                         </div>
                       </DropdownMenuItem>
                     ))}
@@ -578,21 +615,23 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                             return (
                               <label
                                 key={project.id}
-                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted"
+                                className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer hover:bg-muted"
                               >
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
+                                    style={{ backgroundColor: project.color || "#6366f1" }}
+                                  >
+                                    {project.name?.charAt(0)?.toUpperCase()}
+                                  </div>
+                                  <span className="text-sm text-foreground">{project.name}</span>
+                                </div>
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
                                   onChange={() => toggleLinkedProject(project.id ?? "")}
                                   className="h-4 w-4 accent-foreground rounded"
                                 />
-                                <div
-                                  className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
-                                  style={{ backgroundColor: project.color || "#6366f1" }}
-                                >
-                                  {project.name?.charAt(0)?.toUpperCase()}
-                                </div>
-                                <span className="text-sm text-foreground">{project.name}</span>
                               </label>
                             );
                           })

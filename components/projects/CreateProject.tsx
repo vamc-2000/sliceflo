@@ -993,8 +993,22 @@ export const CreateProject = ({
                             return (
                               <label
                                 key={portfolio.id}
-                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted"
+                                className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer hover:bg-muted"
                               >
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
+                                    style={{
+                                      backgroundColor:
+                                        portfolio.color || "#3B82F6",
+                                    }}
+                                  >
+                                    {portfolio.name?.charAt(0)?.toUpperCase()}
+                                  </div>
+                                  <span className="text-xs text-foreground">
+                                    {portfolio.name}
+                                  </span>
+                                </div>
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
@@ -1004,18 +1018,6 @@ export const CreateProject = ({
                                   className="h-4 w-4 accent-primary rounded"
                                   data-testid={`project-portfolio-checkbox-${portfolio.id}`}
                                 />
-                                <div
-                                  className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
-                                  style={{
-                                    backgroundColor:
-                                      portfolio.color || "#3B82F6",
-                                  }}
-                                >
-                                  {portfolio.name?.charAt(0)?.toUpperCase()}
-                                </div>
-                                <span className="text-xs text-foreground">
-                                  {portfolio.name}
-                                </span>
                               </label>
                             );
                           })
