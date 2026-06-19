@@ -281,9 +281,9 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
   }
 
   return (
-    <div className="bg-white flex flex-col w-full">
+    <div className="bg-background flex flex-col w-full">
       <div className="flex-1 flex flex-col">
-        <div className="w-full p-6 bg-white">
+        <div className="w-full p-6 bg-background">
           <div className="space-y-4">
 
             {error && (
@@ -293,15 +293,15 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
             )}
 
             {/* Header Info Row */}
-            <div style={{ backgroundColor: "#F2F2F7" }} className="rounded-lg p-4">
+            <div className="rounded-lg p-4 bg-muted">
               <div className="flex items-start gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Icon</label>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Icon</label>
 
                   <button
                     type="button"
                     onClick={() => setShowColorPicker(true)}
-                    className="w-10 h-10 bg-white border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 transition-colors overflow-hidden"
+                    className="w-10 h-10 bg-card border border-border rounded-md flex items-center justify-center hover:bg-muted transition-colors overflow-hidden"
                   >
                     {renderIcon()}
                   </button>
@@ -319,23 +319,23 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                 </div>
 
                 <div className="w-80">
-                  <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Portfolio name</label>
-                  <Input type="text" value={portfolioName} onChange={handlePortfolioNameChange} placeholder="e.g. Portfolio name" className="h-10 bg-white" />
+                  <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Portfolio name</label>
+                  <Input type="text" value={portfolioName} onChange={handlePortfolioNameChange} placeholder="e.g. Portfolio name" className="h-10 bg-card" />
                 </div>
 
                 <div className="w-80">
-                  <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Portfolio identifier</label>
-                  <Input type="text" value={portfolioIdentifier} onChange={(e) => setPortfolioIdentifier(e.target.value.toUpperCase())} placeholder="e.g. PRO" className="h-10 bg-white uppercase" readOnly />
+                  <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Portfolio identifier</label>
+                  <Input type="text" value={portfolioIdentifier} onChange={(e) => setPortfolioIdentifier(e.target.value.toUpperCase())} placeholder="e.g. PRO" className="h-10 bg-card uppercase" readOnly />
                 </div>
 
                 <div className="w-80">
-                  <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">Start date</label>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">Start date</label>
                   <Popover open={isStartDatePopoverOpen} onOpenChange={setIsStartDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full h-10 bg-white justify-start text-left font-normal",
+                          "w-full h-10 bg-card justify-start text-left font-normal",
                           !startDate && "text-muted-foreground"
                         )}
                       >
@@ -367,13 +367,13 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                 </div>
 
                 <div className="w-80">
-                  <label className="block text-sm font-medium text-[#8E8E93] mb-2 h-4">End date</label>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2 h-4">End date</label>
                   <Popover open={isEndDatePopoverOpen} onOpenChange={setIsEndDatePopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full h-10 bg-white justify-start text-left font-normal",
+                          "w-full h-10 bg-card justify-start text-left font-normal",
                           !endDate && "text-muted-foreground"
                         )}
                       >
@@ -402,11 +402,11 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
             </div>
 
             {/* Portfolio Leader */}
-            <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-white shadow">
+            <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-[#001F3F]">Portfolio leader</h1>
-                  <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">Assign an accountable leader who approves project alignment</p>
+                  <h1 className="font-semibold text-sm text-foreground">Portfolio leader</h1>
+                  <p className="font-medium text-xs text-muted-foreground leading-relaxed">Assign an accountable leader who approves project alignment</p>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -420,23 +420,23 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                                 className="w-6 h-6 rounded-full object-cover"
                               />
                             ) : (
-                              <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                              <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
                                 {selectedLeader?.name?.charAt(0)?.toUpperCase()}
                               </span>
                             )}
-                            <span className="text-gray-500">{selectedLeader?.name}</span>
+                            <span className="text-muted-foreground">{selectedLeader?.name}</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <UserPlus2 className="h-4 w-4 text-gray-500" />
-                            <span className="text-gray-500">Add user or email</span>
+                            <UserPlus2 className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Add user or email</span>
                           </div>
                         )}
                       </div>
-                      <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                      <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-xs border-0 border-b-[5px] border-[#001F3F] bg-white">
+                  <DropdownMenuContent align="start" className="w-xs border border-border bg-popover text-popover-foreground shadow-md">
                     {workspaceMembers.map((member) => (
                       <DropdownMenuItem key={member.userId} onClick={() => setPortfolioLeader(member.userId)} className="cursor-pointer">
                         <div className="flex items-center gap-2 w-full">
@@ -447,13 +447,13 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                               className="w-6 h-6 rounded-full object-cover"
                             />
                           ) : (
-                            <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                            <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
                               {member.name.charAt(0).toUpperCase()}
                             </span>
                           )}
                           <div className="flex flex-col">
                             <span>{member.name}</span>
-                            <span className="text-xs text-gray-500">{member.email}</span>
+                            <span className="text-xs text-muted-foreground">{member.email}</span>
                           </div>
                         </div>
                       </DropdownMenuItem>
@@ -464,11 +464,11 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
             </div>
 
             {/* Priority */}
-            <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-white shadow">
+            <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-center">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-[#001F3F]">Priority</h1>
-                  <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">Set priority based on strategic business value and urgency which drives executive attention.</p>
+                  <h1 className="font-semibold text-sm text-foreground">Priority</h1>
+                  <p className="font-medium text-xs text-muted-foreground leading-relaxed">Set priority based on strategic business value and urgency which drives executive attention.</p>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -482,13 +482,13 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                         </>
                       ) : (
                         <div className="flex justify-between items-center w-full px-2">
-                          <span className="text-gray-500">Create or select a priority</span>
-                          <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                          <span className="text-muted-foreground">Create or select a priority</span>
+                          <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
                         </div>
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-xs border-0 border-b-[5px] border-[#001F3F] bg-white">
+                  <DropdownMenuContent align="start" className="w-xs border border-border bg-popover text-popover-foreground shadow-md">
                     {(["low", "medium", "high", "urgent"] as Priority[]).map((p) => (
                       <DropdownMenuItem key={p} className="justify-between" onClick={() => setPriority(p)}>
                         <span className="capitalize">{p}</span>
@@ -503,29 +503,29 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
             </div>
 
             {/* Portfolio Privacy */}
-            <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-white shadow">
+            <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-start">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-[#001F3F]">Portfolio privacy</h1>
-                  <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">Control and separate who can view and who is accountable for strategic ownership</p>
+                  <h1 className="font-semibold text-sm text-foreground">Portfolio privacy</h1>
+                  <p className="font-medium text-xs text-muted-foreground leading-relaxed">Control and separate who can view and who is accountable for strategic ownership</p>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Button variant="outline" size="lg" onClick={() => setPrivacy("private")} className={cn("w-xs rounded-sm flex justify-start items-center px-2 py-6", privacy === "private" && "border-l-4 border-l-[#001F3F]")}>
+                  <Button variant="outline" size="lg" onClick={() => setPrivacy("private")} className={cn("w-xs rounded-sm flex justify-start items-center px-2 py-6", privacy === "private" && "border-l-4 border-l-foreground")}>
                     <div className={`h-6 w-6 rounded-full flex items-center justify-center`}>
-                      <LockKeyhole className={`h-6 w-6 text-[#8E8E93]`} strokeWidth={2.5} />
+                      <LockKeyhole className={`h-6 w-6 text-muted-foreground`} strokeWidth={2.5} />
                     </div>
                     <div className="flex flex-col justify-center items-start">
-                      <span className="text-xs text-[#8E8E93] font-bold">Private</span>
-                      <span className="text-[10px] text-[#8E8E93] font-medium">Accessible only by invite</span>
+                      <span className="text-xs text-muted-foreground font-bold">Private</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Accessible only by invite</span>
                     </div>
                   </Button>
-                  <Button variant="outline" size="lg" onClick={() => setPrivacy("public")} className={cn("w-xs rounded-sm flex justify-start items-center px-2 py-6", privacy === "public" && "border-l-4 border-l-[#001F3F]")}>
+                  <Button variant="outline" size="lg" onClick={() => setPrivacy("public")} className={cn("w-xs rounded-sm flex justify-start items-center px-2 py-6", privacy === "public" && "border-l-4 border-l-foreground")}>
                     <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                      <Users2 className="h-6 w-6 text-[#8E8E93]" strokeWidth={2.5} />
+                      <Users2 className="h-6 w-6 text-muted-foreground" strokeWidth={2.5} />
                     </div>
                     <div className="flex flex-col justify-center items-start">
-                      <span className="text-xs text-[#8E8E93] font-bold">Public</span>
-                      <span className="text-[10px] text-[#8E8E93] font-medium">Anyone in the workspace except Guests can join</span>
+                      <span className="text-xs text-muted-foreground font-bold">Public</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Anyone in the workspace except Guests can join</span>
                     </div>
                   </Button>
                 </div>
@@ -533,19 +533,19 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
             </div>
 
             {/* Link Projects */}
-            <div className="border-l-4 border-l-[#001F3F] border border-gray-200 rounded-lg p-4 bg-white shadow">
+            <div className="border-l-4 border-l-primary border border-border rounded-lg p-4 bg-card shadow">
               <div className="flex justify-between items-start">
                 <div className="flex-1 pr-6">
-                  <h1 className="font-semibold text-sm text-[#001F3F]">Attached Projects</h1>
-                  <p className="font-medium text-xs text-[#8E8E93] leading-relaxed">Select existing projects to include</p>
+                  <h1 className="font-semibold text-sm text-foreground">Attached Projects</h1>
+                  <p className="font-medium text-xs text-muted-foreground leading-relaxed">Select existing projects to include</p>
                 </div>
                 <div className="flex flex-col items-end gap-2 min-w-[260px]">
                   {linkedProjects.length > 0 && (
                     <div className="flex flex-wrap gap-2 justify-end mb-1">
                       {linkedProjects.map((p) => (
-                        <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded border text-sm text-gray-700">
+                        <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded border border-border text-sm text-foreground">
                           {p.name}
-                          <button type="button" onClick={() => toggleLinkedProject(p.id ?? "")} className="text-gray-400 hover:text-red-500 ml-1">×</button>
+                          <button type="button" onClick={() => toggleLinkedProject(p.id ?? "")} className="text-muted-foreground hover:text-red-500 ml-1">×</button>
                         </span>
                       ))}
                     </div>
@@ -559,32 +559,32 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                       onClick={() => setProjectDropdownOpen((prev) => !prev)}
                       type="button"
                     >
-                      <span className="text-gray-500">
+                      <span className="text-muted-foreground">
                         {linkedProjectIds.length > 0
                           ? `${linkedProjectIds.length} project(s) linked`
                           : "Select"}
                       </span>
-                      <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                      <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
                     </Button>
 
                     {/* Dropdown List */}
                     {projectDropdownOpen && (
-                      <div className="absolute z-50 right-0 bottom-full mb-1 w-full bg-white border-0 border-b-[5px] border-[#001F3F] rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-50 right-0 bottom-full mb-1 w-full bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {projects.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-gray-400">No projects available</div>
+                          <div className="px-3 py-2 text-sm text-muted-foreground">No projects available</div>
                         ) : (
                           projects.map((project) => {
                             const isSelected = linkedProjectIds.includes(project.id ?? "");
                             return (
                               <label
                                 key={project.id}
-                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted"
                               >
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
                                   onChange={() => toggleLinkedProject(project.id ?? "")}
-                                  className="h-4 w-4 accent-[#001F3F] rounded"
+                                  className="h-4 w-4 accent-foreground rounded"
                                 />
                                 <div
                                   className="w-5 h-5 rounded flex items-center justify-center text-xs text-white flex-shrink-0"
@@ -592,7 +592,7 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
                                 >
                                   {project.name?.charAt(0)?.toUpperCase()}
                                 </div>
-                                <span className="text-sm text-gray-700">{project.name}</span>
+                                <span className="text-sm text-foreground">{project.name}</span>
                               </label>
                             );
                           })
@@ -764,11 +764,11 @@ export const CreatePortfolio = ({ teamId, projectId }: CreatePortfolioProps) => 
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-x-4 items-center pt-4">
-              <Button variant="outline" onClick={handleBack} className="min-w-40 text-[#8E8E93]">Cancel</Button>
+              <Button variant="outline" onClick={handleBack} className="min-w-40 text-muted-foreground">Cancel</Button>
               <Button
                 onClick={handleCreatePortfolio}
                 disabled={!isFormValid() || loading}
-                className="min-w-40 bg-[#001F3F] hover:bg-[#001F3F] text-white"
+                className="min-w-40 bg-foreground hover:bg-foreground/90 text-background"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

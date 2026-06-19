@@ -19,7 +19,7 @@ export default function PortfolioProjectActionsMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted"
+          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted cursor-pointer"
           onClick={(e) => e.stopPropagation()}
         >
           <EllipsisVertical className="text-muted-foreground" />

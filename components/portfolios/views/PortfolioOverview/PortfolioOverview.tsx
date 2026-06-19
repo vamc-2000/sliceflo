@@ -271,7 +271,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                         onClick={() => setOpenAddProjectDialog(true)}
                         className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted cursor-pointer">
                           <Plus size={18} />
                         </span>
                         <span>Add new Project</span>
@@ -281,7 +281,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                         onClick={() => setOpenAddProjectDialog(true)}
                         className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted cursor-pointer">
                           <FolderClosed size={18} />
                         </span>
                         <span>Add from existing Projects</span>
@@ -313,7 +313,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                     <button
                       data-testid="portfoliooverview-create-goal-btn"
                       onClick={() => setOpenGoalsDialog(true)}
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
                       <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
                         <Target size={18} />
@@ -323,7 +323,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                     <button
                       data-testid="portfoliooverview-existing-goal-btn"
                       onClick={() => setOpenGoalsDialog(true)}
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
                       <span className="flex items-center justify-center w-9 h-9 rounded-full border border-dashed border-muted-foreground/40 bg-muted">
                         <Target size={18} />

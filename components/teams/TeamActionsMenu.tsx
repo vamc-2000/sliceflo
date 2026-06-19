@@ -39,7 +39,7 @@ export function TeamActionsMenu({
                     aria-label={`More actions for ${teamName}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <MoreHorizontal className="h-4 w-4 text-[#FFFFFF]" />
+                    <MoreHorizontal className="h-4 w-4 text-foreground" />
                 </button>
             </DropdownMenuTrigger>
 
@@ -47,7 +47,7 @@ export function TeamActionsMenu({
                 align="start"
                 side="right"
                 sideOffset={4}
-                className="w-58 border-0 border-b-[5px] border-[#001F3F] rounded-lg "
+                className="w-58 border border-border rounded-lg bg-popover text-popover-foreground shadow-md"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* 1. Rename Team */}
@@ -57,8 +57,8 @@ export function TeamActionsMenu({
                         onRename?.(teamId);
                     }}
                 >
-                    <Pencil className="mr-2 h-4 w-4 text-[#001F3F]" />
-                    <span className="text-[#001F3F]">Rename Team</span>
+                    <Pencil className="mr-2 h-4 w-4 text-foreground" />
+                    <span className="text-foreground">Rename Team</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -71,8 +71,8 @@ export function TeamActionsMenu({
                         onInviteMembers?.(teamId);
                     }}
                 >
-                    <LayoutDashboard className="mr-2 h-4 w-4 text-[#001F3F]" />
-                    <span className="text-[#001F3F]">Create Portfolio</span>
+                    <LayoutDashboard className="mr-2 h-4 w-4 text-foreground" />
+                    <span className="text-foreground">Create Portfolio</span>
                 </DropdownMenuItem>
 
                 {/* 3. Create Projects */}
@@ -83,8 +83,8 @@ export function TeamActionsMenu({
                         onCreateProject?.(teamId); 
                     }}
                 >
-                    <PanelsTopLeft className="mr-2 h-4 w-4 text-[#001F3F]" />
-                    <span className="text-[#001F3F]">Create Projects</span>
+                    <PanelsTopLeft className="mr-2 h-4 w-4 text-foreground" />
+                    <span className="text-foreground">Create Projects</span>
                 </DropdownMenuItem>
 
                 {/* 4. Create Goals */}
@@ -95,8 +95,8 @@ export function TeamActionsMenu({
                         onCreateGoal?.(teamId);
                     }}
                 >
-                    <Trophy className="mr-2 h-4 w-4 text-[#001F3F]" />
-                    <span className="text-[#001F3F]">Create Goals</span>
+                    <Trophy className="mr-2 h-4 w-4 text-foreground" />
+                    <span className="text-foreground">Create Goals</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
@@ -108,8 +108,8 @@ export function TeamActionsMenu({
                         // onArchive?.(teamId);
                     }}
                 >
-                    <Mail className="mr-2 h-4 w-4 text-[#001F3F]" />
-                    <span className="text-[#001F3F]">Send a message via email</span>
+                    <Mail className="mr-2 h-4 w-4 text-foreground" />
+                    <span className="text-foreground">Send a message via email</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

@@ -101,7 +101,7 @@ export function PortfolioViewersDisplay({
             <button
               data-testid="portfoliooverview-add-viewer-btn"
               onClick={onAddViewer}
-              className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted hover:bg-muted/80 transition-colors"
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 bg-muted hover:bg-muted/80 transition-colors cursor-pointer"
             >
               <UserPlus size={18} className="text-muted-foreground" />
             </button>
@@ -110,7 +110,7 @@ export function PortfolioViewersDisplay({
           {/* View all */}
           <button
             onClick={() => setIsViewAllOpen(true)}
-            className="ml-auto text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-80"
+            className="ml-auto text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-80 cursor-pointer"
           >
             View all
           </button>
