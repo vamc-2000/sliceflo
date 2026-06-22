@@ -17,7 +17,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { format } from "date-fns";
 import {
     formatLocalDate,
@@ -104,7 +104,7 @@ export default function CreateTargetModal({
 
         // Get team IDs assigned to the goal
         const goalTeamIds = new Set<string>();
-        
+
         // Check targetGoal.assignedTeams
         if (Array.isArray(targetGoal.assignedTeams)) {
             targetGoal.assignedTeams.forEach(id => {
@@ -533,11 +533,8 @@ export default function CreateTargetModal({
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
                                         <CalendarPicker
-                                            mode="single"
-                                            selected={targetDate}
-                                            onSelect={setTargetDate}
-                                            initialFocus
-                                            data-testid="target-date-calendar"
+                                            selectedDate={targetDate}
+                                            onDateSelect={setTargetDate}
                                             disabled={(date) => date < new Date()}
                                         />
                                     </PopoverContent>

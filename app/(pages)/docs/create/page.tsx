@@ -777,6 +777,8 @@
 
 //     );
 // }
+
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -1053,7 +1055,7 @@ export default function DocsCreatePage() {
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className="w-full h-10 justify-start bg-background dark:bg-card text-primary hover:text-primary/90 hover:bg-muted"
+                                        className="w-full h-10 justify-start bg-background dark:bg-card text-primary-text hover:text-primary-text/90 hover:bg-muted"
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
                                         Link this doc
@@ -1521,6 +1523,9 @@ export default function DocsCreatePage() {
 
     );
 }
+
+
+
 //kartik code
 
 // "use client";

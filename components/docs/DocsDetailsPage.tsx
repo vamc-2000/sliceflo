@@ -569,6 +569,13 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
     return name.substring(0, 1).toUpperCase();
   };
 
+  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || "";
+  const getProfilePictureUrl = (profilePicture?: string | null) => {
+    if (!profilePicture) return undefined;
+    if (profilePicture.startsWith('http')) return profilePicture;
+    return `${s3BaseUrl}/${profilePicture}`;
+  };
+
   const getMemberDetails = (userId: string) => {
     return workspaceMembers.find(m => m.userId === userId || m.id === userId);
   };
@@ -691,8 +698,8 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
           <div className="relative flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 no-print">
               <Avatar className="h-6 w-6" data-testid="user-avatar-trigger">
-                <AvatarImage src={user?.profilePictureUrl || ""} alt={user?.name || "User"} />
-                <AvatarFallback className="bg-primary text-primary-foreground">
+                <AvatarImage src={getProfilePictureUrl(user?.profilePictureUrl) || ""} alt={user?.name || "User"} />
+                <AvatarFallback className="bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 font-semibold text-[10px]">
                   {user?.name?.charAt(0)?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -784,7 +791,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                 const userImage = member?.user?.profilePictureUrl || member?.profilePictureUrl;
                 return (
                   <Avatar key={index} className="h-8 w-8 border-2 border-background">
-                    {userImage && <AvatarImage src={userImage} />}
+                    {userImage && <AvatarImage src={getProfilePictureUrl(userImage)} />}
                     <AvatarFallback className="bg-purple-500 text-white text-xs">
                       {getUserInitials(userName)}
                     </AvatarFallback>
@@ -811,7 +818,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-4 border border-b-[5px] border-b-primary" align="start">
+              <PopoverContent className="w-[400px] p-4 border border-b-[5px] border-b-primary-text" align="start">
                 <DocMembersSection
                   docId={docId || ""}
                   members={docMembers}
@@ -1218,7 +1225,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       <p className="text-xs text-muted-foreground mb-3">Recent Documents</p>
                                       <div className="space-y-1 max-h-60 overflow-y-auto">
                                         {docList.map((docItem) => {
-                                          const isSelected = rootDoc?.linkedDocuments?.includes(docItem.id);
+                                          const isSelected = currentDoc?.pageLinkedDocuments?.includes(docItem.id);
 
                                           return (
                                             <div
@@ -1227,9 +1234,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 }`}
                                               onClick={() => {
                                                 if (isSelected) {
-                                                  removeDocumentFromDocument(rootId, docItem.id);
+                                                  removePageLinkDocument(activeDocId!, docItem.id);
                                                 } else {
-                                                  addDocumentToDocument(rootId, docItem.id);
+                                                  addPageLinkDocument(activeDocId!, docItem.id);
                                                 }
                                               }}
                                             >
@@ -1241,9 +1248,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                                 checked={isSelected}
                                                 onCheckedChange={(checked) => {
                                                   if (checked) {
-                                                    addDocumentToDocument(rootId, docItem.id);
+                                                    addPageLinkDocument(activeDocId!, docItem.id);
                                                   } else {
-                                                    removeDocumentFromDocument(rootId, docItem.id);
+                                                    removePageLinkDocument(activeDocId!, docItem.id);
                                                   }
                                                 }}
                                                 onClick={(e) => e.stopPropagation()}
@@ -1303,7 +1310,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         variant="ghost"
                                         size="sm"
                                         className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => removeProjectFromDocument(rootId, project.id!)}
+                                        onClick={() => removePageLinkProject(activeDocId!, project.id!)}
                                       >
                                         <X className="w-3 h-3 text-muted-foreground" />
                                       </Button>
@@ -1322,7 +1329,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       variant="ghost"
                                       size="sm"
                                       className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => removeTeamFromDocument(rootId, team.id!)}
+                                      onClick={() => removePageLinkTeam(activeDocId!, team.id!)}
                                     >
                                       <X className="w-3 h-3 text-muted-foreground" />
                                     </Button>
@@ -1338,7 +1345,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       {p?.name?.charAt(0).toUpperCase()}
                                     </div>
                                     <span className="text-sm text-foreground flex-1 truncate">{p?.name}</span>
-                                    <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); handleRemovePortfolio(item.id, p?.id!); }}>
+                                    <Button variant="ghost" size="sm" className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); removePageLinkPortfolio(activeDocId!, p?.id!); }}>
                                       <X className="w-3 h-3 text-muted-foreground" />
                                     </Button>
                                   </div>
@@ -1354,7 +1361,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                       variant="ghost"
                                       size="sm"
                                       className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                      onClick={() => removeDocumentFromDocument(rootId, doc.id)}
+                                      onClick={() => removePageLinkDocument(activeDocId!, doc.id)}
                                     >
                                       <X className="w-3 h-3 text-muted-foreground" />
                                     </Button>
@@ -1480,7 +1487,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                               <p className="text-xs text-muted-foreground mb-3">Recent Projects</p>
                               <div className="max-h-60 overflow-y-auto">
                                 {projects.map((project) => {
-                                  const isSelected = selectedProjects.includes(project.id!);
+                                  const isSelected = currentDoc?.pageLinkedProjects?.includes(project.id!);
 
                                   return (
                                     <div
@@ -1489,9 +1496,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }`}
                                       onClick={() => {
                                         if (isSelected) {
-                                          handleRemoveProject(project.id!);
+                                          removePageLinkProject(activeDocId!, project.id!);
                                         } else {
-                                          handleAddProject(project.id!);
+                                          addPageLinkProject(activeDocId!, project.id!);
                                         }
                                       }}
                                     >
@@ -1528,9 +1535,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         checked={isSelected}
                                         onCheckedChange={(checked) => {
                                           if (checked) {
-                                            handleAddProject(project.id!);
+                                            addPageLinkProject(activeDocId!, project.id!);
                                           } else {
-                                            handleRemoveProject(project.id!);
+                                            removePageLinkProject(activeDocId!, project.id!);
                                           }
                                         }}
                                         onClick={(e) => e.stopPropagation()}
@@ -1549,7 +1556,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                               {portfolios.map((p) => {
                                 const isSelected = currentDoc?.pageLinkedPortfolios?.includes(p.id!);
                                 return (
-                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? handleRemovePortfolio(item.id, p.id!) : handleAddPortfolio(item.id, p.id!)}>
+                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted cursor-pointer" onClick={() => isSelected ? removePageLinkPortfolio(activeDocId!, p.id!) : addPageLinkPortfolio(activeDocId!, p.id!)}>
                                     <div className="flex items-center gap-2 min-w-0">
                                       <div
                                         className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
@@ -1570,7 +1577,7 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                               <p className="text-xs text-muted-foreground mb-3">Recent Documents</p>
                               <div className="space-y-1 max-h-60 overflow-y-auto">
                                 {docList.map((doc) => {
-                                  const isSelected = selectedDocuments.includes(doc.id);
+                                  const isSelected = currentDoc?.pageLinkedDocuments?.includes(doc.id);
 
                                   return (
                                     <div
@@ -1579,9 +1586,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         }`}
                                       onClick={() => {
                                         if (isSelected) {
-                                          handleRemoveDocument(doc.id);
+                                          removePageLinkDocument(activeDocId!, doc.id);
                                         } else {
-                                          handleAddDocument(doc.id);
+                                          addPageLinkDocument(activeDocId!, doc.id);
                                         }
                                       }}
                                     >
@@ -1593,9 +1600,9 @@ export default function DocsDetailsPage({ params }: { params: { id: string } }) 
                                         checked={isSelected}
                                         onCheckedChange={(checked) => {
                                           if (checked) {
-                                            handleAddDocument(doc.id);
+                                            addPageLinkDocument(activeDocId!, doc.id);
                                           } else {
-                                            handleRemoveDocument(doc.id);
+                                            removePageLinkDocument(activeDocId!, doc.id);
                                           }
                                         }}
                                         onClick={(e) => e.stopPropagation()}

@@ -39,16 +39,16 @@ const InviteMembersModal: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center w-full">
-      <div className="bg-card dark:bg-gray-900 text-foreground dark:text-white rounded-xl shadow-lg w-full max-w-xl p-6 relative border-b-4 border-brand">
+      <div className="bg-card text-foreground rounded-xl shadow-lg w-full max-w-xl p-6 relative border-b-4 border-brand">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-brand dark:hover:text-white"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-brand"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <h2 className="text-xl font-semibold text-brand mb-4 dark:text-white">
+        <h2 className="text-xl font-semibold text-brand mb-4">
           Invite Team Members
         </h2>
 
@@ -63,8 +63,8 @@ const InviteMembersModal: React.FC<Props> = ({ open, onClose }) => {
               className={`w-full px-4 py-2 border rounded-md text-sm focus:outline-none ${
                 error
                   ? "border-red-500 focus:border-red-500"
-                  : "border-border dark:border-gray-700 focus:border-brand"
-              } bg-card dark:bg-gray-800 text-gray-900 dark:text-white`}
+                  : "border-border focus:border-brand"
+              } bg-card text-foreground`}
             />
             {error && hasSubmitted && (
               <p className="text-red-500 text-xs mt-1">
@@ -79,7 +79,7 @@ const InviteMembersModal: React.FC<Props> = ({ open, onClose }) => {
               <input
                 type="text"
                 placeholder="Start typing to add Team"
-                className="w-full px-4 py-2 border rounded-md border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-sm focus:outline-none focus:border-brand text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border rounded-md border-border bg-card text-sm focus:outline-none focus:border-brand text-foreground"
               />
             </div>
             <div>
@@ -87,13 +87,13 @@ const InviteMembersModal: React.FC<Props> = ({ open, onClose }) => {
               <input
                 type="text"
                 placeholder="Start typing to add Project"
-                className="w-full px-4 py-2 border rounded-md border-border dark:border-gray-700 bg-card dark:bg-gray-800 text-sm focus:outline-none focus:border-brand text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border rounded-md border-border bg-card text-sm focus:outline-none focus:border-brand text-foreground"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-2 text-sm cursor-pointer text-brand dark:text-white">
+            <div className="flex items-center gap-2 text-sm cursor-pointer text-brand">
               <FaLink className="w-4 h-4" />
               <span>Copy Shareable link</span>
             </div>

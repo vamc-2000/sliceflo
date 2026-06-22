@@ -100,17 +100,14 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          "relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
-          props.showWeekNumber
-            ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
-            : "[&:first-child[data-selected=true]_button]:rounded-l-md",
+          "relative w-full h-full p-0 text-center group/day aspect-square select-none",
           defaultClassNames.day
         ),
         range_start: cn(
-          "rounded-l-full",
+          "rounded-full",
         ),
-        range_middle: cn("rounded-none bg-[#FF9500]/20", defaultClassNames.range_middle),
-        range_end: cn("rounded-r-full",),
+        range_middle: cn("rounded-full", defaultClassNames.range_middle),
+        range_end: cn("rounded-full"),
         today: cn(
           "text-foreground font-semibold rounded-full",
         ),
@@ -205,15 +202,14 @@ function CalendarDayButton({
       className={cn(
         "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal rounded-full group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground [&>span]:text-xs [&>span]:opacity-70",
         // Range middle
-        "data-[range-middle=true]:bg-[#FF9500]/20 data-[range-middle=true]:text-[#FF9500] data-[range-middle=true]:rounded-none",
+        "data-[range-middle=true]:bg-[#FCD794] data-[range-middle=true]:text-foreground data-[range-middle=true]:rounded-full",
         // Range start/end
-        "data-[range-start=true]:rounded-l-full data-[range-end=true]:rounded-r-full",
-        "data-[range-start=true]:bg-[#FF9500] data-[range-start=true]:text-white",
-        "data-[range-end=true]:bg-[#FF9500] data-[range-end=true]:text-white",
-        // Today — lower priority
-        "data-[today=true]:bg-[#FF9500]/20 data-[today=true]:text-foreground data-[today=true]:font-semibold",
+        "data-[range-start=true]:bg-[#FF9500] data-[range-start=true]:text-white data-[range-start=true]:rounded-full data-[range-start=true]:border-transparent",
+        "data-[range-end=true]:bg-[#FF9500] data-[range-end=true]:text-white data-[range-end=true]:rounded-full data-[range-end=true]:border-transparent",
+        // Today
+        "data-[today=true]:border data-[today=true]:border-[#F68C1F] data-[today=true]:bg-[#F2F2F7] data-[today=true]:text-foreground data-[today=true]:font-semibold",
         // Selected single — LAST so it always wins over today
-        "data-[selected-single=true]:!bg-[#FF9500] data-[selected-single=true]:!text-white data-[selected-single=true]:rounded-full",
+        "data-[selected-single=true]:!bg-[#FF9500] data-[selected-single=true]:!text-white data-[selected-single=true]:rounded-full data-[selected-single=true]:border-transparent",
         className
       )}
       {...props}

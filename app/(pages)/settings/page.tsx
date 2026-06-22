@@ -4,6 +4,8 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useWorkspaceStore } from "@/stores/workspace-store";
+import { Loader } from "@/components/Loader";
 
 import ProfileSettingsPage from "@/components/settings/accountSettings/ProfileSettingsPage";
 import SettingsLayout from "@/components/layout/SettingPagesLayout";
@@ -22,7 +24,7 @@ import ImportAuthorizationPage from "@/components/settings/workspaceSettings/Imp
 import PaymentsSubscriptionsPage from "@/components/settings/accountSettings/PaymentsSubscriptionsPage";
 import CleanUp from "@/components/settings/workspaceSettings/CleanUpPage";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import SecurityPage from "@/components/settings/workspaceSettings/SecurityPage";
+// import SecurityPage from "@/components/settings/workspaceSettings/SecurityPage";
 import UseRole from "@/components/settings/workspaceSettings/UseRole";
 // import PermissionPage from "@/components/settings/workspaceSettings/PermissionPage";
 import FeaturePage from "@/components/settings/workspaceSettings/FeaturePage";
@@ -52,12 +54,12 @@ const accountMenuItems: MenuItem[] = [
 const workspaceMenuItems: MenuItem[] = [
   { id: "general", text: "General" },
   { id: "features", text: "Features" },
-  { id: "security", text: "Security" },
+  // { id: "security", text: "Security" },
   { id: "userManagement", text: "User Management" },
   { id: "integrations", text: "Integrations & Authorizations" },
 
   { id: "importexport", text: "Export & Import" },
-  { id: "permissions", text: "Permissions" },
+  // { id: "permissions", text: "Permissions" },
   { id: "cleanup", text: "Clean Up" },
 ];
 
@@ -74,6 +76,7 @@ type TabType = "account" | "workspace" | "projects";
 const SettingsPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isWorkspaceSwitching } = useWorkspaceStore();
 
   const activeTab = (searchParams.get("tab") as TabType) || "account";
   const activeSection = searchParams.get("section") || "";
@@ -149,7 +152,7 @@ const SettingsPage = () => {
         case "features":
           return <FeaturePage />;
         case "security":
-          return <SecurityPage />;
+          // return <SecurityPage />;
         case "userManagement":
           return <UserManagementPage />;
         case "integrations":
@@ -165,6 +168,14 @@ const SettingsPage = () => {
       }
     }
   };
+
+  if (isWorkspaceSwitching) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <Loader message="Switching workspace..." size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-background transition-colors duration-200">

@@ -163,7 +163,7 @@ export default function IntegrationsAuthorizations() {
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-3 pl-4">
-          <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center bg-white dark:bg-zinc-800/50 overflow-hidden p-1.5">
+          <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center bg-white dark:bg-muted/50 overflow-hidden p-1.5">
             <img src={row.original.appIcon} alt="" className="w-full h-full object-contain" />
           </div>
           <span className="font-medium text-[14px] text-foreground">

@@ -19,16 +19,46 @@ import {
   CircleArrowLeft,
   CircleArrowRight,
   SkipBack,
-  SkipForward
+  SkipForward,
 } from "lucide-react";
 
 const RELATIONSHIP_TYPES = [
-  { value: "relates-to", label: "Relates to", icon: Link2, color: "text-blue-500" },
-  { value: "duplicate-of", label: "Duplicate of", icon: Copy, color: "text-purple-500" },
-  { value: "blocked-by", label: "Blocked by", icon: Ban, color: "text-red-500" },
-  { value: "blocking", label: "Blocking", icon: XOctagon, color: "text-orange-500" },
-  { value: "starts-before", label: "Starts Before", icon: CircleArrowLeft, color: "text-green-500" },
-  { value: "starts-after", label: "Starts After", icon: CircleArrowRight, color: "text-teal-500" },
+  {
+    value: "relates-to",
+    label: "Relates to",
+    icon: Link2,
+    color: "text-blue-500",
+  },
+  {
+    value: "duplicate-of",
+    label: "Duplicate of",
+    icon: Copy,
+    color: "text-purple-500",
+  },
+  {
+    value: "blocked-by",
+    label: "Blocked by",
+    icon: Ban,
+    color: "text-red-500",
+  },
+  {
+    value: "blocking",
+    label: "Blocking",
+    icon: XOctagon,
+    color: "text-orange-500",
+  },
+  {
+    value: "starts-before",
+    label: "Starts Before",
+    icon: CircleArrowLeft,
+    color: "text-green-500",
+  },
+  {
+    value: "starts-after",
+    label: "Starts After",
+    icon: CircleArrowRight,
+    color: "text-teal-500",
+  },
   // { value: "finishes-before", label: "Finishes Before", icon: SkipBack, color: "text-yellow-600" },
   // { value: "finishes-after", label: "Finishes After", icon: SkipForward, color: "text-lime-600" },
 ];
@@ -51,7 +81,9 @@ export function RelationshipDropdown({
   "data-testid": dataTestId,
 }: RelationshipDropdownProps) {
   const isActionVariant = variant === "action";
-  const defaultButtonText = isActionVariant ? "Relationship" : "Add Relationship";
+  const defaultButtonText = isActionVariant
+    ? "Relationship"
+    : "Add Relationship";
 
   return (
     <DropdownMenu>
@@ -62,7 +94,7 @@ export function RelationshipDropdown({
           className={
             isActionVariant
               ? `text-xs rounded h-8 ${className || ""}`
-              : `h-8 ${className || ""}`
+              : `text-xs h-8 ${className || ""}`
           }
           data-testid={dataTestId}
         >
@@ -70,7 +102,10 @@ export function RelationshipDropdown({
           {buttonText || defaultButtonText}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
+      <DropdownMenuContent
+        align="start"
+        className="w-56 border-0 border-b-[5px] border-b-primary"
+      >
         {RELATIONSHIP_TYPES.map(({ value, label, icon: Icon, color }) => (
           <DropdownMenuItem
             key={value}

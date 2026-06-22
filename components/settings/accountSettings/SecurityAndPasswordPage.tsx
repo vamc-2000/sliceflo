@@ -151,7 +151,7 @@ const SecurityAndPasswordPage = () => {
                     {/* 2FA Setup UI - Moved outside grid for full width */}
                     {appTfa && (
                         <div
-                            className="p-5 rounded-xl shadow-sm space-y-4 border border-orange-200/50 dark:border-zinc-800/80 bg-[#F68C1F26] dark:bg-zinc-900/50"
+                            className="p-5 rounded-xl shadow-sm space-y-4 border border-orange-200/50 dark:border-border bg-[#F68C1F26] dark:bg-muted/30"
                         >
                             <div className="flex flex-col md:flex-row gap-8">
                                 {/* QR Code Section */}
@@ -242,12 +242,12 @@ const SecurityAndPasswordPage = () => {
                                         setAppTfa(false);
                                         setOtp(Array(6).fill(""));
                                     }}
-                                    className="px-8 h-12 rounded-xl border border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold text-[14px] hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
+                                    className="px-8 h-12 rounded-xl border border-border bg-muted text-muted-foreground font-bold text-[14px] hover:bg-muted/80 transition-colors"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
-                                    className="px-8 h-12 rounded-xl bg-[#001F3F] dark:bg-white text-white dark:text-black hover:bg-[#001F3F]/90 dark:hover:bg-zinc-200 font-bold text-[14px] transition-all shadow-sm"
+                                    className="px-8 h-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-[14px] transition-all shadow-sm"
                                     onClick={() => {
                                         toast.success("2FA Setup Complete!");
                                         setAppTfa(false);

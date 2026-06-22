@@ -48,7 +48,9 @@ import {
   ArrowDown01,
   ArrowDown10,
   ChevronRight,
+  Flag,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTasksStore } from "@/stores/tasks-store";
 import { Task } from "@/types/task.types";
 import { TaskGroup } from "./TaskGroup";
@@ -141,6 +143,15 @@ interface SavedFilter {
   filterBlock: FilterBlock;
 }
 
+const getAvatarColor = (name: string): string => {
+  const colors = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
+
 export function ListView({
   projectId,
   onRegisterCollapseHandlers,
@@ -207,7 +218,7 @@ export function ListView({
     return {
       id: userId,
       name: wm?.name || userId,
-      avatar: wm?.avatar,
+      avatar: wm?.avatar || wm?.profilePicture || "",
     };
   });
   const taskTypes = getTaskTypesByProject(projectId);
@@ -2134,37 +2145,66 @@ export function ListView({
                               Assignee
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-64 p-0">
-                            <AssigneeDropdown
-                              projectId={projectId}
-                              currentAssignee={undefined}
-                              onAssigneeChange={(userId) => {
-                                if (userId) {
-                                  setFilterConfig((prev) => {
-                                    const existing = prev.find(
-                                      (f) => f.field === "assignee",
-                                    );
-                                    if (existing)
-                                      return prev.map((f) =>
-                                        f.field === "assignee"
-                                          ? { ...f, value: userId }
-                                          : f,
-                                      );
-                                    return [
-                                      ...prev,
-                                      {
-                                        id: Math.random()
-                                          .toString(36)
-                                          .substr(2, 9),
-                                        field: "assignee",
-                                        condition: "is",
-                                        value: userId,
-                                      },
-                                    ];
-                                  });
-                                }
-                              }}
-                            />
+                          <DropdownMenuSubContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background">
+                            <div className="max-h-60 overflow-y-auto space-y-1">
+                              {members.length === 0 ? (
+                                <div className="text-center py-2 text-xs text-muted-foreground">
+                                  No members found
+                                </div>
+                              ) : (
+                                members.map((member) => (
+                                  <DropdownMenuItem
+                                    key={member.id}
+                                    onSelect={() => {
+                                      setFilterConfig((prev) => {
+                                        const existing = prev.find(
+                                          (f) => f.field === "assignee",
+                                        );
+                                        if (existing)
+                                          return prev.map((f) =>
+                                            f.field === "assignee"
+                                              ? { ...f, value: member.id }
+                                              : f,
+                                          );
+                                        return [
+                                          ...prev,
+                                          {
+                                            id: Math.random()
+                                              .toString(36)
+                                              .substr(2, 9),
+                                            field: "assignee",
+                                            condition: "is",
+                                            value: member.id,
+                                          },
+                                        ];
+                                      });
+                                    }}
+                                    className="p-0 focus:bg-transparent"
+                                  >
+                                    <div className="w-full h-9 flex items-center justify-start rounded-xs text-xs font-medium bg-muted hover:opacity-90 transition-opacity px-2 cursor-pointer gap-2">
+                                      <Avatar className="h-6 w-6 border-0 shrink-0">
+                                        {member.avatar && (
+                                          <AvatarImage src={member.avatar} />
+                                        )}
+                                        <AvatarFallback
+                                          className="text-white text-[10px] font-semibold"
+                                          style={{
+                                            backgroundColor: getAvatarColor(
+                                              member.name,
+                                            ),
+                                          }}
+                                        >
+                                          {member.name.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="truncate flex-1 text-left text-foreground">
+                                        {member.name}
+                                      </span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                ))
+                              )}
+                            </div>
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
 
@@ -2182,45 +2222,54 @@ export function ListView({
                               Priority
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-48 p-2">
-                            {taskPriorityConfigs.map((cfg) => (
-                              <DropdownMenuItem
-                                key={cfg._id}
-                                onSelect={() => {
-                                  setFilterConfig((prev) => {
-                                    const existing = prev.find(
-                                      (f) => f.field === "priority",
-                                    );
-                                    if (existing)
-                                      return prev.map((f) =>
-                                        f.field === "priority"
-                                          ? { ...f, value: cfg.value }
-                                          : f,
+                          <DropdownMenuSubContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background">
+                            {taskPriorityConfigs.length === 0 ? (
+                              <div className="px-2 py-2 text-xs text-muted-foreground italic">
+                                No priorities configured
+                              </div>
+                            ) : (
+                              taskPriorityConfigs.map((cfg) => (
+                                <DropdownMenuItem
+                                  key={cfg._id}
+                                  onSelect={() => {
+                                    setFilterConfig((prev) => {
+                                      const existing = prev.find(
+                                        (f) => f.field === "priority",
                                       );
-                                    return [
-                                      ...prev,
-                                      {
-                                        id: Math.random()
-                                          .toString(36)
-                                          .substr(2, 9),
-                                        field: "priority",
-                                        condition: "is",
-                                        value: cfg.value,
-                                      },
-                                    ];
-                                  });
-                                }}
-                                className="flex items-center gap-2 cursor-pointer text-xs"
-                              >
-                                <div
-                                  className="w-2.5 h-2.5 rounded-full"
-                                  style={{ backgroundColor: cfg.color }}
-                                />
-                                <span className="text-xs font-medium">
-                                  {cfg.label}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
+                                      if (existing)
+                                        return prev.map((f) =>
+                                          f.field === "priority"
+                                            ? { ...f, value: cfg.value }
+                                            : f,
+                                        );
+                                      return [
+                                        ...prev,
+                                        {
+                                          id: Math.random()
+                                            .toString(36)
+                                            .substr(2, 9),
+                                          field: "priority",
+                                          condition: "is",
+                                          value: cfg.value,
+                                        },
+                                      ];
+                                    });
+                                  }}
+                                  className="h-9 text-xs font-medium rounded-xs cursor-pointer px-2 flex items-center justify-between gap-2 w-full focus:opacity-80 focus:bg-transparent"
+                                  style={{
+                                    backgroundColor: `${cfg.color}33`,
+                                  }}
+                                >
+                                  <span className="text-foreground text-left flex-1 truncate">
+                                    {cfg.label}
+                                  </span>
+                                  <Flag
+                                    className="h-3.5 w-3.5 flex-shrink-0"
+                                    style={{ color: cfg.color }}
+                                  />
+                                </DropdownMenuItem>
+                              ))
+                            )}
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
 
@@ -2238,45 +2287,52 @@ export function ListView({
                               Status
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-48 p-2">
-                            {taskStatusConfigs.map((cfg) => (
-                              <DropdownMenuItem
-                                key={cfg._id}
-                                onSelect={() => {
-                                  setFilterConfig((prev) => {
-                                    const existing = prev.find(
-                                      (f) => f.field === "status",
-                                    );
-                                    if (existing)
-                                      return prev.map((f) =>
-                                        f.field === "status"
-                                          ? { ...f, value: cfg.value }
-                                          : f,
+                          <DropdownMenuSubContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background">
+                            {taskStatusConfigs.length === 0 ? (
+                              <div className="px-2 py-2 text-xs text-muted-foreground italic">
+                                No statuses configured
+                              </div>
+                            ) : (
+                              taskStatusConfigs.map((cfg) => (
+                                <DropdownMenuItem
+                                  key={cfg._id}
+                                  onSelect={() => {
+                                    setFilterConfig((prev) => {
+                                      const existing = prev.find(
+                                        (f) => f.field === "status",
                                       );
-                                    return [
-                                      ...prev,
-                                      {
-                                        id: Math.random()
-                                          .toString(36)
-                                          .substr(2, 9),
-                                        field: "status",
-                                        condition: "is",
-                                        value: cfg.value,
-                                      },
-                                    ];
-                                  });
-                                }}
-                                className="flex items-center gap-2 cursor-pointer text-xs"
-                              >
-                                <div
-                                  className="w-2.5 h-2.5 rounded-full"
-                                  style={{ backgroundColor: cfg.color }}
-                                />
-                                <span className="text-xs font-medium">
-                                  {cfg.label}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
+                                      if (existing)
+                                        return prev.map((f) =>
+                                          f.field === "status"
+                                            ? { ...f, value: cfg.value }
+                                            : f,
+                                        );
+                                      return [
+                                        ...prev,
+                                        {
+                                          id: Math.random()
+                                            .toString(36)
+                                            .substr(2, 9),
+                                          field: "status",
+                                          condition: "is",
+                                          value: cfg.value,
+                                        },
+                                      ];
+                                    });
+                                  }}
+                                  className="p-0 focus:bg-transparent"
+                                >
+                                  <div
+                                    className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                    style={{ backgroundColor: cfg.color || "#c4c4c4" }}
+                                  >
+                                    <span className="truncate w-full text-center">
+                                      {cfg.label}
+                                    </span>
+                                  </div>
+                                </DropdownMenuItem>
+                              ))
+                            )}
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>
 
@@ -2352,51 +2408,55 @@ export function ListView({
                               Labels
                             </span>
                           </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="w-48 p-2">
-                            {(currentWorkspace?.labels || []).map((label) => (
-                              <DropdownMenuItem
-                                key={label.id || label.name}
-                                onSelect={() => {
-                                  setFilterConfig((prev) => {
-                                    const existing = prev.find(
-                                      (f) => f.field === "labels",
-                                    );
-                                    const labelValue = label.id || label.name;
-                                    if (existing)
-                                      return prev.map((f) =>
-                                        f.field === "labels"
-                                          ? { ...f, value: labelValue }
-                                          : f,
-                                      );
-                                    return [
-                                      ...prev,
-                                      {
-                                        id: Math.random()
-                                          .toString(36)
-                                          .substr(2, 9),
-                                        field: "labels",
-                                        condition: "contains",
-                                        value: labelValue,
-                                      },
-                                    ];
-                                  });
-                                }}
-                                className="flex items-center gap-2 cursor-pointer text-xs"
-                              >
-                                <div
-                                  className="w-2.5 h-2.5 rounded-full"
-                                  style={{ backgroundColor: label.color }}
-                                />
-                                <span className="text-xs font-medium">
-                                  {label.name}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
+                          <DropdownMenuSubContent className="p-4 w-[200px] space-y-1 border-0 border-b-[5px] border-primary bg-background">
                             {(!currentWorkspace?.labels ||
-                              currentWorkspace.labels.length === 0) && (
+                              currentWorkspace.labels.length === 0) ? (
                               <div className="text-xs text-muted-foreground text-center p-2">
                                 No labels found
                               </div>
+                            ) : (
+                              currentWorkspace.labels.map((label) => {
+                                const labelValue = label.id || label.name;
+                                return (
+                                  <DropdownMenuItem
+                                    key={label.id || label.name}
+                                    onSelect={() => {
+                                      setFilterConfig((prev) => {
+                                        const existing = prev.find(
+                                          (f) => f.field === "labels",
+                                        );
+                                        if (existing)
+                                          return prev.map((f) =>
+                                            f.field === "labels"
+                                              ? { ...f, value: labelValue }
+                                              : f,
+                                          );
+                                        return [
+                                          ...prev,
+                                          {
+                                            id: Math.random()
+                                              .toString(36)
+                                              .substr(2, 9),
+                                            field: "labels",
+                                            condition: "contains",
+                                            value: labelValue,
+                                          },
+                                        ];
+                                      });
+                                    }}
+                                    className="p-0 focus:bg-transparent"
+                                  >
+                                    <div
+                                      className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                      style={{ backgroundColor: label.color || "#c4c4c4" }}
+                                    >
+                                      <span className="truncate w-full text-center">
+                                        {label.name}
+                                      </span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                );
+                              })
                             )}
                           </DropdownMenuSubContent>
                         </DropdownMenuSub>

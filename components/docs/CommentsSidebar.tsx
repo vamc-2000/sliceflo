@@ -253,10 +253,10 @@ export function CommentsSidebar() {
 
 
     return (
-        <div className="h-full w-full bg-white border-l border-gray-200 flex flex-col">
+        <div className="h-full w-full bg-card border-l border-border flex flex-col">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-1 border-b">
+            <div className="flex items-center justify-between px-4 py-1 border-b border-border">
                 <h2 className="text-base font-semibold">Chat</h2>
                 <Button
                     variant="ghost"
@@ -543,8 +543,8 @@ export function CommentsSidebar() {
             </div>
 
             {/* Sticky Footer */}
-            <div className="p-3 border-t bg-background">
-                <div className="border rounded-lg bg-background">
+            <div className="p-3 border-t border-border bg-background">
+                <div className="border border-border rounded-lg bg-background">
 
                     {/* Attachment Preview */}
                     {commentAttachments.length > 0 && (

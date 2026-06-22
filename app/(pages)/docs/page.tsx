@@ -22,6 +22,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { useAuthStore } from "@/stores/auth-store";
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import toast from "react-hot-toast";
 
 export default function DocsPage() {
   const router = useRouter();
@@ -183,7 +184,7 @@ export default function DocsPage() {
                       "h-4 w-4 transition-colors",
                       doc.isFavorite
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground group-hover:text-primary"
+                        : "text-muted-foreground group-hover:text-primary dark:group-hover:text-white"
                     )}
                   />
                 </button>
@@ -191,19 +192,21 @@ export default function DocsPage() {
                   className="h-8 w-8 rounded-full flex items-center justify-center bg-muted/50 border border-border transition-colors group"
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/docs/${doc.id}`);
+                    window.open(`/docs/${doc.id}`, '_blank');
                   }}
                 >
-                  <BiExpandAlt className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <BiExpandAlt className="h-4 w-4 text-muted-foreground group-hover:text-primary dark:group-hover:text-white transition-colors" />
                 </button>
                 <button
                   className="h-8 w-8 rounded-full flex items-center justify-center bg-muted/50 border border-border transition-colors group"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Copy link logic or similar
+                    const url = `${window.location.origin}/docs/${doc.id}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Link copied to clipboard!");
                   }}
                 >
-                  <PiLinkSimple className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <PiLinkSimple className="h-4 w-4 text-muted-foreground group-hover:text-primary dark:group-hover:text-white transition-colors" />
                 </button>
               </div>
             </div>
@@ -299,7 +302,7 @@ export default function DocsPage() {
             className="bg-primary text-primary-foreground hover:opacity-90 gap-2 rounded-lg px-4 py-2"
           >
             <Plus className="h-4 w-4" />
-            Create new Doc
+          Create Doc
           </Button>
         </div>
 
@@ -329,8 +332,12 @@ export default function DocsPage() {
                 fileSize={countAllSubpages(doc.id) > 0 ? `${countAllSubpages(doc.id)} subpages` : undefined}
                 navigateTo={`/docs/${doc.id}`}
                 onToggleFavorite={(id) => toggleFavorite(id)}
-                onShare={(id) => console.log("Share doc:", id)}
-                onMore={(id) => console.log("More options:", id)}
+                onShare={(id) => window.open(`/docs/${id}`, '_blank')}
+                onMore={(id) => {
+                  const url = `${window.location.origin}/docs/${id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Link copied to clipboard!");
+                }}
               />
             ))}
           </DashboardSection>
@@ -360,8 +367,12 @@ export default function DocsPage() {
               fileSize={countAllSubpages(doc.id) > 0 ? `${countAllSubpages(doc.id)} subpages` : undefined}
               navigateTo={`/docs/${doc.id}`}
               onToggleFavorite={(id) => toggleFavorite(id)}
-              onShare={(id) => console.log("Share doc:", id)}
-              onMore={(id) => console.log("More options:", id)}
+              onShare={(id) => window.open(`/docs/${id}`, '_blank')}
+              onMore={(id) => {
+                const url = `${window.location.origin}/docs/${id}`;
+                navigator.clipboard.writeText(url);
+                toast.success("Link copied to clipboard!");
+              }}
             />
           ))}
         </DashboardSection>

@@ -318,7 +318,7 @@ export function TargetsSection({ goalId, targets, onOpenCreateTarget, onOpenEdit
               className="bg-primary text-primary-foreground hover:opacity-90 px-6 py-2 rounded-lg font-medium"
               data-testid="create-first-target-button"
             >
-              Create Target
+             + Create Target 
             </Button>
 
           </div>

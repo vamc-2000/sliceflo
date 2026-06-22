@@ -104,10 +104,13 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
     };
 
     return (
-        <div className="space-y-3 pt-4">
-            <div className="flex items-center justify-between">
+        <div className="space-y-3">
+            <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+            >
                 <div className="flex items-center gap-2">
-                    <Label className="font-semibold">Attachments</Label>
+                    <Label className="font-semibold cursor-pointer">Attachments</Label>
 
                     {attachments.length > 0 && (
                         <span className="text-xs text-muted-foreground">
@@ -121,7 +124,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                     {hasFiles && (
                         <button
                             className="p-2 rounded-md bg-muted hover:bg-muted transition"
-                            onClick={() => setIsAttachModalOpen(true)}
+                            onClick={(e) => { e.stopPropagation(); setIsAttachModalOpen(true); }}
                             disabled={isUploading}
                             data-testid="task-attachments-add-more-btn"
                         >
@@ -131,8 +134,7 @@ export const TaskAttachments: React.FC<TaskAttachmentsProps> = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6"
-                        onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+                        className="h-6 w-6 pointer-events-none"
                     >
                         <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isAttachmentsExpanded ? "rotate-180" : "rotate-0")} />
                     </Button>

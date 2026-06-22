@@ -256,7 +256,7 @@ export function CalendarPicker({
                   row: "mt-0",
                   day: "text-xs",
                   day_button: "text-xs",
-                  day_today: "!bg-transparent !text-inherit !ring-0 mt-0",
+                  day_today: "mt-0",
                 }}
               />
             </motion.div>

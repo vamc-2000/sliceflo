@@ -71,6 +71,10 @@ import {
   RefreshCw,
   Paperclip,
   StickyNote,
+  FolderDown,
+  Layers,
+  RotateCwSquare,
+  Rocket,
 } from "lucide-react"
 
 import {
@@ -176,9 +180,14 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   shield: Shield,
   squarePen: SquarePen,
   eye: Eye,
-  refreshCw: RefreshCw,
   paperclip: Paperclip,
-  stickyNote: StickyNote
+  stickyNote: StickyNote,
+  refreshCw: RefreshCw,
+  home: Home,
+  folderDown: FolderDown,
+  layers: Layers,
+  rotateCwSquare: RotateCwSquare,
+  rocket: Rocket
 }
 
 export function AppSidebar() {
@@ -342,11 +351,13 @@ export function AppSidebar() {
             iconKey: project.icon?.name || 'panelsTopLeft',
             iconColor: project.icon?.color || project.color || '#6366f1',
             nestedItems: [
-              { key: 'overview', label: 'Overview', href: `/project/${project.id}?view=overview`, iconKey: 'layoutDashboard' },
-              { key: 'views', label: 'Views', href: `/project/${project.id}/views`, iconKey: 'eye' },
-              { key: 'cycles', label: 'Cycles', href: `/project/${project.id}/cycles`, iconKey: 'refreshCw' },
+              { key: 'overview', label: 'Overview', href: `/project/${project.id}?view=overview`, iconKey: 'home' },
+              { key: 'intake', label: 'Intake', href: `/project/${project.id}/intake`, iconKey: 'folderDown' },
+              { key: 'views', label: 'Views', href: `/project/${project.id}/views`, iconKey: 'layers' },
+              { key: 'cycles', label: 'Cycles', href: `/project/${project.id}/cycles`, iconKey: 'rotateCwSquare' },
+              { key: 'releases', label: 'Releases', href: `/project/${project.id}/releases`, iconKey: 'rocket' },
               { key: 'attachments', label: 'Attachments', href: `/project/${project.id}?view=attachments`, iconKey: 'paperclip' },
-              { key: 'notes', label: 'Notes', href: `/project/${project.id}?view=notes`, iconKey: 'stickyNote' },
+              { key: 'notes', label: 'Notes', href: `/project/${project.id}?view=notes`, iconKey: 'fileText' },
             ]
           })),
         };
@@ -1350,11 +1361,22 @@ export function AppSidebar() {
                                       }}
                                       className={cn(
                                         "cursor-pointer group/item transition-colors duration-200",
-                                        isSubActive && "text-[#F68C1F] focus:text-[#F68C1F]"
+                                        item.key === "project"
+                                          ? isSubActive
+                                            ? "text-[#F68C1F] focus:text-[#F68C1F] data-[highlighted]:text-[#F68C1F] focus:bg-transparent data-[highlighted]:bg-transparent p-0 focus:p-0"
+                                            : "text-white focus:text-white data-[highlighted]:text-white focus:bg-transparent data-[highlighted]:bg-transparent p-0 focus:p-0"
+                                          : isSubActive && "text-[#F68C1F] focus:text-[#F68C1F]"
                                       )}
                                     >
                                       <div className="flex flex-col w-full">
-                                        <div className="flex items-center justify-between w-full">
+                                        <div className={cn(
+                                          "flex items-center justify-between w-full transition-colors duration-200",
+                                          item.key === "project" && (
+                                            isSubActive
+                                              ? "py-1.5 px-2 rounded-md hover:bg-white text-[#F68C1F] hover:text-[#F68C1F]"
+                                              : "py-1.5 px-2 rounded-md hover:bg-white text-white hover:text-black"
+                                          )
+                                        )}>
                                           <div className="flex items-center gap-2 flex-1">
                                             {iconElement}
                                             {editingTeamId === subItem.key ? (
@@ -1419,7 +1441,7 @@ export function AppSidebar() {
                                                 </button>
                                               </form>
                                             ) : (
-                                              <span className={cn(isSubActive && "!text-[#F68C1F]")}>{subItem.label}</span>
+                                              <span className={cn(item.key !== "project" && isSubActive && "!text-[#F68C1F]")}>{subItem.label}</span>
                                             )}
 
                                           </div>
@@ -1428,9 +1450,9 @@ export function AppSidebar() {
                                           {subItem.nestedItems && (
                                             <div className="ml-auto">
                                               {openProjectSubmenu === subItem.key ? (
-                                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                                <ChevronDown className={cn("h-4 w-4", item.key === "project" ? "text-current" : "text-muted-foreground")} />
                                               ) : (
-                                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                <ChevronRight className={cn("h-4 w-4", item.key === "project" ? "text-current" : "text-muted-foreground")} />
                                               )}
                                             </div>
                                           )}
@@ -1543,8 +1565,8 @@ export function AppSidebar() {
                                                 <div
                                                   key={nestedItem.key}
                                                   className={cn(
-                                                    "flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-muted/50 transition-colors",
-                                                    isNestedActive && "text-[#F68C1F] bg-[#F68C1F]/10"
+                                                    "flex items-center gap-2 py-1 px-1.5 rounded-md cursor-pointer hover:bg-white transition-colors group",
+                                                    isNestedActive && "bg-[#F68C1F]/10"
                                                   )}
                                                   onClick={(e) => {
                                                     e.preventDefault();
@@ -1555,8 +1577,8 @@ export function AppSidebar() {
                                                     router.push(nestedItem.href);
                                                   }}
                                                 >
-                                                  <NestedIcon className={cn("h-3.5 w-3.5", isNestedActive ? "text-[#F68C1F]" : "text-muted-foreground")} />
-                                                  <span className="text-xs font-medium">{nestedItem.label}</span>
+                                                  <NestedIcon className={cn("h-3.5 w-3.5", isNestedActive ? "text-[#F68C1F] group-hover:text-[#F68C1F]" : "text-white group-hover:text-black")} />
+                                                  <span className={cn("text-xs font-medium", isNestedActive ? "text-[#F68C1F] group-hover:text-[#F68C1F]" : "text-white group-hover:text-black")}>{nestedItem.label}</span>
                                                 </div>
                                               );
                                             })}

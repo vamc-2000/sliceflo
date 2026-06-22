@@ -27,10 +27,6 @@ export const LabelBadge: React.FC<LabelBadgeProps> = ({
         border: `1px solid ${label.color}30`,
       }}
     >
-      <div
-        className="w-2 h-2 rounded-full"
-        style={{ backgroundColor: label.color }}
-      />
       {label.name}
       {onRemove && (
         <button

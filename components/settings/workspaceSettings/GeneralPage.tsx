@@ -11,6 +11,7 @@ import { ImageIcon } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import Image from "next/image";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import { Loader } from "@/components/Loader";
 import { useSearchParams } from "next/navigation";
 import { Workspace } from "@/types/workspace.types";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -34,6 +35,7 @@ export default function GeneralPage() {
     updateWorkspaceLocally,
     currentWorkspace,
     isLoading,
+    isWorkspaceSwitching,
     setCurrentWorkspace
   } = useWorkspaceStore();
 
@@ -243,12 +245,10 @@ export default function GeneralPage() {
   });
 
 
-  if (!selectedWorkspace) {
+  if (isLoading || isWorkspaceSwitching || !selectedWorkspace) {
     return (
-      <div className="w-full space-y-6">
-        <div className="text-center py-8">
-          <p className="text-sm text-muted-foreground">No workspace selected</p>
-        </div>
+      <div className="w-full h-[400px] flex items-center justify-center">
+        <Loader message={isWorkspaceSwitching ? "Switching workspace..." : "Loading workspace..."} size="md" />
       </div>
     );
   }

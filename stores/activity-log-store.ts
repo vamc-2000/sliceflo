@@ -25,11 +25,11 @@ interface ActivityLogState {
   hasPrevPage: boolean;
   loading: boolean;
   error: string | null;
-  fetchActivityLogs: (userId: string) => Promise<void>;
-  fetchTeamActivityLogs: (teamId: string) => Promise<void>;
-  fetchProjectActivityLogs: (projectId: string) => Promise<void>;
-  fetchPortfolioActivityLogs: (portfolioId: string) => Promise<void>;
-  fetchTaskActivityLogs: (taskId: string) => Promise<void>;
+  fetchActivityLogs: (userId: string, page?: number, limit?: number) => Promise<void>;
+  fetchTeamActivityLogs: (teamId: string, page?: number, limit?: number) => Promise<void>;
+  fetchProjectActivityLogs: (projectId: string, page?: number, limit?: number) => Promise<void>;
+  fetchPortfolioActivityLogs: (portfolioId: string, page?: number, limit?: number) => Promise<void>;
+  fetchTaskActivityLogs: (taskId: string, page?: number, limit?: number) => Promise<void>;
   clearLogs: () => void;
   reset: () => void;
 }
@@ -63,6 +63,39 @@ const attachMembers = (
   });
 };
 
+const parseActivityLogsResponse = (response: any) => {
+  if (!response) {
+    return {
+      results: [],
+      total: 0,
+      perPage: 10,
+      currentPage: 1,
+      pageCount: 1,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+  }
+
+  // Handle both unwrapped (response.results) and nested wrapped (response.data.results) formats
+  const results = response.results || response.data?.results || [];
+  const total = response.total !== undefined ? response.total : (response.data?.total !== undefined ? response.data.total : results.length);
+  const perPage = response.perPage || response.data?.perPage || 10;
+  const currentPage = response.currentPage || response.data?.currentPage || 1;
+  const pageCount = response.pageCount || response.data?.pageCount || 1;
+  const hasNextPage = response.paginator?.hasNextPage || response.data?.paginator?.hasNextPage || false;
+  const hasPrevPage = response.paginator?.hasPrevPage || response.data?.paginator?.hasPrevPage || false;
+
+  return {
+    results,
+    total,
+    perPage,
+    currentPage,
+    pageCount,
+    hasNextPage,
+    hasPrevPage,
+  };
+};
+
 export const useActivityLogStore = create<ActivityLogState>((set) => ({
   activityLogs: [],
   total: 0,
@@ -74,25 +107,26 @@ export const useActivityLogStore = create<ActivityLogState>((set) => ({
   loading: false,
   error: null,
 
-  fetchActivityLogs: async (userId: string) => {
+  fetchActivityLogs: async (userId: string, page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response: TeamActivityLogsResponse = await fetchActivityLogsByActor(userId);
+      const response = await fetchActivityLogsByActor(userId, page, limit);
       console.log("store actor response", response);
 
       const members = useWorkspaceStore.getState().workspaceMembers || [];
       console.log("store workspaceMembers", members);
 
-      const enriched = attachMembers(response?.results ?? [], members);
+      const parsed = parseActivityLogsResponse(response);
+      const enriched = attachMembers(parsed.results, members);
 
       set({
         activityLogs: enriched,
-        total: response?.total ?? enriched.length,
-        perPage: response?.perPage ?? 10,
-        currentPage: response?.currentPage ?? 1,
-        pageCount: response?.pageCount ?? 1,
-        hasNextPage: response?.paginator?.hasNextPage ?? false,
-        hasPrevPage: response?.paginator?.hasPrevPage ?? false,
+        total: parsed.total,
+        perPage: parsed.perPage,
+        currentPage: parsed.currentPage,
+        pageCount: parsed.pageCount,
+        hasNextPage: parsed.hasNextPage,
+        hasPrevPage: parsed.hasPrevPage,
         loading: false,
       });
     } catch (error: any) {
@@ -108,22 +142,23 @@ export const useActivityLogStore = create<ActivityLogState>((set) => ({
     }
   },
 
-  fetchTeamActivityLogs: async (teamId: string) => {
+  fetchTeamActivityLogs: async (teamId: string, page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response: TeamActivityLogsResponse = await fetchActivityLogsByTeam(teamId);
+      const response = await fetchActivityLogsByTeam(teamId, page, limit);
 
       const members = useWorkspaceStore.getState().workspaceMembers || [];
-      const enriched = attachMembers(response?.results ?? [], members);
+      const parsed = parseActivityLogsResponse(response);
+      const enriched = attachMembers(parsed.results, members);
 
       set({
         activityLogs: enriched,
-        total: response?.total ?? enriched.length,
-        perPage: response?.perPage ?? 10,
-        currentPage: response?.currentPage ?? 1,
-        pageCount: response?.pageCount ?? 1,
-        hasNextPage: response?.paginator?.hasNextPage ?? false,
-        hasPrevPage: response?.paginator?.hasPrevPage ?? false,
+        total: parsed.total,
+        perPage: parsed.perPage,
+        currentPage: parsed.currentPage,
+        pageCount: parsed.pageCount,
+        hasNextPage: parsed.hasNextPage,
+        hasPrevPage: parsed.hasPrevPage,
         loading: false,
       });
     } catch (err: any) {
@@ -138,21 +173,22 @@ export const useActivityLogStore = create<ActivityLogState>((set) => ({
       });
     }
   },
-  fetchProjectActivityLogs: async (projectId: string) => {
+  fetchProjectActivityLogs: async (projectId: string, page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response: TeamActivityLogsResponse = await fetchActivityLogsByProject(projectId);
+      const response = await fetchActivityLogsByProject(projectId, page, limit);
       const members = useWorkspaceStore.getState().workspaceMembers || [];
-      const enriched = attachMembers(response?.results ?? [], members);
+      const parsed = parseActivityLogsResponse(response);
+      const enriched = attachMembers(parsed.results, members);
 
       set({
         activityLogs: enriched,
-        total: response?.total ?? enriched.length,
-        perPage: response?.perPage ?? 10,
-        currentPage: response?.currentPage ?? 1,
-        pageCount: response?.pageCount ?? 1,
-        hasNextPage: response?.paginator?.hasNextPage ?? false,
-        hasPrevPage: response?.paginator?.hasPrevPage ?? false,
+        total: parsed.total,
+        perPage: parsed.perPage,
+        currentPage: parsed.currentPage,
+        pageCount: parsed.pageCount,
+        hasNextPage: parsed.hasNextPage,
+        hasPrevPage: parsed.hasPrevPage,
         loading: false,
       });
     } catch (err: any) {
@@ -168,21 +204,22 @@ export const useActivityLogStore = create<ActivityLogState>((set) => ({
     }
   },
 
-  fetchPortfolioActivityLogs: async (portfolioId: string) => {
+  fetchPortfolioActivityLogs: async (portfolioId: string, page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response: TeamActivityLogsResponse = await fetchActivityLogsByPortfolio(portfolioId);
+      const response = await fetchActivityLogsByPortfolio(portfolioId, page, limit);
       const members = useWorkspaceStore.getState().workspaceMembers || [];
-      const enriched = attachMembers(response?.results ?? [], members);
+      const parsed = parseActivityLogsResponse(response);
+      const enriched = attachMembers(parsed.results, members);
 
       set({
         activityLogs: enriched,
-        total: response?.total ?? enriched.length,
-        perPage: response?.perPage ?? 10,
-        currentPage: response?.currentPage ?? 1,
-        pageCount: response?.pageCount ?? 1,
-        hasNextPage: response?.paginator?.hasNextPage ?? false,
-        hasPrevPage: response?.paginator?.hasPrevPage ?? false,
+        total: parsed.total,
+        perPage: parsed.perPage,
+        currentPage: parsed.currentPage,
+        pageCount: parsed.pageCount,
+        hasNextPage: parsed.hasNextPage,
+        hasPrevPage: parsed.hasPrevPage,
         loading: false,
       });
     } catch (err: any) {
@@ -198,21 +235,22 @@ export const useActivityLogStore = create<ActivityLogState>((set) => ({
     }
   },
 
-  fetchTaskActivityLogs: async (taskId: string) => {
+  fetchTaskActivityLogs: async (taskId: string, page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const response: TeamActivityLogsResponse = await fetchActivityLogsByTask(taskId);
+      const response = await fetchActivityLogsByTask(taskId, page, limit);
       const members = useWorkspaceStore.getState().workspaceMembers || [];
-      const enriched = attachMembers(response?.results ?? [], members);
+      const parsed = parseActivityLogsResponse(response);
+      const enriched = attachMembers(parsed.results, members);
 
       set({
         activityLogs: enriched,
-        total: response?.total ?? enriched.length,
-        perPage: response?.perPage ?? 10,
-        currentPage: response?.currentPage ?? 1,
-        pageCount: response?.pageCount ?? 1,
-        hasNextPage: response?.paginator?.hasNextPage ?? false,
-        hasPrevPage: response?.paginator?.hasPrevPage ?? false,
+        total: parsed.total,
+        perPage: parsed.perPage,
+        currentPage: parsed.currentPage,
+        pageCount: parsed.pageCount,
+        hasNextPage: parsed.hasNextPage,
+        hasPrevPage: parsed.hasPrevPage,
         loading: false,
       });
     } catch (err: any) {

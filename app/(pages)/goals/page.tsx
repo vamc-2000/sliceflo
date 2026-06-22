@@ -8,7 +8,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { Button } from "@/components/ui/button";
 import { Plus, Star, Share2, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
@@ -22,6 +22,7 @@ import { useProfileStore } from "@/stores/profile-store";
 import { Goal } from "@/types/goal.types";
 import { LandingPage } from "@/components/LandingPage";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 
 
@@ -33,7 +34,7 @@ export default function GoalsPage() {
   const router = useRouter();
   const { goals, fetchGoals, isLoading, toggleFavorite } = useGoalsStore();
   const { currentWorkspace, workspaceMembers, fetchWorkspaceMembers } = useWorkspaceStore();
-  const {user:currentUser ,fetchUserProfile}=useProfileStore();
+  const { user: currentUser, fetchUserProfile } = useProfileStore();
   const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
@@ -42,22 +43,22 @@ export default function GoalsPage() {
       fetchGoals(currentWorkspace.id);
       fetchWorkspaceMembers(currentWorkspace.id);
     }
-  }, [currentWorkspace?.id, fetchGoals, fetchWorkspaceMembers,fetchUserProfile]);
+  }, [currentWorkspace?.id, fetchGoals, fetchWorkspaceMembers, fetchUserProfile]);
 
   const getCreatorInfo = (goal: any) => {
     const creator = goal.createdBy;
-    const creatorId=typeof creator === 'object'
-    ? (creator?.userId || creator?.id || creator?._id)
-    :creator;
-    const creatorName= typeof creator ==="object" ? creator?.name:undefined;
-    const creatorImage= typeof creator ==="object" ? creator?.profilePictureUrl ||  creator?.profilePicture ||  creator?.avatar:undefined
-    const currentUserId= currentUser?.id || currentUser?._id
-    const member = workspaceMembers.find((m: any) => m.userId === creatorId ||(creatorName && m.name === creatorName));
-    if(member){
+    const creatorId = typeof creator === 'object'
+      ? (creator?.userId || creator?.id || creator?._id)
+      : creator;
+    const creatorName = typeof creator === "object" ? creator?.name : undefined;
+    const creatorImage = typeof creator === "object" ? creator?.profilePictureUrl || creator?.profilePicture || creator?.avatar : undefined
+    const currentUserId = currentUser?.id || currentUser?._id
+    const member = workspaceMembers.find((m: any) => m.userId === creatorId || (creatorName && m.name === creatorName));
+    if (member) {
       return {
-        name :member.name ,
-        image:member.profilePicture || undefined,
-        intiials: member.name?.split("").map((n:string)=>n?.[0]).join("").toUpperCase() || "M"
+        name: member.name,
+        image: member.profilePicture || undefined,
+        intiials: member.name?.split("").map((n: string) => n?.[0]).join("").toUpperCase() || "M"
       }
     }
     if (creatorName) {
@@ -72,7 +73,7 @@ export default function GoalsPage() {
           .toUpperCase() || "U",
       };
     }
-   if (!creatorId || creatorId === currentUserId) {
+    if (!creatorId || creatorId === currentUserId) {
       if (currentUser) {
         return {
           name: currentUser.name || "You",
@@ -127,7 +128,7 @@ export default function GoalsPage() {
   };
 
   const getFilteredGoals = () => {
-    const currentUserId= currentUser?.id || currentUser?._id;
+    const currentUserId = currentUser?.id || currentUser?._id;
     const getUserId = (u: any) => typeof u === 'object' ? (u?.userId || u?.id || u?._id) : u;
     switch (activeTab) {
       case "my":
@@ -141,16 +142,16 @@ export default function GoalsPage() {
       case "shared-with-me":
         return goals.filter((goal: any) => {
           const creator = goal.createdBy as any;
-          const creatorId = typeof creator === 'object' 
-            ? (creator?.userId || creator?.id || creator?._id) 
+          const creatorId = typeof creator === 'object'
+            ? (creator?.userId || creator?.id || creator?._id)
             : creator;
           return creatorId && creatorId !== currentUserId;
         });
       case "shared-by-me":
         return goals.filter((goal: any) => {
           const creator = goal.createdBy as any;
-          const creatorId = typeof creator === 'object' 
-            ? (creator?.userId || creator?.id || creator?._id) 
+          const creatorId = typeof creator === 'object'
+            ? (creator?.userId || creator?.id || creator?._id)
             : creator;
           const isOwnedByMe = !creatorId || creatorId === currentUserId;
           const otherOwners = goal.owners && goal.owners.filter((o: any) => getUserId(o) !== currentUserId).length > 0;
@@ -190,7 +191,7 @@ export default function GoalsPage() {
                       "h-4 w-4 transition-colors",
                       goal.isFavorite
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground group-hover:text-primary"
+                        : "text-muted-foreground group-hover:text-primary dark:group-hover:text-white"
                     )}
                   />
                 </button>
@@ -198,17 +199,25 @@ export default function GoalsPage() {
                 {/* Edit/Expand Button */}
                 <button
                   className="h-8 w-8 rounded-full flex items-center justify-center bg-muted/50 border border-border transition-colors group"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`/goals/${goal.id}`, '_blank');
+                  }}
                 >
-                  <BiExpandAlt className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <BiExpandAlt className="h-4 w-4 text-muted-foreground group-hover:text-primary dark:group-hover:text-white transition-colors" />
                 </button>
 
                 {/* Link Button */}
                 <button
                   className="h-8 w-8 rounded-full flex items-center justify-center bg-muted/50 border border-border transition-colors group"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const url = `${window.location.origin}/goals/${goal.id}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Link copied to clipboard!");
+                  }}
                 >
-                  <PiLinkSimple className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <PiLinkSimple className="h-4 w-4 text-muted-foreground group-hover:text-primary dark:group-hover:text-white transition-colors" />
                 </button>
 
 
@@ -247,7 +256,7 @@ export default function GoalsPage() {
       },
 
       // Sharing column — change text-right to text-center
-    // Created by column
+      // Created by column
       {
         accessorKey: "createdBy",
         header: () => <div className="text-left pl-2">Created by</div>,
@@ -257,9 +266,9 @@ export default function GoalsPage() {
             <div className="flex items-center gap-2 pl-2">
               <Avatar className="h-6 w-6 border border-border">
                 {creator.image && (
-                  <AvatarImage 
-                    src={creator.image.startsWith('http') || creator.image.startsWith('data:') ? creator.image : `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${creator.image}`} 
-                    alt={creator.name} 
+                  <AvatarImage
+                    src={creator.image.startsWith('http') || creator.image.startsWith('data:') ? creator.image : `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${creator.image}`}
+                    alt={creator.name}
                   />
                 )}
                 <AvatarFallback className="bg-muted text-muted-foreground text-[9px] font-medium">
@@ -273,7 +282,7 @@ export default function GoalsPage() {
       },
 
     ],
-    [toggleFavorite,workspaceMembers, currentUser, currentWorkspace]
+    [toggleFavorite, workspaceMembers, currentUser, currentWorkspace]
   );
 
   // if (isLoading) {
@@ -283,10 +292,10 @@ export default function GoalsPage() {
   //     </div>
   //   );
   // }
-  
-if (isLoading) {
-  return <GoalsSkeleton />  // ✅ Done!
-}
+
+  if (isLoading) {
+    return <GoalsSkeleton />  // ✅ Done!
+  }
 
   if (!isLoading && goals.length === 0) {
     return (
@@ -375,8 +384,12 @@ if (isLoading) {
                 fileSize={goal.fileSize || "2.1 KB"}
                 navigateTo={`/goals/${goal.id}`}
                 onToggleFavorite={(id) => toggleFavorite(id, currentWorkspace?.id)}
-                onShare={(id) => console.log("Share goal:", id)}
-                onMore={(id) => console.log("More options:", id)}
+                onShare={(id) => window.open(`/goals/${id}`, '_blank')}
+                onMore={(id) => {
+                  const url = `${window.location.origin}/goals/${id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Link copied to clipboard!");
+                }}
               />
             ))}
           </DashboardSection>
@@ -408,8 +421,12 @@ if (isLoading) {
               fileSize={goal.fileSize || "2.1 KB"}
               navigateTo={`/goals/${goal.id}`}
               onToggleFavorite={(id) => toggleFavorite(id, currentWorkspace?.id)}
-              onShare={(id) => console.log("Share goal:", id)}
-              onMore={(id) => console.log("More options:", id)}
+              onShare={(id) => window.open(`/goals/${id}`, '_blank')}
+              onMore={(id) => {
+                const url = `${window.location.origin}/goals/${id}`;
+                navigator.clipboard.writeText(url);
+                toast.success("Link copied to clipboard!");
+              }}
             />
           ))}
         </DashboardSection>

@@ -678,18 +678,18 @@ export default function GoalDetailPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="bg-primary/5 hover:bg-primary/15 h-8 w-8 rounded-full"
+                                        className="bg-primary-text/5 hover:bg-primary-text/15 h-8 w-8 rounded-full"
                                         onClick={() => toggleFavorite(goal.id, currentWorkspace?.id)}
                                     >
-                                        <Star className={cn("w-3.5 h-3.5 text-primary", goal.isFavorite && "fill-yellow-400 text-yellow-400")} />
+                                        <Star className={cn("w-3.5 h-3.5 text-primary-text", goal.isFavorite && "fill-yellow-400 text-yellow-400")} />
                                     </Button>
 
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="bg-primary/5 hover:bg-primary/15 h-8 w-8 rounded-full"
+                                        className="bg-primary-text/5 hover:bg-primary-text/15 h-8 w-8 rounded-full"
                                     >
-                                        <Share2 className="w-3.5 h-3.5 text-primary" />
+                                        <Share2 className="w-3.5 h-3.5 text-primary-text" />
                                     </Button>
 
                                     <DropdownMenu>
@@ -812,7 +812,7 @@ export default function GoalDetailPage() {
                                                 type="button"
                                                 className={cn(
                                                     "text-[13px] font-medium transition-colors text-left leading-tight mt-1",
-                                                    isCompleted ? "text-muted-foreground" : "text-primary font-semibold hover:underline underline-offset-2"
+                                                    isCompleted ? "text-muted-foreground" : "text-primary-text font-semibold hover:underline underline-offset-2"
                                                 )}
                                                 onClick={() => router.push(`/goals/create?previewGoalId=${goal.id}&focusField=${step.key}`)}
                                             >

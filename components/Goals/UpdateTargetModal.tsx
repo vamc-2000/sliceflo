@@ -8,9 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Loader } from "../Loader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useWorkspaceStore } from "@/stores/workspace-store";
+
 
 interface UpdateTargetModalProps {
   isOpen: boolean;
@@ -20,9 +23,78 @@ interface UpdateTargetModalProps {
 
 export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModalProps) {
   const { addTargetNote, fetchTargetsForGoal, targetsByGoal } = useGoalsStore();
+  const { workspaceMembers } = useWorkspaceStore();
+  const s3BaseUrl = process.env.NEXT_PUBLIC_S3_BASE_URL || "";
+
   const [currentValue, setCurrentValue] = useState(0);
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getTargetUserId = (item: any): string => {
+    if (typeof item === "string") return item;
+    if (typeof item === "object" && item !== null) {
+      return item.userId || item._id || item.id || "";
+    }
+    return "";
+  };
+
+  const getProfilePictureUrl = (profilePicture?: string | null) => {
+    if (!profilePicture) return undefined;
+    if (profilePicture.startsWith("http")) return profilePicture;
+    return `${s3BaseUrl}/${profilePicture}`;
+  };
+
+  const getUserInitials = (name?: string | null) => {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 1).toUpperCase();
+  };
+
+  const getAssigneeInfo = () => {
+    if (!target) return null;
+    const assignees = target.assignedTo
+      ? (Array.isArray(target.assignedTo) ? target.assignedTo : [target.assignedTo])
+      : [];
+
+    // Find the first valid assignee member
+    for (const item of assignees) {
+      const userId = getTargetUserId(item);
+      const member = workspaceMembers.find(
+        (m) => m.userId === userId || m._id === userId || m.id === userId
+      );
+      if (member) {
+        const name = member.name || member.user?.name || member.email || "Unknown User";
+        return {
+          name,
+          initials: getUserInitials(name),
+          image: getProfilePictureUrl(member.profilePicture || member.user?.avatar),
+        };
+      }
+    }
+
+    // Secondary fallback to createdBy
+    if (target.createdBy) {
+      const member = workspaceMembers.find(
+        (m) => m.userId === target.createdBy || m._id === target.createdBy || m.id === target.createdBy
+      );
+      if (member) {
+        const name = member.name || member.user?.name || member.email || "Unknown User";
+        return {
+          name,
+          initials: getUserInitials(name),
+          image: getProfilePictureUrl(member.profilePicture || member.user?.avatar),
+        };
+      }
+    }
+
+    return null;
+  };
+
+  const assigneeInfo = getAssigneeInfo();
+
 
   // Derive start/end from target value
   const getStartValue = () => {
@@ -120,9 +192,14 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
       <DialogContent className="max-w-xl bg-card text-card-foreground border-border" data-testid="update-target-modal">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center">
-              <span className="text-xs text-muted-foreground font-bold">{(target.label || "?").charAt(0).toUpperCase()}</span>
-            </div>
+            <Avatar className="w-10 h-10 border border-border">
+              {assigneeInfo?.image && (
+                <AvatarImage src={assigneeInfo.image} alt={assigneeInfo.name} />
+              )}
+              <AvatarFallback className="text-xs bg-muted text-muted-foreground font-bold">
+                {assigneeInfo ? assigneeInfo.initials : (target.label || "?").charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <span className="text-foreground" data-testid="target-title-display">{target.label}</span>
           </DialogTitle>
         </DialogHeader>
@@ -240,21 +317,22 @@ export function UpdateTargetModal({ isOpen, onClose, target }: UpdateTargetModal
           </div>
 
           {/* SAVE BUTTON */}
-          {isSubmitting ? (
-            <div className="flex justify-center py-2" data-testid="saving-loader">
-              <Loader message="Saving update..." size="sm" />
-            </div>
-          ) : (
-            <Button
-              className="w-full bg-primary text-primary-foreground hover:opacity-90"
-              size="lg"
-              onClick={handleSaveUpdate}
-              disabled={isSubmitting}
-              data-testid="target-save-btn"
-            >
-              Save update
-            </Button>
-          )}
+          <Button
+            className="w-full bg-primary text-primary-foreground hover:opacity-90 flex items-center justify-center gap-2"
+            size="lg"
+            onClick={handleSaveUpdate}
+            disabled={isSubmitting}
+            data-testid="target-save-btn"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Save update"
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

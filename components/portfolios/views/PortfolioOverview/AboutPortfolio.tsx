@@ -19,7 +19,8 @@ import AttachFileModal from "@/components/disucssions/AttachFileModal";
 import {
   Flag, User, CalendarIcon, Upload, Paperclip,
   Plus, Circle, FileText, SquareArrowOutUpRight, X,
-  Hexagon
+  Hexagon,
+  LoaderCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { formatLocalDate, convertSelectedDateToUTC, convertUTCToCalendarDate } from "@/utils/timezone-utils";
@@ -372,7 +373,7 @@ export default function AboutPortfolio({ portfolioId, workspaceId }: Props) {
           {/* ✅ Status - Left-Right Alignment */}
           <div className="flex items-center justify-between">
             <Label className="text-muted-foreground flex items-center gap-2 text-xs">
-              <Hexagon
+              <LoaderCircle
                 className="h-4 w-4"
               />
               Status

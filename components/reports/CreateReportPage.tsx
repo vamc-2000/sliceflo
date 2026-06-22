@@ -213,7 +213,7 @@ export default function CreateReportPage({
                     variant="ghost"
                     onClick={() => setPrivacy('private')}
                     className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${privacy === 'private'
-                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                       : 'text-[#8E8E93] dark:text-muted-foreground'
                       }`}
                   >
@@ -224,7 +224,7 @@ export default function CreateReportPage({
                     variant="ghost"
                     onClick={() => setPrivacy('public')}
                     className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${privacy === 'public'
-                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                      ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                       : 'text-[#8E8E93] dark:text-muted-foreground'
                       }`}
                   >
@@ -271,7 +271,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setApproveRequests('Me')}
                         className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${approveRequests === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
@@ -282,7 +282,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setApproveRequests('All team members')}
                         className={`flex-1 rounded border border-[#C7C7CC] dark:border-border transition-all duration-200 ${approveRequests === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
@@ -300,7 +300,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setEditTeamPage('Me')}
                         className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editTeamPage === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
@@ -311,7 +311,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setEditTeamPage('All team members')}
                         className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editTeamPage === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
@@ -329,7 +329,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setEditPrivacy('Me')}
                         className={`flex-1 rounded border border-[#8E8E93] dark:border-border transition-all duration-200 ${editPrivacy === 'Me'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >
@@ -340,7 +340,7 @@ export default function CreateReportPage({
                         variant="ghost"
                         onClick={() => setEditPrivacy('All team members')}
                         className={`flex-1 rounded-sm border border-[#8E8E93] dark:border-border transition-all duration-200 ${editPrivacy === 'All team members'
-                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary text-foreground bg-accent/40'
+                          ? 'border-b-2 border-b-[#001F3F] dark:border-b-primary-text text-foreground bg-accent/40'
                           : 'text-[#8E8E93] dark:text-muted-foreground'
                           }`}
                       >

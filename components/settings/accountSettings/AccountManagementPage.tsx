@@ -95,17 +95,17 @@ export default function AccountManagementPage() {
                 <div className="space-y-4">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 space-y-1">
-                            <h3 className="text-base font-semibold text-primary">
+                            <h3 className="text-base font-semibold text-foreground">
                                 Deactivate Account
                             </h3>
-                            <p className="text text-muted-foreground">
+                            <p className="text-sm text-foreground/70">
                                 You can remove access to all organizations and workspaces in SliceFlo.
                             </p>
                         </div>
                         <Button
                             onClick={() => setOpenDeactivateDialog(true)}
                             disabled={isDeactivating}
-                            className="bg-brand-orange/20 hover:bg-brand-orange/20 whitespace-nowrap w-[180px] h-12 text-brand-orange rounded-xl font-semibold text-[14px] disabled:opacity-50 transition-all shadow-none border-none"
+                            className="bg-brand-orange/20 text-brand-orange hover:bg-brand-orange/30 border border-transparent dark:bg-background dark:text-foreground dark:border-border dark:hover:bg-foreground dark:hover:text-background dark:hover:border-transparent whitespace-nowrap w-[180px] h-12 rounded-xl font-semibold text-[14px] disabled:opacity-50 transition-all shadow-none cursor-pointer"
                             data-testid="account-deactivate-btn"
                         >
                             {isDeactivating ? "Deactivating..." : "Deactivate Account"}
@@ -117,17 +117,17 @@ export default function AccountManagementPage() {
                 <div className="space-y-4">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 space-y-1">
-                            <h3 className="text-base font-semibold text-primary">
+                            <h3 className="text-base font-semibold text-foreground">
                                 Delete Account
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-foreground/70">
                                 Deleting your account will lose all your data, progress, files and team projects.
                             </p>
                         </div>
                         <Button
                             onClick={() => setOpenDeleteDialog(true)}
                             disabled={isDeleting}
-                            className="bg-[var(--logout-button)] hover:bg-[var(--logout-button)] whitespace-nowrap w-[180px] h-12 text-white rounded-xl font-semibold text-[14px] disabled:opacity-50 transition-all shadow-none border-none"
+                            className="bg-logout-button text-white hover:bg-logout-button/90 border border-transparent dark:bg-background dark:text-foreground dark:border-border dark:hover:bg-foreground dark:hover:text-background dark:hover:border-transparent whitespace-nowrap w-[180px] h-12 rounded-xl font-semibold text-[14px] disabled:opacity-50 transition-all shadow-none cursor-pointer"
                             data-testid="account-delete-btn"
                         >
                             {isDeleting ? "Deleting..." : "Delete Account"}
@@ -138,43 +138,43 @@ export default function AccountManagementPage() {
 
             {/* Deactivate Account Dialog - Custom Implementation */}
             <Dialog open={openDeactivateDialog} onOpenChange={setOpenDeactivateDialog}>
-                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border border-border/60 rounded-2xl shadow-2xl bg-background" data-testid="account-deactivate-dialog">
+                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border border-border/60 rounded-2xl shadow-2xl bg-background" showCloseButton={false} data-testid="account-deactivate-dialog">
                     <div className="p-8 space-y-7 relative">
                         {/* Custom Close Button */}
                         <button
                             onClick={() => setOpenDeactivateDialog(false)}
-                            className="absolute right-6 top-6 p-1 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                            className="absolute right-6 top-6 p-1 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                             data-testid="account-deactivate-dialog-close-btn"
                         >
                             <X className="w-5 h-5" />
                         </button>
-
+ 
                         <div className="space-y-6">
                             <DialogHeader className="space-y-4">
-                                <DialogTitle className="text-2xl font-bold text-[var(--primary)] dark:text-white text-left">
+                                <DialogTitle className="text-2xl font-bold text-foreground text-left">
                                     Account deactivation
                                 </DialogTitle>
-                                <DialogDescription className="text-[14px] text-foreground/90 font-medium leading-relaxed text-left">
+                                <DialogDescription className="text-[14px] text-muted-foreground font-medium leading-relaxed text-left">
                                     Deactivation is permanent and cannot be undone. Once your account is deactivated, you can no longer log in to any Organizations or Workspaces in SliceFlo. Please visit the SliceFlo Guide for more information.
                                 </DialogDescription>
                             </DialogHeader>
-
+ 
                             <div className="space-y-2">
                                 <Textarea
                                     placeholder="We're always looking for ways to improve SliceFlo. Please share your main reason for deactivating your account."
                                     value={deactivateReason}
                                     onChange={(e) => setDeactivateReason(e.target.value)}
-                                    className="min-h-[140px] border-border rounded-xl p-4 text-[14px] font-medium text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] shadow-none resize-none bg-background"
+                                    className="min-h-[140px] border-border rounded-xl p-4 text-[14px] font-medium text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-brand-orange focus:border-brand-orange dark:focus:ring-foreground dark:focus:border-foreground shadow-none resize-none bg-background"
                                     data-testid="account-deactivate-reason-input"
                                 />
                             </div>
-
+ 
                             <DialogFooter className="flex items-center justify-end gap-3 pt-4 sm:justify-end">
                                 <Button
                                     variant="outline"
                                     onClick={() => setOpenDeactivateDialog(false)}
                                     disabled={isDeactivating}
-                                    className="h-12 px-10 border-[var(--border)] rounded-xl text-[var(--muted-foreground)] font-bold text-[15px] hover:bg-[var(--muted)] shadow-none w-full sm:w-auto transition-colors"
+                                    className="h-12 px-10 border-border rounded-xl text-muted-foreground font-bold text-[15px] hover:bg-muted shadow-none w-full sm:w-auto transition-colors cursor-pointer"
                                     data-testid="account-deactivate-cancel-btn"
                                 >
                                     Cancel
@@ -182,7 +182,7 @@ export default function AccountManagementPage() {
                                 <Button
                                     onClick={handleDeactivateAccount}
                                     disabled={isDeactivating}
-                                    className="h-12 px-10 bg-[var(--logout-button)] hover:opacity-90 text-white rounded-xl font-bold text-[15px] shadow-none w-full sm:w-auto transition-all"
+                                    className="h-12 px-10 bg-brand-orange hover:bg-brand-orange/90 text-white border border-transparent dark:bg-background dark:text-foreground dark:border-border dark:hover:bg-foreground dark:hover:text-background dark:hover:border-transparent rounded-xl font-bold text-[15px] shadow-none w-full sm:w-auto transition-all cursor-pointer"
                                     data-testid="account-deactivate-confirm-btn"
                                 >
                                     {isDeactivating ? "Deactivating..." : "Deactivate"}
@@ -192,27 +192,27 @@ export default function AccountManagementPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-
+ 
             {/* Delete Account Dialog - Custom Implementation */}
             <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border border-border/60 rounded-2xl shadow-2xl bg-background" data-testid="account-delete-dialog">
+                <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border border-border/60 rounded-2xl shadow-2xl bg-background" showCloseButton={false} data-testid="account-delete-dialog">
                     <div className="p-8 space-y-7 relative flex flex-col items-center text-center">
                         {/* Custom Close Button */}
                         <button
                             onClick={() => setOpenDeleteDialog(false)}
-                            className="absolute right-6 top-6 p-1 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                            className="absolute right-6 top-6 p-1 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                             data-testid="account-delete-dialog-close-btn"
                         >
                             <X className="w-5 h-5" />
                         </button>
-
+ 
                         <div className="space-y-6 w-full flex flex-col items-center">
                             <DialogHeader className="space-y-4 items-center">
-                                <DialogTitle className="text-xl font-bold text-[var(--primary)] dark:text-white text-center max-w-[320px] leading-tight">
+                                <DialogTitle className="text-xl font-bold text-foreground text-center max-w-[320px] leading-tight">
                                     Are you sure want to delete your account?
                                 </DialogTitle>
                             </DialogHeader>
-
+ 
                             {/* Graphic Section */}
                             <div className="relative w-32 h-32 flex items-center justify-center">
                                 <Image
@@ -223,17 +223,17 @@ export default function AccountManagementPage() {
                                     className="object-contain"
                                 />
                             </div>
-
+ 
                             <DialogDescription className="text-[14px] text-muted-foreground font-medium leading-relaxed max-w-[380px] text-center">
                                 Deleting your account will lose all your data, progress, files and team projects, you can deactivate your account instead
                             </DialogDescription>
-
+ 
                             <DialogFooter className="flex flex-row items-center justify-center gap-3 pt-4 w-full sm:justify-center">
                                 <Button
                                     variant="outline"
                                     onClick={() => setOpenDeleteDialog(false)}
                                     disabled={isDeleting}
-                                    className="h-12 px-10 border-border rounded-xl text-muted-foreground font-bold text-[15px] hover:bg-muted shadow-none flex-1 transition-colors"
+                                    className="h-12 px-10 border-border rounded-xl text-muted-foreground font-bold text-[15px] hover:bg-muted shadow-none flex-1 transition-colors cursor-pointer"
                                     data-testid="account-delete-cancel-btn"
                                 >
                                     Cancel
@@ -241,7 +241,7 @@ export default function AccountManagementPage() {
                                 <Button
                                     onClick={handleDeleteAccount}
                                     disabled={isDeleting}
-                                    className="h-12 px-10 bg-[var(--logout-button)] hover:opacity-90 text-white rounded-xl font-bold text-[15px] shadow-none flex-1 transition-all"
+                                    className="h-12 px-10 bg-logout-button hover:bg-logout-button/90 text-white border border-transparent dark:bg-background dark:text-foreground dark:border-border dark:hover:bg-foreground dark:hover:text-background dark:hover:border-transparent rounded-xl font-bold text-[15px] shadow-none flex-1 transition-all cursor-pointer"
                                     data-testid="account-delete-confirm-btn"
                                 >
                                     {isDeleting ? "Deleting..." : "Delete Account"}

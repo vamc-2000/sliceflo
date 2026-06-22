@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Check } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -31,12 +31,12 @@ export const LabelPicker: React.FC<LabelPickerProps> = ({
 
   const labels = useMemo(
     () => currentWorkspace?.labels || [],
-    [currentWorkspace]
+    [currentWorkspace],
   );
 
   const filteredLabels = useMemo(() => {
     return labels.filter((label) =>
-      label.name.toLowerCase().includes(searchQuery.toLowerCase())
+      label.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [labels, searchQuery]);
 
@@ -52,7 +52,10 @@ export const LabelPicker: React.FC<LabelPickerProps> = ({
     <>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>{children}</PopoverTrigger>
-        <PopoverContent className="w-64 p-0 bg-popover border border-border border-b-[5px] border-b-primary" align="start">
+        <PopoverContent
+          className="w-64 p-0 bg-popover border border-border border-b-[5px] border-b-primary"
+          align="start"
+        >
           <div className="p-2 border-b border-border">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -67,32 +70,32 @@ export const LabelPicker: React.FC<LabelPickerProps> = ({
           </div>
           <div className="max-h-60 overflow-y-auto">
             {filteredLabels.length > 0 ? (
-              <div className="p-1">
+              <div className="p-1 space-y-1">
                 {filteredLabels.map((label) => {
                   const isSelected = selectedLabelIds.includes(label.id);
                   return (
                     <button
                       key={label.id}
                       onClick={() => handleToggleLabel(label.id)}
-                      className={`w-full flex items-center justify-between px-2 py-1.5 rounded-sm hover:bg-muted transition-colors text-left ${isSelected ? "bg-muted" : ""
-                        }`}
+                      className="w-full p-0 focus:outline-none block"
                     >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: label.color }}
-                        />
-                        <span className="text-[13px] text-foreground">{label.name}</span>
+                      <div
+                        className="w-full h-9 flex items-center justify-center rounded-xs text-white text-xs font-medium transition-opacity hover:opacity-90 px-3 relative"
+                        style={{ backgroundColor: label.color || "#c4c4c4" }}
+                      >
+                        {isSelected && (
+                          <Check className="h-3.5 w-3.5 absolute left-2 text-white" />
+                        )}
+                        <span className="truncate w-full text-center">
+                          {label.name}
+                        </span>
                       </div>
-                      {isSelected && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      )}
                     </button>
                   );
                 })}
               </div>
             ) : (
-              <div className="p-4 text-center text-[12px] text-muted-foreground">
+              <div className="p-4 text-center text-sm text-muted-foreground">
                 No labels found
               </div>
             )}
@@ -103,7 +106,7 @@ export const LabelPicker: React.FC<LabelPickerProps> = ({
                 setIsCreateModalOpen(true);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-muted transition-colors text-left text-[13px] text-primary font-medium"
+              className="w-full flex items-center justify-center h-9 gap-2 px-2 rounded-xs bg-muted hover:bg-muted/80 transition-colors text-xs text-primary-text font-medium"
             >
               <Plus className="h-3.5 w-3.5" />
               Create new label

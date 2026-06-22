@@ -56,7 +56,7 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
 
     return (
         <Dialog open={open} onOpenChange={handleCancel}>
-            <DialogContent className="sm:max-w-lg border-b-4 border-b-[#001F3F] dark:border-b-primary bg-background text-foreground border-border">
+            <DialogContent className="sm:max-w-lg border-b-4 border-b-[#001F3F] dark:border-b-primary-text bg-background text-foreground border-border">
                 <DialogHeader>
                     <DialogTitle className="text-foreground">Invite Members</DialogTitle>
                 </DialogHeader>
@@ -112,7 +112,7 @@ export default function InviteMembersModal({ open, onClose, onInviteData, existi
 
                     <div className="flex justify-end">
                         <div
-                            className="text-sm text-[#001F3F] dark:text-primary cursor-pointer hover:underline"
+                            className="text-sm text-primary-text cursor-pointer hover:underline"
                             onClick={() => setRows([...rows, { email: "", role: "" }])}
                         >
                             + Add more

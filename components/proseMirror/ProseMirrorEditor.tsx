@@ -124,7 +124,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                     keymap({
                         'Enter': (state, dispatch) => {
                             const { $from } = state.selection;
-                            
+
                             // Check if current node or parent is a task_item
                             let isTaskItem = false;
                             for (let d = $from.depth; d >= 0; d--) {
@@ -183,10 +183,10 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                 handleClick(view, pos, event) {
                     const { state } = view;
                     const mark = state.doc.resolve(pos).marks().find(m => m.type.name === 'link');
-                    
+
                     if (mark && mark.attrs.href) {
                         window.open(mark.attrs.href, mark.attrs.target || '_blank');
-                        return true; 
+                        return true;
                     }
                     return false;
                 },
@@ -215,7 +215,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                         if (target.getAttribute('type') === 'checkbox' || target.classList.contains('checkbox-inner') || target.closest('.task-item-checkbox')) {
                             const pos = view.posAtDOM(target, 0);
                             const $pos = view.state.doc.resolve(pos);
-                            
+
                             let taskItemPos = -1;
                             for (let d = $pos.depth; d >= 0; d--) {
                                 if ($pos.node(d).type.name === 'task_item') {
@@ -256,7 +256,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                     const newState = viewRef.current.state.apply(transaction);
                     viewRef.current.updateState(newState);
 
-                   
+
                     const mState = mentionPluginKey.getState(newState);
                     if (mState && mState.active && mState.range) {
                         const coords = viewRef.current?.coordsAtPos(mState.range.from);
@@ -307,7 +307,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
             console.error('Error initializing ProseMirror:', err);
             setError(err instanceof Error ? err.message : 'Failed to initialize editor');
         }
-    }, [isMounted, editable, initialContent]); 
+    }, [isMounted, editable, initialContent]);
 
     if (error) {
         return (
@@ -319,6 +319,36 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
         );
     }
 
+    // Helper to partition class names between wrapper and content container
+    const partitionClasses = (classesString: string) => {
+        if (!classesString) return { wrapperClass: '', innerClass: '' };
+        
+        const wrapperClasses: string[] = [];
+        const innerClasses: string[] = [];
+
+        const words = classesString.split(/\s+/).filter(Boolean);
+        for (const word of words) {
+            if (
+                word.startsWith('border') || 
+                word.startsWith('rounded') || 
+                word.startsWith('shadow') ||
+                word.includes('ring') ||
+                word.includes('focus')
+            ) {
+                wrapperClasses.push(word);
+            } else {
+                innerClasses.push(word);
+            }
+        }
+
+        return {
+            wrapperClass: wrapperClasses.join(' '),
+            innerClass: innerClasses.join(' ')
+        };
+    };
+
+    const { wrapperClass, innerClass } = partitionClasses(className);
+
     if (!isMounted) {
         return (
             <div className={`prose-mirror-wrapper border rounded-lg ${className}`}>
@@ -328,8 +358,8 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
     }
 
     return (
-        <div className="prose-mirror-wrapper bg-background overflow-hidden flex flex-col h-full">
-            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b">
+        <div className={`prose-mirror-wrapper bg-background overflow-hidden flex flex-col h-full ${wrapperClass}`}>
+            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
                 {isEditorReady ? (
                     <EditorToolbar view={viewRef.current} />
                 ) : (
@@ -343,7 +373,7 @@ export const ProseMirrorEditor: React.FC<ProseMirrorEditorProps> = ({
                 )}
             </div>
 
-            <div className={`relative ${className}`}>
+            <div className={`relative ${innerClass}`}>
                 <div
                     ref={editorRef}
                     className="prose-mirror-editor p-3 ProseMirror outline-none focus:outline-none focus-visible:outline-none"

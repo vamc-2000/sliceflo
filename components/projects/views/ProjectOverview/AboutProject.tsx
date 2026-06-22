@@ -539,18 +539,18 @@ export default function AboutProject({
       .find((p) => p.value === currentProject?.phase) ?? null;
 
   return (
-    <div className="space-y-3">
+    <div>
       {/* Project Details */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsProjectDetailsExpanded(!isProjectDetailsExpanded)}
+        >
           <h3 className="text-sm font-semibold">Project Details</h3>
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
-            onClick={() =>
-              setIsProjectDetailsExpanded(!isProjectDetailsExpanded)
-            }
+            className="h-6 w-6 pointer-events-none"
           >
             <ChevronDown
               className={cn(
@@ -977,37 +977,39 @@ export default function AboutProject({
         </div>
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       {/* Workspace Custom Fields - Left-Right Alignment */}
-      {workspaceCustomFields.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Custom Fields</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsCustomFieldsExpanded(!isCustomFieldsExpanded)}
-            >
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  isCustomFieldsExpanded ? "rotate-180" : "rotate-0",
-                )}
-              />
-            </Button>
-          </div>
-
-          <div
-            className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
-              isCustomFieldsExpanded
-                ? "max-h-[1000px] opacity-100"
-                : "max-h-0 opacity-0 pointer-events-none !mt-0",
-            )}
+      <div className="space-y-2">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsCustomFieldsExpanded(!isCustomFieldsExpanded)}
+        >
+          <h3 className="text-sm font-semibold">Custom Fields</h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 pointer-events-none"
           >
-            {workspaceCustomFields.map((field) => {
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform duration-200",
+                isCustomFieldsExpanded ? "rotate-180" : "rotate-0",
+              )}
+            />
+          </Button>
+        </div>
+
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden space-y-2",
+            isCustomFieldsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none !mt-0",
+          )}
+        >
+          {workspaceCustomFields.length > 0 ? (
+            workspaceCustomFields.map((field) => {
               const fieldId = field._id || "";
               const fieldKey = field.name || field.label || "";
               const currentValue = projectCustomFieldValues[fieldKey] ?? "";
@@ -1222,32 +1224,40 @@ export default function AboutProject({
                   ) && <span className="text-xs text-muted-foreground">—</span>}
                 </div>
               );
-            })}
-          </div>
+            })
+          ) : (
+            <div className="text-xs text-muted-foreground italic text-center py-2">
+              No custom fields in workspace
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       {/* Labels */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Labels</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">Labels</Label>
           <div className="flex items-center gap-1">
-            <LabelPicker
-              selectedLabelIds={assignedLabels.map((l) => l.id)}
-              onSelect={handleSelectLabel}
-              onRemove={handleRemoveLabel}
-            >
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <Plus className="h-3 w-3" />
-              </Button>
-            </LabelPicker>
+            <div onClick={(e) => e.stopPropagation()}>
+              <LabelPicker
+                selectedLabelIds={assignedLabels.map((l) => l.id)}
+                onSelect={handleSelectLabel}
+                onRemove={handleRemoveLabel}
+              >
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </LabelPicker>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown
                 className={cn(
@@ -1285,12 +1295,17 @@ export default function AboutProject({
         </div>
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       {/* About this Project */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">About this Project</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsAboutProjectExpanded(!isAboutProjectExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">
+            About this Project
+          </Label>
           <div className="flex items-center gap-2">
             {charCount > 0 && (
               <span className="text-xs text-muted-foreground">
@@ -1300,8 +1315,7 @@ export default function AboutProject({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAboutProjectExpanded(!isAboutProjectExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown
                 className={cn(
@@ -1336,109 +1350,113 @@ export default function AboutProject({
         </div>
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       {/* Linked Items Section */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Linked Items</Label>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
+        >
+          <Label className="font-semibold cursor-pointer">Linked Items</Label>
           <div className="flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-0">
-                {linkedDocs.length > 0 && (
-                  <>
-                    <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
-                      Linked Documents
-                    </div>
-                    {/* linked docs */}
-                    <div className="max-h-48 overflow-y-auto p-2">
-                      {linkedDocs.map((doc) => (
-                        <DropdownMenuItem
-                          key={doc.id}
-                          className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
-                          onSelect={(e) => e.preventDefault()}
-                        >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <span className="truncate text-xs">
-                              {doc.title}
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveDocument(doc.id);
-                            }}
-                          >
-                            <X className="w-3 h-3 text-red-500" />
-                          </Button>
-                        </DropdownMenuItem>
-                      ))}
-                    </div>
-                    <div className="h-px bg-border" />
-                  </>
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
-                      <Plus className="w-4 h-4 text-muted-foreground" />
-                      <span>Link Docs</span>
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    side="right"
-                    className="w-56 p-0"
-                  >
-                    {availableDocs.length > 0 ? (
-                      <>
-                        {/* Fixed header outside scroll */}
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
-                          Available Documents
-                        </div>
-                        {/* Single scroll container */}
-                        <div className="max-h-52 overflow-y-auto">
-                          {availableDocs.map((doc) => (
-                            <DropdownMenuItem
-                              key={doc.id}
-                              onClick={() => handleAddDocument(doc.id)}
-                              className="cursor-pointer px-2 py-2"
-                            >
-                              <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
-                              <span className="truncate">{doc.title}</span>
-                            </DropdownMenuItem>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="p-4 text-xs text-muted-foreground text-center">
-                        No documents available to link
+            <div onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 p-0">
+                  {linkedDocs.length > 0 && (
+                    <>
+                      <div className="px-2 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
+                        Linked Documents
                       </div>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      {/* linked docs */}
+                      <div className="max-h-48 overflow-y-auto p-2">
+                        {linkedDocs.map((doc) => (
+                          <DropdownMenuItem
+                            key={doc.id}
+                            className="cursor-pointer flex items-center justify-between group px-2 py-2 hover:bg-muted"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                              <span className="truncate text-xs">
+                                {doc.title}
+                              </span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveDocument(doc.id);
+                              }}
+                            >
+                              <X className="w-3 h-3 text-red-500" />
+                            </Button>
+                          </DropdownMenuItem>
+                        ))}
+                      </div>
+                      <div className="h-px bg-border" />
+                    </>
+                  )}
 
-                {linkedDocs.length === 0 && (
-                  <div className="px-2 py-1 text-xs text-muted-foreground italic">
-                    No documents linked yet
-                  </div>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer text-xs text-foreground mx-1 my-1">
+                        <Plus className="w-4 h-4 text-muted-foreground" />
+                        <span>Link Docs</span>
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      side="right"
+                      className="w-56 p-0"
+                    >
+                      {availableDocs.length > 0 ? (
+                        <>
+                          {/* Fixed header outside scroll */}
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase border-b border-border">
+                            Available Documents
+                          </div>
+                          {/* Single scroll container */}
+                          <div className="max-h-52 overflow-y-auto">
+                            {availableDocs.map((doc) => (
+                              <DropdownMenuItem
+                                key={doc.id}
+                                onClick={() => handleAddDocument(doc.id)}
+                                className="cursor-pointer px-2 py-2"
+                              >
+                                <FileText className="w-4 h-4 mr-2 text-muted-foreground" />
+                                <span className="truncate">{doc.title}</span>
+                              </DropdownMenuItem>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-4 text-xs text-muted-foreground text-center">
+                          No documents available to link
+                        </div>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {linkedDocs.length === 0 && (
+                    <div className="px-2 py-1 text-xs text-muted-foreground italic">
+                      No documents linked yet
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsLinkedItemsExpanded(!isLinkedItemsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown
                 className={cn(
@@ -1499,13 +1517,16 @@ export default function AboutProject({
         </div>
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       {/* Attachments */}
-      <div className="space-y-3 ">
-        <div className="flex items-center justify-between">
+      <div className="space-y-2">
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+        >
           <div className="flex items-center gap-2">
-            <Label className="font-semibold">Attachments</Label>
+            <Label className="font-semibold cursor-pointer">Attachments</Label>
 
             {projectAttachments.length > 0 && (
               <span className="text-xs text-muted-foreground">
@@ -1518,7 +1539,10 @@ export default function AboutProject({
             {projectAttachments.length > 0 && (
               <button
                 type="button"
-                onClick={() => setIsAttachModalOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAttachModalOpen(true);
+                }}
                 className="p-2 rounded-md bg-muted hover:bg-muted transition"
               >
                 <Paperclip className="h-5 w-5 text-muted-foreground" />
@@ -1527,8 +1551,7 @@ export default function AboutProject({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
-              onClick={() => setIsAttachmentsExpanded(!isAttachmentsExpanded)}
+              className="h-6 w-6 pointer-events-none"
             >
               <ChevronDown
                 className={cn(

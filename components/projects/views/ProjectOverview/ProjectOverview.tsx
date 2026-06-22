@@ -50,6 +50,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, History, Paperclip } from "lucide-react";
 import StatusHistoryModal from "./StatusHistoryModal";
 
+const getStatusStyles = (color?: string) => {
+  const baseColor = color || "#c4c4c4";
+  if (baseColor.startsWith("#") && baseColor.length === 7) {
+    return {
+      backgroundColor: `${baseColor}33`, // 20% opacity background
+      color: baseColor,
+    };
+  }
+  return {
+    backgroundColor: baseColor,
+    color: "#fff",
+  };
+};
+
 interface ProjectOverviewProps {
   project?: any;
   activeTab?: string;
@@ -397,13 +411,12 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 px-3 hover:opacity-90 text-xs font-semibold capitalize flex items-center gap-1.5 text-foreground rounded-sm cursor-pointer"
-                              style={{
-                                backgroundColor:
-                                  statusConfigs.find(
-                                    (c: any) => c.value === selectedStatus,
-                                  )?.color || "#c4c4c4",
-                              }}
+                              className="h-8 px-3 hover:opacity-90 text-xs font-semibold capitalize flex items-center gap-1.5 rounded-sm cursor-pointer"
+                              style={getStatusStyles(
+                                statusConfigs.find(
+                                  (c: any) => c.value === selectedStatus,
+                                )?.color,
+                              )}
                             >
                               <span>
                                 {statusConfigs.find(
@@ -426,10 +439,8 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                 className="p-0 focus:bg-transparent"
                               >
                                 <div
-                                  className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
-                                  style={{
-                                    backgroundColor: level.color || "#c4c4c4",
-                                  }}
+                                  className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                  style={getStatusStyles(level.color)}
                                 >
                                   <span>{level.label}</span>
                                 </div>
@@ -492,11 +503,10 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 px-3 rounded-sm hover:opacity-90 text-xs font-semibold capitalize flex items-center gap-1.5 text-foreground cursor-pointer border border-transparent shadow-none"
-                                  style={{
-                                    backgroundColor:
-                                      latestStatusConfig?.color || "#c4c4c4",
-                                  }}
+                                  className="h-8 px-3 rounded-sm hover:opacity-90 text-xs font-semibold capitalize flex items-center gap-1.5 cursor-pointer"
+                                  style={getStatusStyles(
+                                    latestStatusConfig?.color,
+                                  )}
                                 >
                                   <span>
                                     {latestStatusConfig?.label ||
@@ -518,11 +528,10 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                                     className="p-0 focus:bg-transparent"
                                   >
                                     <div
-                                      className="w-full h-9 flex items-center justify-center rounded-xs text-foreground text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
-                                      style={{
-                                        backgroundColor:
-                                          level.color || "#c4c4c4",
-                                      }}
+                                      className="w-full h-9 flex items-center justify-center rounded-xs text-xs font-semibold transition-opacity hover:opacity-90 px-3 cursor-pointer"
+                                      style={getStatusStyles(
+                                        level.color,
+                                      )}
                                     >
                                       <span>{level.label}</span>
                                     </div>
@@ -562,23 +571,12 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                     <>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {statusConfigs.map((config: any) => {
-                          const isActive =
-                            project?.currentProjectUpdate === config.value;
                           return (
                             <Button
                               key={config._id || config.value}
                               variant="ghost"
-                              className={cn(
-                                "h-12 transition-all duration-200 flex items-center justify-center rounded-md font-semibold text-xs border relative hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-foreground",
-                                isActive
-                                  ? "shadow-sm border-transparent"
-                                  : "hover:bg-muted bg-secondary text-muted-foreground",
-                              )}
-                              style={{
-                                backgroundColor: isActive
-                                  ? config.color || "#c4c4c4"
-                                  : undefined,
-                              }}
+                              className="h-12 transition-all duration-200 flex items-center justify-center rounded-md font-semibold text-xs relative hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm hover:opacity-90"
+                              style={getStatusStyles(config.color)}
                               onClick={() =>
                                 handleStatusButtonClick(config.value)
                               }

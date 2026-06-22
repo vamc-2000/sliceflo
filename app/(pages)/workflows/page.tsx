@@ -395,7 +395,7 @@ const WorkflowsPage = () => {
                                                 {/* Name + Project badge */}
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                                                        <h3 className="font-bold text-foreground group-hover:text-primary dark:group-hover:text-white transition-colors">
                                                             {automation.name}
                                                         </h3>
                                                         {project && (

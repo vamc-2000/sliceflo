@@ -122,7 +122,7 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => { setShowAddInterface(false); setSearchQuery(""); }}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        className="p-1 hover:bg-muted rounded"
                         data-testid="back-button"
                     >
                         <ChevronRight className="h-4 w-4 rotate-180" />
@@ -150,11 +150,11 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                         filteredAvailable.map((member: any) => {
                             const memberId = member.userId || member.id;
                             return (
-                                <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`available-member-item-${memberId}`}>
+                                <div key={memberId} className="flex items-center justify-between p-2 hover:bg-muted rounded-md transition-colors" data-testid={`available-member-item-${memberId}`}>
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Avatar className="h-8 w-8 shrink-0" data-testid={`available-member-avatar-${memberId}`}>
                                             <AvatarImage src={member.image} />
-                                            <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                            <AvatarFallback className="text-[10px] bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400">
                                                 {member.initials}
                                             </AvatarFallback>
                                         </Avatar>
@@ -194,20 +194,20 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                             return (
                                 <Avatar
                                 key={memberId}
-                                    className="h-7 w-7 border-2 border-white ring-1 ring-gray-200"
+                                    className="h-7 w-7 border-2 border-white dark:border-background ring-1 ring-gray-200 dark:ring-border"
                                     style={{ zIndex: index + 1 }}
                                     data-testid={`member-avatar-${memberId}`}
                                 >
                                     <AvatarImage src={member.image} alt={member.name} />
-                                    <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                    <AvatarFallback className="text-[10px] bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400">
                                         {member.initials}
                                     </AvatarFallback>
                                 </Avatar>
                             );
                         })}
                         {memberDetails.length > 4 && (
-                            <div className="h-7 w-7 rounded-full bg-gray-100 border-2 border-white ring-1 ring-gray-200 flex items-center justify-center" style={{ zIndex: 5 }} data-testid="members-extra-count">
-                                <span className="text-[10px] font-medium text-gray-600">+{memberDetails.length - 4}</span>
+                            <div className="h-7 w-7 rounded-full bg-gray-100 dark:bg-muted border-2 border-white dark:border-background ring-1 ring-gray-200 dark:ring-border flex items-center justify-center" style={{ zIndex: 5 }} data-testid="members-extra-count">
+                                <span className="text-[10px] font-medium text-gray-600 dark:text-muted-foreground">+{memberDetails.length - 4}</span>
                             </div>
                         )}
                     </div>
@@ -234,11 +234,11 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                     filteredCurrent.map((member: any) => {
                         const memberId = member.userId || member.id;
                         return (
-                            <div key={memberId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md transition-colors" data-testid={`assigned-member-item-${memberId}`}>
+                            <div key={memberId} className="flex items-center justify-between p-2 hover:bg-muted rounded-md transition-colors" data-testid={`assigned-member-item-${memberId}`}>
                                 <div className="flex items-center gap-3 min-w-0">
                                     <Avatar className="h-8 w-8 shrink-0" data-testid={`assigned-member-avatar-${memberId}`}>
                                         <AvatarImage src={member.image} />
-                                        <AvatarFallback className="text-[10px] bg-orange-100 text-orange-700">
+                                        <AvatarFallback className="text-[10px] bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400">
                                             {member.initials}
                                         </AvatarFallback>
                                     </Avatar>
@@ -270,7 +270,7 @@ const DocMembersSection: React.FC<DocMembersSectionProps> = ({
                     variant="default"
                     size="sm"
                     onClick={() => setShowAddInterface(true)}
-                    className="bg-[#001F3F] hover:bg-[#001F3F]/90 text-white text-xs h-8"
+                    className="bg-[#001F3F] dark:bg-primary hover:bg-[#001F3F]/90 dark:hover:bg-primary/90 text-white dark:text-primary-foreground text-xs h-8"
                     data-testid="open-add-interface-btn"
                 >
                     <Plus className="h-3 w-3 mr-1" />

@@ -335,14 +335,14 @@ const onDataImported = useCallback(async (uploadData: any) => {
                   <td className="border border-border px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        className="p-2 hover:bg-gray-100 rounded transition-colors"
+                        className="p-2 hover:bg-muted rounded transition-colors"
                         onClick={() => toast("info", { title: "Info", description: item.importedNumber })}
                         data-testid={`import-auth-import-view-btn-${item.id}`}
                       >
                         <Eye className="w-4 h-4 text-brand" />
                       </button>
                       <button
-                        className="p-2 hover:bg-gray-100 rounded transition-colors"
+                        className="p-2 hover:bg-muted rounded transition-colors"
                         onClick={() => {
                           if (item.id.startsWith("s")) {
                             toast("error", { title: "Error", description: "Cannot delete static records" });
@@ -458,7 +458,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                     </thead>
                     <tbody>
                       {exports.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 transition-colors" data-testid={`import-auth-export-row-${item.id}`}>
+                        <tr key={item.id} className="hover:bg-muted transition-colors" data-testid={`import-auth-export-row-${item.id}`}>
                           <td className="border border-border px-4 py-3 text-sm text-foreground font-medium">
                             {item.projectName}
                           </td>
@@ -510,7 +510,7 @@ const onDataImported = useCallback(async (uploadData: any) => {
                   </table>
                 </div>
               ) : (
-                <div className="text-center py-6 text-sm text-gray-500 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                <div className="text-center py-6 text-sm text-muted-foreground bg-muted/30 rounded-lg border border-dashed border-border">
                   No export runs found yet.
                 </div>
               )}

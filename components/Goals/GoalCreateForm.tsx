@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/sonner";
 import { Goal, GoalFormData, GoalTarget } from "@/types/goal.types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
@@ -429,23 +429,23 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                             .substring(0, 2)
                             .toUpperCase() || "?";
                         return (
-                            <Avatar key={member.id} className="h-8 w-8 border-[2px] border-white bg-card shadow-sm shrink-0">
+                            <Avatar key={member.id} className="h-8 w-8 border-[2px] border-card bg-card shadow-sm shrink-0">
                                 {member.avatar && <AvatarImage src={member.avatar} alt={member.name} />}
-                                <AvatarFallback className="bg-orange-100 text-orange-600 text-[10px] font-semibold">
+                                <AvatarFallback className="bg-orange-100 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-[10px] font-semibold">
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>
                         );
                     })}
                     {extraCount > 0 && (
-                        <div className="h-8 w-8 rounded-full border-[2px] border-white bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shadow-sm z-10 shrink-0">
+                        <div className="h-8 w-8 rounded-full border-[2px] border-card bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shadow-sm z-10 shrink-0">
                             +{extraCount}
                         </div>
                     )}
                     <button
                         type="button"
                         onClick={onAddClick}
-                        className="h-8 w-8 rounded-full bg-[#001F3F] border-[2px] border-white hover:opacity-90 flex items-center justify-center text-white shadow-sm z-10 shrink-0 transition-opacity"
+                        className="h-8 w-8 rounded-full bg-[#001F3F] dark:bg-primary border-[2px] border-card hover:opacity-90 flex items-center justify-center text-white shadow-sm z-10 shrink-0 transition-opacity"
                     >
                         <Users size={14} />
                     </button>
@@ -755,14 +755,11 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0 bg-card border-border" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={endDate}
-                                            onSelect={handleEndDateSelect}
+                                        <CalendarPicker
+                                            selectedDate={endDate}
+                                            onDateSelect={handleEndDateSelect}
                                             disabled={(date) => date < new Date()}
-                                            initialFocus
                                             className="bg-card text-foreground"
-                                            data-testid="goal-end-date-calendar"
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -790,7 +787,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                 onBlur={(content) => setFormData({ ...formData, description: content })}
                                 placeholder="Describe your goal in detail..."
                                 className={cn(
-                                    "min-h-[140px] bg-card text-foreground transition-all duration-300",
+                                    "h-[240px] overflow-y-auto bg-background text-foreground transition-all duration-300 border border-border rounded-md",
                                     highlightedField === 'name' && "border-2 border-blue-500 focus:ring-blue-500"
                                 )}
                             />
@@ -901,7 +898,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                         variant="outline"
                                         onClick={() => handleVisibilityChange("private")}
                                         className={`px-4 py-2 h-auto text-sm transition-all ${formData.visibility === "private"
-                                            ? "border-b-[3px] border-b-primary bg-muted/50"
+                                            ? "border-b-[3px] border-b-primary-text bg-muted/50"
                                             : "bg-card hover:bg-muted"
                                             }`}
                                         data-testid="visibility-private-button"
@@ -914,7 +911,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                         variant="outline"
                                         onClick={() => handleVisibilityChange("team")}
                                         className={`px-4 py-2 h-auto text-sm transition-all ${formData.visibility === "team"
-                                            ? "border-b-[3px] border-b-primary bg-muted/50"
+                                            ? "border-b-[3px] border-b-primary-text bg-muted/50"
                                             : "bg-card hover:bg-muted"
                                             }`}
                                         data-testid="visibility-teams-button"
@@ -927,7 +924,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                         variant="outline"
                                         onClick={() => handleVisibilityChange("organization")}
                                         className={`px-4 py-2 h-auto text-sm transition-all ${formData.visibility === "organization"
-                                            ? "border-b-[3px] border-b-primary bg-muted/50"
+                                            ? "border-b-[3px] border-b-primary-text bg-muted/50"
                                             : "bg-card hover:bg-muted"
                                             }`}
                                         data-testid="visibility-workspace-button"
@@ -943,37 +940,23 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                             </div>
 
                             {formData.visibility === "private" && (
-                                <div
-                                    className="rounded-md p-2 border border-orange-200/20 bg-orange-500/10"
-                                    data-testid="private-goal-owner-section"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div className="relative">
-                                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 p-[2px] shadow-sm">
-                                                <Avatar className="w-full h-full border-none">
-                                                    <AvatarImage
-                                                        src={currentUser?.profilePictureUrl}
-                                                        alt={currentUser?.name || "You"}
-                                                    />
-                                                    <AvatarFallback className="bg-orange-500 text-white flex items-center justify-center text-xs font-semibold">
-                                                        {currentUser?.name?.[0] || currentUser?.email?.[0] || '?'}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            </div>
-                                        </div>
+                                <div className="flex justify-between items-start gap-6">
+                                    <div className="flex-1">
+                                        <p className="text-sm text-muted-foreground pt-3">Only visible to</p>
+                                    </div>
 
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-medium text-gray-900 truncate">
-                                                {currentUser?.name || 'You'}
-                                            </p>
-                                            <p className="text-[10px] text-gray-600 truncate">
-                                                {currentUser?.email}
-                                            </p>
+                                    <div className="flex-1 max-w-md space-y-2 flex justify-end pt-2" data-testid="private-goal-owner-section">
+                                        <div className="flex items-center -space-x-3.5 text-foreground">
+                                            <Avatar className="h-8 w-8 border-[2px] border-card bg-card shadow-sm shrink-0">
+                                                <AvatarImage
+                                                    src={getProfilePictureUrl(selectedOwner?.profilePicture || currentUser?.profilePictureUrl)}
+                                                    alt={selectedOwner?.name || currentUser?.name || "You"}
+                                                />
+                                                <AvatarFallback className="bg-orange-100 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-[10px] font-semibold">
+                                                    {(selectedOwner?.name || currentUser?.name || "You").charAt(0).toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
                                         </div>
-
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium flex-shrink-0">
-                                            Owner
-                                        </span>
                                     </div>
                                 </div>
                             )}
@@ -1129,7 +1112,7 @@ export function GoalCreateForm({ teamId: propTeamId }: { teamId?: string }) {
                                                                                                         <div className="flex items-center gap-2 min-w-0">
                                                                                                             <Avatar className="h-7 w-7">
                                                                                                                 <AvatarImage src={member.avatar} alt={member.name} />
-                                                                                                                <AvatarFallback className="bg-yellow-100 text-orange-600 text-[11px] font-semibold">
+                                                                                                                <AvatarFallback className="bg-yellow-100 dark:bg-yellow-950/40 text-orange-600 dark:text-orange-400 text-[11px] font-semibold">
                                                                                                                     {initials}
                                                                                                                 </AvatarFallback>
                                                                                                             </Avatar>

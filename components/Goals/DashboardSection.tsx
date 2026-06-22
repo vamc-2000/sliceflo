@@ -74,7 +74,7 @@ export const DashboardSection = ({
                   </div>
 
                   {/* Items List */}
-                  <div className="max-h-[300px] overflow-y-auto">
+                  <div className="max-h-[300px] overflow-y-auto scrollbar-thin">
                     {allItems.map((item, index) => (
                       <div
                         key={item.id || index}
@@ -125,7 +125,7 @@ export const DashboardSection = ({
       </div>
 
       {/* Cards Container */}
-      <div className="overflow-x-auto pb-1 -mx-0 py-1">
+      <div className="overflow-x-auto pb-1 -mx-0 py-1 scrollbar-thin">
         <div className="flex gap-4 min-w-min">
           {children || (
             <div className="w-full py-8 text-center">

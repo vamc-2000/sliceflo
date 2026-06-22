@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import {
   Share2, Tag, MessageSquareText, SquareArrowOutUpRight,
-  Expand, MoreHorizontal, X, Edit, Copy, Star, Link,
+  Expand, Minimize, MoreHorizontal, X, Edit, Copy, Star, Link,
   FileText, Zap, Download, Upload, History, Activity,
   Bell, Lock, Globe, Archive, Trash2, Shield, ChevronLeft, ChevronRight,
   CopyPlus, Link as LinkIcon, Plus,
@@ -1847,7 +1847,7 @@ export default function DocsLayout({
             className="p-3 text-muted-foreground hover:text-foreground hover:bg-muted"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
-            <Expand className="w-4 h-4" />
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Expand className="w-4 h-4" />}
           </Button>
 
           {/* More Options Dropdown (3 dots) */}
@@ -2456,16 +2456,7 @@ export default function DocsLayout({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Close Icon */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-3 text-muted-foreground hover:text-foreground hover:bg-muted"
-            title="Close"
-            onClick={handleClose}
-          >
-            <X className="w-4 h-4" />
-          </Button>
+        
         </div>
       </div>
 
