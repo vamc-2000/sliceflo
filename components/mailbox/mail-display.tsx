@@ -26,6 +26,7 @@ import ShadContextMenu from "./ContextMenu";
 import SnoozeButton from "./SnoozeButton";
 import EmptyMailbox from "./EmptyMailbox";
 import { toast } from "sonner";
+import { formatMailboxDate } from "@/utils/timezone-utils";
 
 interface MailDisplayProps {
   mail: Email | null
@@ -158,7 +159,7 @@ export default function MailDisplay({ mail }: MailDisplayProps) {
 
               {mail.createdAt && (
                 <div data-testid="mail-date" className="ml-auto text-xs text-muted-foreground">
-                  {formatLocalDate(mail.createdAt)}, {formatLocalTime(mail.createdAt)}
+                  {formatMailboxDate(mail.createdAt)}
                 </div>
               )}
             </div>

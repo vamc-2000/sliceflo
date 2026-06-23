@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Email } from "@/types/mailbox.types";
 import ProfileModal from "./ProfileModal";
 import { useProfileStore } from "@/stores/profile-store";
-import { formatLocalDate, formatLocalTime } from "@/utils/timezone-utils";
+import { formatLocalDate, formatLocalTime, formatMailboxDate } from "@/utils/timezone-utils";
 
 interface MailListProps {
   emails: Email[];
@@ -154,7 +154,7 @@ const MailList: React.FC<MailListProps> = ({
                 <div data-testid={`mail-list-item-date-${email._id}`} className="flex items-center shrink-0">
                   {email.createdAt && (
                     <span className="text-xs text-muted-foreground">
-                      {formatLocalDate(email.createdAt)}, {formatLocalTime(email.createdAt)}
+                      {formatMailboxDate(email.createdAt)}
                     </span>
                   )}
                 </div>

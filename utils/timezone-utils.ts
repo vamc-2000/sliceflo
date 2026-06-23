@@ -196,3 +196,23 @@ export function isWeekend(date: Date): boolean {
   const indices = getWeekendDaysIndices();
   return indices.includes(date.getDay());
 }
+
+
+export function formatMailboxDate(
+  dateInput: Date | string | number | null | undefined
+): string {
+  if (!dateInput) return "—";
+
+  const parts = getLocalDateParts(dateInput);
+  if (!parts) return "—";
+
+  const { day, month, hours, minutes } = parts;
+
+  const hh = hours % 12 || 12;
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  return `${day} ${MONTH_NAMES_SHORT[month]} ${String(hh).padStart(
+    2,
+    "0"
+  )}:${String(minutes).padStart(2, "0")} ${ampm}`;
+}
